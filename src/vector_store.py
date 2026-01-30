@@ -15,7 +15,7 @@ class VectorStoreManager:
         
         safe_table_name = create_vector_table(table_name, self.dimension)
         
-        chunks = process_pdf_binary(pdf_bytes)
+        chunks = process_pdf_binary(pdf_bytes, filename=file_name)
         
         if not chunks:
             return {

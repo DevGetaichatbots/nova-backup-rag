@@ -8,16 +8,17 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Vector Store**: Supabase with pgvector extension
 - **Embeddings**: Azure OpenAI text-embedding-3-small
 - **LLM**: Azure OpenAI GPT model
-- **PDF Processing**: pypdf + LangChain text splitters
+- **PDF Processing**: Azure Document Intelligence OCR (primary) + pypdf fallback + LangChain text splitters
 
 ## Project Structure
 ```
 src/
 ├── __init__.py        # Package init
 ├── config.py          # Configuration and settings
-├── database.py        # Supabase/PostgreSQL database operations
+├── database.py        # Supabase/PostgreSQL database operations with SQL injection protection
 ├── embeddings.py      # Azure OpenAI embedding generation
-├── pdf_processor.py   # PDF binary processing and text extraction
+├── azure_ocr.py       # Azure Document Intelligence OCR for PDF table extraction
+├── pdf_processor.py   # PDF processing with Azure OCR (primary) + pypdf fallback
 ├── vector_store.py    # Vector store management
 ├── agent.py           # RAG agent with dual vector store querying
 └── main.py            # FastAPI application
@@ -31,7 +32,7 @@ src/
 ## Flow
 1. User uploads PDF files via `/upload` with a `session_id`
 2. Each PDF gets its own vector store table (e.g., `vs_{session_id}_{filename}`)
-3. Binary PDF is parsed using pypdf (no separate OCR needed)
+3. Binary PDF is parsed using Azure Document Intelligence OCR (with pypdf fallback)
 4. Text is chunked and embedded via Azure OpenAI
 5. Embeddings stored in Supabase pgvector
 6. User queries via `/query` with list of vector store tables
@@ -42,10 +43,13 @@ src/
 - `SUPABASE_SERVICE_KEY` - Supabase service role key
 - `SUPABASE_DB_HOST` - Database host
 - `SUPABASE_DB_PASSWORD` - Database password
+- `SUPABASE_POOLER_URL` - Supabase connection pooler URL (port 6543)
 - `AZURE_OPENAI_API_KEY` - Azure OpenAI API key
 - `AZURE_OPENAI_ENDPOINT` - Azure OpenAI endpoint
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` - Embedding model deployment name
 - `AZURE_OPENAI_CHAT_DEPLOYMENT` - Chat model deployment name
+- `AZURE_DOC_INTELLIGENCE_ENDPOINT` - Azure Document Intelligence endpoint
+- `AZURE_DOC_INTELLIGENCE_KEY` - Azure Document Intelligence API key
 
 ## Running
 ```bash

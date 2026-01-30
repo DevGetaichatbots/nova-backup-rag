@@ -1,0 +1,274 @@
+Instructions for Another Replit Agent
+Goal: Implement Azure Document Intelligence OCR to replace PyPDF. This extracts tables from PDFs using Microsoft's AI-powered document analysis.
+
+Complete Python Code
+"""
+Azure Document Intelligence OCR Integration
+============================================
+Replaces PyPDF with Azure's AI-powered document analysis for better table extraction.
+Required Environment Variables:
+- AZURE_DOC_INTELLIGENCE_ENDPOINT: Your Azure endpoint URL
+- AZURE_DOC_INTELLIGENCE_KEY: Your Azure API key
+Install: pip install requests
+"""
+import os
+import re
+import time
+import logging
+import requests
+from typing import Optional, Dict, List
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+class AzureDocumentIntelligence:
+    """
+    Azure Document Intelligence OCR service.
+    
+    Usage:
+        ocr = AzureDocumentIntelligence()
+        result = ocr.extract_tables_from_pdf(pdf_bytes, "filename.pdf")
+    """
+    
+    # API version for Azure Document Intelligence
+    API_VERSION = "2024-11-30"
+    
+    def __init__(self):
+        """Initialize with Azure credentials from environment variables."""
+        self.endpoint = os.environ.get("AZURE_DOC_INTELLIGENCE_ENDPOINT", "").rstrip('/')
+        self.key = os.environ.get("AZURE_DOC_INTELLIGENCE_KEY", "")
+        
+        if not self.endpoint or not self.key:
+            raise ValueError(
+                "Missing Azure credentials. Set AZURE_DOC_INTELLIGENCE_ENDPOINT "
+                "and AZURE_DOC_INTELLIGENCE_KEY environment variables."
+            )
+        
+        logger.info(f"Azure Document Intelligence initialized for: {self.endpoint}")
+    
+    def _is_valid_pdf(self, pdf_bytes: bytes) -> bool:
+        """Check if bytes represent a valid PDF file."""
+        return pdf_bytes[:4] == b'%PDF' if len(pdf_bytes) >= 4 else False
+    
+    def _submit_pdf(self, pdf_bytes: bytes, filename: str) -> Optional[str]:
+        """
+        Step 1: Submit PDF to Azure for analysis.
+        Returns the operation URL for polling.
+        """
+        # Standard Document Intelligence endpoint
+        url = (
+            f"{self.endpoint}/documentintelligence/documentModels/"
+            f"prebuilt-layout:analyze?api-version={self.API_VERSION}"
+            f"&outputContentFormat=markdown"
+        )
+        
+        headers = {
+            "Ocp-Apim-Subscription-Key": self.key,
+            "Content-Type": "application/pdf"
+        }
+        
+        try:
+            logger.info(f"[{filename}] Submitting PDF to Azure ({len(pdf_bytes)} bytes)...")
+            response = requests.post(url, headers=headers, data=pdf_bytes, timeout=60)
+            response.raise_for_status()
+            
+            # Get operation location from response headers
+            operation_url = response.headers.get("Operation-Location")
+            if not operation_url:
+                logger.error(f"[{filename}] No Operation-Location in response")
+                return None
+            
+            logger.info(f"[{filename}] Operation started: {operation_url}")
+            return operation_url
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"[{filename}] Failed to submit PDF: {e}")
+            return None
+    
+    def _poll_results(self, operation_url: str, filename: str, 
+                      timeout: int = 120, poll_interval: int = 3) -> Optional[Dict]:
+        """
+        Step 2: Poll Azure until analysis is complete.
+        Returns the full result when status is 'succeeded'.
+        """
+        headers = {"Ocp-Apim-Subscription-Key": self.key}
+        start_time = time.time()
+        
+        while True:
+            elapsed = time.time() - start_time
+            
+            # Check timeout
+            if elapsed > timeout:
+                logger.error(f"[{filename}] Polling timeout after {timeout}s")
+                return None
+            
+            try:
+                response = requests.get(operation_url, headers=headers, timeout=30)
+                response.raise_for_status()
+                result = response.json()
+                
+                status = result.get("status", "unknown")
+                logger.info(f"[{filename}] Status: {status} (elapsed: {elapsed:.1f}s)")
+                
+                if status == "succeeded":
+                    logger.info(f"[{filename}] Extraction complete!")
+                    return result
+                elif status == "failed":
+                    error = result.get("error", {})
+                    logger.error(f"[{filename}] Extraction failed: {error}")
+                    return None
+                elif status in ["notStarted", "running"]:
+                    # Still processing, wait and retry
+                    time.sleep(poll_interval)
+                else:
+                    logger.warning(f"[{filename}] Unknown status: {status}")
+                    time.sleep(poll_interval)
+                    
+            except requests.exceptions.RequestException as e:
+                logger.error(f"[{filename}] Polling error: {e}")
+                time.sleep(poll_interval)
+    
+    def _parse_markdown_tables(self, result: Dict, filename: str) -> List[List[str]]:
+        """
+        Step 3: Parse markdown tables from Azure response.
+        Returns list of rows, where each row is a list of cell values.
+        """
+        try:
+            # Extract markdown content from response
+            analyze_result = result.get("analyzeResult", {})
+            content = analyze_result.get("content", "")
+            
+            if not content:
+                logger.warning(f"[{filename}] No content in Azure response")
+                return []
+            
+            logger.info(f"[{filename}] Received {len(content)} chars of markdown")
+            
+            # Parse markdown table format:
+            # | Header1 | Header2 | Header3 |
+            # | --- | --- | --- |
+            # | Data1 | Data2 | Data3 |
+            
+            rows = []
+            lines = content.split('\n')
+            
+            for line in lines:
+                line = line.strip()
+                
+                # Skip empty lines and separator rows (| --- | --- |)
+                if not line or line.startswith('| ---') or re.match(r'^\|[\s\-:|]+\|$', line):
+                    continue
+                
+                # Parse table rows (lines starting and ending with |)
+                if line.startswith('|') and line.endswith('|'):
+                    # Split by | and clean up cells
+                    cells = [cell.strip() for cell in line.split('|')]
+                    # Remove empty strings from start/end
+                    cells = [c for c in cells if c]
+                    if cells:
+                        rows.append(cells)
+            
+            logger.info(f"[{filename}] Parsed {len(rows)} rows from markdown")
+            return rows
+            
+        except Exception as e:
+            logger.error(f"[{filename}] Error parsing markdown: {e}")
+            return []
+    
+    def extract_tables_from_pdf(self, pdf_bytes: bytes, filename: str = "document.pdf",
+                                 timeout: int = 120) -> Dict:
+        """
+        Main method: Extract tables from PDF using Azure Document Intelligence.
+        
+        Args:
+            pdf_bytes: Raw PDF file bytes
+            filename: Name of the file (for logging)
+            timeout: Max seconds to wait for Azure (default 120)
+        
+        Returns:
+            Dict with keys:
+            - success: bool
+            - rows: List of parsed rows (each row is a list of cell values)
+            - raw_markdown: The raw markdown content from Azure
+            - error: Error message if failed
+        """
+        # Validate PDF
+        if not self._is_valid_pdf(pdf_bytes):
+            return {
+                "success": False,
+                "rows": [],
+                "raw_markdown": "",
+                "error": "Invalid PDF file (missing %PDF header)"
+            }
+        
+        # Step 1: Submit PDF
+        operation_url = self._submit_pdf(pdf_bytes, filename)
+        if not operation_url:
+            return {
+                "success": False,
+                "rows": [],
+                "raw_markdown": "",
+                "error": "Failed to submit PDF to Azure"
+            }
+        
+        # Step 2: Poll for results
+        result = self._poll_results(operation_url, filename, timeout)
+        if not result:
+            return {
+                "success": False,
+                "rows": [],
+                "raw_markdown": "",
+                "error": "Azure analysis timed out or failed"
+            }
+        
+        # Step 3: Parse markdown tables
+        raw_markdown = result.get("analyzeResult", {}).get("content", "")
+        rows = self._parse_markdown_tables(result, filename)
+        
+        return {
+            "success": True,
+            "rows": rows,
+            "raw_markdown": raw_markdown,
+            "error": None
+        }
+# =============================================================================
+# USAGE EXAMPLE
+# =============================================================================
+if __name__ == "__main__":
+    # Example: Extract tables from a PDF file
+    
+    # Read PDF file
+    with open("your_document.pdf", "rb") as f:
+        pdf_bytes = f.read()
+    
+    # Initialize OCR
+    ocr = AzureDocumentIntelligence()
+    
+    # Extract tables
+    result = ocr.extract_tables_from_pdf(pdf_bytes, "your_document.pdf")
+    
+    if result["success"]:
+        print(f"Extracted {len(result['rows'])} rows:")
+        for i, row in enumerate(result["rows"][:10]):  # Print first 10 rows
+            print(f"  Row {i}: {row}")
+    else:
+        print(f"Error: {result['error']}")
+Setup Instructions
+Install dependency:
+pip install requests
+Set environment variables:
+export AZURE_DOC_INTELLIGENCE_ENDPOINT="https://your-resource.cognitiveservices.azure.com"
+export AZURE_DOC_INTELLIGENCE_KEY="your-api-key-here"
+Use in your code:
+from azure_ocr import AzureDocumentIntelligence
+ocr = AzureDocumentIntelligence()
+with open("schedule.pdf", "rb") as f:
+    result = ocr.extract_tables_from_pdf(f.read(), "schedule.pdf")
+if result["success"]:
+    for row in result["rows"]:
+        print(row)
+Key Points
+2-step async process: Submit PDF → Poll until done → Parse results
+Returns markdown: Azure returns tables as markdown, parsed into lists
+Handles scanned PDFs: True OCR capability, not just text extraction
+120-second timeout: Polls every 3 seconds until complete
+Prebuilt model: Uses prebuilt-layout - no training required
