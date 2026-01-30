@@ -1,10 +1,8 @@
 """
-Azure Document Intelligence OCR Integration
-============================================
-Replaces PyPDF with Azure's AI-powered document analysis for better table extraction.
-Required Environment Variables:
-- AZURE_DOC_INTELLIGENCE_ENDPOINT: Your Azure endpoint URL
-- AZURE_DOC_INTELLIGENCE_KEY: Your Azure API key
+Azure Document Intelligence OCR
+===============================
+AI-powered document analysis for extracting text and tables from PDFs.
+Optimized for construction schedules and structured data.
 """
 import os
 import re
@@ -23,13 +21,12 @@ class AzureDocumentIntelligence:
     
     Usage:
         ocr = AzureDocumentIntelligence()
-        result = ocr.extract_tables_from_pdf(pdf_bytes, "filename.pdf")
+        result = ocr.extract_from_pdf(pdf_bytes, "filename.pdf")
     """
     
     API_VERSION = "2024-11-30"
     
     def __init__(self):
-        """Initialize with Azure credentials from environment variables."""
         self.endpoint = os.environ.get("AZURE_DOC_INTELLIGENCE_ENDPOINT", "").rstrip('/')
         self.key = os.environ.get("AZURE_DOC_INTELLIGENCE_KEY", "")
         
@@ -39,17 +36,12 @@ class AzureDocumentIntelligence:
                 "and AZURE_DOC_INTELLIGENCE_KEY environment variables."
             )
         
-        logger.info(f"Azure Document Intelligence initialized for: {self.endpoint}")
+        logger.info(f"Azure Document Intelligence initialized")
     
     def _is_valid_pdf(self, pdf_bytes: bytes) -> bool:
-        """Check if bytes represent a valid PDF file."""
         return pdf_bytes[:4] == b'%PDF' if len(pdf_bytes) >= 4 else False
     
     def _submit_pdf(self, pdf_bytes: bytes, filename: str) -> Optional[str]:
-        """
-        Step 1: Submit PDF to Azure for analysis.
-        Returns the operation URL for polling.
-        """
         url = (
             f"{self.endpoint}/documentintelligence/documentModels/"
             f"prebuilt-layout:analyze?api-version={self.API_VERSION}"
@@ -71,7 +63,7 @@ class AzureDocumentIntelligence:
                 logger.error(f"[{filename}] No Operation-Location in response")
                 return None
             
-            logger.info(f"[{filename}] Operation started: {operation_url}")
+            logger.info(f"[{filename}] Operation started")
             return operation_url
             
         except requests.exceptions.RequestException as e:
@@ -79,11 +71,7 @@ class AzureDocumentIntelligence:
             return None
     
     def _poll_results(self, operation_url: str, filename: str, 
-                      timeout: int = 120, poll_interval: int = 3) -> Optional[Dict]:
-        """
-        Step 2: Poll Azure until analysis is complete.
-        Returns the full result when status is 'succeeded'.
-        """
+                      timeout: int = 180, poll_interval: int = 3) -> Optional[Dict]:
         headers = {"Ocp-Apim-Subscription-Key": self.key}
         start_time = time.time()
         
@@ -119,61 +107,159 @@ class AzureDocumentIntelligence:
                 logger.error(f"[{filename}] Polling error: {e}")
                 time.sleep(poll_interval)
     
-    def _parse_markdown_tables(self, result: Dict, filename: str) -> List[List[str]]:
+    def _parse_tables(self, result: Dict, filename: str) -> List[Dict]:
         """
-        Step 3: Parse markdown tables from Azure response.
-        Returns list of rows, where each row is a list of cell values.
+        Extract structured table data from Azure response.
+        Uses Azure's table objects for accurate cell/row/column data.
+        Handles merged cells (rowSpan, columnSpan).
         """
         try:
             analyze_result = result.get("analyzeResult", {})
-            content = analyze_result.get("content", "")
+            tables = analyze_result.get("tables", [])
             
-            if not content:
-                logger.warning(f"[{filename}] No content in Azure response")
+            if not tables:
                 return []
             
-            logger.info(f"[{filename}] Received {len(content)} chars of markdown")
-            
-            rows = []
-            lines = content.split('\n')
-            
-            for line in lines:
-                line = line.strip()
+            structured_tables = []
+            for table_idx, table in enumerate(tables):
+                row_count = table.get("rowCount", 0)
+                col_count = table.get("columnCount", 0)
+                cells_data = table.get("cells", [])
                 
-                if not line or line.startswith('| ---') or re.match(r'^\|[\s\-:|]+\|$', line):
-                    continue
+                grid = [[{"content": "", "row_span": 1, "col_span": 1} for _ in range(col_count)] for _ in range(row_count)]
                 
-                if line.startswith('|') and line.endswith('|'):
-                    cells = [cell.strip() for cell in line.split('|')]
-                    cells = [c for c in cells if c]
-                    if cells:
-                        rows.append(cells)
+                cells_list = []
+                for cell in cells_data:
+                    row_idx = cell.get("rowIndex", 0)
+                    col_idx = cell.get("columnIndex", 0)
+                    cell_content = cell.get("content", "")
+                    row_span = cell.get("rowSpan", 1)
+                    col_span = cell.get("columnSpan", 1)
+                    kind = cell.get("kind", "content")
+                    
+                    cell_info = {
+                        "content": cell_content,
+                        "row": row_idx,
+                        "col": col_idx,
+                        "row_span": row_span,
+                        "col_span": col_span,
+                        "kind": kind
+                    }
+                    cells_list.append(cell_info)
+                    
+                    if 0 <= row_idx < row_count and 0 <= col_idx < col_count:
+                        grid[row_idx][col_idx] = {
+                            "content": cell_content,
+                            "row_span": row_span,
+                            "col_span": col_span
+                        }
+                        for r in range(row_idx, min(row_idx + row_span, row_count)):
+                            for c in range(col_idx, min(col_idx + col_span, col_count)):
+                                if r != row_idx or c != col_idx:
+                                    grid[r][c] = {
+                                        "content": f"^{cell_content[:20]}..." if len(cell_content) > 20 else f"^{cell_content}",
+                                        "row_span": 0,
+                                        "col_span": 0,
+                                        "merged_from": [row_idx, col_idx]
+                                    }
+                
+                bounding_regions = table.get("boundingRegions", [])
+                page_numbers = list(set(br.get("pageNumber", 1) for br in bounding_regions))
+                
+                simple_rows = []
+                for row in grid:
+                    simple_row = [cell["content"] if cell["content"] and not cell["content"].startswith("^") else "" for cell in row]
+                    simple_rows.append(simple_row)
+                
+                structured_tables.append({
+                    "table_id": table_idx,
+                    "row_count": row_count,
+                    "column_count": col_count,
+                    "page_numbers": sorted(page_numbers),
+                    "rows": simple_rows,
+                    "cells": cells_list,
+                    "has_merged_cells": any(c.get("row_span", 1) > 1 or c.get("col_span", 1) > 1 for c in cells_list)
+                })
             
-            logger.info(f"[{filename}] Parsed {len(rows)} rows from markdown")
-            return rows
+            logger.info(f"[{filename}] Extracted {len(structured_tables)} structured tables")
+            return structured_tables
             
         except Exception as e:
-            logger.error(f"[{filename}] Error parsing markdown: {e}")
+            logger.error(f"[{filename}] Error parsing tables: {e}")
             return []
     
-    def _extract_pages_from_result(self, result: Dict, filename: str) -> List[Dict]:
+    def extract_from_pdf(self, pdf_bytes: bytes, filename: str = "document.pdf",
+                         timeout: int = 180) -> Dict:
         """
-        Extract page-level content from Azure response for better metadata.
-        Returns list of page dicts with content and page number.
+        Extract content from PDF using Azure Document Intelligence.
+        
+        Args:
+            pdf_bytes: Raw PDF file bytes
+            filename: Name of the file (for logging)
+            timeout: Max seconds to wait for Azure (default 180)
+        
+        Returns:
+            Dict with:
+            - success: bool
+            - raw_markdown: Full markdown content from Azure
+            - table_rows: List of parsed table rows
+            - error: Error message if failed
         """
+        if not self._is_valid_pdf(pdf_bytes):
+            return {
+                "success": False,
+                "raw_markdown": "",
+                "table_rows": [],
+                "error": "Invalid PDF file (missing %PDF header)"
+            }
+        
+        operation_url = self._submit_pdf(pdf_bytes, filename)
+        if not operation_url:
+            return {
+                "success": False,
+                "raw_markdown": "",
+                "table_rows": [],
+                "error": "Failed to submit PDF to Azure"
+            }
+        
+        result = self._poll_results(operation_url, filename, timeout)
+        if not result:
+            return {
+                "success": False,
+                "raw_markdown": "",
+                "table_rows": [],
+                "error": "Azure analysis timed out or failed"
+            }
+        
+        raw_markdown = result.get("analyzeResult", {}).get("content", "")
+        tables = self._parse_tables(result, filename)
+        pages = self._extract_pages(result, filename)
+        
+        logger.info(f"[{filename}] Extracted {len(raw_markdown)} chars, {len(tables)} tables, {len(pages)} pages")
+        
+        return {
+            "success": True,
+            "raw_markdown": raw_markdown,
+            "tables": tables,
+            "pages": pages,
+            "error": None
+        }
+    
+    def _extract_pages(self, result: Dict, filename: str) -> List[Dict]:
+        """Extract page-level content with page numbers."""
         try:
             analyze_result = result.get("analyzeResult", {})
-            pages = analyze_result.get("pages", [])
+            pages_data = analyze_result.get("pages", [])
             content = analyze_result.get("content", "")
             
-            if not pages:
+            if not pages_data:
                 if content:
                     return [{"content": content, "page_number": 1, "total_pages": 1}]
                 return []
             
-            page_contents = []
-            for i, page in enumerate(pages):
-                page_num = page.get("pageNumber", i + 1)
+            pages = []
+            for page in pages_data:
+                page_num = page.get("pageNumber", 1)
                 spans = page.get("spans", [])
                 
                 page_text = ""
@@ -183,131 +269,23 @@ class AzureDocumentIntelligence:
                     page_text += content[offset:offset + length]
                 
                 if page_text.strip():
-                    page_contents.append({
+                    pages.append({
                         "content": page_text,
                         "page_number": page_num,
-                        "total_pages": len(pages)
+                        "total_pages": len(pages_data)
                     })
             
-            if not page_contents and content:
+            if not pages and content:
                 return [{"content": content, "page_number": 1, "total_pages": 1}]
             
-            logger.info(f"[{filename}] Extracted {len(page_contents)} pages")
-            return page_contents
+            return pages
             
         except Exception as e:
             logger.error(f"[{filename}] Error extracting pages: {e}")
-            if content:
-                return [{"content": content, "page_number": 1, "total_pages": 1}]
             return []
-    
-    def extract_tables_from_pdf(self, pdf_bytes: bytes, filename: str = "document.pdf",
-                                 timeout: int = 120) -> Dict:
-        """
-        Main method: Extract tables from PDF using Azure Document Intelligence.
-        
-        Args:
-            pdf_bytes: Raw PDF file bytes
-            filename: Name of the file (for logging)
-            timeout: Max seconds to wait for Azure (default 120)
-        
-        Returns:
-            Dict with keys:
-            - success: bool
-            - rows: List of parsed rows (each row is a list of cell values)
-            - raw_markdown: The raw markdown content from Azure
-            - error: Error message if failed
-        """
-        if not self._is_valid_pdf(pdf_bytes):
-            return {
-                "success": False,
-                "rows": [],
-                "raw_markdown": "",
-                "error": "Invalid PDF file (missing %PDF header)"
-            }
-        
-        operation_url = self._submit_pdf(pdf_bytes, filename)
-        if not operation_url:
-            return {
-                "success": False,
-                "rows": [],
-                "raw_markdown": "",
-                "error": "Failed to submit PDF to Azure"
-            }
-        
-        result = self._poll_results(operation_url, filename, timeout)
-        if not result:
-            return {
-                "success": False,
-                "rows": [],
-                "raw_markdown": "",
-                "error": "Azure analysis timed out or failed"
-            }
-        
-        raw_markdown = result.get("analyzeResult", {}).get("content", "")
-        rows = self._parse_markdown_tables(result, filename)
-        
-        return {
-            "success": True,
-            "rows": rows,
-            "raw_markdown": raw_markdown,
-            "error": None
-        }
-    
-    def extract_text_from_pdf(self, pdf_bytes: bytes, filename: str = "document.pdf",
-                               timeout: int = 120) -> str:
-        """
-        Extract full text/markdown from PDF (for vector store chunking).
-        
-        Args:
-            pdf_bytes: Raw PDF file bytes
-            filename: Name of the file (for logging)
-            timeout: Max seconds to wait for Azure
-        
-        Returns:
-            Extracted text/markdown content as string, empty string on failure
-        """
-        result = self.extract_tables_from_pdf(pdf_bytes, filename, timeout)
-        
-        if result["success"]:
-            return result["raw_markdown"]
-        else:
-            logger.error(f"[{filename}] Text extraction failed: {result['error']}")
-            return ""
-    
-    def extract_pages_from_pdf(self, pdf_bytes: bytes, filename: str = "document.pdf",
-                                timeout: int = 120) -> List[Dict]:
-        """
-        Extract page-level content from PDF for better metadata granularity.
-        
-        Args:
-            pdf_bytes: Raw PDF file bytes
-            filename: Name of the file (for logging)
-            timeout: Max seconds to wait for Azure
-        
-        Returns:
-            List of dicts with 'content', 'page_number', 'total_pages'
-        """
-        if not self._is_valid_pdf(pdf_bytes):
-            logger.error(f"[{filename}] Invalid PDF file")
-            return []
-        
-        operation_url = self._submit_pdf(pdf_bytes, filename)
-        if not operation_url:
-            return []
-        
-        result = self._poll_results(operation_url, filename, timeout)
-        if not result:
-            return []
-        
-        return self._extract_pages_from_result(result, filename)
     
     @staticmethod
-    def check_credentials() -> tuple[bool, str]:
-        """
-        Check if Azure Document Intelligence credentials are configured.
-        Returns (is_valid, message)
-        """
+    def check_credentials() -> tuple:
         endpoint = os.environ.get("AZURE_DOC_INTELLIGENCE_ENDPOINT", "")
         key = os.environ.get("AZURE_DOC_INTELLIGENCE_KEY", "")
         
@@ -316,4 +294,4 @@ class AzureDocumentIntelligence:
         if not key:
             return False, "AZURE_DOC_INTELLIGENCE_KEY not set"
         
-        return True, "Azure Document Intelligence credentials configured"
+        return True, "Azure Document Intelligence configured"

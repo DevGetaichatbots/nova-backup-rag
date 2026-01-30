@@ -43,17 +43,15 @@ async def startup_event():
         create_chat_memory_table()
         print("Database initialized successfully")
         
-        try:
-            from src.azure_ocr import AzureDocumentIntelligence
-            is_valid, msg = AzureDocumentIntelligence.check_credentials()
-            if is_valid:
-                print("Azure Document Intelligence OCR: Configured")
-            else:
-                print(f"Azure Document Intelligence OCR: {msg} (will use pypdf fallback)")
-        except Exception as e:
-            print(f"Azure Document Intelligence OCR: Not available ({e})")
+        from src.azure_ocr import AzureDocumentIntelligence
+        is_valid, msg = AzureDocumentIntelligence.check_credentials()
+        if is_valid:
+            print("Azure Document Intelligence OCR: Ready")
+        else:
+            raise ValueError(f"Azure OCR required but not configured: {msg}")
     except Exception as e:
-        print(f"Database initialization error: {e}")
+        print(f"Startup error: {e}")
+        raise
 
 
 @app.get("/")

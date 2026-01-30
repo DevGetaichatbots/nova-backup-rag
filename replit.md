@@ -8,7 +8,7 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Vector Store**: Supabase with pgvector extension
 - **Embeddings**: Azure OpenAI text-embedding-3-small
 - **LLM**: Azure OpenAI GPT model
-- **PDF Processing**: Azure Document Intelligence OCR (primary) + pypdf fallback + LangChain text splitters
+- **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
 
 ## Project Structure
 ```
@@ -18,7 +18,7 @@ src/
 ├── database.py        # Supabase/PostgreSQL database operations with SQL injection protection
 ├── embeddings.py      # Azure OpenAI embedding generation
 ├── azure_ocr.py       # Azure Document Intelligence OCR for PDF table extraction
-├── pdf_processor.py   # PDF processing with Azure OCR (primary) + pypdf fallback
+├── pdf_processor.py   # PDF processing with Azure Document Intelligence OCR
 ├── vector_store.py    # Vector store management
 ├── agent.py           # RAG agent with dual vector store querying
 └── main.py            # FastAPI application
@@ -32,7 +32,7 @@ src/
 ## Flow
 1. User uploads PDF files via `/upload` with a `session_id`
 2. Each PDF gets its own vector store table (e.g., `vs_{session_id}_{filename}`)
-3. Binary PDF is parsed using Azure Document Intelligence OCR (with pypdf fallback)
+3. Binary PDF is parsed using Azure Document Intelligence OCR (preserves tables/structure)
 4. Text is chunked and embedded via Azure OpenAI
 5. Embeddings stored in Supabase pgvector
 6. User queries via `/query` with list of vector store tables
