@@ -6,13 +6,19 @@ from src.config import settings, get_database_url
 
 @contextmanager
 def get_db_connection():
-    conn = psycopg2.connect(
-        host=settings.SUPABASE_DB_HOST,
-        port=settings.SUPABASE_DB_PORT,
-        database=settings.SUPABASE_DB_NAME,
-        user=settings.SUPABASE_DB_USER,
-        password=settings.SUPABASE_DB_PASSWORD
-    )
+    db_url = get_database_url()
+    
+    if db_url and "://" in db_url:
+        conn = psycopg2.connect(db_url, sslmode="require")
+    else:
+        conn = psycopg2.connect(
+            host=settings.SUPABASE_DB_HOST,
+            port=settings.SUPABASE_DB_PORT,
+            database=settings.SUPABASE_DB_NAME,
+            user=settings.SUPABASE_DB_USER,
+            password=settings.SUPABASE_DB_PASSWORD,
+            sslmode="require"
+        )
     try:
         yield conn
     finally:
