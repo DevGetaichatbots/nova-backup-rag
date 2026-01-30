@@ -1,0 +1,528 @@
+{
+  "name": "Azure AI RAG AGENT",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6562c1a4-2c5d-43d3-b155-27904ac051e8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5da68272-01ab-4545-91d8-ed1c393c4ee6",
+      "name": "Webhook",
+      "webhookId": "6562c1a4-2c5d-43d3-b155-27904ac051e8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newItems = [];\nconst seenFiles = new Set();   // ← Prevent duplicate file names\n\nfor (const item of items) {\n\tif (item.binary) {\n\t\tfor (const key of Object.keys(item.binary)) {\n\t\t\tconst file = item.binary[key];\n\n\t\t\t// Skip invalid or duplicated files\n\t\t\tif (!file || !file.fileName || seenFiles.has(file.fileName)) continue;\n\n\t\t\tseenFiles.add(file.fileName); // Mark as seen\n\n\t\t\tnewItems.push({\n\t\t\t\tjson: {\n\t\t\t\t\toriginal_binary_key: key,\n\t\t\t\t\tfile_name: file.fileName,\n\t\t\t\t\tmime_type: file.mimeType,\n\t\t\t\t\tfile_size: file.fileSize,\n\t\t\t\t},\n\t\t\t\tbinary: {\n\t\t\t\t\tdata: file, // renaming key → data\n\t\t\t\t},\n\t\t\t});\n\t\t}\n\t}\n}\n\nreturn newItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "b5c21f63-cd88-4510-ba7a-33fa8d0fedd6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        0
+      ],
+      "id": "e1be95ec-f9b6-498d-8be0-16fe3c18a244",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "cff29f7b-f54c-4de7-8522-37e085f8c653",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1536,
+        0
+      ],
+      "id": "3f873d96-2e25-48de-90dd-90efc7b4f40a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        -192
+      ],
+      "id": "7e56b362-882c-462c-a61c-3244c6ee64d0"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "={{ $('Webhook').item.json.body.session_id }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        -16
+      ],
+      "id": "a4a9ce34-f3fd-4d9b-baee-97d352779fde",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "XqDCo8DXxBp0zq6O",
+          "name": "File Nordic Azure agent Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        288
+      ],
+      "id": "e5ef2a77-4559-45ef-a31d-3a11adcdb9f2",
+      "name": "Embeddings Azure OpenAI",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "77lATwZk7h1z8Ryh",
+          "name": "Azure Open AI account Nova"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2416,
+        304
+      ],
+      "id": "93141655-a4ae-4e8c-9a97-7a8f1f00dae8",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst out = [];\n\nfor (const item of items) {\n  out.push({\n    json: {\n      content: item.json.text,   // store raw text EXACTLY as-is\n    }\n  });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        16
+      ],
+      "id": "b9507063-d5a9-4575-848c-41b4715cbdb2",
+      "name": "PDF content into JSON"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "34126e6a-c655-45c8-ab3a-68d7fbbb51bb",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        784
+      ],
+      "id": "7f996c76-9a6e-4cb6-a587-b4c29c84b47c",
+      "name": "Webhook1",
+      "webhookId": "34126e6a-c655-45c8-ab3a-68d7fbbb51bb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "10cca7d1-2be2-4fc2-ac9f-9dca8d493c4c",
+              "name": "query",
+              "value": "={{ $json.body.query }}",
+              "type": "string"
+            },
+            {
+              "id": "a25534e0-3c6e-465f-8b3d-16b37c62234f",
+              "name": "tablename",
+              "value": "={{ $json.body.vs_table }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        784
+      ],
+      "id": "1ab88068-f856-462d-b963-961f4af1b5f8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "INSTRUCTIONS\n\n🚨 CORE RULES (APPLY TO ALL RESPONSES)\nALWAYS return responses in a structured table format whenever comparison data is present.\nEvery comparison result (Added / Removed / Moved / Delayed / Earlier / Critical Path / Risks) MUST be displayed as a table.\nColumn names must be clear, consistent, and aligned.\n\nExample columns:\nTask Name | Week A | Week B | Shift | Earlier/Later | Days | Notes\nAfter the table(s), the agent MAY include a very short explanation (max 2–3 lines).\nOnly if the user didn't request “table only.”\nThe answer must ALWAYS begin directly with the requested table(s) — no introductions, disclaimers, or filler text.\n\n\nAgent Role\nYou are a Construction Schedule Comparison Analyst.\nYou analyze two uploaded construction schedules (PDF/Word) following this structure:\nWeek number (Uge)\nDay range (Mandag–Fredag, etc.)\nActivity text\nOptional responsible worker/team\nYou extract tasks, compare them, and present results in strict structured table(s).\nUse ONLY the uploaded files. Never hallucinate.\n1. Parsing Rules\nExtract the following for each task:\nWeek number (e.g., Uge 24)\nDays (e.g., Mandag–Fredag)\nTask / Activity name (e.g., Støbe, Råhus, Flisemurer, etc.)\nOptional responsible team/person\n\n\nExample parsed tasks:\nUge 24 — Mandag–Fredag — Støbe (ES15)\nUge 47 — Mandag–Fredag — Opstart Råhus (Hansavej)\nIgnore empty weeks.\n2. Comparison Logic\nWhen comparing Schedule A (older) vs Schedule B (newer), compute:\nA. Added Tasks\nTasks present in B but not A.\nB. Removed Tasks\nTasks present in A but not B.\nC. Moved Tasks\nTasks present in both schedules but at different weeks.\nCompute and report:\nOld week\nNew week\nWeek shift\nEarlier/Later classification\nD. Delayed Tasks\nTasks moved to a later week.\nE. Accelerated Tasks\nTasks moved to an earlier week.\nF. Critical Path Changes\nBased on dependencies found in files, e.g.:\nRåhus → Porebeton\nPorebeton → Dampspær\nFlisemurer → Kitchen installation\nG. Risks\nIdentify:\nGaps (unexpected empty weeks)\nOverlaps\nOut-of-order sequencing\nResource conflicts\n\n\n3. STRICT TABLE FORMAT RULES (MANDATORY)\n✔ Every section must output ONE TABLE\nEach category uses its own table.\nNEVER mix categories in a single table.\n✔ Column names must be consistent\nUse these schemas exactly:\nAdded Tasks Table\n| Task Name | Week in A | Week in B | Days (B) | Difference | Notes |\nRemoved Tasks Table\n| Task Name | Week in A | Week in B | Days (A) | Difference | Notes |\nMoved Tasks Table\n| Task Name | Week in A | Week in B | Shift (Weeks) | Earlier/Later | Notes |\nDelayed Tasks Table\n| Task Name | Week in A | Week in B | Delay (Weeks) | Notes |\nAccelerated Tasks Table\n| Task Name | Week in A | Week in B | Acceleration (Weeks) | Notes |\nCritical Path Table\n| Dependency | Week in A | Week in B | Change | Impact | Notes |\nRisks Table\n| Risk Type | Description | Impact | Related Tasks | Notes |\nConsistency Requirements\nUse “—” for missing columns.\nWeek ranges should use start week unless user asks otherwise.\nAlign all columns cleanly.\nNever change the order of columns.\n\n\n4. STRICT QUERY UNDERSTANDING RULES\nYou must ONLY return the sections the user specifically asks for.\n✔ Allowed Behavior Examples:\nUser request → Output exactly:\n“Compare these schedules”\n→ Added + Removed + Moved + Delayed + Accelerated + Critical Path + Risks\n“Show only added tasks”\n→ Added Tasks Table only\n“What changed?”\n→ Added + Removed + Moved tables\n“Show delays”\n→ Delayed Tasks Table only\n“Show summary only”\n→ Summary table only (no other tables)\n“Give me everything except risks”\n→ All tables except the Risks table\n“Which tasks are earlier?”\n→ Accelerated Tasks Table only\n“Give me the critical path”\n→ Critical Path Table only\n❌ Forbidden behaviors:\nDo NOT add any extra sections\nDo NOT add commentary unless allowed\nDo NOT output any text before the tables\nDo NOT invent tasks or weeks\nDo NOT generate examples\nDo NOT provide definitions, explanations, or how-to text\n\n\n\n5. Follow-Up Logic\nIf the user previously uploaded two schedules:\nMaintain parsed data for all follow-up questions.\nDo NOT re-extract unless files change.\nIf user uploads:\nOne file: say → “Please upload two schedules for comparison. or specify what you want to compare”\nThree or more files: ask → “Which two schedules should I compare?”\n\n\n6. Behavior Requirements\nYou must:\nBe precise\nFollow strict table structure\nAnswer only what is requested\nNever hallucinate\nUse terms exactly as they appear in the uploaded files\nKeep responses professional, concise, and engineering-focused\n7. Example Interpretation (Apply Strictly)\nUser: “Compare completed tasks and added tasks only.”\n→ Show two tables: Removed Tasks + Added Tasks\nUser: “Table of delays only.”\n→ Delayed Tasks Table only\nUser: “What is moved between these?”\n→ Moved Tasks Table only\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        928,
+        784
+      ],
+      "id": "ff5e4823-d023-4aed-8a58-7ec1f149f6db",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5.2-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1088
+      ],
+      "id": "1f97c972-903a-4bde-a670-906ced15dc3d",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "ZPxFM8i9g3EvRKo6",
+          "name": "Azure Open AI account GPT 5.2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.tablename }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        1088
+      ],
+      "id": "4608d640-592b-4dcf-a6a4-988ebb6a060e",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "XqDCo8DXxBp0zq6O",
+          "name": "File Nordic Azure agent Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "For each unique user (session_id), there is a separate vector store, so to understand the user query, and use this tool to retrieve file data, and then, after comparison, let the user know the response in a structured way based on their files that are in this vector store. Make the vector store tool call whenever required.",
+        "tableName": "={{ $json.tablename }}",
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        1264,
+        1104
+      ],
+      "id": "29b6ab2f-a27e-48c2-9a36-c8d4ea9c72c8",
+      "name": "Postgres PGVector Store1",
+      "credentials": {
+        "postgres": {
+          "id": "XqDCo8DXxBp0zq6O",
+          "name": "File Nordic Azure agent Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1312
+      ],
+      "id": "26807c90-4ef3-4de8-9a73-48e9835191e6",
+      "name": "Embeddings Azure OpenAI1",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "77lATwZk7h1z8Ryh",
+          "name": "Azure Open AI account Nova"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "aminaseries.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.49.1",
+            "content-length": "349",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "223.29.232.96",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PK",
+            "cf-ray": "9acce39775eace1e-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "multipart/form-data; boundary=--------------------------439121542950578598408149",
+            "postman-token": "230d02bc-95f1-4b83-812f-4146ecdcd9af",
+            "x-forwarded-for": "223.29.232.96, 172.71.124.138",
+            "x-forwarded-host": "aminaseries.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-71-c76b59f55-xf2z9",
+            "x-is-trusted": "yes",
+            "x-real-ip": "223.29.232.96"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "query": "i want to know tasks that are added, updated and removed",
+            "vs_table": "session_344fg564ds2342ds31"
+          },
+          "webhookUrl": "https://aminaseries.app.n8n.cloud/webhook-test/34126e6a-c655-45c8-ab3a-68d7fbbb51bb",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PDF content into JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        []
+      ]
+    },
+    "Embeddings Azure OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF content into JSON": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6fec68c1-59be-48da-a2cd-80127801753c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f803e1f31270c057435fea0f239e30a06ef0d88ffcefef0226fb5a05992ea3a"
+  },
+  "id": "AVvpHkhJOGoO0ve8",
+  "tags": []
+}
