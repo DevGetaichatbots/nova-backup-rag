@@ -1,163 +1,112 @@
 """
-PDF Processor using Azure Document Intelligence OCR
-====================================================
-Extracts text and tables from PDFs using Azure's AI-powered document analysis.
-Falls back to pypdf if Azure OCR fails or credentials are not configured.
+PDF Processor - Azure Document Intelligence OCR
+================================================
+Extracts text and tables from PDFs, optimized for construction schedules.
+Uses Azure's AI-powered document analysis for accurate OCR.
+Preserves table structure using Azure's structured table output.
 """
-import io
+import json
 import logging
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from src.azure_ocr import AzureDocumentIntelligence
 
 logger = logging.getLogger(__name__)
 
-AzureDocumentIntelligence = None
-PdfReader = None
-AZURE_OCR_AVAILABLE = False
-PYPDF_AVAILABLE = False
 
-try:
-    from src.azure_ocr import AzureDocumentIntelligence
-    AZURE_OCR_AVAILABLE = True
-except (ImportError, ValueError) as e:
-    logger.warning(f"Azure OCR not available, will try pypdf fallback: {e}")
-
-try:
-    from pypdf import PdfReader
-    PYPDF_AVAILABLE = True
-except ImportError:
-    pass
-
-
-def extract_text_with_azure_ocr(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
+def extract_from_pdf(pdf_bytes: bytes, filename: str = "document.pdf") -> dict:
     """
-    Extract text from PDF using Azure Document Intelligence OCR.
-    Returns list of page-like dicts with content for chunking.
-    """
-    if not AZURE_OCR_AVAILABLE or AzureDocumentIntelligence is None:
-        logger.warning(f"[{filename}] Azure OCR not available")
-        return []
-    
-    is_valid, msg = AzureDocumentIntelligence.check_credentials()
-    if not is_valid:
-        logger.warning(f"[{filename}] Azure OCR credentials not configured: {msg}")
-        return []
-    
-    try:
-        ocr = AzureDocumentIntelligence()
-        pages = ocr.extract_pages_from_pdf(pdf_bytes, filename)
-        
-        if pages:
-            logger.info(f"[{filename}] Azure OCR extracted {len(pages)} pages")
-            return [
-                {
-                    "content": page["content"],
-                    "page_number": page["page_number"],
-                    "total_pages": page["total_pages"],
-                    "source": "azure_ocr"
-                }
-                for page in pages
-            ]
-        else:
-            logger.error(f"[{filename}] Azure OCR returned no pages")
-            return []
-    except Exception as e:
-        logger.error(f"[{filename}] Azure OCR exception: {e}")
-        return []
-
-
-def extract_text_with_pypdf(pdf_bytes: bytes) -> list[dict]:
-    """
-    Fallback: Extract text from PDF using pypdf.
-    """
-    if not PYPDF_AVAILABLE:
-        logger.error("pypdf not available for fallback")
-        return []
-    
-    try:
-        pdf_file = io.BytesIO(pdf_bytes)
-        reader = PdfReader(pdf_file)
-        
-        pages = []
-        for page_num, page in enumerate(reader.pages):
-            text = page.extract_text()
-            if text and text.strip():
-                pages.append({
-                    "content": text,
-                    "page_number": page_num + 1,
-                    "total_pages": len(reader.pages),
-                    "source": "pypdf"
-                })
-        
-        return pages
-    except Exception as e:
-        logger.error(f"pypdf extraction failed: {e}")
-        return []
-
-
-def extract_text_from_pdf_bytes(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
-    """
-    Extract text from PDF bytes.
-    Uses Azure Document Intelligence OCR if available, falls back to pypdf.
+    Extract content from PDF using Azure Document Intelligence.
     
     Args:
         pdf_bytes: Raw PDF file bytes
-        filename: Name of the file (for logging)
+        filename: Name of the file
     
     Returns:
-        List of dicts with 'content', 'page_number', 'total_pages', 'source'
+        Dict with 'success', 'pages', 'tables', 'raw_markdown', 'error'
+    
+    Raises:
+        ValueError: If Azure OCR not configured
     """
-    pages = []
+    is_valid, msg = AzureDocumentIntelligence.check_credentials()
+    if not is_valid:
+        raise ValueError(f"Azure OCR not configured: {msg}")
     
-    if AZURE_OCR_AVAILABLE:
-        try:
-            pages = extract_text_with_azure_ocr(pdf_bytes, filename)
-            if pages:
-                logger.info(f"[{filename}] Using Azure OCR extraction")
-                return pages
-        except Exception as e:
-            logger.warning(f"[{filename}] Azure OCR failed, trying pypdf: {e}")
-    
-    if not pages and PYPDF_AVAILABLE:
-        logger.info(f"[{filename}] Using pypdf fallback extraction")
-        pages = extract_text_with_pypdf(pdf_bytes)
-    
-    if not pages:
-        logger.error(f"[{filename}] No extraction method succeeded")
-    
-    return pages
+    try:
+        ocr = AzureDocumentIntelligence()
+        result = ocr.extract_from_pdf(pdf_bytes, filename)
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "pages": result.get("pages", []),
+                "tables": result.get("tables", []),
+                "raw_markdown": result["raw_markdown"],
+                "error": None
+            }
+        else:
+            return {
+                "success": False,
+                "pages": [],
+                "tables": [],
+                "raw_markdown": "",
+                "error": result["error"]
+            }
+    except Exception as e:
+        logger.error(f"[{filename}] OCR extraction failed: {e}")
+        raise
 
 
-def chunk_documents(pages: list[dict], chunk_size: int = 1000, chunk_overlap: int = 100) -> list[dict]:
-    """
-    Split extracted pages into smaller chunks for embedding.
+def table_to_markdown(table: dict) -> str:
+    """Convert structured table to markdown format."""
+    rows = table.get("rows", [])
+    if not rows:
+        return ""
     
-    Args:
-        pages: List of page dicts from extract_text_from_pdf_bytes
-        chunk_size: Maximum characters per chunk
-        chunk_overlap: Overlap between chunks
+    lines = []
+    for i, row in enumerate(rows):
+        line = "| " + " | ".join(str(cell) for cell in row) + " |"
+        lines.append(line)
+        if i == 0:
+            separator = "| " + " | ".join("---" for _ in row) + " |"
+            lines.append(separator)
     
-    Returns:
-        List of chunk dicts with 'content' and 'metadata'
-    """
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " ", ""]
-    )
+    return "\n".join(lines)
+
+
+def chunk_text_content(content: str, chunk_size: int = 1000) -> list[str]:
+    """Split text into chunks by paragraphs."""
+    if not content or not content.strip():
+        return []
     
+    paragraphs = content.split("\n\n")
     chunks = []
-    for page in pages:
-        page_chunks = text_splitter.split_text(page["content"])
-        for i, chunk_content in enumerate(page_chunks):
-            chunks.append({
-                "content": chunk_content,
-                "metadata": {
-                    "page_number": page.get("page_number", 1),
-                    "total_pages": page.get("total_pages", 1),
-                    "chunk_index": i,
-                    "source": page.get("source", "unknown")
-                }
-            })
+    current_chunk = ""
+    
+    for para in paragraphs:
+        para = para.strip()
+        if not para:
+            continue
+        
+        if len(current_chunk) + len(para) + 2 <= chunk_size:
+            current_chunk += ("\n\n" if current_chunk else "") + para
+        else:
+            if current_chunk:
+                chunks.append(current_chunk)
+            
+            if len(para) <= chunk_size:
+                current_chunk = para
+            else:
+                words = para.split()
+                current_chunk = ""
+                for word in words:
+                    if len(current_chunk) + len(word) + 1 <= chunk_size:
+                        current_chunk += (" " if current_chunk else "") + word
+                    else:
+                        if current_chunk:
+                            chunks.append(current_chunk)
+                        current_chunk = word
+    
+    if current_chunk:
+        chunks.append(current_chunk)
     
     return chunks
 
@@ -165,24 +114,141 @@ def chunk_documents(pages: list[dict], chunk_size: int = 1000, chunk_overlap: in
 def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
                        chunk_size: int = 1000, chunk_overlap: int = 100) -> list[dict]:
     """
-    Main function: Process PDF binary to chunks ready for embedding.
+    Process PDF binary to chunks ready for embedding.
+    
+    Tables are chunked separately to preserve structure.
+    Each table row becomes a searchable chunk with full table context.
     
     Args:
         pdf_bytes: Raw PDF file bytes
-        filename: Name of the file (for logging and metadata)
-        chunk_size: Maximum characters per chunk
-        chunk_overlap: Overlap between chunks
+        filename: Name of the file
+        chunk_size: Max chars per text chunk (tables handled separately)
+        chunk_overlap: Overlap for text chunks
     
     Returns:
-        List of chunk dicts with 'content' and 'metadata' ready for embedding
+        List of chunk dicts with 'content' and 'metadata'
+    
+    Raises:
+        ValueError: If Azure OCR not configured or extraction fails
     """
-    pages = extract_text_from_pdf_bytes(pdf_bytes, filename)
+    extraction = extract_from_pdf(pdf_bytes, filename)
     
-    if not pages:
-        logger.warning(f"[{filename}] No text extracted from PDF")
-        return []
+    if not extraction["success"]:
+        raise ValueError(f"PDF extraction failed: {extraction['error']}")
     
-    chunks = chunk_documents(pages, chunk_size, chunk_overlap)
-    logger.info(f"[{filename}] Created {len(chunks)} chunks from PDF")
+    chunks = []
+    chunk_index = 0
+    
+    tables = extraction.get("tables", [])
+    for table in tables:
+        table_id = table.get("table_id", 0)
+        row_count = table.get("row_count", 0)
+        col_count = table.get("column_count", 0)
+        page_numbers = table.get("page_numbers", [1])
+        rows = table.get("rows", [])
+        cells = table.get("cells", [])
+        has_merged_cells = table.get("has_merged_cells", False)
+        
+        if not rows:
+            continue
+        
+        header_row = rows[0] if rows else []
+        
+        structured_table = {
+            "table_id": table_id,
+            "rows": rows,
+            "cells": cells,
+            "pages": page_numbers
+        }
+        table_content = f"TABLE {table_id} (Pages {page_numbers})\n"
+        table_content += table_to_markdown(table)
+        table_content += f"\n[STRUCTURED: {json.dumps(structured_table)}]"
+        
+        chunks.append({
+            "content": table_content,
+            "metadata": {
+                "chunk_index": chunk_index,
+                "filename": filename,
+                "type": "table",
+                "table_id": table_id,
+                "row_count": row_count,
+                "column_count": col_count,
+                "page_numbers": page_numbers,
+                "has_merged_cells": has_merged_cells,
+                "source": "azure_ocr"
+            }
+        })
+        chunk_index += 1
+        
+        for row_idx, row in enumerate(rows[1:], start=1):
+            row_cells = [c for c in cells if c.get("row") == row_idx]
+            
+            row_page = page_numbers[0] if page_numbers else 1
+            for cell in row_cells:
+                if "bounding_regions" in cell:
+                    for br in cell.get("bounding_regions", []):
+                        row_page = br.get("pageNumber", row_page)
+                        break
+            
+            row_content_parts = []
+            for i, cell_val in enumerate(row):
+                if cell_val:
+                    header = header_row[i] if i < len(header_row) else f"Col{i+1}"
+                    row_content_parts.append(f"{header}: {cell_val}")
+            
+            if row_content_parts:
+                row_content = f"Row {row_idx} (Page {row_page}): " + " | ".join(row_content_parts)
+                chunks.append({
+                    "content": row_content,
+                    "metadata": {
+                        "chunk_index": chunk_index,
+                        "filename": filename,
+                        "type": "table_row",
+                        "table_id": table_id,
+                        "row_index": row_idx,
+                        "page_number": row_page,
+                        "cells_data": json.dumps(row_cells) if row_cells else None,
+                        "source": "azure_ocr"
+                    }
+                })
+                chunk_index += 1
+    
+    pages = extraction.get("pages", [])
+    for page in pages:
+        page_content = page.get("content", "")
+        page_number = page.get("page_number", 1)
+        total_pages = page.get("total_pages", 1)
+        
+        text_chunks = chunk_text_content(page_content, chunk_size)
+        
+        for i, text in enumerate(text_chunks):
+            chunks.append({
+                "content": text,
+                "metadata": {
+                    "chunk_index": chunk_index,
+                    "filename": filename,
+                    "type": "text",
+                    "page_number": page_number,
+                    "total_pages": total_pages,
+                    "page_chunk_index": i,
+                    "source": "azure_ocr"
+                }
+            })
+            chunk_index += 1
+    
+    if not chunks and extraction["raw_markdown"]:
+        text_chunks = chunk_text_content(extraction["raw_markdown"], chunk_size)
+        for i, text in enumerate(text_chunks):
+            chunks.append({
+                "content": text,
+                "metadata": {
+                    "chunk_index": i,
+                    "filename": filename,
+                    "type": "text",
+                    "source": "azure_ocr"
+                }
+            })
+    
+    logger.info(f"[{filename}] Created {len(chunks)} chunks ({len(tables)} tables, {len(pages)} pages)")
     
     return chunks

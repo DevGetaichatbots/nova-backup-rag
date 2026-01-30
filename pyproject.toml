@@ -14,7 +14,6 @@ dependencies = [
     "pgvector>=0.4.2",
     "psycopg2-binary>=2.9.11",
     "pydantic>=2.12.5",
-    "pypdf>=6.6.2",
     "python-dotenv>=1.2.1",
     "python-multipart>=0.0.22",
     "requests>=2.32.5",
