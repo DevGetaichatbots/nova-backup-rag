@@ -1,15 +1,84 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from psycopg2 import sql
 from contextlib import contextmanager
+from urllib.parse import urlparse, unquote
+import re
 from src.config import settings, get_database_url
+
+
+def sanitize_table_name(name: str) -> str:
+    sanitized = name.replace("-", "_").replace(" ", "_").replace(".", "_")
+    sanitized = re.sub(r'[^a-zA-Z0-9_]', '', sanitized)
+    if sanitized and sanitized[0].isdigit():
+        sanitized = "t_" + sanitized
+    sanitized = sanitized[:63]
+    if not sanitized:
+        raise ValueError("Invalid table name: results in empty string after sanitization")
+    return sanitized.lower()
+
+
+def parse_database_url(url: str) -> dict:
+    if not url:
+        return {}
+    
+    try:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        
+        at_idx = url.rfind('@')
+        if at_idx == -1:
+            return {}
+        
+        credentials_part = url[len("postgresql://"):at_idx]
+        host_part = url[at_idx + 1:]
+        
+        if ':' in credentials_part:
+            user, password = credentials_part.split(':', 1)
+        else:
+            user = credentials_part
+            password = ""
+        
+        if '/' in host_part:
+            host_and_port, database = host_part.split('/', 1)
+            database = database.split('?')[0]
+        else:
+            host_and_port = host_part
+            database = "postgres"
+        
+        if ':' in host_and_port:
+            host, port = host_and_port.rsplit(':', 1)
+            port = int(port)
+        else:
+            host = host_and_port
+            port = 5432
+        
+        return {
+            "host": host,
+            "port": port,
+            "database": database,
+            "user": unquote(user),
+            "password": unquote(password)
+        }
+    except Exception as e:
+        print(f"Error parsing database URL: {e}")
+        return {}
 
 
 @contextmanager
 def get_db_connection():
     db_url = get_database_url()
+    parsed = parse_database_url(db_url) if db_url else {}
     
-    if db_url and "://" in db_url:
-        conn = psycopg2.connect(db_url, sslmode="require")
+    if parsed:
+        conn = psycopg2.connect(
+            host=parsed["host"],
+            port=parsed["port"],
+            database=parsed["database"],
+            user=parsed["user"],
+            password=parsed["password"],
+            sslmode="require"
+        )
     else:
         conn = psycopg2.connect(
             host=settings.SUPABASE_DB_HOST,
@@ -33,24 +102,33 @@ def init_pgvector_extension():
 
 
 def create_vector_table(table_name: str, dimension: int = 1536):
-    safe_table_name = table_name.replace("-", "_").replace(" ", "_")
+    safe_table_name = sanitize_table_name(table_name)
+    index_name = f"{safe_table_name}_embedding_idx"
     
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"""
-                CREATE TABLE IF NOT EXISTS {safe_table_name} (
+            create_table_query = sql.SQL("""
+                CREATE TABLE IF NOT EXISTS {table} (
                     id SERIAL PRIMARY KEY,
                     content TEXT NOT NULL,
-                    embedding vector({dimension}),
+                    embedding vector({dim}),
                     metadata JSONB DEFAULT '{{}}',
                     created_at TIMESTAMPTZ DEFAULT NOW()
-                );
-            """)
+                )
+            """).format(
+                table=sql.Identifier(safe_table_name),
+                dim=sql.Literal(dimension)
+            )
+            cur.execute(create_table_query)
             
-            cur.execute(f"""
-                CREATE INDEX IF NOT EXISTS {safe_table_name}_embedding_idx 
-                ON {safe_table_name} USING hnsw (embedding vector_cosine_ops);
-            """)
+            create_index_query = sql.SQL("""
+                CREATE INDEX IF NOT EXISTS {index} 
+                ON {table} USING hnsw (embedding vector_cosine_ops)
+            """).format(
+                index=sql.Identifier(index_name),
+                table=sql.Identifier(safe_table_name)
+            )
+            cur.execute(create_index_query)
             
             conn.commit()
     
@@ -58,36 +136,39 @@ def create_vector_table(table_name: str, dimension: int = 1536):
 
 
 def insert_embeddings(table_name: str, documents: list):
-    safe_table_name = table_name.replace("-", "_").replace(" ", "_")
+    safe_table_name = sanitize_table_name(table_name)
     
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            insert_query = sql.SQL("""
+                INSERT INTO {table} (content, embedding, metadata)
+                VALUES (%s, %s::vector, %s::jsonb)
+            """).format(table=sql.Identifier(safe_table_name))
+            
             for doc in documents:
                 embedding_str = "[" + ",".join(map(str, doc["embedding"])) + "]"
-                cur.execute(f"""
-                    INSERT INTO {safe_table_name} (content, embedding, metadata)
-                    VALUES (%s, %s::vector, %s::jsonb)
-                """, (doc["content"], embedding_str, doc.get("metadata", "{}")))
+                cur.execute(insert_query, (doc["content"], embedding_str, doc.get("metadata", "{}")))
             conn.commit()
 
 
 def similarity_search(table_name: str, query_embedding: list, top_k: int = 5):
-    safe_table_name = table_name.replace("-", "_").replace(" ", "_")
+    safe_table_name = sanitize_table_name(table_name)
     embedding_str = "[" + ",".join(map(str, query_embedding)) + "]"
     
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(f"""
+            search_query = sql.SQL("""
                 SELECT 
                     id,
                     content,
                     metadata,
                     1 - (embedding <=> %s::vector) AS similarity
-                FROM {safe_table_name}
+                FROM {table}
                 ORDER BY embedding <=> %s::vector
                 LIMIT %s
-            """, (embedding_str, embedding_str, top_k))
+            """).format(table=sql.Identifier(safe_table_name))
             
+            cur.execute(search_query, (embedding_str, embedding_str, top_k))
             results = cur.fetchall()
     
     return results
