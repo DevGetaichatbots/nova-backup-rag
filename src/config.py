@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     SUPABASE_DB_NAME: str = "postgres"
     SUPABASE_DB_PORT: int = 5432
     DATABASE_URL: str = ""
+    SUPABASE_POOLER_URL: str = ""
     
     AZURE_OPENAI_API_KEY: str = ""
     AZURE_OPENAI_ENDPOINT: str = ""
@@ -30,6 +31,8 @@ settings = Settings()
 
 
 def get_database_url() -> str:
+    if settings.SUPABASE_POOLER_URL:
+        return settings.SUPABASE_POOLER_URL
     if settings.DATABASE_URL:
         return settings.DATABASE_URL
     return f"postgresql://{settings.SUPABASE_DB_USER}:{settings.SUPABASE_DB_PASSWORD}@{settings.SUPABASE_DB_HOST}:{settings.SUPABASE_DB_PORT}/{settings.SUPABASE_DB_NAME}"
