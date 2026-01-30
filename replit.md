@@ -38,6 +38,13 @@ src/
 6. User queries via `/query` with list of vector store tables
 7. Agent retrieves from both stores and provides comparison analysis
 
+## Table Extraction (Construction Schedules)
+- Uses Azure Document Intelligence structured table output (analyzeResult.tables)
+- Handles merged cells via rowSpan/columnSpan tracking
+- Table chunks include: markdown + embedded structured JSON
+- Row chunks include: page_number, cells_data with coordinates
+- Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
+
 ## Environment Variables Required
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_SERVICE_KEY` - Supabase service role key
