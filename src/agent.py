@@ -317,7 +317,7 @@ REMEMBER:
             model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
             messages=messages,
             temperature=0.3,
-            max_tokens=4000
+            max_tokens=16000
         )
         
         assistant_response = response.choices[0].message.content or ""
