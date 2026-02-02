@@ -7,7 +7,7 @@ from typing import List
 import json
 
 
-SYSTEM_PROMPT = """INSTRUCTIONS
+SYSTEM_PROMPT_BASE = """INSTRUCTIONS
 
 CORE RULES (APPLY TO ALL RESPONSES)
 - ALWAYS return responses in a structured table format whenever comparison data is present.
@@ -26,6 +26,12 @@ You have access to two vector stores containing document data. When the user ask
 4. Provide insights based on the comparison
 
 Be thorough in your analysis and always cite which document the information came from."""
+
+
+LANGUAGE_INSTRUCTIONS = {
+    "da": "IMPORTANT: You MUST respond in Danish (Dansk). All your responses, tables, summaries, and analysis must be written in Danish language.",
+    "en": "Respond in English."
+}
 
 
 class RAGAgent:
@@ -57,14 +63,18 @@ class RAGAgent:
         user_query: str, 
         table_names: list[str], 
         session_id: str,
+        language: str = "en",
         top_k: int = 10
     ) -> dict:
         context = self._retrieve_context(user_query, table_names, top_k)
         
         chat_history = get_chat_history(session_id, limit=10)
         
+        lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
+        system_prompt = f"{SYSTEM_PROMPT_BASE}\n\n{lang_instruction}"
+        
         messages: List[ChatCompletionMessageParam] = [
-            {"role": "system", "content": SYSTEM_PROMPT}
+            {"role": "system", "content": system_prompt}
         ]
         
         for msg in chat_history:

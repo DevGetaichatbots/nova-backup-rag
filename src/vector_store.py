@@ -9,11 +9,13 @@ class VectorStoreManager:
     def __init__(self):
         self.dimension = settings.EMBEDDING_DIMENSION
     
-    def create_store_from_pdf(self, session_id: str, file_name: str, pdf_bytes: bytes) -> dict:
-        table_name = f"vs_{session_id}_{file_name.replace('.', '_').replace(' ', '_')}"
-        table_name = table_name[:63]
+    def create_store_from_pdf(self, session_id: str, file_name: str, pdf_bytes: bytes, table_name: str | None = None) -> dict:
+        if table_name:
+            safe_name = table_name.replace('-', '_').replace(' ', '_')[:63]
+        else:
+            safe_name = f"vs_{session_id}_{file_name.replace('.', '_').replace(' ', '_')}"[:63]
         
-        safe_table_name = create_vector_table(table_name, self.dimension)
+        safe_table_name = create_vector_table(safe_name, self.dimension)
         
         chunks = process_pdf_binary(pdf_bytes, filename=file_name)
         
