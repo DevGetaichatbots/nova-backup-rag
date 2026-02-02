@@ -2,7 +2,6 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import json
 
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
@@ -21,19 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class QueryRequest(BaseModel):
-    query: str
-    vs_tables: List[str]
-    session_id: str
-    top_k: Optional[int] = 10
-
-
-class QueryResponse(BaseModel):
-    response: str
-    sources: List[str]
-    context_chunks: int
 
 
 @app.on_event("startup")
@@ -59,7 +45,7 @@ async def root():
     return {
         "message": "RAG Agent SaaS API",
         "endpoints": {
-            "upload": "POST /upload - Upload PDF and create vector store",
+            "upload": "POST /upload - Upload 2 PDF schedules",
             "query": "POST /query - Query the AI agent",
             "health": "GET /health - Health check"
         }
@@ -72,43 +58,79 @@ async def health_check():
 
 
 @app.post("/upload")
-async def upload_pdf(
-    file: UploadFile = File(...),
-    session_id: str = Form(...)
+async def upload_schedules(
+    session_id: str = Form(...),
+    old_session_id: str = Form(...),
+    new_session_id: str = Form(...),
+    old_schedule: UploadFile = File(...),
+    new_schedule: UploadFile = File(...)
 ):
-    filename = file.filename or "document.pdf"
-    if not filename.lower().endswith('.pdf'):
+    old_filename = old_schedule.filename or "old_schedule.pdf"
+    new_filename = new_schedule.filename or "new_schedule.pdf"
+    
+    if not old_filename.lower().endswith('.pdf') or not new_filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
     
     try:
-        pdf_bytes = await file.read()
+        old_pdf_bytes = await old_schedule.read()
+        new_pdf_bytes = await new_schedule.read()
         
-        result = vector_store_manager.create_store_from_pdf(
+        old_result = vector_store_manager.create_store_from_pdf(
             session_id=session_id,
-            file_name=filename,
-            pdf_bytes=pdf_bytes
+            file_name=old_filename,
+            pdf_bytes=old_pdf_bytes,
+            table_name=old_session_id
         )
         
-        return result
+        new_result = vector_store_manager.create_store_from_pdf(
+            session_id=session_id,
+            file_name=new_filename,
+            pdf_bytes=new_pdf_bytes,
+            table_name=new_session_id
+        )
+        
+        return {
+            "status": "success",
+            "session_id": session_id,
+            "old_schedule": {
+                "table_name": old_result.get("table_name"),
+                "chunks": old_result.get("chunks_processed", 0)
+            },
+            "new_schedule": {
+                "table_name": new_result.get("table_name"),
+                "chunks": new_result.get("chunks_processed", 0)
+            },
+            "message": "Both schedules processed and stored successfully"
+        }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/query", response_model=QueryResponse)
-async def query_agent(request: QueryRequest):
-    if not request.vs_tables:
-        raise HTTPException(status_code=400, detail="At least one vector store table is required")
-    
+@app.post("/query")
+async def query_agent(
+    query: str = Form(...),
+    vs_table: str = Form(...),
+    old_session_id: str = Form(...),
+    new_session_id: str = Form(...),
+    language: str = Form("en")
+):
     try:
+        table_names = [old_session_id, new_session_id]
+        
         result = rag_agent.query(
-            user_query=request.query,
-            table_names=request.vs_tables,
-            session_id=request.session_id,
-            top_k=request.top_k or 10
+            user_query=query,
+            table_names=table_names,
+            session_id=vs_table,
+            language=language,
+            top_k=10
         )
         
-        return QueryResponse(**result)
+        return {
+            "response": result["response"],
+            "sources": result["sources"],
+            "context_chunks": result["context_chunks"]
+        }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
