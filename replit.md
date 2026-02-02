@@ -50,7 +50,8 @@ curl -X POST "https://your-domain/query" \
   -F "vs_table=session_abc123" \
   -F "language=da" \
   -F "old_session_id=table_old_xyz789" \
-  -F "new_session_id=table_new_xyz123"
+  -F "new_session_id=table_new_xyz123" \
+  -F "format=html"
 ```
 | Field | Description |
 |-------|-------------|
@@ -59,6 +60,7 @@ curl -X POST "https://your-domain/query" \
 | language | "da" (Danish) or "en" (English) |
 | old_session_id | Reference to old file's vector store |
 | new_session_id | Reference to new file's vector store |
+| format | "markdown" (default) or "html" (premium styled) |
 
 ### GET /health - Health check
 
