@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -129,16 +129,28 @@ async def upload_schedules(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+DEV_HOSTS = [
+    "a2f76a97-674f-4a1f-9ac6-c5bcb0c92fc9-00-jwtgkqguc1o3.worf.replit.dev",
+]
+
 @app.post("/query")
 async def query_agent(
+    request: Request,
     query: str = Form(...),
     vs_table: str = Form(...),
     old_session_id: str = Form(...),
     new_session_id: str = Form(...),
     language: str = Form("en"),
-    format: str = Form("markdown")
+    format: str = Form(None)
 ):
+    host = request.headers.get("host", "")
+    is_dev = any(dev_host in host for dev_host in DEV_HOSTS)
+    
+    if format is None:
+        format = "markdown" if is_dev else "html"
+    
     logger.info(f"=== QUERY REQUEST ===")
+    logger.info(f"Host: {host} | Is Dev: {is_dev}")
     logger.info(f"Query: {query[:100]}{'...' if len(query) > 100 else ''}")
     logger.info(f"Session: {vs_table} | Language: {language} | Format: {format}")
     logger.info(f"Vector stores: {old_session_id}, {new_session_id}")
