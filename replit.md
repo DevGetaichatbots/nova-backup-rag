@@ -25,9 +25,42 @@ src/
 ```
 
 ## API Endpoints
-- `POST /upload` - Upload PDF binary, auto-extract text, create embeddings, store in dynamic vector table
-- `POST /query` - Query the AI agent with access to multiple vector stores for comparison
-- `GET /health` - Health check
+
+### POST /upload - Upload two PDF schedules
+```bash
+curl -X POST "https://your-domain/upload" \
+  -F "session_id=session_abc123" \
+  -F "old_session_id=table_old_xyz789" \
+  -F "old_schedule=@old_schedule.pdf" \
+  -F "new_session_id=table_new_xyz123" \
+  -F "new_schedule=@new_schedule.pdf"
+```
+| Field | Description |
+|-------|-------------|
+| session_id | Main chat session ID |
+| old_session_id | Vector store table name for old file |
+| old_schedule | The old PDF file |
+| new_session_id | Vector store table name for new file |
+| new_schedule | The new PDF file |
+
+### POST /query - Query the AI agent
+```bash
+curl -X POST "https://your-domain/query" \
+  -F "query=Compare the two schedules" \
+  -F "vs_table=session_abc123" \
+  -F "language=da" \
+  -F "old_session_id=table_old_xyz789" \
+  -F "new_session_id=table_new_xyz123"
+```
+| Field | Description |
+|-------|-------------|
+| query | User's question |
+| vs_table | Main session ID (for chat history) |
+| language | "da" (Danish) or "en" (English) |
+| old_session_id | Reference to old file's vector store |
+| new_session_id | Reference to new file's vector store |
+
+### GET /health - Health check
 
 ## Flow
 1. User uploads PDF files via `/upload` with a `session_id`
