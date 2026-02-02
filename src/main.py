@@ -2,6 +2,14 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
@@ -65,30 +73,42 @@ async def upload_schedules(
     old_schedule: UploadFile = File(...),
     new_schedule: UploadFile = File(...)
 ):
+    logger.info(f"=== UPLOAD REQUEST ===")
+    logger.info(f"Session: {session_id}")
+    logger.info(f"Old schedule: {old_schedule.filename} -> table: {old_session_id}")
+    logger.info(f"New schedule: {new_schedule.filename} -> table: {new_session_id}")
+    
     old_filename = old_schedule.filename or "old_schedule.pdf"
     new_filename = new_schedule.filename or "new_schedule.pdf"
     
     if not old_filename.lower().endswith('.pdf') or not new_filename.lower().endswith('.pdf'):
+        logger.error("Invalid file type - only PDF accepted")
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
     
     try:
         old_pdf_bytes = await old_schedule.read()
         new_pdf_bytes = await new_schedule.read()
+        logger.info(f"Files read: old={len(old_pdf_bytes)} bytes, new={len(new_pdf_bytes)} bytes")
         
+        logger.info(f"Processing OLD schedule...")
         old_result = vector_store_manager.create_store_from_pdf(
             session_id=session_id,
             file_name=old_filename,
             pdf_bytes=old_pdf_bytes,
             table_name=old_session_id
         )
+        logger.info(f"OLD schedule done: {old_result.get('chunks_processed', 0)} chunks")
         
+        logger.info(f"Processing NEW schedule...")
         new_result = vector_store_manager.create_store_from_pdf(
             session_id=session_id,
             file_name=new_filename,
             pdf_bytes=new_pdf_bytes,
             table_name=new_session_id
         )
+        logger.info(f"NEW schedule done: {new_result.get('chunks_processed', 0)} chunks")
         
+        logger.info(f"=== UPLOAD COMPLETE ===")
         return {
             "status": "success",
             "session_id": session_id,
@@ -104,6 +124,7 @@ async def upload_schedules(
         }
         
     except Exception as e:
+        logger.error(f"Upload failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -115,6 +136,11 @@ async def query_agent(
     new_session_id: str = Form(...),
     language: str = Form("en")
 ):
+    logger.info(f"=== QUERY REQUEST ===")
+    logger.info(f"Query: {query[:100]}{'...' if len(query) > 100 else ''}")
+    logger.info(f"Session: {vs_table} | Language: {language}")
+    logger.info(f"Vector stores: {old_session_id}, {new_session_id}")
+    
     try:
         table_names = [old_session_id, new_session_id]
         
@@ -126,6 +152,9 @@ async def query_agent(
             top_k=10
         )
         
+        logger.info(f"Response generated: {len(result['response'])} chars, {result['context_chunks']} chunks used")
+        logger.info(f"=== QUERY COMPLETE ===")
+        
         return {
             "response": result["response"],
             "sources": result["sources"],
@@ -133,6 +162,7 @@ async def query_agent(
         }
         
     except Exception as e:
+        logger.error(f"Query failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

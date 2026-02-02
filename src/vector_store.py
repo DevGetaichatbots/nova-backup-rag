@@ -1,8 +1,11 @@
 import json
+import logging
 from src.database import create_vector_table, insert_embeddings, similarity_search
 from src.embeddings import generate_embeddings, generate_single_embedding
 from src.pdf_processor import process_pdf_binary
 from src.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStoreManager:
@@ -15,17 +18,21 @@ class VectorStoreManager:
         else:
             safe_name = f"vs_{session_id}_{file_name.replace('.', '_').replace(' ', '_')}"[:63]
         
+        logger.info(f"  Creating vector table: {safe_name}")
         safe_table_name = create_vector_table(safe_name, self.dimension)
         
+        logger.info(f"  Extracting text from PDF ({len(pdf_bytes)} bytes)...")
         chunks = process_pdf_binary(pdf_bytes, filename=file_name)
         
         if not chunks:
+            logger.warning(f"  No content extracted from PDF")
             return {
                 "status": "error",
                 "message": "No text content found in PDF",
                 "table_name": safe_table_name
             }
         
+        logger.info(f"  Extracted {len(chunks)} chunks, generating embeddings...")
         texts = [chunk["content"] for chunk in chunks]
         embeddings = generate_embeddings(texts)
         
@@ -37,8 +44,10 @@ class VectorStoreManager:
                 "metadata": json.dumps(chunk["metadata"])
             })
         
+        logger.info(f"  Storing {len(documents)} embeddings in database...")
         insert_embeddings(safe_table_name, documents)
         
+        logger.info(f"  Vector store ready: {safe_table_name}")
         return {
             "status": "success",
             "table_name": safe_table_name,

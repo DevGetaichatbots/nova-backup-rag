@@ -5,6 +5,9 @@ from src.vector_store import vector_store_manager
 from src.database import save_chat_message, get_chat_history
 from typing import List
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT_BASE = """INSTRUCTIONS
@@ -66,9 +69,12 @@ class RAGAgent:
         language: str = "en",
         top_k: int = 10
     ) -> dict:
+        logger.info(f"  Retrieving context from {len(table_names)} vector stores...")
         context = self._retrieve_context(user_query, table_names, top_k)
         
+        logger.info(f"  Loading chat history for session: {session_id}")
         chat_history = get_chat_history(session_id, limit=10)
+        logger.info(f"  Found {len(chat_history)} previous messages")
         
         lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
         system_prompt = f"{SYSTEM_PROMPT_BASE}\n\n{lang_instruction}"
@@ -95,6 +101,7 @@ Please analyze the content from both documents and provide a structured comparis
 
         messages.append({"role": "user", "content": user_message})
         
+        logger.info(f"  Calling Azure OpenAI ({settings.AZURE_OPENAI_CHAT_DEPLOYMENT})...")
         response = self.client.chat.completions.create(
             model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
             messages=messages,
@@ -103,9 +110,11 @@ Please analyze the content from both documents and provide a structured comparis
         )
         
         assistant_response = response.choices[0].message.content or ""
+        logger.info(f"  AI response received: {len(assistant_response)} chars")
         
         save_chat_message(session_id, "user", user_query)
         save_chat_message(session_id, "assistant", assistant_response)
+        logger.info(f"  Chat history saved")
         
         return {
             "response": assistant_response,
