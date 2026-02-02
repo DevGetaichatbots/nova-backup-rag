@@ -191,6 +191,8 @@ def generate_table_html(headers: List[str], groups: Dict[str, List[List[str]]], 
         all_rows.extend(rows)
     csv_data = base64.b64encode(json.dumps([headers] + all_rows).encode()).decode()
     
+    download_js = f"(function(){{try{{var d=document.getElementById('csvData_{table_id}');var f=document.getElementById('csvFilename_{table_id}');if(!d||!f)return;var j=decodeURIComponent(escape(atob(d.textContent)));var dt=JSON.parse(j);var fn=f.textContent;var csv=dt.map(function(r){{return r.map(function(c){{var v=String(c||'');if(v.search(/[,\\\"\\\\n]/)!==-1)v='\"'+v.replace(/\"/g,'\"\"')+'\"';return v;}}).join(',')}}).join('\\n');var b=new Blob(['\\uFEFF'+csv],{{type:'text/csv;charset=utf-8;'}});var u=URL.createObjectURL(b);var l=document.createElement('a');l.href=u;l.download=fn;document.body.appendChild(l);l.click();document.body.removeChild(l);URL.revokeObjectURL(u);}}catch(e){{alert('CSV Error: '+e.message);}}}})()".replace("'", "&#39;")
+    
     html_parts = [f'''
 <div class="comparison-table-container" style="margin-bottom: 32px;">
   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
@@ -203,6 +205,12 @@ def generate_table_html(headers: List[str], groups: Dict[str, List[List[str]]], 
         <p style="font-size: 14px; color: #64748b; margin: 4px 0 0 0;">{total_tasks} {"opgaver analyseret" if language == "da" else "tasks analyzed"}</p>
       </div>
     </div>
+    
+    <button type="button" onclick="{download_js}"
+            style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; border-radius: 14px; font-weight: 600; font-size: 14px; color: white; background: linear-gradient(135deg, #00D6D6, #00B8B8); border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 214, 214, 0.35);">
+      {SVG_ICONS["download"]}
+      <span>{"Eksporter til CSV" if language == "da" else "Export to CSV"}</span>
+    </button>
   </div>
 
   <div id="csvData_{table_id}" style="display:none;">{csv_data}</div>
@@ -470,7 +478,32 @@ def format_response_as_html(markdown: str, language: str = "en") -> str:
     summary_html = generate_summary_html(parsed["summary_section"], language)
     health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language)
     
+    styles = '''
+<style>
+  .comparison-table-container .data-row:hover {
+    background: rgba(0, 214, 214, 0.06) !important;
+    border-left: 4px solid #00D6D6 !important;
+  }
+  .comparison-table-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 214, 214, 0.45) !important;
+  }
+  .comparison-table-container .table-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+  .comparison-table-container .table-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 214, 214, 0.05);
+    border-radius: 10px;
+  }
+  .comparison-table-container .table-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00D6D6, #00B8B8);
+    border-radius: 10px;
+  }
+</style>
+'''
+    
     return f'''
+{styles}
 <div class="agent-response" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   {table_html}
   {summary_html}
