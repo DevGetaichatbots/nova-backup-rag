@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
 from src.database import init_pgvector_extension, create_chat_memory_table
+from src.html_formatter import format_response_as_html
 
 app = FastAPI(
     title="RAG Agent SaaS",
@@ -134,11 +135,12 @@ async def query_agent(
     vs_table: str = Form(...),
     old_session_id: str = Form(...),
     new_session_id: str = Form(...),
-    language: str = Form("en")
+    language: str = Form("en"),
+    format: str = Form("markdown")
 ):
     logger.info(f"=== QUERY REQUEST ===")
     logger.info(f"Query: {query[:100]}{'...' if len(query) > 100 else ''}")
-    logger.info(f"Session: {vs_table} | Language: {language}")
+    logger.info(f"Session: {vs_table} | Language: {language} | Format: {format}")
     logger.info(f"Vector stores: {old_session_id}, {new_session_id}")
     
     try:
@@ -152,13 +154,20 @@ async def query_agent(
             top_k=10
         )
         
-        logger.info(f"Response generated: {len(result['response'])} chars, {result['context_chunks']} chunks used")
+        response_text = result["response"]
+        
+        if format == "html":
+            logger.info(f"Converting to HTML format...")
+            response_text = format_response_as_html(response_text, language)
+        
+        logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")
         
         return {
-            "response": result["response"],
+            "response": response_text,
             "sources": result["sources"],
-            "context_chunks": result["context_chunks"]
+            "context_chunks": result["context_chunks"],
+            "format": format
         }
         
     except Exception as e:
