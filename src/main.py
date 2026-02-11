@@ -167,10 +167,14 @@ async def query_agent(
         )
         
         response_text = result["response"]
+        is_comparison = result.get("is_comparison", True)
         
-        if format == "html":
+        if format == "html" and is_comparison:
             logger.info(f"Converting to HTML format...")
             response_text = format_response_as_html(response_text, language)
+        elif format == "html" and not is_comparison:
+            logger.info(f"Conversational response - wrapping in simple HTML...")
+            response_text = f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px; color: #0f172a; line-height: 1.6; font-size: 15px;">{response_text}</div>'
         
         logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")

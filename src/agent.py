@@ -225,7 +225,26 @@ Every comparison response MUST contain exactly THREE sections in order:
 - NEVER skip the PROJECT_HEALTH section
 - NEVER output data not retrieved from vector stores
 - NEVER create example or placeholder comparisons
-- NEVER vary your response for the same query and same files"""
+- NEVER vary your response for the same query and same files
+
+---
+
+## NON-COMPARISON QUERIES
+
+Not every message from the user is a comparison request. The user may send:
+- Greetings: "hi", "hello", "hey", "good morning", etc.
+- General questions: "what can you do?", "how does this work?", "who are you?"
+- Follow-up clarifications: "what do you mean?", "can you explain more?"
+- Thank you messages: "thanks", "thank you", "great work"
+
+**For these non-comparison messages, respond naturally and conversationally.**
+- Do NOT output the three-section format (no tables, no SUMMARY_OF_CHANGES, no PROJECT_HEALTH)
+- Greet the user warmly and explain you are a Construction Schedule Comparison Analyst
+- Explain that you can compare their uploaded schedules when they ask
+- Keep responses friendly, helpful, and concise
+- If schedules are uploaded, mention that you're ready to analyze them whenever they ask
+
+**Only use the three-section comparison format when the user explicitly asks to compare, analyze, or review the schedules.**"""
 
 
 LANGUAGE_INSTRUCTIONS = {
@@ -248,6 +267,37 @@ class RAGAgent:
             api_version=settings.AZURE_OPENAI_API_VERSION,
             azure_endpoint=settings.AZURE_OPENAI_ENDPOINT
         )
+    
+    def _is_comparison_query(self, query: str) -> bool:
+        query_lower = query.strip().lower()
+        
+        non_comparison_patterns = [
+            "hi", "hello", "hey", "hej", "godmorgen", "god morgen", "good morning",
+            "good afternoon", "good evening", "howdy", "greetings",
+            "thanks", "thank you", "tak", "mange tak",
+            "bye", "goodbye", "farvel", "see you",
+            "what can you do", "who are you", "how does this work",
+            "help", "hjælp",
+            "ok", "okay", "sure", "yes", "no", "ja", "nej",
+            "great", "good", "nice", "cool", "awesome", "perfect",
+        ]
+        
+        for pattern in non_comparison_patterns:
+            if query_lower == pattern or query_lower == pattern + "!" or query_lower == pattern + "?":
+                return False
+            if query_lower == pattern + ".":
+                return False
+        
+        if len(query_lower.split()) <= 2 and not any(
+            kw in query_lower for kw in [
+                "compare", "sammenlign", "difference", "forskel", "change", "ændring",
+                "delay", "forsink", "schedule", "tidsplan", "task", "opgave",
+                "what", "hvad", "show", "vis", "list", "find"
+            ]
+        ):
+            return False
+        
+        return True
     
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 10) -> str:
         all_results = vector_store_manager.search_multiple_stores(table_names, query, top_k)
@@ -275,8 +325,15 @@ class RAGAgent:
         language: str = "en",
         top_k: int = 10
     ) -> dict:
-        logger.info(f"  Retrieving context from {len(table_names)} vector stores...")
-        context = self._retrieve_context(user_query, table_names, top_k)
+        is_comparison = self._is_comparison_query(user_query)
+        logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
+        
+        if is_comparison:
+            logger.info(f"  Retrieving context from {len(table_names)} vector stores...")
+            context = self._retrieve_context(user_query, table_names, top_k)
+        else:
+            context = ""
+            logger.info(f"  Skipping vector store retrieval for non-comparison query")
         
         logger.info(f"  Loading chat history for session: {session_id}")
         chat_history = get_chat_history(session_id, limit=10)
@@ -296,7 +353,9 @@ class RAGAgent:
             elif role == "assistant":
                 messages.append({"role": "assistant", "content": str(msg["content"])})
         
-        user_message = f"""Based on the following retrieved document context, please answer the user's question.
+        
+        if is_comparison:
+            user_message = f"""Based on the following retrieved document context, please answer the user's question.
 
 RETRIEVED CONTEXT FROM VECTOR STORES:
 {context}
@@ -309,6 +368,14 @@ REMEMBER:
 - Include SUMMARY_OF_CHANGES after tables
 - Include PROJECT_HEALTH after summary
 - Use actual data from the retrieved context only"""
+        else:
+            user_message = f"""USER MESSAGE: {user_query}
+
+Note: This does not appear to be a comparison request. Respond naturally and conversationally. 
+Do NOT use the three-section comparison format. 
+If the user is greeting you, greet them back warmly.
+If they ask what you can do, explain your capabilities as a schedule comparison analyst.
+Keep your response concise and helpful."""
 
         messages.append({"role": "user", "content": user_message})
         
@@ -330,7 +397,8 @@ REMEMBER:
         return {
             "response": assistant_response,
             "sources": list(table_names),
-            "context_chunks": len(context.split("Chunk"))
+            "context_chunks": len(context.split("Chunk")),
+            "is_comparison": is_comparison
         }
 
 
