@@ -1,6 +1,9 @@
+import logging
 import psycopg2
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, execute_values
 from psycopg2 import sql
+
+logger = logging.getLogger(__name__)
 from contextlib import contextmanager
 from urllib.parse import urlparse, unquote
 import re
@@ -138,16 +141,33 @@ def create_vector_table(table_name: str, dimension: int = 1536):
 def insert_embeddings(table_name: str, documents: list):
     safe_table_name = sanitize_table_name(table_name)
     
+    values = []
+    for doc in documents:
+        embedding_str = "[" + ",".join(map(str, doc["embedding"])) + "]"
+        values.append((doc["content"], embedding_str, doc.get("metadata", "{}")))
+    
+    BATCH_SIZE = 100
+    
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            insert_query = sql.SQL("""
-                INSERT INTO {table} (content, embedding, metadata)
-                VALUES (%s, %s::vector, %s::jsonb)
-            """).format(table=sql.Identifier(safe_table_name))
+            template = sql.SQL("(%s, %s::vector, %s::jsonb)")
+            insert_prefix = sql.SQL("INSERT INTO {table} (content, embedding, metadata) VALUES ").format(
+                table=sql.Identifier(safe_table_name)
+            )
             
-            for doc in documents:
-                embedding_str = "[" + ",".join(map(str, doc["embedding"])) + "]"
-                cur.execute(insert_query, (doc["content"], embedding_str, doc.get("metadata", "{}")))
+            for i in range(0, len(values), BATCH_SIZE):
+                batch = values[i:i + BATCH_SIZE]
+                execute_values(
+                    cur,
+                    sql.SQL("INSERT INTO {table} (content, embedding, metadata) VALUES %s").format(
+                        table=sql.Identifier(safe_table_name)
+                    ).as_string(conn),
+                    batch,
+                    template="(%s, %s::vector, %s::jsonb)",
+                    page_size=BATCH_SIZE
+                )
+                logger.info(f"  Inserted batch {i // BATCH_SIZE + 1} ({len(batch)} rows)")
+            
             conn.commit()
 
 

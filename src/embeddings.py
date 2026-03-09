@@ -39,7 +39,7 @@ def generate_embeddings(texts: list[str]) -> list[list[float]]:
     safe_texts = [truncate_text(t) for t in texts]
     
     embeddings = []
-    batch_size = 16
+    batch_size = 100
     
     for i in range(0, len(safe_texts), batch_size):
         batch = safe_texts[i:i + batch_size]
