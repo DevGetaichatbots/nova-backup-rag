@@ -1,0 +1,129 @@
+15:11 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:11.74
+d6bad0e4
+User
+15:15:11 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:11.86
+d6bad0e4
+User
+15:15:11 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:11.98
+d6bad0e4
+User
+15:15:11 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:12.11
+d6bad0e4
+User
+15:15:12 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:12.52
+d6bad0e4
+User
+15:15:12 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:12.64
+d6bad0e4
+User
+15:15:12 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:12.77
+d6bad0e4
+User
+15:15:12 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:12.89
+d6bad0e4
+User
+15:15:12 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:13.01
+d6bad0e4
+User
+15:15:13 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:13.27
+d6bad0e4
+User
+15:15:13 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:13.38
+d6bad0e4
+User
+15:15:13 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:13.50
+d6bad0e4
+User
+15:15:13 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:13.98
+d6bad0e4
+User
+15:15:13 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:14.20
+d6bad0e4
+User
+15:15:14 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:15.15
+d6bad0e4
+User
+15:15:15 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:15.36
+d6bad0e4
+User
+15:15:15 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:15.53
+d6bad0e4
+User
+15:15:15 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:15.74
+d6bad0e4
+User
+15:15:15 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:15.93
+d6bad0e4
+User
+15:15:15 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:16.15
+d6bad0e4
+User
+15:15:16 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:16.35
+d6bad0e4
+User
+15:15:16 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:16.57
+d6bad0e4
+User
+15:15:16 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:16.72
+d6bad0e4
+User
+15:15:16 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:16.92
+d6bad0e4
+User
+15:15:16 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:17.11
+d6bad0e4
+User
+15:15:17 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:17.27
+d6bad0e4
+User
+15:15:17 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:17.43
+d6bad0e4
+User
+15:15:17 | INFO | HTTP Request: POST https://azurenordicgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-15-preview "HTTP/1.1 200 OK"
+2026-03-09 20:15:17.46
+d6bad0e4
+User
+15:15:17 | INFO | Storing 860 embeddings in database...
+2026-03-09 20:16:07.35
+d6bad0e4
+User
+[2026-03-09 15:16:07 +0000] [28] [CRITICAL] WORKER TIMEOUT (pid:33)
+2026-03-09 20:16:07.37
+d6bad0e4
+User
+[2026-03-09 15:16:07 +0000] [28] [WARNING] Worker (pid:33) was sent SIGABRT!
+2026-03-09 20:16:07.38
+d6bad0e4
+User
+[2026-03-09 15:16:07 +0000] [49] [INFO] Booting worker with pid: 49
+2026-03-09 20:16:07.38
+d6bad0e4
+User
+[2026-03-09 15:16:07 +0000] [49] [INFO] Booting worker with pid: 49
