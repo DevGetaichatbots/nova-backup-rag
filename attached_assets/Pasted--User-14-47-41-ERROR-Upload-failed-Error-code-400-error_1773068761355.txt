@@ -1,0 +1,249 @@
+
+User
+14:47:41 | ERROR | Upload failed: Error code: 400 - {'error': {'message': "This model's maximum context length is 8192 tokens, however you requested 8215 tokens (8215 in your prompt; 0 for the completion). Please reduce your prompt; or completion length.", 'type': 'invalid_request_error', 'param': None, 'code': None}}
+2026-03-09 20:02:47.45
+99b640ed
+System
+system: received signal terminated
+2026-03-09 20:02:47.45
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [25] [INFO] Handling signal: term
+2026-03-09 20:02:47.46
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [35] [INFO] Shutting down
+2026-03-09 20:02:47.46
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [35] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+2026-03-09 20:02:47.46
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [34] [INFO] Shutting down
+2026-03-09 20:02:47.46
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [34] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [35] [INFO] Waiting for application shutdown.
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [35] [INFO] Application shutdown complete.
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [35] [INFO] Finished server process [35]
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [34] [INFO] Waiting for application shutdown.
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [34] [INFO] Finished server process [34]
+2026-03-09 20:02:47.56
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [34] [INFO] Application shutdown complete.
+2026-03-09 20:02:47.65
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [25] [INFO] Worker (pid:34) was sent SIGTERM!
+2026-03-09 20:02:47.65
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [25] [INFO] Worker (pid:35) was sent SIGTERM!
+2026-03-09 20:02:47.75
+99b640ed
+User
+[2026-03-09 15:02:47 +0000] [25] [INFO] Shutting down: Master
+2026-03-09 20:02:47.83
+99b640ed
+System
+command finished successfully with exit code 0
+2026-03-09 20:02:47.83
+99b640ed
+System
+main done, exiting
+Wrap
+Colors
+RAG Agent SaaS
+Overview
+A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that replicates the n8n Azure AI RAG workflow using Supabase pgvector instead of Azure AI Search.
+
+Architecture
+Framework: FastAPI
+Vector Store: Supabase with pgvector extension
+Embeddings: Azure OpenAI text-embedding-3-small
+LLM: Azure OpenAI GPT model
+PDF Processing: Azure Document Intelligence OCR + LangChain text splitters
+Project Structure
+src/
+├── __init__.py        # Package init
+├── config.py          # Configuration and settings
+├── database.py        # Supabase/PostgreSQL database operations with SQL injection protection
+├── embeddings.py      # Azure OpenAI embedding generation
+├── azure_ocr.py       # Azure Document Intelligence OCR for PDF table extraction
+├── pdf_processor.py   # PDF processing with Azure Document Intelligence OCR
+├── vector_store.py    # Vector store management
+├── agent.py           # RAG agent with dual vector store querying
+└── main.py            # FastAPI application
+API Endpoints
+POST /upload - Upload two PDF schedules
+curl -X POST "https://your-domain/upload" \
+  -F "session_id=session_abc123" \
+  -F "old_session_id=table_old_xyz789" \
+  -F "old_schedule=@old_schedule.pdf" \
+  -F "new_session_id=table_new_xyz123" \
+  -F "new_schedule=@new_schedule.pdf"
+Field	Description
+session_id	Main chat session ID
+old_session_id	Vector store table name for old file
+old_schedule	The old PDF file
+new_session_id	Vector store table name for new file
+new_schedule	The new PDF file
+POST /query - Query the AI agent
+curl -X POST "https://your-domain/query" \
+  -F "query=Compare the two schedules" \
+  -F "vs_table=session_abc123" \
+  -F "language=da" \
+  -F "old_session_id=table_old_xyz789" \
+  -F "new_session_id=table_new_xyz123" \
+  -F "format=html"
+Field	Description
+query	User's question
+vs_table	Main session ID (for chat history)
+language	"da" (Danish) or "en" (English)
+old_session_id	Reference to old file's vector store
+new_session_id	Reference to new file's vector store
+format	"markdown" (default) or "html" (premium styled)
+GET /health - Health check
+Flow
+User uploads PDF files via /upload with a session_id
+Each PDF gets its own vector store table (e.g., vs_{session_id}_{filename})
+Binary PDF is parsed using Azure Document Intelligence OCR (preserves tables/structure)
+Text is chunked and embedded via Azure OpenAI
+Embeddings stored in Supabase pgvector
+User queries via /query with list of vector store tables
+Agent retrieves from both stores and provides comparison analysis
+Table Extraction (Construction Schedules)
+Uses Azure Document Intelligence structured table output (analyzeResult.tables)
+Handles merged cells via rowSpan/columnSpan tracking
+Table chunks include: markdown + embedded structured JSON
+Row chunks include: page_number, cells_data with coordinates
+Format: TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]
+Environment Variables Required
+SUPABASE_URL - Supabase project URL
+SUPABASE_SERVICE_KEY - Supabase service role key
+SUPABASE_DB_HOST - Database host
+SUPABASE_DB_PASSWORD - Database password
+SUPABASE_POOLER_URL - Supabase connection pooler URL (port 6543)
+AZURE_OPENAI_API_KEY - Azure OpenAI API key
+AZURE_OPENAI_ENDPOINT - Azure OpenAI endpoint
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT - Embedding model deployment name
+AZURE_OPENAI_CHAT_DEPLOYMENT - Chat model deployment name
+AZURE_DOC_INTELLIGENCE_ENDPOINT - Azure Document Intelligence endpoint
+AZURE_DOC_INTELLIGENCE_KEY - Azure Document Intelligence API key
+Running
+python -m uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
+Published your App
+and please maksue token out or in use maximum wenneeded
+
+is postgresh handling chat memory of agnet by supabse right?
+
+ok n8n whne i get repsone from azure agent i was passing repsoent o this temlate so make sure it is added here as well in optimal best way
+
+did you added same everyhing of html templated ? like it wil not change
+
+check whats is this issue
+
+Look this
+
+ok i have made new deployemnt within smae resourec is taht corect now or we need to add uri endpint of this model
+
+ok see the logs and ana;ze how and way things opened are correct
+
+ok how query respsne is goingback like in which format?
+
+ok when api is called by deployed base url use syled html by defult if webhok call is by this prodction url https://a2f76a97-674f-4a1f-9ac6-c5bcb0c92fc9-00-jwtgkqguc1o3.worf.replit.dev/queryhttps://a2f76a97-674f-4a1f-9ac6-c5bcb0c92fc9-00-jwtgkqguc1o3.worf.replit.dev/query then use markdown
+
+check and fix it in proper way
+
+ok i want little short oen or 2 page detaisl of thsi my backend like how we are using azure ocr and all things pipeline and make it deployent on azure deployemnt in details so provide me details
+
+please please make sure that agent should also respsone queries of non comaprsion like greetings hi here all these kinds make sure curnrlty ia m receving emty messages on hese query resposne make sure that it fixed
+
+which endpoints is recnvg pdfs and after recving whats happening?
+
+The POST /upload endpoint receives the PDFs. Here's what happens step by step:
+
+1. Receive Files
+POST /upload
+Fields: session_id, old_session_id, old_schedule (PDF), new_session_id, new_schedule (PDF)
+Two PDF files arrive as binary uploads (old schedule + new schedule)
+Each gets its own vector store table name (old_session_id, new_session_id)
+2. For Each PDF, This Pipeline Runs:
+Step A → Create Vector Table
+
+A new PostgreSQL table is created in Supabase with pgvector extension
+Schema: id, content, embedding (1536d vector), metadata, created_at
+Step B → Azure Document Intelligence OCR
+
+Binary PDF is sent to Azure Document Intelligence (Layout model)
+Polls until processing completes (~3-7 seconds)
+Extracts: page text + structured tables with cell coordinates
+Handles merged cells via rowSpan/columnSpan tracking
+Step C → Text Chunking
+
+Table chunks: Full table as markdown + embedded JSON with cell data
+Row chunks: Individual rows with page numbers
+Page text chunks: Split at 1000 chars with 200 char overlap
+Step D → Embedding Generation
+
+Each chunk sent to Azure OpenAI text-embedding-3-small
+Returns 1536-dimension vectors
+Batched 16 at a time for efficiency
+Step E → Store in Supabase
+
+Embeddings + text content stored in the session-specific table
+IVFFlat index created for fast similarity search
+3. Result
+Both PDFs are now searchable vector stores, ready for comparison queries via /query.
+
+Timeline for a typical upload:
+
+Old PDF: OCR (~4s) → Chunk (~0.1s) → Embed (~1s) → Store (~2s)
+New PDF: OCR (~4s) → Chunk (~0.1s) → Embed (~1s) → Store (~2s)
+Total: ~15 seconds
+then wtf is thsi error why ia m recieinvg?
+
+what you did? is thsi nw change can handle larger pdfs without missing ther content if not let me know if there is need r larger embeeding model
+
+Good question. Let me be honest about what the current approach does and its tradeoffs:
+
+What the fix does:
+Layer 1 - Smarter chunking (PDF Processor):
+
+Small tables → kept fully intact (markdown + structured JSON)
+Medium tables → drops the raw JSON blob (which is huge) but keeps the readable markdown table
+Very large tables → splits the markdown into multiple parts
+Layer 2 - Safety truncation (Embeddings):
+
+If a chunk still exceeds ~24K characters, it gets truncated before sending to the API
+The honest tradeoff:
+For extremely large tables, some content at the end of a truncated chunk could be lost from the embedding. However:
+
+The row-level chunks are still created separately — every single row of every table gets its own small chunk with all cell values. These are never truncated because individual rows are small.
+So even if a full table chunk gets trimmed, the individual row data is still fully searchable.
+The text content (non-table pages) uses 1000-char chunks, which are well within limits.
+In practice: No actual data is lost for search/comparison because the row chunks capture everything. The table chunks are just for giving the AI a "big picture" view of the table structure.
+
+Do you need a larger embedding model?
+No. The text-embedding-3-small (8K token limit) is fine because:
+
+Row-level chunks are small (~100-300 tokens each)
+Text chunks are 1000 chars (~250 tokens each)

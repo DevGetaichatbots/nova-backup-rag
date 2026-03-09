@@ -1,11 +1,16 @@
 import logging
+import tiktoken
 from openai import AzureOpenAI
 from src.config import settings
 
 logger = logging.getLogger(__name__)
 
-MAX_EMBEDDING_TOKENS = 8000
-MAX_CHARS = MAX_EMBEDDING_TOKENS * 3
+MAX_TOKENS = 8000
+
+try:
+    _encoder = tiktoken.encoding_for_model("text-embedding-3-small")
+except Exception:
+    _encoder = tiktoken.get_encoding("cl100k_base")
 
 
 def get_azure_openai_client():
@@ -16,11 +21,16 @@ def get_azure_openai_client():
     )
 
 
-def truncate_text(text: str, max_chars: int = MAX_CHARS) -> str:
-    if len(text) <= max_chars:
+def count_tokens(text: str) -> int:
+    return len(_encoder.encode(text))
+
+
+def truncate_text(text: str, max_tokens: int = MAX_TOKENS) -> str:
+    tokens = _encoder.encode(text)
+    if len(tokens) <= max_tokens:
         return text
-    logger.warning(f"  Truncating text from {len(text)} to {max_chars} chars for embedding")
-    return text[:max_chars]
+    logger.warning(f"  Truncating text from {len(tokens)} to {max_tokens} tokens for embedding")
+    return _encoder.decode(tokens[:max_tokens])
 
 
 def generate_embeddings(texts: list[str]) -> list[list[float]]:
