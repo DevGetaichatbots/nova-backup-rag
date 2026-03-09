@@ -154,31 +154,93 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
         
         header_row = rows[0] if rows else []
         
-        structured_table = {
-            "table_id": table_id,
-            "rows": rows,
-            "cells": cells,
-            "pages": page_numbers
-        }
-        table_content = f"TABLE {table_id} (Pages {page_numbers})\n"
-        table_content += table_to_markdown(table)
-        table_content += f"\n[STRUCTURED: {json.dumps(structured_table)}]"
+        MAX_TABLE_CHUNK_CHARS = 20000
         
-        chunks.append({
-            "content": table_content,
-            "metadata": {
-                "chunk_index": chunk_index,
-                "filename": filename,
-                "type": "table",
-                "table_id": table_id,
-                "row_count": row_count,
-                "column_count": col_count,
-                "page_numbers": page_numbers,
-                "has_merged_cells": has_merged_cells,
-                "source": "azure_ocr"
-            }
-        })
-        chunk_index += 1
+        table_md = table_to_markdown(table)
+        structured_json = json.dumps({"table_id": table_id, "rows": rows, "cells": cells, "pages": page_numbers})
+        
+        full_table_content = f"TABLE {table_id} (Pages {page_numbers})\n{table_md}\n[STRUCTURED: {structured_json}]"
+        
+        if len(full_table_content) <= MAX_TABLE_CHUNK_CHARS:
+            chunks.append({
+                "content": full_table_content,
+                "metadata": {
+                    "chunk_index": chunk_index,
+                    "filename": filename,
+                    "type": "table",
+                    "table_id": table_id,
+                    "row_count": row_count,
+                    "column_count": col_count,
+                    "page_numbers": page_numbers,
+                    "has_merged_cells": has_merged_cells,
+                    "source": "azure_ocr"
+                }
+            })
+            chunk_index += 1
+        else:
+            table_content_no_json = f"TABLE {table_id} (Pages {page_numbers})\n{table_md}"
+            
+            if len(table_content_no_json) <= MAX_TABLE_CHUNK_CHARS:
+                chunks.append({
+                    "content": table_content_no_json,
+                    "metadata": {
+                        "chunk_index": chunk_index,
+                        "filename": filename,
+                        "type": "table",
+                        "table_id": table_id,
+                        "row_count": row_count,
+                        "column_count": col_count,
+                        "page_numbers": page_numbers,
+                        "has_merged_cells": has_merged_cells,
+                        "source": "azure_ocr"
+                    }
+                })
+                chunk_index += 1
+            else:
+                md_lines = table_md.split("\n")
+                current_part = f"TABLE {table_id} (Pages {page_numbers})\n"
+                part_num = 1
+                
+                for line in md_lines:
+                    if len(current_part) + len(line) + 1 > MAX_TABLE_CHUNK_CHARS:
+                        if current_part.strip():
+                            chunks.append({
+                                "content": current_part,
+                                "metadata": {
+                                    "chunk_index": chunk_index,
+                                    "filename": filename,
+                                    "type": "table",
+                                    "table_id": table_id,
+                                    "part": part_num,
+                                    "row_count": row_count,
+                                    "column_count": col_count,
+                                    "page_numbers": page_numbers,
+                                    "source": "azure_ocr"
+                                }
+                            })
+                            chunk_index += 1
+                            part_num += 1
+                        current_part = f"TABLE {table_id} Part {part_num} (Pages {page_numbers})\n"
+                    current_part += line + "\n"
+                
+                if current_part.strip():
+                    chunks.append({
+                        "content": current_part,
+                        "metadata": {
+                            "chunk_index": chunk_index,
+                            "filename": filename,
+                            "type": "table",
+                            "table_id": table_id,
+                            "part": part_num,
+                            "row_count": row_count,
+                            "column_count": col_count,
+                            "page_numbers": page_numbers,
+                            "source": "azure_ocr"
+                        }
+                    })
+                    chunk_index += 1
+            
+            logger.info(f"[{filename}] Large table {table_id} split into {part_num if 'part_num' in dir() else 1} chunks (was {len(full_table_content)} chars)")
         
         for row_idx, row in enumerate(rows[1:], start=1):
             row_cells = [c for c in cells if c.get("row") == row_idx]
