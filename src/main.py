@@ -2,7 +2,10 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+import asyncio
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -91,25 +94,30 @@ async def upload_schedules(
         new_pdf_bytes = await new_schedule.read()
         logger.info(f"Files read: old={len(old_pdf_bytes)} bytes, new={len(new_pdf_bytes)} bytes")
         
-        logger.info(f"Processing OLD schedule...")
-        old_result = vector_store_manager.create_store_from_pdf(
-            session_id=session_id,
-            file_name=old_filename,
-            pdf_bytes=old_pdf_bytes,
-            table_name=old_session_id
-        )
+        start_time = time.time()
+        
+        logger.info(f"Processing BOTH schedules in parallel...")
+        loop = asyncio.get_event_loop()
+        
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            old_future = loop.run_in_executor(
+                executor,
+                vector_store_manager.create_store_from_pdf,
+                session_id, old_filename, old_pdf_bytes, old_session_id
+            )
+            new_future = loop.run_in_executor(
+                executor,
+                vector_store_manager.create_store_from_pdf,
+                session_id, new_filename, new_pdf_bytes, new_session_id
+            )
+            
+            old_result, new_result = await asyncio.gather(old_future, new_future)
+        
+        elapsed = time.time() - start_time
         logger.info(f"OLD schedule done: {old_result.get('chunks_processed', 0)} chunks")
-        
-        logger.info(f"Processing NEW schedule...")
-        new_result = vector_store_manager.create_store_from_pdf(
-            session_id=session_id,
-            file_name=new_filename,
-            pdf_bytes=new_pdf_bytes,
-            table_name=new_session_id
-        )
         logger.info(f"NEW schedule done: {new_result.get('chunks_processed', 0)} chunks")
+        logger.info(f"=== UPLOAD COMPLETE ({elapsed:.1f}s) ===")
         
-        logger.info(f"=== UPLOAD COMPLETE ===")
         return {
             "status": "success",
             "session_id": session_id,
@@ -121,7 +129,7 @@ async def upload_schedules(
                 "table_name": new_result.get("table_name"),
                 "chunks": new_result.get("chunks_processed", 0)
             },
-            "message": "Both schedules processed and stored successfully"
+            "message": f"Both schedules processed in {elapsed:.1f}s"
         }
         
     except Exception as e:
