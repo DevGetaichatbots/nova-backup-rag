@@ -1,0 +1,397 @@
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+1 9712 Ex - ALLE AP - MORCH (excl. lukning + råhus) 661 d 01-03-2022 11-10-2024 31%
+2 9713 E0 FBH+AP ALLE E0 - alle arbejder 578 d 01-03-2022 18-06-2024 29%
+3 9954 E0 FBH+AP ALLE E0 - produktionskøkken 180 d 31-07-2023 15-04-2024 48%
+5 10342 E0 FBH+AP INS Installation i væg - EL 10 u 21-08-2023 27-10-2023 95%
+6 9958 E0 FBH+AP TØ TØ fix#2 (lukning gipsvægge) 1 u 21-08-2023 28-08-2023 99%
+8 9960 E0 FBH+AP APT Undergulv 2 u 08-09-2023 22-09-2023 95%
+9 9961 E0 FBH+AP APT Vægfliser incl. membran 6 u 06-11-2023 15-12-2023 85%
+10 9964 E0 FBH+AP INS installationer over loft - alle fag 12 u 27-11-2023 21-02-2024 9% R
+11 9971 E0 FBH+AP BH Kølerum 2 u 11-12-2023 22-12-2023 0%
+12 9962 E0 FBH+AP APT Banevarer (vinyl) 2 u 22-02-2024 06-03-2024 0% R
+13 9966 E0 FBH+AP TØ Hygiejneloft 10 d 22-02-2024 06-03-2024 0% R
+14 9963 E0 FBH+AP APT Vægfliser nederste bane (ud over vinyl) 1 u 07-03-2024 13-03-2024 0% R
+15 9967 E0 FBH+AP INS Slutmontage alle fag 5 d 07-03-2024 13-03-2024 0% R
+16 9968 E0 FBH+AP TØ Brandjalousi 5 d 07-03-2024 13-03-2024 0% R
+17 9969 E0 FBH+AP APT Rullegardiner 3 d 11-03-2024 13-03-2024 0% R
+18 9973 E0 FBH+AP ALLE Mangelgennemgang/overdragelse 2 u 14-03-2024 27-03-2024 0% R
+19 9970 E0 FBH+AP BH Køkkenmaskiner mv. 2 u 02-04-2024 15-04-2024 0% R
+20 9897 E0 AP ALLE E0 - alle arbejder i AP (atrium) 543 d 09-03-2022 03-05-2024 51%
+23 10943 E0 AP INS Installation #1 & #3 (over loft, restarbejder) 2 u 22-02-2024 06-03-2024 0% NY
+24 9899 E0 AP TØ TØ fix#2 (lukning gipsvægge) 10 d 09-03-2022 22-03-2022 95%
+25 10344 E0 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 13-11-2023 24-11-2023 25%
+26 9901 E0 AP APT Malerbehandling (ex. toiletter) 10 d 20-11-2023 01-12-2023 0%
+27 9902 E0 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 10 d 07-03-2024 20-03-2024 0% R
+28 10473 E0 AP INS Installation #1 & #3 (i loft) 10 d 19-03-2024 04-04-2024 0% R
+31 10586 E0 AP STÅL Værn v. atriumtrappe 10 d 18-12-2023 04-01-2024 0%
+32 9907 E0 AP APT Tyndpudsfinish/rep. 5 d 19-12-2023 27-12-2023 95%
+34 10306 E0 AP BH Gulvbelægning (terrazzo/Kvium) incl. afdækning 8 u 04-01-2024 28-02-2024 0%
+35 9909 E0 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 08-02-2024 28-02-2024 0%
+36 10913 E0 FBH APT Malerbehandling (toiletter) 7 d 20-02-2024 29-02-2024 0%
+37 10905 E0 FBH APT Flisearbejder (toiletter) 5 d 29-02-2024 06-03-2024 0%
+38 10308 E0 AP MTH Speedgates 3 u 29-02-2024 20-03-2024 0%
+39 9911 E0 AP APT Indv. solafskærmning/gardiner 5 d 07-03-2024 13-03-2024 0%
+40 9912 E0 AP INS Slutmontage alle install. 5 d 07-03-2024 13-03-2024 0%
+41 9913 E0 AP TØ TØ fix#5 (lukning lofter/låsesmed) 10 d 07-03-2024 20-03-2024 0%
+42 9914 E0 AP APT Slutmaling 5 d 21-03-2024 27-03-2024 0%
+43 9910 E0 AP APT Fast inventar 4 d 30-04-2024 03-05-2024 0%
+44 10914 E0 AP INS Instal. I tekøkkener 3 d 01-05-2024 03-05-2024 0%
+45 9878 E0 FBH ALLE E0 - alle arbejder i FBH (folkekøkken mm.) 578 d 01-03-2022 18-06-2024 17%
+46 9879 E0 FBH INS Installation #1 & #3 (over loft) 202 d 27-03-2023 15-01-2024 25%
+47 9880 E0 FBH TØ TØ fix#2 (lukning gipsvægge) 15 d 01-03-2022 21-03-2022 95%
+48 10907 E0 AP LUK Bundring til karruseldøre 2 d 13-12-2023 14-12-2023 0%
+49 9881 E0 FBH TØ Faste gipslofter (ikke toiletrum!) 5 d 18-03-2022 24-03-2022 0%
+50 9882 E0 FBH APT Malerbehandling (inkl. toiletter) 10 d 03-01-2024 16-01-2024 0%
+51 10556 E0 FBH APT Flisearbejder (toiletter) 10 d 17-01-2024 30-01-2024 0%
+52 10343 E0 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 17-01-2024 30-01-2024 0%
+53 9883 E0 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 10 d 05-03-2024 18-03-2024 0% R
+54 10558 E0 FBH INS Installation #1 & #3 (i loft) 10 d 19-03-2024 04-04-2024 0% R
+55 9887 E0 FBH INS Gulvbokse 3 d 05-04-2024 09-04-2024 0% R
+56 9888 E0 FBH APT Tyndpudsfinish/rep. 8 d 05-04-2024 16-04-2024 0% R
+57 10307 E0 FBH Råhus Gulvbelægning (glittet beton) incl. afdækning 6 u 05-04-2024 17-05-2024 0% R
+58 9889 E0 FBH GU Gulvbelægning (blødt gulv) incl. afdækning 3 u 17-04-2024 07-05-2024 0% R
+59 9890 E0 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 13-05-2024 03-06-2024 0% R
+60 9892 E0 FBH APT Indv. solafskærmning/gardiner 5 d 28-05-2024 03-06-2024 0% R
+61 9893 E0 FBH INS Slutmontage alle install. 5 d 04-06-2024 11-06-2024 0% R
+62 9894 E0 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 04-06-2024 11-06-2024 0% R
+63 9895 E0 FBH APT Slutmaling 5 d 12-06-2024 18-06-2024 0% R
+64 9891 E0 FBH APT Fast inventar 3 d 21-05-2024 23-05-2024 0% R
+65 10915 E0 AP INS Instal. i tekøkkener 3 d 21-05-2024 23-05-2024 0%
+66 10447 E0 AP ALLE E0 - alle arbejder i AP (auditorium + div. birum) 283 d 17-04-2023 30-05-2024 3%
+67 10448 E0 AP INS Installation #1 & #3 (over loft) 190 d 17-04-2023 15-01-2024 0%
+68 10449 E0 AP TØ TØ fix#2 (lukning gipsvægge) 10 d 08-08-2023 21-08-2023 95%
+69 10452 E0 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 11-12-2023 22-12-2023 0%
+70 10451 E0 AP APT Malerbehandling (inkl. toiletter) 10 d 10-01-2024 23-01-2024 0%
+71 10470 E0 AP APT Flisearbejder (toiletter) 10 d 24-01-2024 06-02-2024 0%
+72 10453 E0 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 10 d 26-02-2024 08-03-2024 0% R
+73 10471 E0 AP INS Installation #1 & #3 (i loft) 10 d 07-03-2024 20-03-2024 0% R
+74 10457 E0 AP INS Gulvbokse 3 d 21-03-2024 25-03-2024 0% R
+75 10458 E0 AP APT Tyndpudsfinish/rep. 8 d 21-03-2024 04-04-2024 0% R
+76 10459 E0 AP GU Gulvbelægning (blødt gulv) incl. afdækning 3 u 05-04-2024 25-04-2024 0% R
+77 10461 E0 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 19-04-2024 10-05-2024 0% R
+lukkes uge 34
+leveringstidspunkt?
+udføres parallelt med E4/FBH
+udføres parallelt med E4/AP
+10-01-24
+31 07 14 21 28 04 11 18 25 02 09 16 23 30 06 13 20 27 04 11 18 25 01 08 15 22 29 05 12 19 26 04 11 18 25 01 08 15 22 29 06 13 20 27 03 10 17 24
+aug 23 sep 23 okt 23 nov 23 dec 23 jan 24 feb 24 mar 24 apr 24 maj 24 jun 24
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Udarbejdet af: AHMBA/MORCH Side 1 af 9 Rev. 2024-01-10 / Opdateret 2024-01-xx
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+78 10463 E0 AP APT Indv. solafskærmning/gardiner 5 d 03-05-2024 10-05-2024 0% R
+79 10464 E0 AP INS Slutmontage alle install. 5 d 03-05-2024 10-05-2024 0% R
+80 10465 E0 AP TØ TØ fix#5 (lukning lofter/låsesmed) 10 d 03-05-2024 17-05-2024 0% R
+81 10466 E0 AP APT Slutmaling 5 d 24-05-2024 30-05-2024 0% R
+82 10462 E0 AP APT Fast inventar 3 d 21-05-2024 23-05-2024 0% R
+83 10916 E0 AP INS Instal. i tekøkkener 3 d 21-05-2024 23-05-2024 0% R
+84 9714 E1 FBH+AP ALLE E1 - alle arbejder 344 d 06-02-2023 20-06-2024 28%
+85 9935 E1 AP ALLE E1 - alle arbejder i AP 296 d 17-04-2023 19-06-2024 31%
+86 9936 E1 AP INS Installation #1 & #3 (over loft) 190 d 17-04-2023 15-01-2024 50%
+87 9937 E1 AP TØ TØ fix#2 (lukning gipsvægge) 12 d 29-08-2023 13-09-2023 95%
+88 10340 E1 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 11-12-2023 22-12-2023 0%
+89 9938 E1 AP TØ Faste gipslofter 5 d 18-12-2023 22-12-2023 0%
+90 9920 E1 FBH APT Malerbehandling (inkl. Toiletter) 10 d 02-01-2024 15-01-2024 0%
+91 10579 E1 FBH APT Malerbehandling (toiletter) 7 d 16-01-2024 24-01-2024 0%
+92 10944 E1 AP APT Flisearbejder (toiletter) 10 d 25-01-2024 07-02-2024 0%
+93 10443 E1 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 16-01-2024 29-01-2024 0%
+94 9940 E1 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 13-03-2024 02-04-2024 0% R
+95 10444 E1 AP INS Installation #1 & #3 (i loft) 12 d 27-03-2024 16-04-2024 0% R
+96 9944 E1 AP INS Gulvbokse 3 d 17-04-2024 19-04-2024 0% R
+97 9945 E1 AP APT Tyndpudsfinish/rep. 8 d 17-04-2024 26-04-2024 0% R
+98 9946 E1 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 29-04-2024 21-05-2024 0% R
+99 9947 E1 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 14-05-2024 04-06-2024 0% R
+100 9949 E1 AP APT Indv. solafskærmning/gardiner 5 d 29-05-2024 04-06-2024 0% R
+101 9951 E1 AP TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 06-06-2024 12-06-2024 0% R
+102 9950 E1 AP INS Slutmontage alle install. 5 d 06-06-2024 12-06-2024 0% R
+103 9952 E1 AP APT Slutmaling 5 d 13-06-2024 19-06-2024 0% R
+104 9948 E1 AP APT Fast inventar 5 d 22-05-2024 28-05-2024 0% R
+105 10917 E1 AP INS Instal. i tekøkkener 3 d 24-05-2024 28-05-2024 0% R
+106 9916 E1 FBH ALLE E1 - alle arbejder i FBH (greybox + omklædning) 344 d 06-02-2023 20-06-2024 26%
+108 9917 E1 FBH INS Installation #1 & #3 (over loft) 237 d 06-02-2023 15-01-2024 40%
+109 9918 E1 FBH TØ TØ fix#2 (lukning gipsvægge) 13 d 28-08-2023 13-09-2023 95%
+110 9939 E1 AP APT Malerbehandling (ex. Toiletter) 10 d 09-01-2024 22-01-2024 30%
+111 10341 E1 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 16-01-2024 29-01-2024 0%
+112 10441 E1 AP APT Malerbehandling (toiletter/omkl.) 10 d 23-01-2024 05-02-2024 0%
+113 10945 E1 FBH APT Flisearbejder (toiletter/omkl.) 20 d 30-01-2024 26-02-2024 0%
+114 10584 E1 FBH TØ Faste gipslofter 5 d 23-01-2024 29-01-2024 0%
+115 9921 E1 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 21-03-2024 10-04-2024 0% R
+116 10581 E1 FBH INS Installation #1 & #3 (i loft) 12 d 09-04-2024 24-04-2024 0% R
+117 10582 E1 FBH TØ TØ fix#2 (install. plader lys/BS/sprinkl.) 4 d 23-04-2024 26-04-2024 0% R
+118 9926 E1 FBH APT Tyndpudsfinish/rep. 8 d 25-04-2024 06-05-2024 0% R
+119 9927 E1 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 2 u 07-05-2024 22-05-2024 0% R
+120 9928 E1 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 10 d 23-05-2024 06-06-2024 0% R
+121 10911 E1 AP APT Omklædningsskabe (alle 5 rum) 25 d 30-04-2024 06-06-2024 0% R
+122 10912 E1 FBH INS Fremfør inst. til omklædningsskabe 20 d 07-05-2024 06-06-2024 0% R
+123 9930 E1 FBH APT Indv. solafskærmning/gardiner 5 d 30-05-2024 06-06-2024 0% R
+124 9931 E1 FBH INS Slutmontage alle install. 5 d 07-06-2024 13-06-2024 0% R
+125 9932 E1 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 07-06-2024 13-06-2024 0% R
+126 9933 E1 FBH APT Slutmaling 5 d 14-06-2024 20-06-2024 0% R
+127 9929 E1 FBH APT Fast inventar 5 d 29-05-2024 04-06-2024 0% R
+128 10918 E1 AP INS Instal. i tekøkkener 3 d 31-05-2024 04-06-2024 0% R
+129 9715 E2 FBH+AP ALLE E2 - alle arbejder 535 d 01-03-2022 15-04-2024 58%
+130 9763 E2 AP ALLE E2 - alle arbejder i AP 530 d 01-03-2022 08-04-2024 58%
+131 9726 E2 AP INS Installation #1 & #3 (over loft) 157 d 17-04-2023 24-11-2023 85%
+132 9746 E2 AP TØ TØ fix#2 (lukning gipsvægge) 20 d 01-03-2022 28-03-2022 95%
+133 10313 E2 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 30-10-2023 10-11-2023 50%
+136 10932 E2 AP APT Flisearbejder (toiletter) 10 d 24-01-2024 06-02-2024 0% R
+137 9747 E2 AP TØ Faste gipslofter 5 d 06-11-2023 10-11-2023 80%
+138 10349 E2 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 20-11-2023 01-12-2023 0%
+139 9749 E2 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 27-11-2023 12-12-2023 80% R
+140 9751 E2 AP INS Installation #1 & #3 (i loft) 12 d 08-01-2024 23-01-2024 0% R
+141 9753 E2 AP INS Gulvbokse 3 d 24-01-2024 26-01-2024 0% R
+142 9754 E2 AP APT Tyndpudsfinish/rep. 8 d 24-01-2024 02-02-2024 0% R
+143 9755 E2 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 05-02-2024 23-02-2024 0% R
+144 9756 E2 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 3 u 19-02-2024 08-03-2024 0% R
+145 9758 E2 AP APT Indv. solafskærmning/gardiner 5 d 04-03-2024 08-03-2024 0% R
+146 9759 E2 AP INS Slutmontage alle install. 5 d 11-03-2024 15-03-2024 0% R
+147 9760 E2 AP TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 11-03-2024 15-03-2024 0% R
+148 9761 E2 AP APT Slutmaling 5 d 18-03-2024 22-03-2024 0% R
+149 9757 E2 AP APT Fast inventar 5 d 02-04-2024 08-04-2024 0%
+150 10919 E2 AP INS Instal. i tekøkkener 3 d 04-04-2024 08-04-2024 0%
+udføres parallelt med E5/AP
+obs! afdækning
+udføres parallelt med E5/FBH
+10-01-24
+31 07 14 21 28 04 11 18 25 02 09 16 23 30 06 13 20 27 04 11 18 25 01 08 15 22 29 05 12 19 26 04 11 18 25 01 08 15 22 29 06 13 20 27 03 10 17 24
+aug 23 sep 23 okt 23 nov 23 dec 23 jan 24 feb 24 mar 24 apr 24 maj 24 jun 24
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Udarbejdet af: AHMBA/MORCH Side 2 af 9 Rev. 2024-01-10 / Opdateret 2024-01-xx
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+151 9745 E2 FBH ALLE E2 - alle arbejder i FBH 535 d 01-03-2022 15-04-2024 58%
+152 9725 E2 FBH INS Installation #1 & #3 (over loft) 178 d 14-03-2023 24-11-2023 80%
+153 9727 E2 FBH TØ TØ fix#2 (lukning gipsvægge) 20 d 01-03-2022 28-03-2022 95%
+154 10312 E2 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 06-11-2023 17-11-2023 80%
+155 9728 E2 FBH TØ Faste gipslofter 5 d 13-11-2023 17-11-2023 80%
+158 10933 E2 FBH APT Flisearbejder (toiletter) 10 d 07-02-2024 20-02-2024 0% R
+159 10352 E2 FBH TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 27-11-2023 08-12-2023 0%
+160 9730 E2 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 05-12-2023 20-12-2023 80%
+161 9732 E2 FBH INS Installation #1 & #3 (i loft) 12 d 22-01-2024 06-02-2024 0% R
+162 9734 E2 FBH INS Gulvbokse 3 d 07-02-2024 09-02-2024 0% R
+163 9735 E2 FBH APT Tyndpudsfinish/rep. 8 d 07-02-2024 16-02-2024 0% R
+164 9736 E2 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 19-02-2024 08-03-2024 0% R
+165 9738 E2 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 3 u 04-03-2024 22-03-2024 0% R
+166 9740 E2 FBH APT Indv. solafskærmning/gardiner 5 d 18-03-2024 22-03-2024 0% R
+167 9741 E2 FBH INS Slutmontage alle install. 5 d 25-03-2024 03-04-2024 0% R
+168 9742 E2 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 25-03-2024 03-04-2024 0% R
+169 9743 E2 FBH APT Slutmaling 5 d 04-04-2024 10-04-2024 0% R
+170 9739 E2 FBH APT Fast inventar 5 d 09-04-2024 15-04-2024 0%
+171 10920 E2 AP INS Instal. i tekøkkener 3 d 11-04-2024 15-04-2024 0%
+172 9716 E3 FBH+AP ALLE E3 - alle arbejder 539 d 18-03-2022 08-05-2024 41%
+173 9783 E3 AP ALLE E3 - alle arbejder i AP 527 d 22-03-2022 24-04-2024 40%
+174 9784 E3 AP INS Installation #1 & #3 (over loft) 141 d 02-06-2023 15-12-2023 75%
+175 9785 E3 AP TØ TØ fix#2 (lukning gipsvægge) 10 d 22-03-2022 04-04-2022 95%
+176 10335 E3 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 13-11-2023 24-11-2023 15%
+177 9786 E3 AP TØ Faste gipslofter 5 d 20-11-2023 24-11-2023 5%
+178 9787 E3 AP APT Malerbehandling (ex. toiletter) 10 d 18-09-2023 29-09-2023 0%
+179 10360 E3 AP APT Malerbehandling (toiletter) 7 d 13-11-2023 21-11-2023 0%
+180 10935 E3 AP APT Flisearbejder (toiletter) 10 d 21-02-2024 05-03-2024 0% R
+181 10362 E3 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 04-12-2023 15-12-2023 0%
+182 9788 E3 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 21-12-2023 10-01-2024 0% R
+183 9790 E3 AP INS Installation #1 & #3 (i loft) 12 d 05-02-2024 20-02-2024 0% R
+184 9792 E3 AP INS Gulvbokse 3 d 21-02-2024 23-02-2024 0% R
+185 9793 E3 AP APT Tyndpudsfinish/rep. 8 d 21-02-2024 01-03-2024 0% R
+186 9794 E3 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 04-03-2024 22-03-2024 0% R
+187 9795 E3 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 18-03-2024 10-04-2024 0% R
+188 9797 E3 AP APT Indv. solafskærmning/gardiner 5 d 04-04-2024 10-04-2024 0% R
+189 9798 E3 AP INS Slutmontage alle install. 5 d 11-04-2024 17-04-2024 0% R
+190 9799 E3 AP TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 11-04-2024 17-04-2024 0% R
+191 9800 E3 AP APT Slutmaling 5 d 18-04-2024 24-04-2024 0% R
+192 9796 E3 AP APT Fast inventar 5 d 02-04-2024 08-04-2024 0%
+193 10921 E3 AP INS Instal. i tekøkkener 3 d 04-04-2024 08-04-2024 0%
+194 9764 E3 FBH ALLE E3 - alle arbejder i FBH 539 d 18-03-2022 08-05-2024 42%
+195 9765 E3 FBH INS Installation #1 & #3 (over loft) 166 d 25-04-2023 15-12-2023 65%
+196 9766 E3 FBH TØ TØ fix#2 (lukning gipsvægge) 10 d 18-03-2022 31-03-2022 95%
+199 10936 E3 FBH APT Flisearbejder (toiletter) 10 d 06-03-2024 19-03-2024 0% R
+200 10334 E3 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 20-11-2023 01-12-2023 0%
+201 9767 E3 FBH TØ Faste gipslofter 5 d 27-11-2023 01-12-2023 0%
+202 10356 E3 FBH TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 11-12-2023 22-12-2023 0%
+203 9769 E3 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 11-01-2024 26-01-2024 0% R
+204 9771 E3 FBH INS Installation #1 & #3 (i loft) 12 d 19-02-2024 05-03-2024 0% R
+205 9773 E3 FBH INS Gulvbokse 3 d 06-03-2024 08-03-2024 0% R
+206 9774 E3 FBH APT Tyndpudsfinish/rep. 8 d 06-03-2024 15-03-2024 0% R
+207 9775 E3 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 18-03-2024 10-04-2024 0% R
+208 9776 E3 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 04-04-2024 24-04-2024 0% R
+209 9778 E3 FBH APT Indv. solafskærmning/gardiner 5 d 18-04-2024 24-04-2024 0% R
+210 9779 E3 FBH INS Slutmontage alle install. 5 d 25-04-2024 01-05-2024 0% R
+211 9780 E3 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 25-04-2024 01-05-2024 0% R
+212 9781 E3 FBH APT Slutmaling 5 d 02-05-2024 08-05-2024 0% R
+213 9777 E3 FBH APT Fast inventar 5 d 11-04-2024 17-04-2024 0%
+214 10922 E3 AP INS Instal. i tekøkkener 3 d 15-04-2024 17-04-2024 0%
+215 9717 E4 FBH+AP ALLE E4 - alle arbejder 559 d 29-03-2022 19-06-2024 27%
+216 9821 E4 AP ALLE E4 - alle arbejder i AP 544 d 05-04-2022 04-06-2024 29%
+217 9822 E4 AP INS Installation #1 & #3 (over loft) 157 d 17-07-2023 23-02-2024 40% R
+218 9823 E4 AP TØ TØ fix#2 (lukning gipsvægge) 10 d 05-04-2022 21-04-2022 95%
+221 10937 E4 AP APT Flisearbejder (toiletter) 10 d 03-04-2024 16-04-2024 0% R
+222 10337 E4 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 27-11-2023 08-12-2023 0%
+223 9824 E4 AP TØ Faste gipslofter 5 d 04-12-2023 08-12-2023 0%
+224 10374 E4 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 18-12-2023 03-01-2024 0%
+225 9826 E4 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 26-02-2024 12-03-2024 0% R
+226 10931 E4 AP INS Installation #1 & #3 (i loft) 12 d 13-03-2024 02-04-2024 0% R
+(underlag)
+10-01-24
+31 07 14 21 28 04 11 18 25 02 09 16 23 30 06 13 20 27 04 11 18 25 01 08 15 22 29 05 12 19 26 04 11 18 25 01 08 15 22 29 06 13 20 27 03 10 17 24
+aug 23 sep 23 okt 23 nov 23 dec 23 jan 24 feb 24 mar 24 apr 24 maj 24 jun 24
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Udarbejdet af: AHMBA/MORCH Side 3 af 9 Rev. 2024-01-10 / Opdateret 2024-01-xx
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+227 9830 E4 AP INS Gulvbokse 3 d 03-04-2024 05-04-2024 0% R
+228 9831 E4 AP APT Tyndpudsfinish/rep. 8 d 03-04-2024 12-04-2024 0% R
+229 9832 E4 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 15-04-2024 03-05-2024 0% R
+230 9833 E4 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 29-04-2024 21-05-2024 0% R
+231 9835 E4 AP APT Indv. solafskærmning/gardiner 5 d 14-05-2024 21-05-2024 0% R
+232 9836 E4 AP INS Slutmontage alle install. 5 d 22-05-2024 28-05-2024 0% R
+233 9837 E4 AP TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 22-05-2024 28-05-2024 0% R
+234 9838 E4 AP APT Slutmaling 5 d 29-05-2024 04-06-2024 0% R
+235 9834 E4 AP APT Fast inventar 5 d 06-05-2024 13-05-2024 0% R
+236 10923 E4 AP INS Instal. i tekøkkener 3 d 08-05-2024 13-05-2024 0% R
+237 9802 E4 FBH ALLE E4 - alle arbejder i FBH 559 d 29-03-2022 19-06-2024 25%
+238 9803 E4 FBH INS Installation #1 & #3 (over loft) 163 d 07-07-2023 23-02-2024 35% R
+239 9804 E4 FBH TØ TØ fix#2 (lukning gipsvægge) 10 d 29-03-2022 11-04-2022 95%
+241 10365 E4 FBH APT Malerbehandling (toiletter) 7 d 04-12-2023 12-12-2023 50%
+242 10939 E4 FBH APT Flisearbejder (toiletter) 10 d 10-04-2024 23-04-2024 0%
+243 10336 E4 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 04-12-2023 15-12-2023 0%
+244 9805 E4 FBH TØ Faste gipslofter 5 d 11-12-2023 15-12-2023 0%
+245 10367 E4 FBH TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 27-12-2023 10-01-2024 0%
+246 9807 E4 FBH TØ TØ fix#2 (stropper/skinnesystem/install. plader) 12 d 05-03-2024 20-03-2024 0% R
+247 9809 E4 FBH INS Installation #1 & #3 (i loft) 12 d 27-03-2024 16-04-2024 0% R
+248 9811 E4 FBH INS Gulvbokse 3 d 17-04-2024 19-04-2024 0% R
+249 9812 E4 FBH APT Tyndpudsfinish/rep. 8 d 17-04-2024 26-04-2024 0% R
+250 9813 E4 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 29-04-2024 21-05-2024 0% R
+251 9814 E4 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 14-05-2024 04-06-2024 0% R
+252 9816 E4 FBH APT Indv. solafskærmning/gardiner 5 d 29-05-2024 04-06-2024 0% R
+253 9817 E4 FBH INS Slutmontage alle install. 5 d 06-06-2024 12-06-2024 0% R
+254 9818 E4 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 06-06-2024 12-06-2024 0% R
+255 9819 E4 FBH APT Slutmaling 5 d 13-06-2024 19-06-2024 0% R
+256 9815 E4 FBH APT Fast inventar 5 d 22-05-2024 28-05-2024 0% R
+257 10924 E4 AP INS Instal. i tekøkkener 3 d 24-05-2024 28-05-2024 0% R
+258 9718 E5 FBH+AP ALLE E5 - alle arbejder 561 d 22-04-2022 12-07-2024 16%
+259 9859 E5 AP ALLE E5 - alle arbejder i AP 546 d 29-04-2022 28-06-2024 23%
+261 9860 E5 AP INS Installation #1 & #3 (over loft) 148 d 04-08-2023 01-03-2024 30% R
+262 9861 E5 AP TØ TØ fix#2 (lukning gipsvægge) 10 d 29-04-2022 12-05-2022 95%
+264 10380 E5 AP APT Malerbehandling (toiletter) 7 d 11-12-2023 19-12-2023 80%
+265 10940 E5 AP APT Flisearbejder (toiletter) 10 d 01-05-2024 15-05-2024 0% R
+266 10339 E5 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 11-12-2023 22-12-2023 0%
+267 9862 E5 AP TØ Faste gipslofter 5 d 18-12-2023 22-12-2023 0%
+268 10382 E5 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 04-01-2024 17-01-2024 0%
+269 9864 E5 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 13-03-2024 02-04-2024 0% R
+270 9866 E5 AP INS Installation #1 & #3 (i loft) 12 d 15-04-2024 30-04-2024 0% R
+271 9868 E5 AP INS Gulvbokse 3 d 01-05-2024 03-05-2024 0% R
+272 9869 E5 AP APT Tyndpudsfinish/rep. 5 d 01-05-2024 07-05-2024 0% R
+273 9870 E5 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 08-05-2024 30-05-2024 0% R
+274 9871 E5 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 24-05-2024 14-06-2024 0% R
+275 9873 E5 AP APT Indv. solafskærmning/gardiner 5 d 10-06-2024 14-06-2024 0% R
+276 9874 E5 AP INS Slutmontage alle install. 5 d 17-06-2024 21-06-2024 0% R
+277 9875 E5 AP TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 17-06-2024 21-06-2024 0% R
+278 9872 E5 AP APT Fast inventar 5 d 31-05-2024 07-06-2024 0% R
+279 10925 E5 AP INS Instal. i tekøkkener 3 d 04-06-2024 07-06-2024 0% R
+280 9876 E5 AP APT Slutmaling 5 d 24-06-2024 28-06-2024 0% R
+281 9840 E5 FBH ALLE E5 - alle arbejder i FBH 561 d 22-04-2022 12-07-2024 8%
+283 9841 E5 FBH INS Installation #1 & #3 (over loft) 154 d 27-07-2023 01-03-2024 0% R
+284 9842 E5 FBH TØ TØ fix#2 (lukning gipsvægge) 10 d 22-04-2022 05-05-2022 95%
+286 10375 E5 FBH APT Malerbehandling (toiletter) 7 d 18-12-2023 28-12-2023 80%
+287 10942 E5 FBH APT Flisearbejder (toiletter) 10 d 16-05-2024 30-05-2024 0% R
+288 10338 E5 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d 18-12-2023 03-01-2024 0%
+289 9843 E5 FBH TØ Faste gipslofter 5 d 27-12-2023 03-01-2024 0%
+290 10379 E5 FBH TØ TØ fix#3 (vinduesbænke + lysninger) 10 d 11-01-2024 24-01-2024 0%
+291 9845 E5 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 12 d 21-03-2024 10-04-2024 0% R
+292 10930 E5 FBH INS Installation #1 & #3 (i loft) 12 d 29-04-2024 15-05-2024 0% R
+293 9849 E5 FBH INS Gulvbokse 3 d 16-05-2024 21-05-2024 0% R
+294 9850 E5 FBH APT Tyndpudsfinish/rep. 5 d 16-05-2024 23-05-2024 0% R
+295 9851 E5 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u 24-05-2024 14-06-2024 0% R
+296 9852 E5 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d 10-06-2024 28-06-2024 0% R
+297 9854 E5 FBH APT Indv. solafskærmning/gardiner 5 d 17-06-2024 21-06-2024 0% R
+298 9853 E5 FBH APT Fast inventar 5 d 17-06-2024 21-06-2024 0% R
+299 10926 E5 AP INS Instal. i tekøkkener 3 d 19-06-2024 21-06-2024 0% R
+300 9855 E5 FBH INS Slutmontage alle install. 5 d 01-07-2024 05-07-2024 0% R
+301 9856 E5 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 01-07-2024 05-07-2024 0% R
+10-01-24
+31 07 14 21 28 04 11 18 25 02 09 16 23 30 06 13 20 27 04 11 18 25 01 08 15 22 29 05 12 19 26 04 11 18 25 01 08 15 22 29 06 13 20 27 03 10 17 24
+aug 23 sep 23 okt 23 nov 23 dec 23 jan 24 feb 24 mar 24 apr 24 maj 24 jun 24
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Udarbejdet af: AHMBA/MORCH Side 4 af 9 Rev. 2024-01-10 / Opdateret 2024-01-xx
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+302 9857 E5 FBH APT Slutmaling 5 d 08-07-2024 12-07-2024 0% R
+303 9719 E6 FBH+AP ALLE E6 - alle arbejder 296 d 16-03-2023 22-05-2024 35%
+304 10385 E6 FBH ALLE E6 - alle arbejder i FBH (væksthus + toiletter) 125 d 20-11-2023 22-05-2024 7%
+305 10386 E5 FBH TØ TØ fix#1 (gipsvægge gips 1 side + skørt v. facade) 10 d 20-11-2023 01-12-2023 95%
+306 10387 E5 FBH INS Installation #1 & #3 25 d 04-12-2023 10-01-2024 0%
+307 10388 E5 FBH TØ TØ fix#2 (lukning gipsvægge) 5 d 04-01-2024 10-01-2024 0%
+308 10391 E5 FBH APT Malerbehandling (toiletter) 7 d 11-01-2024 19-01-2024 0%
+309 10394 E5 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 5 d 11-01-2024 17-01-2024 0%
+310 10395 E5 FBH TØ TØ fix#2 (stropper/skinnesystem/install. plader VE) 5 d 18-01-2024 24-01-2024 0%
+311 10392 E5 FBH APT Flisearbejder (toiletter) 8 d 22-01-2024 31-01-2024 0%
+312 10396 E5 FBH INS Montage i lysskinner + VAV boxe. 6 d 23-01-2024 30-01-2024 0%
+313 10397 E5 FBH TØ TØ fix#2 (install. plader lys/BS/sprinkl.) 4 d 29-01-2024 01-02-2024 0%
+314 10398 E5 FBH INS Montage i loft, alle install. 6 d 31-01-2024 07-02-2024 0%
+315 10400 E5 FBH APT Tyndpudsfinish/rep. 5 d 08-02-2024 14-02-2024 0%
+316 10401 E5 FBH GU Gulvbelægning (trægulv) incl. afdækning 3 u 15-02-2024 06-03-2024 0%
+317 10402 E5 FBH TØ TØ fix#4 (døre/akustikvægge) 8 d 05-03-2024 14-03-2024 0%
+318 10405 E5 FBH INS Slutmontage alle install. 5 d 08-03-2024 14-03-2024 0%
+319 10406 E5 FBH TØ TØ fix#5 (lukning lofter/låsesmed) 5 d 08-03-2024 14-03-2024 0%
+320 10407 E5 FBH APT Slutmaling 5 d 15-03-2024 21-03-2024 0%
+321 10403 E5 FBH APT Fast inventar 5 d 15-05-2024 22-05-2024 0%
+322 10927 E5 AP INS Instal. i tekøkkener 3 d 17-05-2024 22-05-2024 0%
+323 10412 E6 AP ALLE E6 - alle arbejder i AP (div. Teknikrum) 60 d 20-11-2023 14-02-2024 25%
+324 10800 E6 FBH+AP MTH Støvbinding og imprægnering 3 d 22-11-2023 24-11-2023 0%
+325 10415 E6 AP INS Nødkølecentral (input fra KL ønskes) 40 d 20-11-2023 17-01-2024 81%
+326 10413 E6 AP INS Server-/HX-rum 55 d 27-11-2023 14-02-2024 3%
+327 10414 E6 AP INS Tavle-/UPS-/batteri-rum (input fra KL ønskes) 40 d 11-12-2023 07-02-2024 0%
+328 9721 E6 AP INS KL arbejdsplan - tekniketage 232 d 16-03-2023 15-02-2024 55%
+329 9723 E6 FBH INS KL arbejdsplan - tekniketage 222 d 30-03-2023 15-02-2024 48%
+330 10309 E6 FBH+AP INS Cx + indregulering 15 u 26-01-2024 15-05-2024 0%
+331 9985 Ex FBH+AP ALLE Installationsskakte (ve) 115 d 28-08-2023 07-02-2024 64%
+375 10574 Ex FBH ALLE Trapperum/FBH/ap - alle arbejder 109 d 03-11-2023 11-04-2024 7%
+376 10715 Ex FBH ALLE Trappekerne 1 82 d 03-11-2023 29-02-2024 10%
+378 10717 Ex FBH INS K&L installationer i vægge 16 d 06-11-2023 27-11-2023 0%
+380 10721 Ex FBH APT Malerbehandling vægge/reposer 7 d 28-11-2023 06-12-2023 50%
+381 10904 Ex FBH INS K&L installationer i vægge 8 d 18-12-2023 29-12-2023 0%
+382 10726 Ex FBH INS Lodrette vvs rør 4 d 18-12-2023 21-12-2023 0%
+383 10720 Ex FBH INS K&L installationer over loft E5/E6 3 d 27-12-2023 29-12-2023 0%
+384 10722 Ex FBH TØ Systemloft E5/E6 2 d 02-01-2024 03-01-2024 0%
+385 10719 Ex FBH Råhus Luk huller/recesser 3 d 02-01-2024 04-01-2024 0%
+386 10723 Ex FBH INS Installationer i loft E5/E6- inkl. Brand&sikring 2 d 04-01-2024 05-01-2024 0%
+387 10724 Ex FBH TØ luk loft E5/E6 1 d 08-01-2024 08-01-2024 0%
+388 10725 Ex FBH TØ Demonter platform 2 d 09-01-2024 10-01-2024 0%
+389 10727 Ex FBH INS Installationer under trapperepos 10 d 02-01-2024 15-01-2024 0%
+390 10728 Ex FBH MTH Etablering af støvvægge 2 d 15-01-2024 16-01-2024 0%
+391 10729 Ex FBH Råhus Trappefinish inkl. Slibning (Terrazzo) 12 d 17-01-2024 01-02-2024 0%
+392 10730 Ex FBH Råhus Trappeværn samt evt. finisharbejde 3 d 02-02-2024 06-02-2024 0%
+393 10731 Ex FBH MTH Afdækning af trappe 3 d 07-02-2024 09-02-2024 0%
+395 10733 Ex FBH TØ Akustiklofter under trapperepos 8 d 12-02-2024 21-02-2024 0%
+396 10734 Ex FBH INS Slutmontage inkl armatur 5 d 19-02-2024 23-02-2024 0%
+397 10735 Ex FBH APT Slutmaling 4 d 26-02-2024 29-02-2024 0%
+398 10736 Ex FBH ALLE Trappekerne 2 93 d 06-11-2023 18-03-2024 8%
+400 10742 Ex FBH APT Malerbehandling vægge/reposer 8 d 30-11-2023 11-12-2023 20%
+402 10747 Ex FBH INS Lodrette vvs rør 4 d 22-12-2023 29-12-2023 0%
+403 10741 Ex FBH INS K&L installationer over loft E5/E6 2 d 02-01-2024 03-01-2024 0%
+404 10738 Ex FBH INS K&L installationer i vægge 5 d 02-01-2024 08-01-2024 0%
+405 10740 Ex FBH Råhus Luk huller/recesser 3 d 08-01-2024 10-01-2024 0%
+406 10743 Ex FBH TØ Systemloft E5/E6 2 d 09-01-2024 10-01-2024 0%
+407 10744 Ex FBH INS Installationer i loft E5/E6- inkl. Brand&sikring 2 d 11-01-2024 12-01-2024 0%
+408 10745 Ex FBH TØ luk loft E5/E6 1 d 15-01-2024 15-01-2024 0%
+409 10746 Ex FBH TØ Demonter platform 1 d 16-01-2024 16-01-2024 0%
+410 10748 Ex FBH INS Installationer under trapperepos 10 d 09-01-2024 22-01-2024 0%
+411 10749 Ex FBH MTH Etablering af støvvægge 2 d 22-01-2024 23-01-2024 0%
+412 10750 Ex FBH Råhus Trappefinish inkl. Slibning (Terrazzo) 12 d 02-02-2024 19-02-2024 0%
+413 10751 Ex FBH Råhus Trappeværn samt evt. finisharbejde 3 d 20-02-2024 22-02-2024 0%
+414 10752 Ex FBH MTH Afdækning af trappe 3 d 23-02-2024 27-02-2024 0%
+416 10754 Ex FBH TØ Akustiklofter under trapperepos 8 d 28-02-2024 08-03-2024 0%
+417 10755 Ex FBH INS Slutmontage inkl armatur 5 d 06-03-2024 12-03-2024 0%
+418 10756 Ex FBH APT Slutmaling 4 d 13-03-2024 18-03-2024 0%
+419 10757 Ex AP ALLE Trappekerne 3 102 d 07-11-2023 04-04-2024 6%
+422 10763 Ex AP APT Malerbehandling vægge/reposer 7 d 07-12-2023 15-12-2023 0%
+detail-input fra KL ikke modtaget
+detail-input fra KL ikke modtaget
+10-01-24
+31 07 14 21 28 04 11 18 25 02 09 16 23 30 06 13 20 27 04 11 18 25 01 08 15 22 29 05 12 19 26 04 11 18 25 01 08 15 22 29 06 13 20 27 03 10 17 24
+aug 23 sep 23 okt 23 nov 23 dec 23 jan 24 feb 24 mar 24 apr 24 maj 24 jun 24
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Udarbejdet af: AHMBA/MORCH Side 5 af 9 Rev. 2024-01-10 / Opdateret 2024-01-xx
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+423 10768 Ex AP INS Lodrette vvs rør 4 d 02-01-2024 05-01-2024 0%
+424 10760 Ex AP INS K&L installationer i vægge 5 d 09-01-2024 15-01-2024 0%
+425 10761 Ex AP Råhus Luk huller/recesser 3 d 15-01-2024 17-01-2024 0%
+426 10762 Ex AP INS K&L installationer over loft E5/E6 2 d 16-01-2024 17-01-2024 0%
+427 10764 Ex AP TØ Systemloft E5/E6 2 d 18-01-2024 19-01-2024 0%
+428 10765 Ex AP INS Installationer i loft E5/E6- inkl. Brand&sikring 

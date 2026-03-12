@@ -1,0 +1,187 @@
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+Kvt 1 2024 Kvt 2 2024 Kvt 3 2024 Kvt 4 2024
+1 9712 Ex - ALLE AP - MORCH (excl. lukning + råhus) 710 d ti 01-03-22 to 19-12-24 64%
+jan feb mar apr maj jun jul aug sep okt nov dec
+06-06-24
+2 9713 E0 FBH+AP ALLE E0 - alle arbejder 629 d ti 01-03-22 on 28-08-24 76%
+3 9954 E0 FBH+AP ALLE E0 - produktionskøkken 236 d ma 31-07-23 fr 05-07-24 86%
+12 9966 E0 FBH+AP TØ Hygiejneloft 20 d ti 30-04-24 on 29-05-24 75%
+13 11120 E0 FBH+AP APT Malerbehandling 7 d on 08-05-24 fr 17-05-24 90%
+14 11240 E0 FBH+AP INS Installation #1 & #3 (i loft) 10 d to 23-05-24 to 06-06-24 60% X
+Etape 1 inden tyndpudsopstart
+15 11098 E0 FBH+AP APT Tyndpudsfinish/rep. 5 d on 29-05-24 ti 04-06-24 10% X
+16 9962 E0 FBH+AP GU Banevarer (vinyl) 10 d to 06-06-24 on 19-06-24 0%
+17 9968 E0 FBH+AP TØ Brandjalousi 5 d to 13-06-24 on 19-06-24 90%
+18 9963 E0 FBH+AP APT Vægfliser nederste bane (ud over vinyl) 5 d ma 17-06-24 fr 21-06-24 0%
+19 9967 E0 FBH+AP INS Slutmontage alle fag 5 d ma 17-06-24 fr 21-06-24 15% X
+21 9973 E0 FBH+AP ALLE Mangelgennemgang/overdragelse 2 u ma 24-06-24 fr 05-07-24 0%
+22 9970 E0 FBH+AP BH Køkkenmaskiner mv./ID 2 (start) 0 u to 27-06-24 to 27-06-24 0%
+27-06-2024
+23 9897 E0 AP ALLE E0 - alle arbejder i AP (atrium) 614 d on 09-03-22 to 15-08-24 73%
+29 10586 E0 AP STÅL Værn v. atriumtrappe 10 d on 27-12-23 to 11-01-24 0%
+leveringstidspunkt?
+33 10308 E0 AP MTH Speedgates 3 u ti 02-04-24 ma 22-04-24 0%
+34 10344 E0 AP TØ TØ fix#2 (kantskinner/akustikunderlag) 30 d ma 08-04-24 ti 21-05-24 90% X
+35 10913 E0 AP APT Malerbehandling (rest maling inkl. toiletter) 7 d fr 17-05-24 ti 28-05-24 90% X
+36 9902 E0 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 13 d to 16-05-24 ti 04-06-24 80% X
+40 10473 E0 AP INS Installation #1 & #3 (i loft) 11 d ma 03-06-24 ti 18-06-24 0% R
+41 9909 E0 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d fr 07-06-24 to 27-06-24 0%
+42 10905 E0 AP APT Flisearbejder (toiletter) 5 d ma 10-06-24 fr 14-06-24 0% R
+43 9912 E0 AP INS Slutmontage alle install. 5 d ma 17-06-24 fr 21-06-24 20% X/R
+44 11037 E0 AP INS Sanitet 5 d ma 17-06-24 fr 21-06-24 0% R
+45 11283 E0 AP LUK Karrusel (hovedindgang) 5 d ma 15-07-24 fr 19-07-24 0% NY
+46 9913 E0 AP TØ TØ fix#5 (låsesmed) 3 d to 18-07-24 ma 22-07-24 0% R
+47 11242 E0 AP BH Aktivt udstyr - Bygherreleverance ID12 2 d to 18-07-24 fr 19-07-24 0% NY
+48 9910 E0 AP APT Fast inventar 3 d fr 19-07-24 ti 23-07-24 0% R
+49 10914 E0 AP INS Instal. i tekøkkener 5 d fr 19-07-24 to 25-07-24 0% R
+50 11286 E0 AP TØ Glasbur (hovedindgang) 5 d ma 22-07-24 fr 26-07-24 0% NY
+51 9911 E0 AP APT Indv. solafskærmning/gardiner 3 d on 24-07-24 fr 26-07-24 0% R
+52 11244 E0 AP BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d to 08-08-24 fr 09-08-24 0% NY
+53 9914 E0 AP APT Slutmaling 5 d to 08-08-24 on 14-08-24 0% R
+54 11284 E0 AP LUK Slutmontage karrusel 4 d ma 12-08-24 to 15-08-24 0% NY
+55 11233 E0 AP TØ Luk lofter jf. KL prikplan 3 d ti 13-08-24 to 15-08-24 0%
+56 9878 E0 FBH ALLE E0 - alle arbejder i FBH (folkekøkken mm.) 629 d ti 01-03-22 on 28-08-24 70%
+57 9879 E0 FBH INS Installation #1 & #3 (over loft) 284 d ma 27-03-23 ti 14-05-24 95%
+60 9882 E0 FBH APT Malerbehandling (inkl. toiletter) 8 d ti 07-05-24 fr 17-05-24 15%
+61 10343 E0 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 8 d ti 07-05-24 fr 17-05-24 90%
+63 9883 E0 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. Plader) 7 d ma 13-05-24 on 22-05-24 50%
+64 9881 E0 FBH TØ Faste gipslofter (affaldsrum) 5 d on 15-05-24 on 22-05-24 0%
+65 10558 E0 FBH INS Installation #1 & #3 (i loft) 6 d fr 17-05-24 ma 27-05-24 50% X
+66 10307 E0 FBH Råhus Gulvbelægning (glittet beton) incl. afdækning 17 d ti 21-05-24 to 13-06-24 40%
+67 11237 E0 FBH Råhus Hærdetid 5 d fr 14-06-24 to 20-06-24 0%
+68 9888 E0 FBH APT Tyndpudsfinish/rep. 4 d to 20-06-24 on 26-06-24 0%
+69 11238 E0 FBH MTH Afdækning af gulv 2 d to 20-06-24 fr 21-06-24 0%
+70 11288 E0 FBH INS Installation #1 & #3 (over loft) restarbejder 4 d ma 24-06-24 to 27-06-24 0% NY
+71 9889 E0 FBH GU Gulvbelægning (blødt gulv) incl. afdækning 2 u on 26-06-24 ti 09-07-24 0% R
+72 10556 E0 FBH APT Flisearbejder (toiletter) 10 d on 26-06-24 ti 09-07-24 0% R
+73 9890 E0 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 8 d fr 05-07-24 ti 16-07-24 0%
+74 11038 E0 FBH INS Sanitet 5 d on 10-07-24 ti 16-07-24 0%
+75 11282 E0 FBH LUK Karrusel (hovedindgang) 5 d ma 15-07-24 fr 19-07-24 0% NY
+76 9893 E0 FBH INS Slutmontage alle install. 5 d to 18-07-24 on 24-07-24 0% X
+77 9894 E0 FBH TØ TØ fix#5 (låsesmed) 5 d fr 19-07-24 to 25-07-24 0% R
+78 11269 E0 FBH BH Aktivt udstyr - Bygherreleverance ID12 2 d fr 19-07-24 ma 22-07-24 0% NY
+79 9891 E0 FBH APT Fast inventar 3 d on 24-07-24 fr 26-07-24 0% R
+80 10915 E0 FBH INS Instal. i tekøkkener 5 d on 24-07-24 ti 30-07-24 0% R
+81 9892 E0 FBH APT Indv. solafskærmning/gardiner 3 d fr 26-07-24 ti 30-07-24 0% R
+82 11287 E0 FBH TØ Glasbur (hovedindgang) 5 d ma 29-07-24 fr 02-08-24 0% NY
+84 11277 E0 FBH BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d fr 09-08-24 ma 12-08-24 0% NY
+85 9895 E0 FBH APT Slutmaling 5 d fr 16-08-24 to 22-08-24 0% R
+86 11285 E0 AP LUK Slutmontage karrusel 5 d fr 16-08-24 to 22-08-24 0% NY
+87 11234 E0 FBH TØ Luk lofter jf. KL prikplan 5 d to 22-08-24 on 28-08-24 0%
+Udarbejdet af: AHMBA/MORCH
+Forklaring: R=aktivitet revideret - X=opdateret stade - NY= ny aktivitet
+Side 1 af 7 Rev. 2024-06-06 / Opdateret 2024-06-06
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+Kvt 1 2024 Kvt 2 2024 Kvt 3 2024 Kvt 4 2024
+88 10447 E0 AP ALLE E0 - alle arbejder i AP (auditorium + div. Birum) 617 d on 09-03-22 ti 20-08-24 79%
+jan feb mar apr maj jun jul aug sep okt nov dec
+06-06-24
+90 10453 E0 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 28 d ma 15-04-24 fr 24-05-24 80%
+93 10451 E0 AP APT Malerbehandling (inkl. toiletter) 7 d ti 07-05-24 to 16-05-24 80%
+94 10471 E0 AP INS Installation #1 & #3 (i loft) 13 d to 23-05-24 ti 11-06-24 0% R
+95 10457 E0 AP INS Gulvbokse 3 d on 12-06-24 fr 14-06-24 0% R
+96 10458 E0 AP APT Tyndpudsfinish/rep. 5 d on 12-06-24 ti 18-06-24 0% R
+97 10470 E0 AP APT Flisearbejder (toiletter) 7 d ma 17-06-24 ti 25-06-24 0% R
+98 10459 E0 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 2 u on 19-06-24 ti 02-07-24 0% R
+99 11039 E0 AP INS Sanitet 5 d ma 24-06-24 fr 28-06-24 0% R
+100 10464 E0 AP INS Slutmontage alle install. 5 d ma 24-06-24 fr 28-06-24 0% X
+101 10461 E0 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 5 d on 03-07-24 ti 09-07-24 20% X/R
+102 10465 E0 AP TØ TØ fix#5 (låsesmed) 3 d ti 16-07-24 to 18-07-24 0% R
+103 11110 E0 AP GU Slibning/behandling af gulv 5 d ma 22-07-24 fr 26-07-24 0%
+104 10463 E0 AP APT Indv. solafskærmning/gardiner 3 d ma 29-07-24 on 31-07-24 0% R
+105 10466 E0 AP APT Slutmaling 5 d ti 13-08-24 ma 19-08-24 0% R
+106 11235 E0 AP TØ Luk lofter jf. KL prikplan 3 d fr 16-08-24 ti 20-08-24 0%
+107 9714 E1 FBH+AP ALLE E1 - alle arbejder 390 d ma 06-02-23 fr 23-08-24 76%
+108 9935 E1 AP ALLE E1 - alle arbejder i AP 334 d ma 17-04-23 ma 12-08-24 78%
+114 9940 E1 AP TØ TØ fix#2 (stropper/skinnesystem/alle install. plader) 30 d to 11-04-24 fr 24-05-24 85%
+udføres parallelt med E5/AP
+115 10443 E1 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d to 25-04-24 on 08-05-24 98%
+119 11040 E1 AP INS Sanitet 5 d to 23-05-24 on 29-05-24 0%
+120 10444 E1 AP INS Installation #1 & #3 (i loft) 9 d ma 27-05-24 fr 07-06-24 80% X
+121 9944 E1 AP INS Gulvbokse 3 d ti 04-06-24 fr 07-06-24 5% R
+122 9945 E1 AP APT Tyndpudsfinish/rep. 6 d ma 10-06-24 ma 17-06-24 0% R
+123 9946 E1 AP GU Gulvbelægning (blødt-/trægulv) incl. afdækning 3 u ti 18-06-24 ma 08-07-24 0% R
+124 9947 E1 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d ti 02-07-24 ma 22-07-24 0% R
+125 9951 E1 AP TØ TØ fix#5 (låsesmed) 5 d ma 08-07-24 fr 12-07-24 0% R
+126 11176 E1 AP APT Malerarbejde - Indv. balkonforkanter 7 d fr 05-07-24 ma 15-07-24 0%
+127 9948 E1 AP APT Fast inventar 3 d to 11-07-24 ma 15-07-24 0% R
+128 10917 E1 AP INS Instal. I tekøkkener 5 d to 11-07-24 on 17-07-24 0% R
+129 9950 E1 AP INS Slutmontage alle install. 5 d to 11-07-24 on 17-07-24 0% R
+130 9949 E1 AP APT Indv. solafskærmning/gardiner 5 d ma 15-07-24 fr 19-07-24 0% R
+131 11247 E1 AP BH Aktivt udstyr - Bygherreleverance ID12 2 d ma 15-07-24 ti 16-07-24 0% NY
+132 11104 E1 AP GU Slibning/behandling af gulv 5 d ma 22-07-24 fr 26-07-24 0%
+133 9952 E1 AP APT Slutmaling 5 d ti 30-07-24 ma 05-08-24 0% R
+134 11259 E1 AP BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d ma 05-08-24 ti 06-08-24 0% NY
+135 11232 E1 AP TØ Luk lofter jf. KL prikplan 5 d ti 06-08-24 ma 12-08-24 0%
+136 9916 E1 FBH ALLE E1 - alle arbejder i FBH (greybox + omklædning) 390 d ma 06-02-23 fr 23-08-24 75%
+140 10945 E1 FBH APT Flisearbejder (toiletter/omkl.) 35 d ti 19-03-24 fr 10-05-24 80%
+obs! afdækning
+143 10341 E1 FBH TØ TØ fix#2 (kantskinner/akustikunderlag) 10 d ti 16-04-24 ma 29-04-24 15%
+145 11042 E1 FBH TØ TØ fix#3 (vinduesbænke + lysninger) 10 d to 02-05-24 to 16-05-24 10%
+146 9921 E1 FBH TØ TØ fix#2 (stropper/skinnesystem/alle install. Plader) 18 d fr 17-05-24 to 13-06-24 40% X/R
+148 11041 E1 FBH INS Sanitet 5 d ti 28-05-24 ma 03-06-24 0%
+149 10911 E1 FBH APT Omklædningsskabe (alle 5 rum) 25 d to 30-05-24 to 04-07-24 15% X
+150 10912 E1 FBH INS Fremfør inst. til omklædningsskabe 20 d to 30-05-24 to 27-06-24 80% X
+151 10581 E1 FBH INS Installation #1 & #3 (i loft) 8 d ma 03-06-24 to 13-06-24 0%
+153 9926 E1 FBH APT Tyndpudsfinish/rep. 5 d ti 25-06-24 ti 02-07-24 0% R
+154 9927 E1 FBH GU Gulvbelægning (blødt-/trægulv) incl. afdækning 2 u ti 02-07-24 ma 15-07-24 0% R
+155 9928 E1 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 10 d to 11-07-24 on 24-07-24 0% R
+156 9932 E1 FBH TØ TØ fix#5 (låsesmed) 5 d to 11-07-24 on 17-07-24 0% R
+157 11267 E1 FBH BH Aktivt udstyr - Bygherreleverance ID12 2 d ti 16-07-24 on 17-07-24 0% NY
+158 9929 E1 FBH APT Fast inventar 3 d ti 16-07-24 to 18-07-24 0% R
+159 10918 E1 FBH INS Instal. i tekøkkener 5 d ti 16-07-24 ma 22-07-24 0% R
+160 9931 E1 FBH INS Slutmontage alle install. 5 d on 17-07-24 ti 23-07-24 0% R
+161 9930 E1 FBH APT Indv. solafskærmning/gardiner 5 d to 18-07-24 on 24-07-24 0% R
+162 9933 E1 FBH APT Slutmaling 5 d fr 02-08-24 to 08-08-24 0% R
+163 11276 E1 FBH BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d ti 06-08-24 on 07-08-24 0% NY
+164 11231 E1 FBH TØ Luk lofter jf. KL prikplan 5 d ma 19-08-24 fr 23-08-24 0%
+165 9715 E2 FBH+AP ALLE E2 - alle arbejder 614 d ti 01-03-22 on 07-08-24 89%
+166 9763 E2 AP ALLE E2 - alle arbejder i AP 600 d ti 01-03-22 to 18-07-24 88%
+179 9756 E2 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 3 u on 21-02-24 ti 12-03-24 90%
+180 10349 E2 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d on 28-02-24 ti 12-03-24 98%
+181 9759 E2 AP INS Slutmontage alle install. 5 d on 13-03-24 on 20-03-24 60%
+Udarbejdet af: AHMBA/MORCH
+Forklaring: R=aktivitet revideret - X=opdateret stade - NY= ny aktivitet
+Side 2 af 7 Rev. 2024-06-06 / Opdateret 2024-06-06
+HOLM 8 Detailtidsplan, færdiggørelse AP (inkl. atrium) + PAV MT Højgaard Danmark
+Id Entydigt id Etage omr. Ansvarlig Opgavenavn Varighed Startdato Slutdato % færdigt bemærkn.
+Kvt 1 2024 Kvt 2 2024 Kvt 3 2024 Kvt 4 2024
+184 9757 E2 AP APT Fast inventar 3 d fr 07-06-24 ti 11-06-24 0% R
+jan feb mar apr maj jun jul aug sep okt nov dec
+06-06-24
+185 10919 E2 AP INS Instal. i tekøkkener 5 d fr 07-06-24 to 13-06-24 0% R
+186 9760 E2 AP TØ TØ fix#5 (låsesmed) 5 d fr 07-06-24 to 13-06-24 0% R
+187 9758 E2 AP APT Indv. solafskærmning/gardiner 5 d fr 14-06-24 to 20-06-24 0% R
+188 9761 E2 AP APT Slutmaling 5 d fr 21-06-24 to 27-06-24 0% R
+189 11248 E2 AP BH Aktivt udstyr - Bygherreleverance ID12 2 d on 26-06-24 to 27-06-24 0% NY
+190 11222 E2 AP TØ Luk lofter jf. KL prikplan 5 d on 26-06-24 ti 02-07-24 0%
+191 11100 E2 AP GU Slibning/behandling af gulv 5 d on 03-07-24 ti 09-07-24 0%
+192 11258 E2 AP BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d on 17-07-24 to 18-07-24 0% NY
+193 9745 E2 FBH ALLE E2 - alle arbejder i FBH 614 d ti 01-03-22 on 07-08-24 90%
+207 9738 E2 FBH TØ TØ fix#4 (glasvægge/døre/akustikvægge) 3 u on 06-03-24 ti 26-03-24 90% X
+209 9741 E2 FBH INS Slutmontage alle install. 5 d on 27-03-24 ma 08-04-24 60%
+211 9739 E2 FBH APT Fast inventar 3 d on 12-06-24 fr 14-06-24 0% R
+212 10920 E2 FBH INS Instal. i tekøkkener 5 d on 12-06-24 ti 18-06-24 0% R
+213 9742 E2 FBH TØ TØ fix#5 (låsesmed) 5 d on 12-06-24 ti 18-06-24 0% R
+214 9740 E2 FBH APT Indv. solafskærmning/gardiner 5 d on 19-06-24 ti 25-06-24 0% R
+215 9743 E2 FBH APT Slutmaling 5 d on 26-06-24 ti 02-07-24 0% R
+216 11262 E2 FBH BH Aktivt udstyr - Bygherreleverance ID12 2 d fr 28-06-24 ma 01-07-24 0% NY
+217 11273 E2 FBH BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d fr 19-07-24 ma 22-07-24 0% NY
+218 11223 E2 FBH TØ Luk lofter jf. KL prikplan 5 d to 01-08-24 on 07-08-24 0%
+219 9716 E3 FBH+AP ALLE E3 - alle arbejder 604 d fr 18-03-22 ma 12-08-24 86%
+220 9783 E3 AP ALLE E3 - alle arbejder i AP 589 d ti 22-03-22 on 24-07-24 85%
+232 9795 E3 AP TØ TØ fix#4 (glasvægge/døre/akustikvægge) 15 d ma 18-03-24 on 10-04-24 90% X
+234 9798 E3 AP INS Slutmontage alle install. 5 d to 11-04-24 on 17-04-24 40%
+237 10362 E3 AP TØ TØ fix#3 (vinduesbænke + lysninger) 10 d fr 10-05-24 fr 24-05-24 98%
+238 11170 E3 AP APT Malerarbejde - Indv. balkonforkanter 7 d fr 31-05-24 ti 11-06-24 0%
+239 9799 E3 AP TØ TØ fix#5 (låsesmed) 5 d ma 17-06-24 fr 21-06-24 10% X
+240 9796 E3 AP APT Fast inventar 3 d ma 17-06-24 on 19-06-24 0% R
+241 10921 E3 AP INS Instal. i tekøkkener 5 d ma 17-06-24 fr 21-06-24 0% R
+242 9797 E3 AP APT Indv. solafskærmning/gardiner 5 d ma 24-06-24 fr 28-06-24 0% R
+243 11224 E3 AP TØ Luk lofter jf. KL prikplan 5 d ma 01-07-24 fr 05-07-24 0%
+244 9800 E3 AP APT Slutmaling 5 d on 03-07-24 ti 09-07-24 0% R
+245 11101 E3 AP GU Slibning/behandling af gulv 5 d on 03-07-24 ti 09-07-24 0%
+246 11249 E3 AP BH Aktivt udstyr - Bygherreleverance ID12 2 d on 10-07-24 to 11-07-24 0% NY
+247 11272 E3 AP BH Folie på indv. glasvægge - Bygherreleverance ID6 2 d ti 23-07-24 on 24-07-24 0% 
