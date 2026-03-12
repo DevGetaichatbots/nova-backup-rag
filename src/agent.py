@@ -254,16 +254,37 @@ class RAGAgent:
         return True
     
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 10) -> str:
-        all_results = vector_store_manager.search_multiple_stores(table_names, query, top_k)
+        broad_queries = [
+            query,
+            "alle opgaver aktiviteter startdato slutdato entydigt id",
+            "opgavenavn varighed etage ansvarlig bemærkn",
+            "all tasks activities schedule dates duration floor",
+        ]
+        
+        seen_contents: dict[str, set] = {t: set() for t in table_names}
+        merged_results: dict[str, list] = {t: [] for t in table_names}
+        
+        for q in broad_queries:
+            batch = vector_store_manager.search_multiple_stores(table_names, q, top_k)
+            for table_name, results in batch.items():
+                if isinstance(results, dict) and "error" in results:
+                    continue
+                for r in results:
+                    content = r["content"]
+                    if content not in seen_contents[table_name]:
+                        seen_contents[table_name].add(content)
+                        merged_results[table_name].append(r)
         
         context_parts = []
-        for table_name, results in all_results.items():
+        for table_name in table_names:
             doc_label = "OLD Schedule" if "old" in table_name.lower() else "NEW Schedule"
+            results = merged_results[table_name]
             
-            if isinstance(results, dict) and "error" in results:
-                context_parts.append(f"\n[{doc_label}: {table_name}]\nError retrieving: {results['error']}\n")
+            if not results:
+                context_parts.append(f"\n[{doc_label}: {table_name}]\nNo data retrieved.\n")
             else:
-                context_parts.append(f"\n[{doc_label}: {table_name}]")
+                results.sort(key=lambda x: x["similarity"], reverse=True)
+                context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} unique chunks retrieved")
                 for i, result in enumerate(results, 1):
                     context_parts.append(f"Chunk {i} (similarity: {result['similarity']:.3f}):")
                     context_parts.append(result["content"])
@@ -277,13 +298,13 @@ class RAGAgent:
         table_names: list[str], 
         session_id: str,
         language: str = "en",
-        top_k: int = 10
+        top_k: int = 20
     ) -> dict:
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
         if is_comparison:
-            logger.info(f"  Retrieving context from {len(table_names)} vector stores...")
+            logger.info(f"  Retrieving context from {len(table_names)} vector stores (top_k={top_k} per query pass)...")
             context = self._retrieve_context(user_query, table_names, top_k)
         else:
             context = ""
@@ -309,19 +330,48 @@ class RAGAgent:
         
         
         if is_comparison:
-            user_message = f"""Based on the following retrieved document context, please answer the user's question.
+            user_message = f"""You have been given retrieved chunks from two construction schedule files. Perform a precise comparison.
 
-RETRIEVED CONTEXT FROM VECTOR STORES:
+═══════════════════════════════════════════════════════════
+RETRIEVED CONTEXT FROM BOTH VECTOR STORES:
+═══════════════════════════════════════════════════════════
 {context}
+═══════════════════════════════════════════════════════════
 
 USER QUESTION: {user_query}
 
-REMEMBER:
-- Compare OLD schedule vs NEW schedule
-- Use structured tables for all comparison data
-- Include SUMMARY_OF_CHANGES after tables
-- Include PROJECT_HEALTH after summary
-- Use actual data from the retrieved context only"""
+═══════════════════════════════════════════════════════════
+STEP-BY-STEP MATCHING INSTRUCTIONS (MANDATORY):
+═══════════════════════════════════════════════════════════
+
+STEP 1 — BUILD TASK LISTS
+From every OLD Schedule chunk, extract all rows and record:
+  → Entydigt id, Opgavenavn, Etage, Ansvarlig, Startdato, Slutdato, Varighed, % færdigt, bemærkn.
+
+From every NEW Schedule chunk, do the same.
+
+STEP 2 — MATCH BY Entydigt id
+For each Entydigt id:
+  A. Found in OLD only → REMOVED task
+  B. Found in NEW only → ADDED task (often marked "NY" in bemærkn.)
+  C. Found in BOTH → compare Slutdato:
+     - NEW Slutdato > OLD Slutdato → DELAYED (calculate exact day difference)
+     - NEW Slutdato < OLD Slutdato → ACCELERATED (calculate exact day difference)
+     - Slutdato same but Varighed or scope changed → MODIFIED
+
+STEP 3 — BUILD TABLES
+Output one table per category. Include Entydigt id in every row.
+Show exact dates from the retrieved data — never approximate.
+
+STEP 4 — MANDATORY SECTIONS
+After all tables, output ## SUMMARY_OF_CHANGES then ## PROJECT_HEALTH as defined in your instructions.
+
+CRITICAL RULES:
+- Only use data present in the retrieved context above
+- Never invent or approximate task data
+- If a category has zero tasks, write "No [category] tasks found in the retrieved data"
+- Include Entydigt id in every table row for traceability
+═══════════════════════════════════════════════════════════"""
         else:
             user_message = f"""USER MESSAGE: {user_query}
 
