@@ -194,6 +194,30 @@ def similarity_search(table_name: str, query_embedding: list, top_k: int = 5):
     return results
 
 
+def fetch_all_chunks(table_name: str) -> list:
+    safe_table_name = sanitize_table_name(table_name)
+    
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            query = sql.SQL("""
+                SELECT id, content, metadata
+                FROM {table}
+                ORDER BY id ASC
+            """).format(table=sql.Identifier(safe_table_name))
+            
+            cur.execute(query)
+            results = cur.fetchall()
+    
+    return [
+        {
+            "content": r["content"],
+            "similarity": 1.0,
+            "metadata": r["metadata"] if r["metadata"] else {}
+        }
+        for r in results
+    ]
+
+
 def create_chat_memory_table():
     with get_db_connection() as conn:
         with conn.cursor() as cur:

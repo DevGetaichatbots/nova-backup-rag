@@ -253,43 +253,30 @@ class RAGAgent:
         
         return True
     
-    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 10) -> str:
-        broad_queries = [
-            query,
-            "alle opgaver aktiviteter startdato slutdato entydigt id",
-            "opgavenavn varighed etage ansvarlig bemærkn",
-            "all tasks activities schedule dates duration floor",
-        ]
-        
-        seen_contents: dict[str, set] = {t: set() for t in table_names}
-        merged_results: dict[str, list] = {t: [] for t in table_names}
-        
-        for q in broad_queries:
-            batch = vector_store_manager.search_multiple_stores(table_names, q, top_k)
-            for table_name, results in batch.items():
-                if isinstance(results, dict) and "error" in results:
-                    continue
-                for r in results:
-                    content = r["content"]
-                    if content not in seen_contents[table_name]:
-                        seen_contents[table_name].add(content)
-                        merged_results[table_name].append(r)
+    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20) -> str:
+        logger.info(f"  Fetching ALL chunks from {len(table_names)} stores (full table scan)...")
+        all_results = vector_store_manager.fetch_all_from_stores(table_names)
         
         context_parts = []
+        total_chunks = 0
+        
         for table_name in table_names:
             doc_label = "OLD Schedule" if "old" in table_name.lower() else "NEW Schedule"
-            results = merged_results[table_name]
+            results = all_results.get(table_name, {})
             
-            if not results:
-                context_parts.append(f"\n[{doc_label}: {table_name}]\nNo data retrieved.\n")
+            if isinstance(results, dict) and "error" in results:
+                context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {results['error']}\n")
+            elif not results:
+                context_parts.append(f"\n[{doc_label}: {table_name}]\nNo data found in this store.\n")
             else:
-                results.sort(key=lambda x: x["similarity"], reverse=True)
-                context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} unique chunks retrieved")
+                total_chunks += len(results)
+                context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} chunks (COMPLETE DATA)")
                 for i, result in enumerate(results, 1):
-                    context_parts.append(f"Chunk {i} (similarity: {result['similarity']:.3f}):")
+                    context_parts.append(f"--- Chunk {i} ---")
                     context_parts.append(result["content"])
                     context_parts.append("")
         
+        logger.info(f"  Total chunks retrieved: {total_chunks} across {len(table_names)} stores")
         return "\n".join(context_parts)
     
     def query(

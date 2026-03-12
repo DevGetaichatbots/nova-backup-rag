@@ -1,6 +1,6 @@
 import json
 import logging
-from src.database import create_vector_table, insert_embeddings, similarity_search
+from src.database import create_vector_table, insert_embeddings, similarity_search, fetch_all_chunks
 from src.embeddings import generate_embeddings, generate_single_embedding
 from src.pdf_processor import process_pdf_binary
 from src.config import settings
@@ -84,6 +84,19 @@ class VectorStoreManager:
                     for r in results
                 ]
             except Exception as e:
+                all_results[table_name] = {"error": str(e)}
+        
+        return all_results
+    
+    def fetch_all_from_stores(self, table_names: list[str]) -> dict:
+        all_results = {}
+        for table_name in table_names:
+            try:
+                results = fetch_all_chunks(table_name)
+                all_results[table_name] = results
+                logger.info(f"  Full fetch from {table_name}: {len(results)} chunks")
+            except Exception as e:
+                logger.error(f"  Full fetch error for {table_name}: {e}")
                 all_results[table_name] = {"error": str(e)}
         
         return all_results
