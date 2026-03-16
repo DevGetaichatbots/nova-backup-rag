@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     AZURE_OPENAI_ENDPOINT: str = ""
     AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-small"
     AZURE_OPENAI_CHAT_DEPLOYMENT: str = "gpt-4o"
+    AZURE_OPENAI_PREDICTIVE_DEPLOYMENT: str = "gpt-5.1-chat"
     AZURE_OPENAI_API_VERSION: str = "2024-02-15-preview"
     
     EMBEDDING_DIMENSION: int = 1536

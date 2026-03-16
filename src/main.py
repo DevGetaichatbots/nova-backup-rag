@@ -7,6 +7,8 @@ import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+_query_executor = ThreadPoolExecutor(max_workers=4)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
@@ -16,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
+from src.predictive_agent import predictive_agent
 from src.database import init_pgvector_extension, create_chat_memory_table
 from src.html_formatter import format_response_as_html
 
@@ -166,16 +169,56 @@ async def query_agent(
     try:
         table_names = [old_session_id, new_session_id]
         
-        result = rag_agent.query(
-            user_query=query,
-            table_names=table_names,
-            session_id=vs_table,
-            language=language,
-            top_k=10
-        )
+        is_comparison = rag_agent._is_comparison_query(query)
+        logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
+        
+        if is_comparison:
+            loop = asyncio.get_event_loop()
+            
+            context = await loop.run_in_executor(
+                _query_executor,
+                lambda: rag_agent._retrieve_context(query, table_names)
+            )
+            
+            logger.info(f"  Running GPT-4.1 (comparison) and GPT-5.1 (predictive) in parallel...")
+            
+            comparison_future = loop.run_in_executor(
+                _query_executor,
+                lambda: rag_agent.query(
+                    user_query=query,
+                    table_names=table_names,
+                    session_id=vs_table,
+                    language=language,
+                    top_k=10,
+                    preloaded_context=context
+                )
+            )
+            
+            predictive_future = loop.run_in_executor(
+                _query_executor,
+                lambda: predictive_agent.analyze(
+                    context=context,
+                    user_query=query,
+                    language=language
+                )
+            )
+            
+            result, predictive_result = await asyncio.gather(
+                comparison_future, predictive_future
+            )
+            
+            logger.info(f"  Predictive agent status: {predictive_result['status']}")
+        else:
+            result = rag_agent.query(
+                user_query=query,
+                table_names=table_names,
+                session_id=vs_table,
+                language=language,
+                top_k=10
+            )
+            predictive_result = None
         
         response_text = result["response"]
-        is_comparison = result.get("is_comparison", True)
         
         if format == "html" and is_comparison:
             logger.info(f"Converting to HTML format...")
@@ -187,12 +230,24 @@ async def query_agent(
         logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")
         
-        return {
+        response_payload = {
             "response": response_text,
             "sources": result["sources"],
             "context_chunks": result["context_chunks"],
             "format": format
         }
+        
+        if predictive_result and predictive_result["status"] == "success":
+            predictive_text = predictive_result["predictive_insights"]
+            if format == "html" and predictive_text:
+                predictive_text = format_response_as_html(predictive_text, language)
+            response_payload["predictive_insights"] = predictive_text
+            response_payload["predictive_model"] = predictive_result["model"]
+        elif predictive_result and predictive_result["status"] == "error":
+            response_payload["predictive_insights"] = ""
+            response_payload["predictive_error"] = predictive_result.get("error", "Unknown error")
+        
+        return response_payload
         
     except Exception as e:
         logger.error(f"Query failed: {e}")

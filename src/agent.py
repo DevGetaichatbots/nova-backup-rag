@@ -359,14 +359,19 @@ class RAGAgent:
         table_names: list[str], 
         session_id: str,
         language: str = "en",
-        top_k: int = 20
+        top_k: int = 20,
+        preloaded_context: str = None
     ) -> dict:
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
         if is_comparison:
-            logger.info(f"  Retrieving context from {len(table_names)} vector stores (top_k={top_k} per query pass)...")
-            context = self._retrieve_context(user_query, table_names, top_k)
+            if preloaded_context is not None:
+                context = preloaded_context
+                logger.info(f"  Using preloaded context ({len(context)} chars)")
+            else:
+                logger.info(f"  Retrieving context from {len(table_names)} vector stores (top_k={top_k} per query pass)...")
+                context = self._retrieve_context(user_query, table_names, top_k)
         else:
             context = ""
             logger.info(f"  Skipping vector store retrieval for non-comparison query")
