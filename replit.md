@@ -7,21 +7,24 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Framework**: FastAPI
 - **Vector Store**: Supabase with pgvector extension
 - **Embeddings**: Azure OpenAI text-embedding-3-small
-- **LLM**: Azure OpenAI GPT model
+- **LLM (Comparison)**: Azure OpenAI GPT-4.1 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
+- **LLM (Predictive)**: Azure OpenAI GPT-5.1 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
+- **Multi-LLM**: Both models run in parallel on comparison queries via `asyncio.gather`
 
 ## Project Structure
 ```
 src/
-├── __init__.py        # Package init
-├── config.py          # Configuration and settings
-├── database.py        # Supabase/PostgreSQL database operations with SQL injection protection
-├── embeddings.py      # Azure OpenAI embedding generation
-├── azure_ocr.py       # Azure Document Intelligence OCR for PDF table extraction
-├── pdf_processor.py   # PDF processing with Azure Document Intelligence OCR
-├── vector_store.py    # Vector store management
-├── agent.py           # RAG agent with dual vector store querying
-└── main.py            # FastAPI application
+├── __init__.py          # Package init
+├── config.py            # Configuration and settings
+├── database.py          # Supabase/PostgreSQL database operations with SQL injection protection
+├── embeddings.py        # Azure OpenAI embedding generation
+├── azure_ocr.py         # Azure Document Intelligence OCR for PDF table extraction
+├── pdf_processor.py     # PDF processing with Azure Document Intelligence OCR
+├── vector_store.py      # Vector store management
+├── agent.py             # RAG agent with dual vector store querying (GPT-4.1)
+├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.1)
+└── main.py              # FastAPI application with parallel agent execution
 ```
 
 ## API Endpoints
@@ -80,6 +83,24 @@ curl -X POST "https://your-domain/query" \
 - Row chunks include: page_number, cells_data with coordinates
 - Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
 
+## Query Response (Multi-LLM)
+For comparison queries, the `/query` endpoint returns:
+- `response` — GPT-4.1 comparison analysis (existing field)
+- `predictive_insights` — GPT-5.1 Nova Insight predictive report (new field)
+- `predictive_model` — model name used for predictions
+- Non-comparison queries skip the predictive agent entirely
+
+### Nova Insight Modules (GPT-5.1)
+- **Module A**: Overdue activities (Startdato past, % færdigt = 0)
+- **Module B**: Unrealistic progress reporting (|Expected - Reported| > 25%)
+- **Module C**: Dependency chain risk (inferred from floor/date sequencing, best-effort)
+- **Module D**: Decision bottlenecks (Varighed = 0, approval keywords)
+- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato)
+- **Module F**: Long duration risks (Varighed > 90 days)
+- **Module G**: Discipline progress dashboard (grouped by Ansvarlig)
+- **Complexity Score**: Low/Medium/High/Very High
+- **Predictive Delay Engine**: risk %, delay window, primary risk source
+
 ## Environment Variables Required
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_SERVICE_KEY` - Supabase service role key
@@ -89,7 +110,8 @@ curl -X POST "https://your-domain/query" \
 - `AZURE_OPENAI_API_KEY` - Azure OpenAI API key
 - `AZURE_OPENAI_ENDPOINT` - Azure OpenAI endpoint
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` - Embedding model deployment name
-- `AZURE_OPENAI_CHAT_DEPLOYMENT` - Chat model deployment name
+- `AZURE_OPENAI_CHAT_DEPLOYMENT` - Chat model deployment name (GPT-4.1 comparison)
+- `AZURE_OPENAI_PREDICTIVE_DEPLOYMENT` - Predictive model deployment name (GPT-5.1 Nova Insight)
 - `AZURE_DOC_INTELLIGENCE_ENDPOINT` - Azure Document Intelligence endpoint
 - `AZURE_DOC_INTELLIGENCE_KEY` - Azure Document Intelligence API key
 
