@@ -105,7 +105,7 @@ Output per flagged task:
 - Risk: what downstream work is blocked
 
 ### MODULE E: Artificial Scheduling Clusters
-Logic: Find groups of 4+ tasks that share the EXACT same Startdato within the same Etage or Ansvarlig discipline.
+Logic: Find groups of 5+ tasks that share the EXACT same Startdato within the same Etage or Ansvarlig discipline.
 This indicates placeholder planning rather than realistic scheduling.
 
 Output:
@@ -219,6 +219,7 @@ Your response MUST be structured as follows. Use exact headers:
 ### PREDICTIVE_DELAY_ENGINE
 **Overall Delay Risk:** [Low/Medium/High/Critical]
 **Delay Risk Score:** [X]
+**Delay Risk %:** [X%] (calculated as: min(delay_risk_score / 80 × 100, 100), capped at 100%)
 **Estimated Delay Window:** [X-Y days]
 **Primary Risk Source:** [description]
 
@@ -233,7 +234,7 @@ Your response MUST be structured as follows. Use exact headers:
 **Assessment:**
 [2-3 sentence professional assessment of overall schedule health and recommended actions]
 
-<!--INSIGHT_DATA:{"delay_risk":"low|medium|high|critical","delay_risk_score":X,"estimated_delay_days_min":X,"estimated_delay_days_max":X,"primary_risk_source":"...","overdue_count":X,"anomaly_count":X,"chain_risk_count":X,"bottleneck_count":X,"cluster_count":X,"long_duration_count":X,"complexity":"low|medium|high|very_high","total_activities":X}-->
+<!--INSIGHT_DATA:{"delay_risk":"low|medium|high|critical","delay_risk_score":X,"delay_risk_percent":X,"estimated_delay_days_min":X,"estimated_delay_days_max":X,"primary_risk_source":"...","overdue_count":X,"anomaly_count":X,"chain_risk_count":X,"bottleneck_count":X,"cluster_count":X,"long_duration_count":X,"complexity":"low|medium|high|very_high","total_activities":X}-->
 ```
 
 ---
