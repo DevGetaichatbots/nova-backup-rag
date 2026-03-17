@@ -395,7 +395,7 @@ class RAGAgent:
             logger.info(f"  Skipping vector store retrieval for non-comparison query")
         
         logger.info(f"  Loading chat history for session: {session_id}")
-        chat_history = get_chat_history(session_id, limit=10)
+        chat_history = get_chat_history(session_id, limit=4)
         logger.info(f"  Found {len(chat_history)} previous messages")
         
         lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
@@ -407,10 +407,13 @@ class RAGAgent:
         
         for msg in chat_history:
             role = msg["role"]
+            content = str(msg["content"])
             if role == "user":
-                messages.append({"role": "user", "content": str(msg["content"])})
+                messages.append({"role": "user", "content": content})
             elif role == "assistant":
-                messages.append({"role": "assistant", "content": str(msg["content"])})
+                if len(content) > 500:
+                    content = content[:500] + "\n\n[... previous response truncated for context ...]"
+                messages.append({"role": "assistant", "content": content})
         
         
         if is_comparison:
