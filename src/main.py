@@ -282,8 +282,6 @@ async def get_predictive_result(predictive_id: str):
     elif result["status"] == "error":
         response["error"] = result.get("error", "Unknown error")
     
-    del _predictive_results[predictive_id]
-    
     return response
 
 
