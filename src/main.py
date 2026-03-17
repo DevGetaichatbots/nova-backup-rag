@@ -9,7 +9,6 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 _query_executor = ThreadPoolExecutor(max_workers=4)
-_predictive_results: Dict[str, Dict[str, Any]] = {}
 _upload_progress: Dict[str, Dict[str, Any]] = {}
 
 logging.basicConfig(
@@ -236,43 +235,70 @@ async def query_agent(
         is_comparison = rag_agent._is_comparison_query(query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
-        predictive_id = None
+        loop = asyncio.get_event_loop()
         
         if is_comparison:
-            loop = asyncio.get_event_loop()
-            
             context = await loop.run_in_executor(
                 _query_executor,
                 lambda: rag_agent._retrieve_context(query, table_names, old_filename=old_filename, new_filename=new_filename)
             )
             
-            predictive_id = str(uuid.uuid4())[:8]
-            _predictive_results[predictive_id] = {"status": "processing"}
+            logger.info(f"  Running comparison + predictive in parallel...")
             
-            async def _run_predictive_background(pid, ctx, q, lang, fmt, of, nf):
-                try:
-                    logger.info(f"  [Predictive:{pid}] Starting background analysis...")
-                    pred_result = await loop.run_in_executor(
-                        _query_executor,
-                        lambda: predictive_agent.analyze(context=ctx, user_query=q, language=lang, old_filename=of, new_filename=nf)
+            async def _run_comparison():
+                return await loop.run_in_executor(
+                    _query_executor,
+                    lambda: rag_agent.query(
+                        user_query=query,
+                        table_names=table_names,
+                        session_id=vs_table,
+                        language=language,
+                        top_k=10,
+                        preloaded_context=context,
+                        old_filename=old_filename_clean,
+                        new_filename=new_filename_clean
                     )
-                    predictive_text = pred_result.get("predictive_insights", "")
-                    if fmt == "html" and predictive_text:
-                        predictive_text = format_response_as_html(predictive_text, lang)
-                    _predictive_results[pid] = {
-                        "status": pred_result["status"],
-                        "predictive_insights": predictive_text,
-                        "predictive_model": pred_result.get("model", ""),
-                    }
-                    logger.info(f"  [Predictive:{pid}] Complete: {len(predictive_text)} chars")
-                except Exception as e:
-                    logger.error(f"  [Predictive:{pid}] Failed: {e}")
-                    _predictive_results[pid] = {"status": "error", "error": str(e)}
+                )
             
-            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format, old_filename_clean, new_filename_clean))
+            async def _run_predictive():
+                return await loop.run_in_executor(
+                    _query_executor,
+                    lambda: predictive_agent.analyze(
+                        context=context,
+                        user_query=query,
+                        language=language,
+                        old_filename=old_filename_clean,
+                        new_filename=new_filename_clean
+                    )
+                )
             
-            logger.info(f"  Running GPT-5.2 comparison (predictive:{predictive_id} in background)...")
+            comparison_result, predictive_result = await asyncio.gather(
+                _run_comparison(),
+                _run_predictive(),
+                return_exceptions=True
+            )
             
+            if isinstance(comparison_result, Exception):
+                logger.error(f"  Comparison agent failed: {comparison_result}")
+                raise comparison_result
+            
+            result = comparison_result
+            
+            if isinstance(predictive_result, Exception):
+                logger.error(f"  Predictive agent failed: {predictive_result}")
+                predictive_text = ""
+                predictive_status = "error"
+                predictive_model = ""
+            else:
+                predictive_text = predictive_result.get("predictive_insights", "")
+                predictive_status = predictive_result.get("status", "error")
+                predictive_model = predictive_result.get("model", "")
+            
+            if format == "html" and predictive_text:
+                predictive_text = format_response_as_html(predictive_text, language)
+            
+            logger.info(f"  Predictive complete: {len(predictive_text)} chars, status: {predictive_status}")
+        else:
             result = await loop.run_in_executor(
                 _query_executor,
                 lambda: rag_agent.query(
@@ -281,21 +307,13 @@ async def query_agent(
                     session_id=vs_table,
                     language=language,
                     top_k=10,
-                    preloaded_context=context,
                     old_filename=old_filename_clean,
                     new_filename=new_filename_clean
                 )
             )
-        else:
-            result = rag_agent.query(
-                user_query=query,
-                table_names=table_names,
-                session_id=vs_table,
-                language=language,
-                top_k=10,
-                old_filename=old_filename_clean,
-                new_filename=new_filename_clean
-            )
+            predictive_text = None
+            predictive_status = None
+            predictive_model = None
         
         response_text = result["response"]
         
@@ -316,9 +334,10 @@ async def query_agent(
             "format": format
         }
         
-        if predictive_id:
-            response_payload["predictive_id"] = predictive_id
-            response_payload["predictive_status"] = "processing"
+        if is_comparison:
+            response_payload["predictive_insights"] = predictive_text or ""
+            response_payload["predictive_status"] = predictive_status
+            response_payload["predictive_model"] = predictive_model or ""
         
         return response_payload
         
@@ -327,28 +346,6 @@ async def query_agent(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/query/predictive/{predictive_id}")
-async def get_predictive_result(predictive_id: str):
-    if predictive_id not in _predictive_results:
-        raise HTTPException(status_code=404, detail="Predictive ID not found")
-    
-    result = _predictive_results[predictive_id]
-    
-    if result["status"] == "processing":
-        return {"status": "processing", "predictive_id": predictive_id}
-    
-    response = {
-        "status": result["status"],
-        "predictive_id": predictive_id,
-    }
-    
-    if result["status"] == "success":
-        response["predictive_insights"] = result.get("predictive_insights", "")
-        response["predictive_model"] = result.get("predictive_model", "")
-    elif result["status"] == "error":
-        response["error"] = result.get("error", "Unknown error")
-    
-    return response
 
 
 if __name__ == "__main__":
