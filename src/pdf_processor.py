@@ -8,6 +8,7 @@ Preserves table structure using Azure's structured table output.
 import json
 import logging
 from src.azure_ocr import AzureDocumentIntelligence
+from src.embeddings import count_tokens, MAX_TOKENS
 
 logger = logging.getLogger(__name__)
 
@@ -311,6 +312,27 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
                 }
             })
     
-    logger.info(f"[{filename}] Created {len(chunks)} chunks ({len(tables)} tables, {len(pages)} pages)")
+    safe_token_limit = MAX_TOKENS - 100
+    final_chunks = []
+    split_count = 0
+    for chunk in chunks:
+        token_count = count_tokens(chunk["content"])
+        if token_count <= safe_token_limit:
+            final_chunks.append(chunk)
+        else:
+            from src.embeddings import split_oversized_text
+            parts = split_oversized_text(chunk["content"], safe_token_limit)
+            split_count += 1
+            for part_idx, part_text in enumerate(parts):
+                new_chunk = {
+                    "content": part_text,
+                    "metadata": {**chunk["metadata"], "chunk_index": len(final_chunks), "split_part": part_idx + 1, "split_total": len(parts)}
+                }
+                final_chunks.append(new_chunk)
+
+    if split_count > 0:
+        logger.info(f"[{filename}] Token safety: split {split_count} oversized chunks → {len(final_chunks)} total (was {len(chunks)})")
     
-    return chunks
+    logger.info(f"[{filename}] Created {len(final_chunks)} chunks ({len(tables)} tables, {len(pages)} pages)")
+    
+    return final_chunks
