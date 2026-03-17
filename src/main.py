@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
 from src.predictive_agent import predictive_agent
-from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
+from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata, save_chat_message
 from src.html_formatter import format_response_as_html
 
 app = FastAPI(
@@ -197,7 +197,7 @@ async def query_agent(
             predictive_id = str(uuid.uuid4())[:8]
             _predictive_results[predictive_id] = {"status": "processing"}
             
-            async def _run_predictive_background(pid, ctx, q, lang, fmt, of, nf):
+            async def _run_predictive_background(pid, ctx, q, lang, fmt, of, nf, sid):
                 try:
                     logger.info(f"  [Predictive:{pid}] Starting background analysis...")
                     pred_result = await loop.run_in_executor(
@@ -212,12 +212,15 @@ async def query_agent(
                         "predictive_insights": predictive_text,
                         "predictive_model": pred_result.get("model", ""),
                     }
+                    if predictive_text and pred_result["status"] == "success":
+                        save_chat_message(sid, "assistant", f"[PREDICTIVE_INSIGHT]\n{predictive_text}")
+                        logger.info(f"  [Predictive:{pid}] Saved to chat history for session: {sid}")
                     logger.info(f"  [Predictive:{pid}] Complete: {len(predictive_text)} chars")
                 except Exception as e:
                     logger.error(f"  [Predictive:{pid}] Failed: {e}")
                     _predictive_results[pid] = {"status": "error", "error": str(e)}
             
-            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format, old_filename_clean, new_filename_clean))
+            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format, old_filename_clean, new_filename_clean, vs_table))
             
             logger.info(f"  Running GPT-5.2 comparison (predictive:{predictive_id} in background)...")
             
