@@ -480,7 +480,7 @@ EXECUTION STEPS:
                 "model": self.deployment,
                 "messages": messages,
                 "temperature": 1,
-                "max_completion_tokens": 65536,
+                "max_completion_tokens": 32768,
             }
 
             try:
