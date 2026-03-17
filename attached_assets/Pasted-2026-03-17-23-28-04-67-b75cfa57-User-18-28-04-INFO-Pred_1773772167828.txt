@@ -1,0 +1,150 @@
+2026-03-17 23:28:04.67
+b75cfa57
+User
+18:28:04 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-17 23:28:04.67
+b75cfa57
+User
+18:28:04 | INFO | [Predictive:0806a54c] Starting background analysis...
+2026-03-17 23:28:06.06
+b75cfa57
+User
+18:28:06 | INFO | Found 4 previous messages
+2026-03-17 23:28:06.06
+b75cfa57
+User
+18:28:06 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:28:06.06
+b75cfa57
+User
+18:28:06 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:28:06.06
+b75cfa57
+User
+18:28:06 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:28:54.58
+b75cfa57
+User
+18:28:54 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:28:54.58
+b75cfa57
+User
+18:28:54 | INFO | AI response received: 6034 chars
+2026-03-17 23:28:56.70
+b75cfa57
+User
+18:28:56 | INFO | Session: session_9ec6257a123572fb7854 | Language: en | Format: html
+2026-03-17 23:28:56.70
+b75cfa57
+User
+18:28:56 | INFO | Query: show me added tasks of these schdules
+2026-03-17 23:28:56.70
+b75cfa57
+User
+18:28:56 | INFO | === QUERY REQUEST ===
+2026-03-17 23:28:56.70
+b75cfa57
+User
+18:28:56 | INFO | Vector stores: table_old_mmux2rzh_4aaea96c8c, table_new_mmux2rzh_b15442653e
+2026-03-17 23:28:56.70
+b75cfa57
+User
+18:28:56 | INFO | Host: nova-azure-ai-rag-agent.replit.app | Is Dev: False
+2026-03-17 23:28:57.39
+b75cfa57
+User
+18:28:57 | INFO | Chat history saved
+2026-03-17 23:28:57.39
+b75cfa57
+User
+18:28:57 | INFO | Converting to HTML format...
+2026-03-17 23:28:57.39
+b75cfa57
+User
+18:28:57 | INFO | === QUERY COMPLETE ===
+2026-03-17 23:28:57.39
+b75cfa57
+User
+18:28:57 | INFO | Response generated: 79196 chars, 1 chunks used
+2026-03-17 23:28:57.92
+b75cfa57
+User
+18:28:57 | INFO | Query type: comparison
+2026-03-17 23:28:57.92
+b75cfa57
+User
+18:28:57 | INFO | File names: d76a1522-e6d7-41f9-9d2f-3e134c8be500.pdf / 5b8dd7f8-43f5-4b15-877b-10cd12faa857.pdf
+2026-03-17 23:28:57.93
+b75cfa57
+User
+18:28:57 | INFO | Fetching table chunks from 2 stores...
+2026-03-17 23:28:59.61
+b75cfa57
+User
+18:28:59 | INFO | Fetch from table_old_mmux2rzh_4aaea96c8c: 11 chunks (type=table)
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Chunks sent to LLM: 18
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Fetch from table_new_mmux2rzh_b15442653e: 7 chunks (type=table)
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Chunks sent to LLM: 18
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Fetch from table_new_mmux2rzh_b15442653e: 7 chunks (type=table)
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Loading chat history for session: session_9ec6257a123572fb7854
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Running GPT-5.2 comparison (predictive:66750d3d in background)...
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Query type: comparison
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | Using preloaded context (168562 chars)
+2026-03-17 23:29:01.15
+b75cfa57
+User
+18:29:01 | INFO | [Predictive:66750d3d] Starting background analysis...
+2026-03-17 23:29:01.16
+b75cfa57
+User
+18:29:01 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Found 4 previous messages
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Found 4 previous messages
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Calling Azure OpenAI (gpt-5.2)...
+2026-03-17 23:29:02.52
+b75cfa57
+User
+18:29:02 | INFO | Found 4 previous messages
+Wrap
+Colors
