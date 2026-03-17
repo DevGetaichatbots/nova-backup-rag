@@ -91,17 +91,23 @@ For comparison queries, the `/query` endpoint returns:
 - Non-comparison queries skip the predictive agent entirely
 
 ### Nova Insight Modules (GPT-5.2, CTCO-optimized prompt)
-- **Module A**: Overdue activities (Startdato < today AND % færdigt = 0)
+- **Module A**: Overdue activities (Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0)
 - **Module B**: Unrealistic progress reporting (deviation > 25%, over/under-reported sub-types)
-- **Module C**: Dependency chain risk (inferred graph: Etage+dates+trade sequence, chains > 4 tasks)
-- **Module D**: Decision bottlenecks (Varighed = 0 + Danish/English decision keywords + BH client tasks)
-- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato per Etage/Ansvarlig)
-- **Module F**: Long duration risks (Varighed > 90 days elevated, > 120 days critical)
-- **Module G**: Discipline progress dashboard (grouped by Ansvarlig, health scoring)
+- **Module C**: Dependency chain risk — uses REAL dependency graph from Foregående/Efterfølgende opgaver columns (semicolon-separated task IDs), chains > 4 tasks
+- **Module D**: Decision bottlenecks (Varighed = 0d + Danish/English decision keywords + BH client tasks + has successors)
+- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato per Omr./area, distinguishes coordination milestones from work clusters)
+- **Module F**: Long duration risks (Varighed > 90 days elevated, > 120 days critical, excludes summary rows)
+- **Module G**: Discipline progress dashboard (grouped by E100.XX prefix + responsible party annotations, health scoring)
 - **Schedule Health Overview**: Quick-glance summary of all findings
-- **Complexity Score**: Low/Medium/High/Very High (activities + floors + disciplines + chain depth)
+- **Complexity Score**: Low/Medium/High/Very High (activities + areas + disciplines + chain depth + dependency links)
 - **Predictive Delay Engine**: weighted risk score, risk %, delay window, primary risk source
-- **Prompt optimizations**: CTCO framework, few-shot examples, reasoning_effort=high, temperature=0.1, 32K output tokens
+- **Prompt optimizations**: CTCO framework, few-shot examples from real data, reasoning_effort=high, temperature=0.1, 32K output tokens
+
+### Schedule Format Support
+- **MS Project Export** (PRIMARY): `Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver` — match by Id, explicit dependencies
+- **Detailtidsplan**: `Id | Entydigt id | Etage | omr. | Ansvarlig | Opgavenavn | ...` — match by Entydigt id
+- **Unstructured Week-based**: `Uge: X` format — match by week + work type
+- Both agents auto-detect document type from column headers
 
 ## Environment Variables Required
 - `SUPABASE_URL` - Supabase project URL
