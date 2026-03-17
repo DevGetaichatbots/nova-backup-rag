@@ -7,10 +7,10 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Framework**: FastAPI
 - **Vector Store**: Supabase with pgvector extension
 - **Embeddings**: Azure OpenAI text-embedding-3-small
-- **LLM (Comparison)**: Azure OpenAI GPT-4.1 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
-- **LLM (Predictive)**: Azure OpenAI GPT-5.1 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
+- **LLM (Comparison)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
+- **LLM (Predictive)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
-- **Multi-LLM**: Both models run in parallel on comparison queries via `asyncio.gather`
+- **Dual-Agent**: Both agents run in parallel on comparison queries via `asyncio.gather` (same GPT-5.2 model, different system prompts)
 
 ## Project Structure
 ```
@@ -22,8 +22,8 @@ src/
 ├── azure_ocr.py         # Azure Document Intelligence OCR for PDF table extraction
 ├── pdf_processor.py     # PDF processing with Azure Document Intelligence OCR
 ├── vector_store.py      # Vector store management
-├── agent.py             # RAG agent with dual vector store querying (GPT-4.1)
-├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.1)
+├── agent.py             # RAG agent with dual vector store querying (GPT-5.2)
+├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.2)
 └── main.py              # FastAPI application with parallel agent execution
 ```
 
@@ -85,12 +85,12 @@ curl -X POST "https://your-domain/query" \
 
 ## Query Response (Multi-LLM)
 For comparison queries, the `/query` endpoint returns:
-- `response` — GPT-4.1 comparison analysis (existing field)
-- `predictive_insights` — GPT-5.1 Nova Insight predictive report (new field)
+- `response` — GPT-5.2 comparison analysis (existing field)
+- `predictive_insights` — GPT-5.2 Nova Insight predictive report (new field)
 - `predictive_model` — model name used for predictions
 - Non-comparison queries skip the predictive agent entirely
 
-### Nova Insight Modules (GPT-5.1)
+### Nova Insight Modules (GPT-5.2)
 - **Module A**: Overdue activities (Startdato past, % færdigt = 0)
 - **Module B**: Unrealistic progress reporting (|Expected - Reported| > 25%)
 - **Module C**: Dependency chain risk (inferred from floor/date sequencing, best-effort)
@@ -110,8 +110,8 @@ For comparison queries, the `/query` endpoint returns:
 - `AZURE_OPENAI_API_KEY` - Azure OpenAI API key
 - `AZURE_OPENAI_ENDPOINT` - Azure OpenAI endpoint
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` - Embedding model deployment name
-- `AZURE_OPENAI_CHAT_DEPLOYMENT` - Chat model deployment name (GPT-4.1 comparison)
-- `AZURE_OPENAI_PREDICTIVE_DEPLOYMENT` - Predictive model deployment name (GPT-5.1 Nova Insight)
+- `AZURE_OPENAI_CHAT_DEPLOYMENT` - Chat model deployment name (GPT-5.2 comparison)
+- `AZURE_OPENAI_PREDICTIVE_DEPLOYMENT` - Predictive model deployment name (GPT-5.2 Nova Insight)
 - `AZURE_DOC_INTELLIGENCE_ENDPOINT` - Azure Document Intelligence endpoint
 - `AZURE_DOC_INTELLIGENCE_KEY` - Azure Document Intelligence API key
 

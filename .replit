@@ -49,4 +49,4 @@ externalPort = 80
 [userenv]
 
 [userenv.shared]
-AZURE_OPENAI_PREDICTIVE_DEPLOYMENT = "gpt-5.1-chat"
+AZURE_OPENAI_PREDICTIVE_DEPLOYMENT = "gpt-5.2"
