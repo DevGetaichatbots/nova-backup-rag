@@ -336,6 +336,7 @@ class RAGAgent:
         
         context_parts = []
         total_chunks = 0
+        included_chunks = 0
         
         for table_name in table_names:
             doc_label = "OLD Schedule" if "old" in table_name.lower() else "NEW Schedule"
@@ -347,13 +348,27 @@ class RAGAgent:
                 context_parts.append(f"\n[{doc_label}: {table_name}]\nNo data found in this store.\n")
             else:
                 total_chunks += len(results)
-                context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} chunks (COMPLETE DATA)")
-                for i, result in enumerate(results, 1):
-                    context_parts.append(f"--- Chunk {i} ---")
-                    context_parts.append(result["content"])
-                    context_parts.append("")
+                table_chunks = [r for r in results if r.get("metadata", {}).get("type") == "table"]
+                
+                if table_chunks:
+                    included_chunks += len(table_chunks)
+                    context_parts.append(f"\n[{doc_label}: {table_name}] — {len(table_chunks)} table chunks (structured data)")
+                    for i, result in enumerate(table_chunks, 1):
+                        context_parts.append(f"--- Table {i} ---")
+                        context_parts.append(result["content"])
+                        context_parts.append("")
+                else:
+                    text_chunks = [r for r in results if r.get("metadata", {}).get("type") in ("text", None)]
+                    if not text_chunks:
+                        text_chunks = results
+                    included_chunks += len(text_chunks)
+                    context_parts.append(f"\n[{doc_label}: {table_name}] — {len(text_chunks)} chunks")
+                    for i, result in enumerate(text_chunks, 1):
+                        context_parts.append(f"--- Chunk {i} ---")
+                        context_parts.append(result["content"])
+                        context_parts.append("")
         
-        logger.info(f"  Total chunks retrieved: {total_chunks} across {len(table_names)} stores")
+        logger.info(f"  Total chunks in DB: {total_chunks}, sent to LLM: {included_chunks} (table/text only, skipped row duplicates)")
         return "\n".join(context_parts)
     
     def query(

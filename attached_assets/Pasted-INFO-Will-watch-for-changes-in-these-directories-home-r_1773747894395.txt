@@ -1,0 +1,31 @@
+INFO:     Will watch for changes in these directories: ['/home/runner/workspace']
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+11:43:47 | INFO | PredictiveAgent initialized with model: gpt-5.2
+INFO:     Started server process [4698]
+INFO:     Waiting for application startup.
+Database initialized successfully
+Azure Document Intelligence OCR: Ready
+INFO:     Application startup complete.
+INFO:     10.83.1.48:0 - "GET / HTTP/1.1" 200 OK
+11:43:56 | INFO | === QUERY REQUEST ===
+11:43:56 | INFO | Host: a2f76a97-674f-4a1f-9ac6-c5bcb0c92fc9-00-jwtgkqguc1o3.worf.replit.dev | Is Dev: True
+11:43:56 | INFO | Query: Compare the two schedules
+11:43:56 | INFO | Session: test_session_001 | Language: da | Format: html
+11:43:56 | INFO | Vector stores: table_old_001, table_new_001
+11:43:56 | INFO |   Query type: comparison
+11:43:56 | INFO |   Fetching ALL chunks from 2 stores (full table scan)...
+11:43:59 | INFO |   Full fetch from table_old_001: 578 chunks
+11:44:01 | INFO |   Full fetch from table_new_001: 860 chunks
+11:44:01 | INFO |   Total chunks retrieved: 1438 across 2 stores
+11:44:01 | INFO |   Running GPT-5.2 (comparison) and GPT-5.2 (predictive) in parallel...
+11:44:01 | INFO |   Query type: comparison
+11:44:01 | INFO |   Using preloaded context (803542 chars)
+11:44:01 | INFO |   Loading chat history for session: test_session_001
+11:44:01 | INFO |   [PredictiveAgent] Starting analysis with gpt-5.2...
+11:44:02 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 400 Bad Request"
+11:44:02 | ERROR |   [PredictiveAgent] Error: Error code: 400 - {'error': {'message': 'Input tokens exceed the configured limit of 272000 tokens. Your messages resulted in 388619 tokens. Please reduce the length of the messages.', 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+11:44:02 | INFO |   Found 0 previous messages
+11:44:02 | INFO |   Calling Azure OpenAI (gpt-5.2)...
+11:44:03 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 400 Bad Request"
+11:44:03 | ERROR | Query failed: Error code: 400 - {'error': {'message': 'Input tokens exceed the configured limit of 272000 tokens. Your messages resulted in 387199 tokens. Please reduce the length of the messages.', 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+INFO:     10.83.3.14:0 - "POST /query HTTP/1.1" 500 Internal Server Error
