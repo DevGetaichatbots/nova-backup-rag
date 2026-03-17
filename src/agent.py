@@ -498,7 +498,7 @@ Keep your response concise and helpful."""
                 model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
                 messages=messages,
                 temperature=1,
-                max_completion_tokens=16000,
+                max_completion_tokens=32768,
                 reasoning_effort="low"
             )
         except Exception as reasoning_err:
@@ -508,7 +508,7 @@ Keep your response concise and helpful."""
                     model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
                     messages=messages,
                     temperature=1,
-                    max_completion_tokens=16000
+                    max_completion_tokens=32768
                 )
             else:
                 raise reasoning_err
