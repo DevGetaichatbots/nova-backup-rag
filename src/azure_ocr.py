@@ -11,7 +11,6 @@ import logging
 import requests
 from typing import Optional, Dict, List
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
