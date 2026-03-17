@@ -494,9 +494,20 @@ EXECUTION STEPS:
                 else:
                     raise reasoning_err
 
-            insight_response = response.choices[0].message.content or ""
+            choice = response.choices[0]
+            insight_response = choice.message.content or ""
+
+            if not insight_response and hasattr(choice.message, 'refusal') and choice.message.refusal:
+                logger.warning(f"  [PredictiveAgent] Model refused: {choice.message.refusal}")
+                insight_response = ""
+
+            if not insight_response:
+                logger.warning(f"  [PredictiveAgent] Empty content. finish_reason={choice.finish_reason}, message keys={vars(choice.message).keys()}")
+
             model_used = getattr(response, 'model', self.deployment)
-            logger.info(f"  [PredictiveAgent] Response received: {len(insight_response)} chars, model: {model_used}")
+            usage = getattr(response, 'usage', None)
+            usage_info = f", tokens: prompt={usage.prompt_tokens}, completion={usage.completion_tokens}" if usage else ""
+            logger.info(f"  [PredictiveAgent] Response received: {len(insight_response)} chars, model: {model_used}{usage_info}")
 
             return {
                 "predictive_insights": insight_response,
