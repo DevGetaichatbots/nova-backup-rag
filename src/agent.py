@@ -330,7 +330,7 @@ class RAGAgent:
         
         return True
     
-    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20) -> str:
+    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
         all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
         
@@ -339,7 +339,10 @@ class RAGAgent:
         has_table_chunks = False
         
         for table_name in table_names:
-            doc_label = "OLD Schedule" if "old" in table_name.lower() else "NEW Schedule"
+            if "old" in table_name.lower():
+                doc_label = f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
+            else:
+                doc_label = f"NEW Schedule ({new_filename})" if new_filename else "NEW Schedule"
             results = all_results.get(table_name, {})
             
             if isinstance(results, dict) and "error" in results:
@@ -361,7 +364,10 @@ class RAGAgent:
             context_parts = []
             total_chunks = 0
             for table_name in table_names:
-                doc_label = "OLD Schedule" if "old" in table_name.lower() else "NEW Schedule"
+                if "old" in table_name.lower():
+                    doc_label = f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
+                else:
+                    doc_label = f"NEW Schedule ({new_filename})" if new_filename else "NEW Schedule"
                 results = all_results.get(table_name, {})
                 if isinstance(results, dict) and "error" in results:
                     context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {results['error']}\n")
@@ -383,7 +389,9 @@ class RAGAgent:
         session_id: str,
         language: str = "en",
         top_k: int = 20,
-        preloaded_context: str = None
+        preloaded_context: str = None,
+        old_filename: str = None,
+        new_filename: str = None
     ) -> dict:
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
@@ -421,8 +429,13 @@ class RAGAgent:
                 messages.append({"role": "assistant", "content": content})
         
         
+        old_label = old_filename if old_filename else "Version A"
+        new_label = new_filename if new_filename else "Version B"
+        
         if is_comparison:
             user_message = f"""You have been given retrieved chunks from two construction schedule files. Perform a precise comparison.
+
+IMPORTANT: Throughout your response, refer to the old schedule as "{old_label}" and the new schedule as "{new_label}". Use these exact names in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
 
 ═══════════════════════════════════════════════════════════
 RETRIEVED CONTEXT FROM BOTH VECTOR STORES:

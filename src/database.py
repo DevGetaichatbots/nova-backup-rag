@@ -241,8 +241,46 @@ def create_chat_memory_table():
                 
                 CREATE INDEX IF NOT EXISTS chat_memory_session_idx 
                 ON chat_memory(session_id);
+
+                CREATE TABLE IF NOT EXISTS session_metadata (
+                    id SERIAL PRIMARY KEY,
+                    session_id VARCHAR(255) NOT NULL,
+                    old_filename VARCHAR(500),
+                    new_filename VARCHAR(500),
+                    old_table_name VARCHAR(255),
+                    new_table_name VARCHAR(255),
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
+
+                CREATE INDEX IF NOT EXISTS session_metadata_idx
+                ON session_metadata(session_id);
             """)
             conn.commit()
+
+
+def save_session_metadata(session_id: str, old_filename: str, new_filename: str, old_table_name: str, new_table_name: str):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO session_metadata (session_id, old_filename, new_filename, old_table_name, new_table_name)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+            """, (session_id, old_filename, new_filename, old_table_name, new_table_name))
+            conn.commit()
+
+
+def get_session_metadata(session_id: str) -> dict:
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT old_filename, new_filename, old_table_name, new_table_name
+                FROM session_metadata
+                WHERE session_id = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (session_id,))
+            result = cur.fetchone()
+    return dict(result) if result else {}
 
 
 def save_chat_message(session_id: str, role: str, content: str):
