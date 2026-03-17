@@ -65,15 +65,16 @@ def split_oversized_text(text: str, max_tokens: int = MAX_TOKENS) -> list[str]:
     return parts
 
 
-def generate_embeddings(texts: list[str]) -> list[list[float]]:
+def generate_embeddings(texts: list[str], progress_callback=None) -> list[list[float]]:
     client = get_azure_openai_client()
     
     safe_texts = [truncate_text(t) for t in texts]
     
     embeddings = []
     batch_size = 100
+    total_batches = (len(safe_texts) + batch_size - 1) // batch_size
     
-    for i in range(0, len(safe_texts), batch_size):
+    for batch_num, i in enumerate(range(0, len(safe_texts), batch_size), 1):
         batch = safe_texts[i:i + batch_size]
         response = client.embeddings.create(
             model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
@@ -82,6 +83,9 @@ def generate_embeddings(texts: list[str]) -> list[list[float]]:
         
         for item in response.data:
             embeddings.append(item.embedding)
+        
+        if progress_callback:
+            progress_callback(batch_num, total_batches)
     
     return embeddings
 

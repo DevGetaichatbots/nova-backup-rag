@@ -12,29 +12,41 @@ class VectorStoreManager:
     def __init__(self):
         self.dimension = settings.EMBEDDING_DIMENSION
     
-    def create_store_from_pdf(self, session_id: str, file_name: str, pdf_bytes: bytes, table_name: str | None = None) -> dict:
+    def create_store_from_pdf(self, session_id: str, file_name: str, pdf_bytes: bytes, table_name: str | None = None, progress_callback=None) -> dict:
+        def _progress(step, detail, pct):
+            if progress_callback:
+                progress_callback(step, detail, pct)
+        
         if table_name:
             safe_name = table_name.replace('-', '_').replace(' ', '_')[:63]
         else:
             safe_name = f"vs_{session_id}_{file_name.replace('.', '_').replace(' ', '_')}"[:63]
         
+        _progress("table", f"Creating database table...", 5)
         logger.info(f"  Creating vector table: {safe_name}")
         safe_table_name = create_vector_table(safe_name, self.dimension)
         
+        _progress("ocr", f"Running OCR on {file_name}...", 10)
         logger.info(f"  Extracting text from PDF ({len(pdf_bytes)} bytes)...")
         chunks = process_pdf_binary(pdf_bytes, filename=file_name)
         
         if not chunks:
             logger.warning(f"  No content extracted from PDF")
+            _progress("error", "No content found in PDF", 0)
             return {
                 "status": "error",
                 "message": "No text content found in PDF",
                 "table_name": safe_table_name
             }
         
+        _progress("chunking", f"Extracted {len(chunks)} chunks from {file_name}", 40)
         logger.info(f"  Extracted {len(chunks)} chunks, generating embeddings...")
         texts = [chunk["content"] for chunk in chunks]
-        embeddings = generate_embeddings(texts)
+        
+        _progress("embedding", f"Generating embeddings for {len(chunks)} chunks...", 50)
+        embeddings = generate_embeddings(texts, progress_callback=lambda done, total: _progress(
+            "embedding", f"Embedding batch {done}/{total}...", 50 + int((done / max(total, 1)) * 35)
+        ))
         
         documents = []
         for i, chunk in enumerate(chunks):
@@ -44,9 +56,11 @@ class VectorStoreManager:
                 "metadata": json.dumps(chunk["metadata"])
             })
         
+        _progress("storing", f"Storing {len(documents)} embeddings in database...", 90)
         logger.info(f"  Storing {len(documents)} embeddings in database...")
         insert_embeddings(safe_table_name, documents)
         
+        _progress("complete", f"Done — {len(chunks)} chunks stored", 100)
         logger.info(f"  Vector store ready: {safe_table_name}")
         return {
             "status": "success",
