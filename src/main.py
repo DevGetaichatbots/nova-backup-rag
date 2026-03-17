@@ -23,6 +23,7 @@ from src.agent import rag_agent
 from src.predictive_agent import predictive_agent
 from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
 from src.html_formatter import format_response_as_html
+from src.predictive_html_formatter import format_predictive_as_html
 
 app = FastAPI(
     title="RAG Agent SaaS",
@@ -295,7 +296,7 @@ async def query_agent(
                 predictive_model = predictive_result.get("model", "")
             
             if format == "html" and predictive_text:
-                predictive_text = format_response_as_html(predictive_text, language)
+                predictive_text = format_predictive_as_html(predictive_text, language)
             
             logger.info(f"  Predictive complete: {len(predictive_text)} chars, status: {predictive_status}")
         else:
