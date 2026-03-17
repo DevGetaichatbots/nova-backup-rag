@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 _query_executor = ThreadPoolExecutor(max_workers=4)
 _predictive_results: Dict[str, Dict[str, Any]] = {}
+_upload_progress: Dict[str, Dict[str, Any]] = {}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -99,50 +100,101 @@ async def upload_schedules(
         new_pdf_bytes = await new_schedule.read()
         logger.info(f"Files read: old={len(old_pdf_bytes)} bytes, new={len(new_pdf_bytes)} bytes")
         
-        start_time = time.time()
+        upload_id = str(uuid.uuid4())[:8]
+        _upload_progress[upload_id] = {
+            "status": "processing",
+            "upload_id": upload_id,
+            "session_id": session_id,
+            "old_filename": old_filename,
+            "new_filename": new_filename,
+            "started_at": time.time(),
+            "old_schedule": {"step": "queued", "detail": "Waiting to start", "progress": 0},
+            "new_schedule": {"step": "queued", "detail": "Waiting to start", "progress": 0},
+            "overall_progress": 0
+        }
         
-        logger.info(f"Processing BOTH schedules in parallel...")
         loop = asyncio.get_event_loop()
         
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            old_future = loop.run_in_executor(
-                executor,
-                vector_store_manager.create_store_from_pdf,
-                session_id, old_filename, old_pdf_bytes, old_session_id
-            )
-            new_future = loop.run_in_executor(
-                executor,
-                vector_store_manager.create_store_from_pdf,
-                session_id, new_filename, new_pdf_bytes, new_session_id
-            )
-            
-            old_result, new_result = await asyncio.gather(old_future, new_future)
+        async def _process_upload_background():
+            try:
+                def progress_cb(file_key, step, detail, progress):
+                    _upload_progress[upload_id][file_key]["step"] = step
+                    _upload_progress[upload_id][file_key]["detail"] = detail
+                    _upload_progress[upload_id][file_key]["progress"] = progress
+                    old_p = _upload_progress[upload_id]["old_schedule"]["progress"]
+                    new_p = _upload_progress[upload_id]["new_schedule"]["progress"]
+                    _upload_progress[upload_id]["overall_progress"] = (old_p + new_p) // 2
+
+                def process_file(file_key, filename, pdf_bytes, table_id):
+                    progress_cb(file_key, "ocr", f"Extracting content from {filename}...", 10)
+                    result = vector_store_manager.create_store_from_pdf(
+                        session_id, filename, pdf_bytes, table_id,
+                        progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
+                    )
+                    progress_cb(file_key, "complete", f"{filename} processed", 100)
+                    return result
+                
+                old_future = loop.run_in_executor(
+                    _query_executor,
+                    lambda: process_file("old_schedule", old_filename, old_pdf_bytes, old_session_id)
+                )
+                new_future = loop.run_in_executor(
+                    _query_executor,
+                    lambda: process_file("new_schedule", new_filename, new_pdf_bytes, new_session_id)
+                )
+                
+                old_result, new_result = await asyncio.gather(old_future, new_future)
+                
+                save_session_metadata(session_id, old_filename, new_filename, old_session_id, new_session_id)
+                
+                elapsed = time.time() - _upload_progress[upload_id]["started_at"]
+                _upload_progress[upload_id].update({
+                    "status": "complete",
+                    "overall_progress": 100,
+                    "elapsed_seconds": round(elapsed, 1),
+                    "old_schedule": {
+                        "step": "complete",
+                        "detail": f"{old_result.get('chunks_processed', 0)} chunks stored",
+                        "progress": 100,
+                        "table_name": old_result.get("table_name"),
+                        "chunks": old_result.get("chunks_processed", 0)
+                    },
+                    "new_schedule": {
+                        "step": "complete",
+                        "detail": f"{new_result.get('chunks_processed', 0)} chunks stored",
+                        "progress": 100,
+                        "table_name": new_result.get("table_name"),
+                        "chunks": new_result.get("chunks_processed", 0)
+                    }
+                })
+                logger.info(f"=== UPLOAD COMPLETE ({elapsed:.1f}s) ===")
+                
+            except Exception as e:
+                logger.error(f"Upload failed: {e}")
+                _upload_progress[upload_id].update({
+                    "status": "error",
+                    "error": str(e)
+                })
         
-        elapsed = time.time() - start_time
-        logger.info(f"OLD schedule done: {old_result.get('chunks_processed', 0)} chunks")
-        logger.info(f"NEW schedule done: {new_result.get('chunks_processed', 0)} chunks")
-        
-        save_session_metadata(session_id, old_filename, new_filename, old_session_id, new_session_id)
-        logger.info(f"Session metadata saved: {old_filename} / {new_filename}")
-        logger.info(f"=== UPLOAD COMPLETE ({elapsed:.1f}s) ===")
+        asyncio.create_task(_process_upload_background())
         
         return {
-            "status": "success",
+            "status": "processing",
+            "upload_id": upload_id,
             "session_id": session_id,
-            "old_schedule": {
-                "table_name": old_result.get("table_name"),
-                "chunks": old_result.get("chunks_processed", 0)
-            },
-            "new_schedule": {
-                "table_name": new_result.get("table_name"),
-                "chunks": new_result.get("chunks_processed", 0)
-            },
-            "message": f"Both schedules processed in {elapsed:.1f}s"
+            "message": f"Upload started. Poll GET /upload/progress/{upload_id} for real-time progress."
         }
         
     except Exception as e:
         logger.error(f"Upload failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/upload/progress/{upload_id}")
+async def get_upload_progress(upload_id: str):
+    if upload_id not in _upload_progress:
+        raise HTTPException(status_code=404, detail="Upload ID not found")
+    return _upload_progress[upload_id]
 
 
 DEV_HOSTS = [
