@@ -1,0 +1,150 @@
+2026-03-17 23:00:40.49
+b75cfa57
+User
+18:00:40 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:44.49
+b75cfa57
+User
+18:00:44 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:45.72
+b75cfa57
+User
+18:00:45 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:46.29
+b75cfa57
+User
+18:00:46 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:46.49
+b75cfa57
+User
+18:00:46 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:48.79
+b75cfa57
+User
+18:00:48 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:49.59
+b75cfa57
+User
+18:00:49 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:51.99
+b75cfa57
+User
+18:00:51 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:00:57.29
+b75cfa57
+User
+18:00:57 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:01:01.49
+b75cfa57
+User
+18:01:01 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:01:04.29
+b75cfa57
+User
+18:01:04 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:01:09.10
+b75cfa57
+User
+18:01:09 | INFO | Storing 578 embeddings in database...
+2026-03-17 23:01:10.39
+b75cfa57
+User
+18:01:10 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-17 23:01:12.58
+b75cfa57
+User
+18:01:12 | INFO | Storing 862 embeddings in database...
+2026-03-17 23:04:16.59
+b75cfa57
+User
+18:04:16 | INFO | Inserted batch 1 (100 rows)
+2026-03-17 23:04:19.99
+b75cfa57
+User
+18:04:19 | INFO | Inserted batch 1 (100 rows)
+2026-03-17 23:04:20.41
+b75cfa57
+User
+18:04:20 | INFO | Inserted batch 2 (100 rows)
+2026-03-17 23:04:22.29
+b75cfa57
+User
+18:04:22 | INFO | Inserted batch 2 (100 rows)
+2026-03-17 23:04:23.66
+b75cfa57
+User
+18:04:23 | INFO | Inserted batch 3 (100 rows)
+2026-03-17 23:04:24.79
+b75cfa57
+User
+18:04:24 | INFO | Inserted batch 3 (100 rows)
+2026-03-17 23:04:24.79
+b75cfa57
+User
+18:04:24 | INFO | Inserted batch 3 (100 rows)
+2026-03-17 23:04:24.79
+b75cfa57
+User
+18:04:24 | INFO | Inserted batch 3 (100 rows)
+2026-03-17 23:04:27.09
+b75cfa57
+User
+18:04:26 | INFO | Inserted batch 4 (100 rows)
+2026-03-17 23:04:27.79
+b75cfa57
+User
+18:04:27 | INFO | Inserted batch 4 (100 rows)
+2026-03-17 23:04:29.29
+b75cfa57
+User
+18:04:29 | INFO | Inserted batch 5 (100 rows)
+2026-03-17 23:04:29.29
+b75cfa57
+User
+18:04:29 | INFO | Inserted batch 5 (100 rows)
+2026-03-17 23:04:32.37
+b75cfa57
+User
+18:04:32 | INFO | Inserted batch 5 (100 rows)
+2026-03-17 23:04:32.49
+b75cfa57
+User
+18:04:32 | INFO | Inserted batch 6 (100 rows)
+2026-03-17 23:04:37.39
+b75cfa57
+User
+18:04:37 | INFO | Inserted batch 6 (78 rows)
+2026-03-17 23:04:38.29
+b75cfa57
+User
+18:04:38 | INFO | Vector store ready: table_new_mmux2rzh_b15442653e
+2026-03-17 23:04:39.53
+b75cfa57
+User
+18:04:39 | INFO | Inserted batch 7 (100 rows)
+2026-03-17 23:04:41.50
+b75cfa57
+User
+18:04:41 | INFO | Inserted batch 8 (100 rows)
+2026-03-17 23:04:42.69
+b75cfa57
+User
+18:04:42 | INFO | Inserted batch 9 (62 rows)
+2026-03-17 23:04:42.89
+b75cfa57
+User
+18:04:42 | INFO | Vector store ready: table_old_mmux2rzh_4aaea96c8c
+2026-03-17 23:04:42.89
+b75cfa57
+User
+18:04:42 | INFO | Vector store ready: table_old_mmux2rzh_4aaea96c8c
+2026-03-17 23:04:46.13
+b75cfa57
+User
+18:04:46 | INFO | === UPLOAD COMPLETE (320.8s) ===
+2026-03-17 23:04:46.13
+b75cfa57
+User
+18:04:46 | INFO | === UPLOAD COMPLETE (320.8s) ===
+Wrap
+Colors

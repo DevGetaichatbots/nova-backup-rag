@@ -2,12 +2,15 @@ import logging
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_values
 from psycopg2 import sql
+from psycopg2 import pool as pg_pool
 
 logger = logging.getLogger(__name__)
 from contextlib import contextmanager
 from urllib.parse import urlparse, unquote
 import re
 from src.config import settings, get_database_url
+
+_connection_pool = None
 
 
 def sanitize_table_name(name: str) -> str:
@@ -68,33 +71,43 @@ def parse_database_url(url: str) -> dict:
         return {}
 
 
+def _get_pool():
+    global _connection_pool
+    if _connection_pool is None:
+        db_url = get_database_url()
+        parsed = parse_database_url(db_url) if db_url else {}
+        
+        if parsed:
+            _connection_pool = pg_pool.ThreadedConnectionPool(
+                minconn=2, maxconn=8,
+                host=parsed["host"],
+                port=parsed["port"],
+                database=parsed["database"],
+                user=parsed["user"],
+                password=parsed["password"],
+                sslmode="require"
+            )
+        else:
+            _connection_pool = pg_pool.ThreadedConnectionPool(
+                minconn=2, maxconn=8,
+                host=settings.SUPABASE_DB_HOST,
+                port=settings.SUPABASE_DB_PORT,
+                database=settings.SUPABASE_DB_NAME,
+                user=settings.SUPABASE_DB_USER,
+                password=settings.SUPABASE_DB_PASSWORD,
+                sslmode="require"
+            )
+    return _connection_pool
+
+
 @contextmanager
 def get_db_connection():
-    db_url = get_database_url()
-    parsed = parse_database_url(db_url) if db_url else {}
-    
-    if parsed:
-        conn = psycopg2.connect(
-            host=parsed["host"],
-            port=parsed["port"],
-            database=parsed["database"],
-            user=parsed["user"],
-            password=parsed["password"],
-            sslmode="require"
-        )
-    else:
-        conn = psycopg2.connect(
-            host=settings.SUPABASE_DB_HOST,
-            port=settings.SUPABASE_DB_PORT,
-            database=settings.SUPABASE_DB_NAME,
-            user=settings.SUPABASE_DB_USER,
-            password=settings.SUPABASE_DB_PASSWORD,
-            sslmode="require"
-        )
+    pool = _get_pool()
+    conn = pool.getconn()
     try:
         yield conn
     finally:
-        conn.close()
+        pool.putconn(conn)
 
 
 def init_pgvector_extension():
@@ -141,32 +154,28 @@ def create_vector_table(table_name: str, dimension: int = 1536):
 def insert_embeddings(table_name: str, documents: list):
     safe_table_name = sanitize_table_name(table_name)
     
-    values = []
-    for doc in documents:
-        embedding_str = "[" + ",".join(map(str, doc["embedding"])) + "]"
-        values.append((doc["content"], embedding_str, doc.get("metadata", "{}")))
-    
     BATCH_SIZE = 100
     
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            template = sql.SQL("(%s, %s::vector, %s::jsonb)")
-            insert_prefix = sql.SQL("INSERT INTO {table} (content, embedding, metadata) VALUES ").format(
-                table=sql.Identifier(safe_table_name)
-            )
-            
-            for i in range(0, len(values), BATCH_SIZE):
-                batch = values[i:i + BATCH_SIZE]
+            for i in range(0, len(documents), BATCH_SIZE):
+                batch_docs = documents[i:i + BATCH_SIZE]
+                batch_values = []
+                for doc in batch_docs:
+                    embedding_str = "[" + ",".join(map(str, doc["embedding"])) + "]"
+                    batch_values.append((doc["content"], embedding_str, doc.get("metadata", "{}")))
+                
                 execute_values(
                     cur,
                     sql.SQL("INSERT INTO {table} (content, embedding, metadata) VALUES %s").format(
                         table=sql.Identifier(safe_table_name)
                     ).as_string(conn),
-                    batch,
+                    batch_values,
                     template="(%s, %s::vector, %s::jsonb)",
                     page_size=BATCH_SIZE
                 )
-                logger.info(f"  Inserted batch {i // BATCH_SIZE + 1} ({len(batch)} rows)")
+                batch_num = i // BATCH_SIZE + 1
+                logger.info(f"  Inserted batch {batch_num} ({len(batch_docs)} rows)")
             
             conn.commit()
 
