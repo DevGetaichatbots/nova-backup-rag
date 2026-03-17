@@ -90,16 +90,18 @@ For comparison queries, the `/query` endpoint returns:
 - `predictive_model` — model name used for predictions
 - Non-comparison queries skip the predictive agent entirely
 
-### Nova Insight Modules (GPT-5.2)
-- **Module A**: Overdue activities (Startdato past, % færdigt = 0)
-- **Module B**: Unrealistic progress reporting (|Expected - Reported| > 25%)
-- **Module C**: Dependency chain risk (inferred from floor/date sequencing, best-effort)
-- **Module D**: Decision bottlenecks (Varighed = 0, approval keywords)
-- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato)
-- **Module F**: Long duration risks (Varighed > 90 days)
-- **Module G**: Discipline progress dashboard (grouped by Ansvarlig)
-- **Complexity Score**: Low/Medium/High/Very High
-- **Predictive Delay Engine**: risk %, delay window, primary risk source
+### Nova Insight Modules (GPT-5.2, CTCO-optimized prompt)
+- **Module A**: Overdue activities (Startdato < today AND % færdigt = 0)
+- **Module B**: Unrealistic progress reporting (deviation > 25%, over/under-reported sub-types)
+- **Module C**: Dependency chain risk (inferred graph: Etage+dates+trade sequence, chains > 4 tasks)
+- **Module D**: Decision bottlenecks (Varighed = 0 + Danish/English decision keywords + BH client tasks)
+- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato per Etage/Ansvarlig)
+- **Module F**: Long duration risks (Varighed > 90 days elevated, > 120 days critical)
+- **Module G**: Discipline progress dashboard (grouped by Ansvarlig, health scoring)
+- **Schedule Health Overview**: Quick-glance summary of all findings
+- **Complexity Score**: Low/Medium/High/Very High (activities + floors + disciplines + chain depth)
+- **Predictive Delay Engine**: weighted risk score, risk %, delay window, primary risk source
+- **Prompt optimizations**: CTCO framework, few-shot examples, reasoning_effort=high, temperature=0.1, 32K output tokens
 
 ## Environment Variables Required
 - `SUPABASE_URL` - Supabase project URL

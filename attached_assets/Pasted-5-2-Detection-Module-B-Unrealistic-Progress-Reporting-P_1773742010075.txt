@@ -1,0 +1,155 @@
+5.2 Detection Module B
+Unrealistic Progress Reporting
+Project managers often report incorrect progress percentages.
+Example:
+Task duration: 100 days
+Elapsed time: 28 days
+Reported progress: 60%
+Actual expected progress should be approximately 28%.
+Calculation:
+Expected Progress =
+(Today − Start Date) / Duration
+If difference between expected and reported progress exceeds threshold:
+Example threshold:
+20–30%
+Then flag activity.
+Example output:
+Task: Cable Installation
+Expected progress: 28%
+Reported progress: 60%
+Status: Progress anomaly.
+5.3 Detection Module C
+Dependency Chain Analysis
+Construction schedules rely heavily on dependencies.
+Example:
+Cable trays → electrical installation → lighting → controls.
+Nova must detect long chains of dependencies and analyze risk propagation.
+If a task early in the chain is delayed, downstream tasks will also be affected.
+Algorithm steps:
+1. Build dependency graph
+2. Identify chains of dependencies
+3. Detect chains longer than threshold
+4. Evaluate delay impact
+Output example:
+Critical dependency chain detected:
+Electrical installation → lighting installation → controls commissioning.
+Risk level: High.
+5.4 Detection Module D
+Decision Activities
+Many activities have duration of zero days.
+These are typically coordination or decision tasks.
+Examples:
+Approval of equipment
+Component selection
+Client decisions
+These activities are often hidden schedule risks.
+Logic:
+If duration = 0 days
+AND activity name contains keywords like:
+approval
+selection
+decision
+placement
+coordination
+Then classify as decision activity.
+Output example:
+Client decision required: Placement of fire safety components.
+Risk level: medium.
+5.5 Detection Module E
+Artificial Scheduling Clusters
+In many schedules multiple tasks start on exactly the same date.
+Example found in the schedule:
+9 tasks starting on the same day.
+This often indicates placeholder planning rather than realistic scheduling.
+Logic:
+If more than X tasks share the same start date within the same discipline:
+Flag cluster.
+Example output:
+Scheduling cluster detected.
+8 tasks scheduled to start on Feb 9.
+Possible planning placeholder.
+5.6 Detection Module F
+Long Duration Activities
+Tasks exceeding a certain duration often carry higher risk.
+Example thresholds:
+90 days
+120 days
+If duration exceeds threshold:
+Flag for risk.
+Example output:
+Task: Project Engineering Completion
+Duration: 125 days
+Risk level: Elevated.
+5.7 Detection Module G
+Discipline Clustering
+The schedule contains repeated task types such as:
+Electrical installation
+Lighting installation
+IT and low voltage
+Cable trays
+Nova should group tasks by discipline automatically.
+This allows progress tracking per discipline.
+Example output:
+Electrical progress: 58%
+Lighting progress: 42%
+IT systems progress: 61%
+6. Schedule Complexity Scoring
+Nova should compute a complexity score.
+Inputs:
+Number of activities
+Number of dependencies
+Average chain length
+Example output:
+Activities: 1243
+Dependencies: 2800
+Average dependency chain: 7
+Schedule complexity score: High.
+This helps identify schedules that require deeper monitoring.
+7. Predictive Delay Engine
+This is the most important component.
+The system should estimate delay risk using:
+Activity progress
+Dependency chains
+Remaining durations
+Blocked activities
+Example output:
+Potential delay risk: 34%
+Estimated delay window: 18–24 days
+Primary risk source:
+Electrical installation chain.
+8. User Output Layer
+Nova should not overwhelm users with data.
+The interface should present insights such as:
+Schedule Health Overview
+• 7 activities should have started
+• 12 progress anomalies
+• 4 blocked activities
+• 2 critical dependency chains
+Risk level: Medium.
+9. Development Priority
+This predictive layer must be implemented immediately.
+Reason:
+Multiple senior project managers have now requested this capability.
+It solves a real industry problem and differentiates Nova from traditional scheduling software.
+This feature is extremely valuable and has been described by industry professionals as gold
+for project management.
+10. Delivery Deadline
+Prototype implementation deadline:
+Wednesday
+15:00 Bali Time
+Minimum deliverable:
+Working predictive engine capable of analyzing:
+Start dates
+Durations
+Percent progress
+Dependencies
+And producing anomaly reports.
+11. Strategic Importance
+If implemented correctly, this predictive layer will position Nova Insight as a true schedule
+intelligence platform, not just a schedule viewer.
+This is the direction the product must evolve.
+It will provide enormous value to:
+Project directors
+Planning engineers
+Claims specialists
+Client representatives
