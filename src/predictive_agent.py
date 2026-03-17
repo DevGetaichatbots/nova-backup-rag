@@ -480,11 +480,11 @@ EXECUTION STEPS:
                 "model": self.deployment,
                 "messages": messages,
                 "temperature": 1,
-                "max_completion_tokens": 32000,
+                "max_completion_tokens": 65536,
             }
 
             try:
-                api_params["reasoning_effort"] = "high"
+                api_params["reasoning_effort"] = "medium"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
