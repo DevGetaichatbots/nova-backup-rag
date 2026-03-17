@@ -10,7 +10,8 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **LLM (Comparison)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
 - **LLM (Predictive)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
-- **Dual-Agent**: Comparison agent returns immediately (~1 min), predictive runs in background (poll via `/query/predictive/{id}`)
+- **Dual-Agent**: Both agents run in parallel via `asyncio.gather`, single response (~60s), no polling needed
+- **DB Connection Pooling**: ThreadedConnectionPool (2-8 connections), batch embedding conversion
 - **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
 
 ## Project Structure
@@ -66,9 +67,6 @@ curl -X POST "https://your-domain/query" \
 | new_session_id | Reference to new file's vector store |
 | format | "markdown" (default) or "html" (premium styled) |
 
-### GET /query/predictive/{predictive_id} - Poll predictive insights
-Response returns `{"status": "processing"}` while running, then full predictive report when done.
-
 ### GET /health - Health check
 
 ## Flow
@@ -87,12 +85,15 @@ Response returns `{"status": "processing"}` while running, then full predictive 
 - Row chunks include: page_number, cells_data with coordinates
 - Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
 
-## Query Response (Multi-LLM)
-For comparison queries, the `/query` endpoint returns:
-- `response` — GPT-5.2 comparison analysis (existing field)
-- `predictive_insights` — GPT-5.2 Nova Insight predictive report (new field)
+## Query Response (Parallel Dual-Agent)
+Both agents run in parallel via `asyncio.gather` — response time = max(comparison, predictive), not sum.
+For comparison queries, the `/query` endpoint returns everything in a single response:
+- `response` — GPT-5.2 comparison analysis
+- `predictive_insights` — GPT-5.2 Nova Insight predictive report
+- `predictive_status` — "success" or "error"
 - `predictive_model` — model name used for predictions
 - Non-comparison queries skip the predictive agent entirely
+- Both agents use `reasoning_effort="low"` for optimal speed
 
 ### Nova Insight Modules (GPT-5.2, CTCO-optimized prompt)
 - **Module A**: Overdue activities (Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0)
@@ -105,7 +106,7 @@ For comparison queries, the `/query` endpoint returns:
 - **Schedule Health Overview**: Quick-glance summary of all findings
 - **Complexity Score**: Low/Medium/High/Very High (activities + areas + disciplines + chain depth + dependency links)
 - **Predictive Delay Engine**: weighted risk score, risk %, delay window, primary risk source
-- **Prompt optimizations**: CTCO framework, few-shot examples from real data, reasoning_effort=high, temperature=0.1, 32K output tokens
+- **Prompt optimizations**: CTCO framework, few-shot examples from real data, reasoning_effort=low, temperature=1, 32K output tokens
 
 ### Schedule Format Support
 - **MS Project Export** (PRIMARY): `Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver` — match by Id, explicit dependencies

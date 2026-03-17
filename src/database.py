@@ -1,4 +1,5 @@
 import logging
+import threading
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_values
 from psycopg2 import sql
@@ -11,6 +12,7 @@ import re
 from src.config import settings, get_database_url
 
 _connection_pool = None
+_pool_lock = threading.Lock()
 
 
 def sanitize_table_name(name: str) -> str:
@@ -73,7 +75,11 @@ def parse_database_url(url: str) -> dict:
 
 def _get_pool():
     global _connection_pool
-    if _connection_pool is None:
+    if _connection_pool is not None:
+        return _connection_pool
+    with _pool_lock:
+        if _connection_pool is not None:
+            return _connection_pool
         db_url = get_database_url()
         parsed = parse_database_url(db_url) if db_url else {}
         
@@ -106,6 +112,9 @@ def get_db_connection():
     conn = pool.getconn()
     try:
         yield conn
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         pool.putconn(conn)
 
