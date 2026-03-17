@@ -194,18 +194,27 @@ def similarity_search(table_name: str, query_embedding: list, top_k: int = 5):
     return results
 
 
-def fetch_all_chunks(table_name: str) -> list:
+def fetch_all_chunks(table_name: str, chunk_type: str = None) -> list:
     safe_table_name = sanitize_table_name(table_name)
     
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            query = sql.SQL("""
-                SELECT id, content, metadata
-                FROM {table}
-                ORDER BY id ASC
-            """).format(table=sql.Identifier(safe_table_name))
+            if chunk_type:
+                query = sql.SQL("""
+                    SELECT id, content, metadata
+                    FROM {table}
+                    WHERE metadata->>'type' = %s
+                    ORDER BY id ASC
+                """).format(table=sql.Identifier(safe_table_name))
+                cur.execute(query, (chunk_type,))
+            else:
+                query = sql.SQL("""
+                    SELECT id, content, metadata
+                    FROM {table}
+                    ORDER BY id ASC
+                """).format(table=sql.Identifier(safe_table_name))
+                cur.execute(query)
             
-            cur.execute(query)
             results = cur.fetchall()
     
     return [

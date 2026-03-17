@@ -88,13 +88,14 @@ class VectorStoreManager:
         
         return all_results
     
-    def fetch_all_from_stores(self, table_names: list[str]) -> dict:
+    def fetch_all_from_stores(self, table_names: list[str], chunk_type: str = None) -> dict:
         all_results = {}
         for table_name in table_names:
             try:
-                results = fetch_all_chunks(table_name)
+                results = fetch_all_chunks(table_name, chunk_type=chunk_type)
+                type_label = f" (type={chunk_type})" if chunk_type else ""
                 all_results[table_name] = results
-                logger.info(f"  Full fetch from {table_name}: {len(results)} chunks")
+                logger.info(f"  Fetch from {table_name}: {len(results)} chunks{type_label}")
             except Exception as e:
                 logger.error(f"  Full fetch error for {table_name}: {e}")
                 all_results[table_name] = {"error": str(e)}

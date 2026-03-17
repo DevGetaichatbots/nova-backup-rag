@@ -1,13 +1,15 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import asyncio
 import logging
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 _query_executor = ThreadPoolExecutor(max_workers=4)
+_predictive_results: Dict[str, Dict[str, Any]] = {}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -172,6 +174,8 @@ async def query_agent(
         is_comparison = rag_agent._is_comparison_query(query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
+        predictive_id = None
+        
         if is_comparison:
             loop = asyncio.get_event_loop()
             
@@ -180,9 +184,34 @@ async def query_agent(
                 lambda: rag_agent._retrieve_context(query, table_names)
             )
             
-            logger.info(f"  Running GPT-5.2 (comparison) and GPT-5.2 (predictive) in parallel...")
+            predictive_id = str(uuid.uuid4())[:8]
+            _predictive_results[predictive_id] = {"status": "processing"}
             
-            comparison_future = loop.run_in_executor(
+            async def _run_predictive_background(pid, ctx, q, lang, fmt):
+                try:
+                    logger.info(f"  [Predictive:{pid}] Starting background analysis...")
+                    pred_result = await loop.run_in_executor(
+                        _query_executor,
+                        lambda: predictive_agent.analyze(context=ctx, user_query=q, language=lang)
+                    )
+                    predictive_text = pred_result.get("predictive_insights", "")
+                    if fmt == "html" and predictive_text:
+                        predictive_text = format_response_as_html(predictive_text, lang)
+                    _predictive_results[pid] = {
+                        "status": pred_result["status"],
+                        "predictive_insights": predictive_text,
+                        "predictive_model": pred_result.get("model", ""),
+                    }
+                    logger.info(f"  [Predictive:{pid}] Complete: {len(predictive_text)} chars")
+                except Exception as e:
+                    logger.error(f"  [Predictive:{pid}] Failed: {e}")
+                    _predictive_results[pid] = {"status": "error", "error": str(e)}
+            
+            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format))
+            
+            logger.info(f"  Running GPT-5.2 comparison (predictive:{predictive_id} in background)...")
+            
+            result = await loop.run_in_executor(
                 _query_executor,
                 lambda: rag_agent.query(
                     user_query=query,
@@ -193,21 +222,6 @@ async def query_agent(
                     preloaded_context=context
                 )
             )
-            
-            predictive_future = loop.run_in_executor(
-                _query_executor,
-                lambda: predictive_agent.analyze(
-                    context=context,
-                    user_query=query,
-                    language=language
-                )
-            )
-            
-            result, predictive_result = await asyncio.gather(
-                comparison_future, predictive_future
-            )
-            
-            logger.info(f"  Predictive agent status: {predictive_result['status']}")
         else:
             result = rag_agent.query(
                 user_query=query,
@@ -216,7 +230,6 @@ async def query_agent(
                 language=language,
                 top_k=10
             )
-            predictive_result = None
         
         response_text = result["response"]
         
@@ -237,21 +250,41 @@ async def query_agent(
             "format": format
         }
         
-        if predictive_result and predictive_result["status"] == "success":
-            predictive_text = predictive_result["predictive_insights"]
-            if format == "html" and predictive_text:
-                predictive_text = format_response_as_html(predictive_text, language)
-            response_payload["predictive_insights"] = predictive_text
-            response_payload["predictive_model"] = predictive_result["model"]
-        elif predictive_result and predictive_result["status"] == "error":
-            response_payload["predictive_insights"] = ""
-            response_payload["predictive_error"] = predictive_result.get("error", "Unknown error")
+        if predictive_id:
+            response_payload["predictive_id"] = predictive_id
+            response_payload["predictive_status"] = "processing"
         
         return response_payload
         
     except Exception as e:
         logger.error(f"Query failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/query/predictive/{predictive_id}")
+async def get_predictive_result(predictive_id: str):
+    if predictive_id not in _predictive_results:
+        raise HTTPException(status_code=404, detail="Predictive ID not found")
+    
+    result = _predictive_results[predictive_id]
+    
+    if result["status"] == "processing":
+        return {"status": "processing", "predictive_id": predictive_id}
+    
+    response = {
+        "status": result["status"],
+        "predictive_id": predictive_id,
+    }
+    
+    if result["status"] == "success":
+        response["predictive_insights"] = result.get("predictive_insights", "")
+        response["predictive_model"] = result.get("predictive_model", "")
+    elif result["status"] == "error":
+        response["error"] = result.get("error", "Unknown error")
+    
+    del _predictive_results[predictive_id]
+    
+    return response
 
 
 if __name__ == "__main__":
