@@ -473,8 +473,8 @@ Keep your response concise and helpful."""
         response = self.client.chat.completions.create(
             model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
             messages=messages,
-            temperature=0.3,
-            max_tokens=16000
+            temperature=1,
+            max_completion_tokens=16000
         )
         
         assistant_response = response.choices[0].message.content or ""
