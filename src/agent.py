@@ -493,12 +493,25 @@ Keep your response concise and helpful."""
         messages.append({"role": "user", "content": user_message})
         
         logger.info(f"  Calling Azure OpenAI ({settings.AZURE_OPENAI_CHAT_DEPLOYMENT})...")
-        response = self.client.chat.completions.create(
-            model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
-            messages=messages,
-            temperature=1,
-            max_completion_tokens=16000
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
+                messages=messages,
+                temperature=1,
+                max_completion_tokens=16000,
+                reasoning_effort="low"
+            )
+        except Exception as reasoning_err:
+            if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
+                logger.warning(f"  reasoning_effort not supported, falling back without it")
+                response = self.client.chat.completions.create(
+                    model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
+                    messages=messages,
+                    temperature=1,
+                    max_completion_tokens=16000
+                )
+            else:
+                raise reasoning_err
         
         assistant_response = response.choices[0].message.content or ""
         logger.info(f"  AI response received: {len(assistant_response)} chars")
