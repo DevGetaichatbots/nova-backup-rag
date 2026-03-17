@@ -180,7 +180,7 @@ async def query_agent(
                 lambda: rag_agent._retrieve_context(query, table_names)
             )
             
-            logger.info(f"  Running GPT-4.1 (comparison) and GPT-5.1 (predictive) in parallel...")
+            logger.info(f"  Running GPT-5.2 (comparison) and GPT-5.2 (predictive) in parallel...")
             
             comparison_future = loop.run_in_executor(
                 _query_executor,
