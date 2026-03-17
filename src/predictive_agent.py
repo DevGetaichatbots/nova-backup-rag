@@ -434,7 +434,9 @@ class PredictiveAgent:
         self,
         context: str,
         user_query: str,
-        language: str = "en"
+        language: str = "en",
+        old_filename: str = None,
+        new_filename: str = None
     ) -> dict:
         logger.info(f"  [PredictiveAgent] Starting analysis with {self.deployment}...")
 
@@ -443,7 +445,12 @@ class PredictiveAgent:
         )
         system_prompt = f"{PREDICTIVE_SYSTEM_PROMPT}\n\n{lang_instruction}"
 
+        old_label = old_filename if old_filename else "Old Schedule"
+        new_label = new_filename if new_filename else "New Schedule"
+
         user_message = f"""Analyze the following construction schedule data. Produce a complete Nova Insight predictive report.
+
+IMPORTANT: Throughout your report, refer to the old schedule as "{old_label}" and the new schedule as "{new_label}". Use these exact file names in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
 
 ═══════════════════════════════════════════════════════════
 COMPLETE SCHEDULE DATA FROM BOTH VECTOR STORES:

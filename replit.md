@@ -10,7 +10,8 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **LLM (Comparison)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
 - **LLM (Predictive)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
-- **Dual-Agent**: Both agents run in parallel on comparison queries via `asyncio.gather` (same GPT-5.2 model, different system prompts)
+- **Dual-Agent**: Comparison agent returns immediately (~1 min), predictive runs in background (poll via `/query/predictive/{id}`)
+- **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
 
 ## Project Structure
 ```
@@ -64,6 +65,9 @@ curl -X POST "https://your-domain/query" \
 | old_session_id | Reference to old file's vector store |
 | new_session_id | Reference to new file's vector store |
 | format | "markdown" (default) or "html" (premium styled) |
+
+### GET /query/predictive/{predictive_id} - Poll predictive insights
+Response returns `{"status": "processing"}` while running, then full predictive report when done.
 
 ### GET /health - Health check
 

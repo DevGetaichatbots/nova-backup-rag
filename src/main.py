@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 from src.vector_store import vector_store_manager
 from src.agent import rag_agent
 from src.predictive_agent import predictive_agent
-from src.database import init_pgvector_extension, create_chat_memory_table
+from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
 from src.html_formatter import format_response_as_html
 
 app = FastAPI(
@@ -121,6 +121,9 @@ async def upload_schedules(
         elapsed = time.time() - start_time
         logger.info(f"OLD schedule done: {old_result.get('chunks_processed', 0)} chunks")
         logger.info(f"NEW schedule done: {new_result.get('chunks_processed', 0)} chunks")
+        
+        save_session_metadata(session_id, old_filename, new_filename, old_session_id, new_session_id)
+        logger.info(f"Session metadata saved: {old_filename} / {new_filename}")
         logger.info(f"=== UPLOAD COMPLETE ({elapsed:.1f}s) ===")
         
         return {
@@ -171,6 +174,13 @@ async def query_agent(
     try:
         table_names = [old_session_id, new_session_id]
         
+        session_meta = get_session_metadata(vs_table)
+        old_filename = session_meta.get("old_filename", "Old Schedule")
+        new_filename = session_meta.get("new_filename", "New Schedule")
+        old_filename_clean = old_filename.replace(".pdf", "").replace(".PDF", "")
+        new_filename_clean = new_filename.replace(".pdf", "").replace(".PDF", "")
+        logger.info(f"  File names: {old_filename} / {new_filename}")
+        
         is_comparison = rag_agent._is_comparison_query(query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
@@ -181,18 +191,18 @@ async def query_agent(
             
             context = await loop.run_in_executor(
                 _query_executor,
-                lambda: rag_agent._retrieve_context(query, table_names)
+                lambda: rag_agent._retrieve_context(query, table_names, old_filename=old_filename, new_filename=new_filename)
             )
             
             predictive_id = str(uuid.uuid4())[:8]
             _predictive_results[predictive_id] = {"status": "processing"}
             
-            async def _run_predictive_background(pid, ctx, q, lang, fmt):
+            async def _run_predictive_background(pid, ctx, q, lang, fmt, of, nf):
                 try:
                     logger.info(f"  [Predictive:{pid}] Starting background analysis...")
                     pred_result = await loop.run_in_executor(
                         _query_executor,
-                        lambda: predictive_agent.analyze(context=ctx, user_query=q, language=lang)
+                        lambda: predictive_agent.analyze(context=ctx, user_query=q, language=lang, old_filename=of, new_filename=nf)
                     )
                     predictive_text = pred_result.get("predictive_insights", "")
                     if fmt == "html" and predictive_text:
@@ -207,7 +217,7 @@ async def query_agent(
                     logger.error(f"  [Predictive:{pid}] Failed: {e}")
                     _predictive_results[pid] = {"status": "error", "error": str(e)}
             
-            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format))
+            asyncio.create_task(_run_predictive_background(predictive_id, context, query, language, format, old_filename_clean, new_filename_clean))
             
             logger.info(f"  Running GPT-5.2 comparison (predictive:{predictive_id} in background)...")
             
@@ -219,7 +229,9 @@ async def query_agent(
                     session_id=vs_table,
                     language=language,
                     top_k=10,
-                    preloaded_context=context
+                    preloaded_context=context,
+                    old_filename=old_filename_clean,
+                    new_filename=new_filename_clean
                 )
             )
         else:
@@ -228,7 +240,9 @@ async def query_agent(
                 table_names=table_names,
                 session_id=vs_table,
                 language=language,
-                top_k=10
+                top_k=10,
+                old_filename=old_filename_clean,
+                new_filename=new_filename_clean
             )
         
         response_text = result["response"]
