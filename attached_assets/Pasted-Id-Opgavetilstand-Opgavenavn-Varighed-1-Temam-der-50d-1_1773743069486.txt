@@ -1,0 +1,397 @@
+Id Opgavetilstand Opgavenavn Varighed 1 Temamøder 50d 14 Bygherreafklaringer 111d 15 E100.02 - Fastlæggelse af rørmaterialer 15d 16 E100.03 - BH, godkendelse af synlinge komponter 10d 20 E100.02 - Vandbehandling og vandingsanlæg til
+haverne
+10d 21 E100.02 - Indretning af produktionskøkken,
+datablade på komponenter, central/decentral
+10d 23 blødgøring?
+E100.01 - Fastlæg krav til kemidepot 10d 24 Sikringsprojekt, omfang af ADK 10d 25 Infovæg med glasfronter (ARK pkt. 3.7) 2d 26 E100.02 - Stillingtagen til kølevand i terræn -
+udskiftning/relining
+14d 27 E100 Pressemøder I Banksalen skal afklares 5d 28 E100.03 - Afklaring af DAS/SINE 40d 29 E100.12 - SolafskærmningMørklægning,funktionskrav 15d 30 IKT 5d 32 Fredning 65d 33 Gokendelse af synlige komponeter fra E100.03 5d 34 Godkendelse af Maskinhalarmatur 15d 35 Godkendelse af indbygning af RKS og RUD 15d 36 Godkendelse af indbygning i "ovenlys" 15d 37 Godkendelse af kølecentralens indretning 15d 38 Deadline for afstemt materiale til ALJ vedr. SLKS 0d 39 Sikringsprojekt 100d 40 Placering/antal af sikringskomponenter, lofter 100d 41 Placering/antal af sikringskomponenter, vægge 1d 42 Placering/antal af sikringskomponenter, døre 1d 43 E100.01 Ventilation 172d 144 E100.02 VVS 0d 436 E100.03 EL 0d 437 Omr. 1 106,93d 438 Afhængigheder 106,93d 454 Placering og valg af ABA komponenter 0d 461 Samlet el-belastning for BMS-KT og BMS-IBI tavler 1d 462 Færdiggøre projektering 55d 463 ABA installationer 15d 464 AVA installationer 15d 465 Tavler 20d 466 Føringsveje 15d 467 Kraftinstallationer 16,24d 468 Lysinstallationer 10d 469 IT og Svagstrøm 15d 470 Svagstrøm Ur 3d 471 Omr. 2 142,85d 472 Afhængigheder 128,85d 476 Fyldningsgrad i spor/ udviddelsesfaktor 0d 481 Placering og valg af ABA komponenter 0d Opgave
+Opdeling
+Projekt: 2026-03-12 Samlet tid
+Dato: to 12-03-26
+Milepæl
+Hovedopgave
+Projektoversigt
+Inaktiv opgave
+Startdato Slutdato %
+Foregående opgaver Efterfølgende opgaver
+ma 05-01-26 fr 20-03-26 arbejde
+færdigt
+12%
+2026 Kvt1 Kvt2 Kvt3 Kvt4 2027
+Kvt1
+ma 08-09-25 ma 02-03-26 59%
+ti 21-10-25 ma 10-11-25 80% 149 150
+VVS(BH)
+ma 26-01-26 fr 06-02-26 95% 33
+EL(BH)
+on 05-11-25 ti 18-11-25 0%
+VVS(BH)
+ti 30-09-25 ma 13-10-25 0% 84
+VVS(BH)
+ma 05-01-26 fr 16-01-26 0% 103
+VE(PSO)
+ma 05-01-26 fr 16-01-26 0% 1078;1082;42
+ma 05-01-26 ti 06-01-26 0%
+Ark
+ma 05-01-26 to 22-01-26 0%
+VVS(BH)
+ma 05-01-26 fr 09-01-26 0%
+Ark
+ti 16-12-25 ma 02-03-26 75% 644 634
+EL
+ma 03-11-25 fr 21-11-25 0% 679;1093;1084;743;796;937;990;1042
+ma 05-01-26 fr 09-01-26 0%
+ma 19-01-26 to 30-04-26 1%
+ma 19-01-26 fr 23-01-26 0% 652 16
+ALJ
+ma 16-03-26 on 08-04-26 5% 50 112;38
+VE - ALJ
+ma 16-03-26 on 08-04-26 0% 51 116;38
+VE - ALJ
+ma 23-02-26 fr 13-03-26 0% 52 126;38
+VE - ALJ
+ma 16-03-26 on 08-04-26 0% 153 414
+VVS(TR)
+to 30-04-26 to 30-04-26 0% 34;35;36
+30-04
+ma 03-11-25 on 15-04-26 0%
+ma 03-11-25 on 15-04-26 0% 1074 1096;1112;1130;1136;1142;1150;1161;1125;1119
+Ark
+ma 05-01-26 ma 05-01-26 0%
+Ark
+ma 19-01-26 ma 19-01-26 0% 24
+Ark
+ma 08-09-25 fr 29-05-26 59%
+ma 08-09-25 - 26%
+ma 08-09-25 - 54%
+ma 08-09-25 ti 24-02-26 93% 1225
+ma 08-09-25 ti 24-02-26 33%
+ma 08-09-25 ma 08-09-25 98% 08-09
+1096;463;464
+ma 23-02-26 ti 24-02-26 0% 691
+BMS(TR);A&H
+ma 08-09-25 fr 21-11-25 95%
+ma 20-10-25 fr 07-11-25 98% 464;454 487;488
+KL (TEGN 4)
+ma 08-09-25 fr 26-09-25 75% 454 KL (TEGN 4)
+463
+ma 27-10-25 fr 21-11-25 98% 439;440;441;442;443;445;449;460 1090;663;489;661;662
+KL-ING
+ma 03-11-25 fr 21-11-25 98% KL (TEGN 1)
+468;440;441;442;443;444;449;450;451;456;460 1091;1092;659;664;665;492
+ma 20-10-25 ti 11-11-25 98% 455;440;441;442;444;449;450;451;456;459
+KL (TEGN 2)
+ma 03-11-25 fr 14-11-25 98% 447;445;448 466;660
+KL (TEGN 1)
+ma 20-10-25 fr 07-11-25 98% 442;452;453;456 493
+KL (TEGN 3)
+ma 17-11-25 on 19-11-25 98% 457;458
+KL (TEGN 2)
+ma 10-11-25 ti 23-06-26 65% 1228
+fr 28-11-25 ti 23-06-26 80%
+fr 28-11-25 fr 28-11-25 85% 473;474;480 489;490
+28-11
+fr 28-11-25 fr 28-11-25 95% 487;488
+28-11
+Inaktiv milepæl
+Kun start
+Sti for efterfølgende opgave - hovedopgave
+Kritisk opdeling
+Inaktiv oversigt
+Kun slutdato
+Sti for efterfølgende opgave - normal opgave
+Fremdrift
+Manuel opgave
+Eksterne opgaver
+Forudgående element i sti for milepælopgave
+Manuel status
+Kun varighed
+Ekstern milepæl
+Forudgående element i sti for hovedopgave
+Manuel oversigtsopløftning
+Deadline
+Forudgående element i sti for normal opgave
+Manuel oversigt
+Sti for efterfølgende opgave - opgave med milepæle
+Kritisk
+Side 1
+Id Opgavetilstand Opgavenavn Varighed 483 Installationer for 4. sal Chef-køkken 1d 484 AV installationer for 4. sals mødelokaler 0d 485 Samlet el-belastning for BMS-KT og BMS-IBI tavler 0d 486 Færdiggøre projektering 74,38d 487 ABA installationer 21,5d 488 AVA installationer 15d 489 Tavler 15d 490 Føringsveje 54,38d 491 Kraftinstallationer 6,37d 492 Lysinstallationer 10d 493 IT og Svagstrøm 17,6d 494 Svagstrøm Ur 3d 495 Omr. 3 210,8d 496 Afhængigheder 210,8d 509 Færdiggøre projektering 63,5d 510 ABA installationer 63,5d 511 AVA installationer 0d 512 Tavler 38,4d 513 Føringsveje 32,67d 514 Kraftinstallationer 40,2d 515 Lysinstallationer 40,88d 516 IT og Svagstrøm 59d 517 Svagstrøm Ur 3d 518 Omr. 4 160,25d 519 Afhængigheder 135,25d 520 Fancoils for dim af kabling 0d 521 Øvrige installationer for dim af kabling 0d 522 Arbejdsstationer placering 0d 523 Fyldningsgrad i spor/ udviddelsesfaktor 0d 524 Lysinstallation - Opdeling af DALI inst. 0d 525 Placering af belysning 0d 526 Placering synligt udstyr fx tryk og pir, Input
+vedr. DALI
+0d 527 Kraft - Placering af komponenter, belastning 0d 528 Placering og valg af ABA komponenter 0d 529 Koordinering af AV-installationer med
+isolering på skørter. Placering af inst. Over loft
+samt under gulv
+0d 530 Samlet el-belastning for BMS-KT og BMS-IBI tavler 0d 531 Færdiggøre projektering 54d 533 AVA installationer 0d 534 Tavler 18,4d 535 Føringsveje 7,68d 536 Kraftinstallationer 17,68d 537 Lysinstallationer 17,68d 538 IT og Svagstrøm 15d 539 Svagstrøm Ur 3d Opgave
+Opdeling
+Projekt: 2026-03-12 Samlet tid
+Dato: to 12-03-26
+Milepæl
+Hovedopgave
+Projektoversigt
+Inaktiv opgave
+Startdato Slutdato %
+Foregående opgaver Efterfølgende opgaver
+fr 28-11-25 fr 28-11-25 arbejde
+færdigt
+80% 2026 Kvt1 Kvt2 Kvt3 Kvt4 2027
+Kvt1
+489;490;491
+EL(K&L) - EL(TR)
+fr 28-11-25 fr 28-11-25 5% 489;490;491;493
+28-11
+ti 23-06-26 ti 23-06-26 0% 747;771
+23-06
+ma 10-11-25 fr 13-03-26 65%
+ma 10-11-25 ti 09-12-25 50% 463;481 510
+KL-ING
+ma 10-11-25 ti 09-12-25 50% 463;481 510
+KL (TEGN 1)
+ma 24-11-25 fr 12-12-25 90% KL-ING
+465;439;473;474;475;476;477;480;460;483;484 512AS+5d;534AS+5d;728;726;727
+ma 08-12-25 fr 13-03-26 70% 492;444;450;451;508;473;474;475;476;480;482;460;483;484 515;537;724;729;730
+KL (TEGN 1)
+ma 24-11-25 ti 02-12-25 65% 444;450;451;459;473;474;475;480;482;483;484
+KL (TEGN 2)
+ma 24-11-25 fr 05-12-25 62% 466;477;478;479 490;725
+KL (TEGN 1)
+ma 10-11-25 on 03-12-25 60% 469;452;453;475;482;484 516
+KL (TEGN 3)
+ma 05-01-26 on 07-01-26 95% 457;458
+KL (TEGN 2)
+ma 08-09-25 fr 14-08-26 58% 1230
+ma 08-09-25 fr 14-08-26 85%
+ma 01-12-25 to 19-03-26 57%
+ma 01-12-25 to 19-03-26 50% 487;488;508;505 532
+KL (TEGN 4)
+ti 10-03-26 ti 10-03-26 50% 508;505
+10-03
+ma 12-01-26 to 12-03-26 60% 489AS+5d;439;508;497;498;499;500;501;504;460 534AS+5d;781;779;780
+KL-ING
+ma 26-01-26 on 18-03-26 60% 515;444;450;451;508;497;498;499;500;504;506;460 537;536;777;782;783
+KL (TEGN 1)
+ma 12-01-26 ma 16-03-26 50% 444;450;451;459;508;497;498;499;504;506
+KL (TEGN 2)
+ma 12-01-26 ma 16-03-26 50% 490;508;501;502;503 513;778
+KL (TEGN 1)
+ma 01-12-25 to 12-03-26 60% 493;452;453;508;499;506
+KL (TEGN 3)
+ma 16-02-26 on 18-02-26 95% 457;458
+KL (TEGN 2)
+ma 05-01-26 fr 18-09-26 98% 1232
+ma 09-02-26 fr 18-09-26 0%
+ma 09-02-26 ma 09-02-26 0% 523;534;535;536
+09-02
+ma 09-02-26 ma 09-02-26 0% 523;534;535;536
+09-02
+ma 09-02-26 ma 09-02-26 0% 534;535;536;538
+09-02
+ma 09-02-26 ma 09-02-26 0% 520;521;527 534;535
+09-02
+ma 09-02-26 ma 09-02-26 0% 534;537
+09-02
+ma 09-02-26 ma 09-02-26 0% 537
+09-02
+ma 09-02-26 ma 09-02-26 0% 537
+09-02
+ma 09-02-26 ma 09-02-26 0% 523;534;535;536
+09-02
+ma 09-02-26 ma 09-02-26 0% 532;533
+09-02
+ma 09-02-26 ma 09-02-26 0% 535;536;538
+09-02
+fr 18-09-26 fr 18-09-26 0% 852;873
+18-09
+ma 05-01-26 to 26-03-26 98%
+ma 09-02-26 ma 09-02-26 7% 528
+09-02
+ma 23-02-26 to 19-03-26 100% 489AS+5d;512AS+5d;439;520;521;522;523;524;527;460 828;556
+KL-ING
+ma 09-03-26 on 18-03-26 100% 537;444;450;451;520;521;522;523;527;529;460 826;829;559
+KL (TEGN 1)
+ma 23-02-26 on 18-03-26 100% 513;444;450;451;459;520;521;522;527;529
+KL (TEGN 2)
+ma 23-02-26 on 18-03-26 100% 490;513;524;525;526 535;827
+KL (TEGN 1)
+ma 19-01-26 ma 09-02-26 100% 452;453;522;529
+KL (TEGN 3)
+ti 24-03-26 to 26-03-26 95% 457;458
+KL (TEGN 2)
+Inaktiv milepæl
+Kun start
+Sti for efterfølgende opgave - hovedopgave
+Kritisk opdeling
+Inaktiv oversigt
+Kun slutdato
+Sti for efterfølgende opgave - normal opgave
+Fremdrift
+Manuel opgave
+Eksterne opgaver
+Forudgående element i sti for milepælopgave
+Manuel status
+Kun varighed
+Ekstern milepæl
+Forudgående element i sti for hovedopgave
+Manuel oversigtsopløftning
+Deadline
+Forudgående element i sti for normal opgave
+Manuel oversigt
+Sti for efterfølgende opgave - opgave med milepæle
+Kritisk
+Side 2
+Id Opgavetilstand Opgavenavn Varighed Startdato Slutdato %
+Foregående opgaver 540 Omr. 5 162,55d ma 26-01-26 ti 20-10-26 arbejde
+færdigt
+26% 541 Afhængigheder 132,55d ma 16-03-26 ti 20-10-26 0%
+542 Fancoils for dim af kabling 0d ma 16-03-26 ma 16-03-26 0% 543 Øvrige installationer for dim af kabling 0d ma 16-03-26 ma 16-03-26 0% 544 Arbejdsstationer placering 0d ma 16-03-26 ma 16-03-26 0% 545 Fyldningsgrad i spor/ udviddelsesfaktor 0d ma 16-03-26 ma 16-03-26 0% 542;543;549 546 Lysinstallation - Opdeling af DALI inst. 0d ma 16-03-26 ma 16-03-26 0% 547 Placering af belysning 0d ma 16-03-26 ma 16-03-26 0% 548 Placering synligt udstyr fx tryk og pir, Input
+vedr. DALI
+0d ma 16-03-26 ma 16-03-26 0% 549 Kraft - Placering af komponenter, belastning 0d ma 16-03-26 ma 16-03-26 0% 550 Placering og valg af ABA komponenter 0d ma 16-03-26 ma 16-03-26 0% 551 Koordinering af AV-installationer med
+isolering på skørter. Placering af inst. Over loft
+samt under gulv
+0d ma 16-03-26 ma 16-03-26 0% 552 Samlet el-belastning for BMS-KT og BMS-IBI tavler 0d ti 20-10-26 ti 20-10-26 0% 897;913
+553 Færdiggøre projektering 64d ma 26-01-26 ti 05-05-26 26%
+562 Omr. 6 0d ma 23-02-26 - 98% 586 Omr. 7 0d ma 24-11-25 - 0% 608 Omr. 8 0d ma 24-11-25 - 95% 631 Globals 0d ma 08-09-25 - 21%
+632 Afhængigheder 0d ma 08-09-25 - 35%
+633 10kV Designkrav 25d ma 20-10-25 fr 21-11-25 35% 634 DAS/Sine - Omfang af dækning 0d ma 02-03-26 ma 02-03-26 90% 28
+635 DAS/Sine - Placering af synlige komponeneter 0d ma 23-02-26 ma 23-02-26 90%
+636 DAS/Sine - Anlægs størrelse og udformning 0d ma 08-09-25 ma 08-09-25 90% 08-09
+638 Omfang - reetablering af solceller 0d to 18-12-25 to 18-12-25 50% 639 Placering skorsten + ind/afkast generator 0d to 01-01-50 - 0%
+640 HX-1 Designkrav 0d ma 08-09-25 ma 08-09-25 85% 08-09
+641 Designkrav jording 0d ma 08-09-25 ma 08-09-25 50% 08-09
+642 Armaturtyper 0d ma 08-09-25 ma 08-09-25 50%
+08-09
+643 Færdiggøre projektering 125d on 01-10-25 fr 17-04-26 18%
+644 Udarbejde notat om DAS/SINE 10d ti 02-12-25 ma 15-12-25 0% 645 Projektering af DAS/Sine 11d ti 18-11-25 ti 02-12-25 0% 636
+646 10kV 20d ma 01-12-25 fr 09-01-26 11% 633
+647 UPS anlæg 11d on 03-12-25 on 17-12-25 80% 637
+648 Reetablering af solceller 11d to 18-12-25 to 15-01-26 0% 649 Generator anlæg 11d ma 05-01-26 ma 19-01-26 50%
+650 HX-1 6d ma 19-01-26 ma 26-01-26 50% 640
+651 Jording 6d ti 27-01-26 ti 03-02-26 0% 641
+652 Komponentkatalog for synlige komponenter
+til godkendelse
+10d ma 05-01-26 fr 16-01-26 100% 653 Lysarmaturer 45d on 04-02-26 fr 17-04-26 5%
+654 Ur-anlæg 60d on 01-10-25 ti 06-01-26 70%
+655 E100.04 BMS 0d ma 08-09-25 - 11%
+1071 Ark 0d? ma 25-08-25 - 50%
+1185 E100.05 ELEV 75d ma 03-11-25 fr 06-03-26 0% Opgave
+Inaktiv milepæl
+Opdeling
+Inaktiv oversigt
+Projekt: 2026-03-12 Samlet tid
+Dato: to 12-03-26
+Milepæl
+Manuel opgave
+Hovedopgave
+Kun varighed
+Projektoversigt
+Manuel oversigtsopløftning
+Inaktiv opgave
+Manuel oversigt
+Efterfølgende opgaver
+2026 Kvt1 Kvt2 Kvt3 Kvt4 2027
+Kvt1
+1234
+545;556;557;558
+16-03
+545;556;557;558
+16-03
+556;557;558;560
+16-03
+556;557
+16-03
+556;559
+16-03
+559
+16-03
+559
+16-03
+545;556;557;558
+16-03
+554;555
+16-03
+557;558;560
+16-03
+20-10
+1236
+1238
+1240
+646
+EL(TR)
+02-03
+23-02
+645
+784
+18-12
+650
+651
+28
+KL
+KL
+KL
+784
+KL
+KL
+KL
+KL
+33
+KL
+1225;1228;1230;1232;1234;1236;1238;1240
+Kun start
+Sti for efterfølgende opgave - hovedopgave
+Kritisk opdeling
+Kun slutdato
+Sti for efterfølgende opgave - normal opgave
+Fremdrift
+Eksterne opgaver
+Forudgående element i sti for milepælopgave
+Manuel status
+Ekstern milepæl
+Forudgående element i sti for hovedopgave
+Deadline
+Forudgående element i sti for normal opgave
+Sti for efterfølgende opgave - opgave med milepæle
+Kritisk
+Side 3
+Id Opgavetilstand Opgavenavn Varighed Startdato Slutdato %
+Foregående opgaver Efterfølgende opgaver
+arbejde
+færdigt
+2026 2027
+Kvt1 Kvt2 Kvt3 Kvt4 Kvt1
+1187 Oversigt projekteringstidsplan - projekt til
+prisvalidering
+0d ma 08-09-25 - 0%
+1219 Projektering efter prisvalidering er startet jf.
+leveranceplaner
+75d on 10-06-26 ti 20-10-26 0%
+1224 Oversigt projekteringtidsplan - 100 % projekt 200d to 26-03-26 ti 02-02-27 0%
+1243 Udførelsesprojektering - 100% færdig 0d ti 02-02-27 ti 02-02-27 0% 1225;1228;1230;1232;1234;1236;1238;1240 02-02
+Opgave
+Inaktiv milepæl
+Kun start
+Sti for efterfølgende opgave - hovedopgave
+Kritisk opdeling
+Opdeling
+Inaktiv oversigt
+Kun slutdato
+Sti for efterfølgende opgave - normal opgave
+Fremdrift
+Projekt: 2026-03-12 Samlet tid
+Dato: to 12-03-26
+Milepæl
+Manuel opgave
+Eksterne opgaver
+Forudgående element i sti for milepælopgave
+Manuel status
+Hovedopgave
+Kun varighed
+Ekstern milepæl
+Forudgående element i sti for hovedopgave
+Projektoversigt
+Manuel oversigtsopløftning
+Deadline
+Forudgående element i sti for normal opgave
+Inaktiv opgave
+Manuel oversigt
+Sti for efterfølgende opgave - opgave med milepæle
+Kritisk
+Side 4
