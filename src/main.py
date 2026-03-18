@@ -234,7 +234,6 @@ async def query_agent(
         logger.info(f"  File names: {old_filename} / {new_filename}")
         
         is_comparison = rag_agent._is_comparison_query(query)
-        logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
         loop = asyncio.get_event_loop()
         
