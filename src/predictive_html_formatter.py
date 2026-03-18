@@ -52,25 +52,25 @@ def _parse_insight_data(markdown: str) -> Optional[Dict]:
 def _get_risk_color(level: str) -> dict:
     level_lower = (level or "").lower()
     if level_lower in ["critical", "kritisk"]:
-        return {"color": "#dc2626", "bg": "rgba(220, 38, 38, 0.1)", "border": "rgba(220, 38, 38, 0.25)"}
+        return {"color": "#ff4d6a", "bg": "rgba(255, 77, 106, 0.08)", "border": "rgba(255, 77, 106, 0.2)"}
     if level_lower in ["high", "høj"]:
-        return {"color": "#ef4444", "bg": "rgba(239, 68, 68, 0.1)", "border": "rgba(239, 68, 68, 0.25)"}
+        return {"color": "#f87171", "bg": "rgba(248, 113, 113, 0.08)", "border": "rgba(248, 113, 113, 0.2)"}
     if level_lower in ["medium", "mellem", "elevated"]:
-        return {"color": "#f59e0b", "bg": "rgba(245, 158, 11, 0.1)", "border": "rgba(245, 158, 11, 0.25)"}
-    return {"color": "#10b981", "bg": "rgba(16, 185, 129, 0.1)", "border": "rgba(16, 185, 129, 0.25)"}
+        return {"color": "#fbbf24", "bg": "rgba(251, 191, 36, 0.08)", "border": "rgba(251, 191, 36, 0.2)"}
+    return {"color": "#34d399", "bg": "rgba(52, 211, 153, 0.08)", "border": "rgba(52, 211, 153, 0.2)"}
 
 
 def _health_badge(text: str) -> str:
     lower = text.lower().strip()
     if "critical" in lower or "kritisk" in lower:
-        return f'<span style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(220,38,38,0.12);color:#dc2626;border:1px solid rgba(220,38,38,0.2);">{_escape(text)}</span>'
+        return f'<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(255,77,106,0.15);color:#ff4d6a;border:1px solid rgba(255,77,106,0.25);letter-spacing:0.3px;">{_escape(text)}</span>'
     if "at risk" in lower or "i fare" in lower or "high" in lower or "høj" in lower:
-        return f'<span style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">{_escape(text)}</span>'
+        return f'<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.25);letter-spacing:0.3px;">{_escape(text)}</span>'
     if "attention" in lower or "opmærksomhed" in lower or "medium" in lower or "mellem" in lower or "elevated" in lower:
-        return f'<span style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(245,158,11,0.12);color:#d97706;border:1px solid rgba(245,158,11,0.2);">{_escape(text)}</span>'
-    if "healthy" in lower or "sund" in lower or "low" in lower or "lav" in lower:
-        return f'<span style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(16,185,129,0.12);color:#059669;border:1px solid rgba(16,185,129,0.2);">{_escape(text)}</span>'
-    return f'<span style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.15);">{_escape(text)}</span>'
+        return f'<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);letter-spacing:0.3px;">{_escape(text)}</span>'
+    if "healthy" in lower or "sund" in lower or "low" in lower or "lav" in lower or "on track" in lower:
+        return f'<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.25);letter-spacing:0.3px;">{_escape(text)}</span>'
+    return f'<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.2);letter-spacing:0.3px;">{_escape(text)}</span>'
 
 
 def _render_table(markdown_lines: List[str], accent_color: str) -> str:
@@ -92,28 +92,27 @@ def _render_table(markdown_lines: List[str], accent_color: str) -> str:
         return ""
 
     header_html = "".join(
-        f'<th style="padding:14px 16px;text-align:left;font-size:11px;font-weight:700;color:rgba(255,255,255,0.95);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;border-right:1px solid rgba(255,255,255,0.08);">{_escape(h)}</th>'
+        f'<th style="padding:12px 14px;text-align:left;font-size:10px;font-weight:700;color:{accent_color};text-transform:uppercase;letter-spacing:1.2px;white-space:nowrap;border-bottom:2px solid {accent_color}30;background:transparent;">{_escape(h)}</th>'
         for h in headers
     )
 
     rows_html = []
     for idx, row in enumerate(rows):
-        bg = "#ffffff" if idx % 2 == 0 else "rgba(248,250,252,0.8)"
         cells_html = ""
         for ci, cell in enumerate(row):
             h_name = headers[ci].lower() if ci < len(headers) else ""
-            if any(k in h_name for k in ["health", "risk", "sundhed", "risiko", "type", "assessment", "level"]):
+            if any(k in h_name for k in ["health", "risk", "sundhed", "risiko", "type", "assessment", "level", "status"]):
                 content = _health_badge(cell)
             elif ci == 0:
-                content = f'<span style="font-weight:600;color:#1e293b;">{_escape(cell)}</span>'
+                content = f'<span style="font-weight:600;color:#e2e8f0;font-size:13px;">{_escape(cell)}</span>'
             else:
-                content = f'<span style="color:#475569;font-size:14px;">{_escape(cell)}</span>'
-            cells_html += f'<td style="padding:14px 16px;font-size:14px;border-bottom:1px solid #f1f5f9;border-right:1px solid #f1f5f9;vertical-align:middle;">{content}</td>'
-        rows_html.append(f'<tr style="background:{bg};transition:all 0.2s ease;">{cells_html}</tr>')
+                content = f'<span style="color:#94a3b8;font-size:13px;">{_escape(cell)}</span>'
+            cells_html += f'<td style="padding:11px 14px;border-bottom:1px solid rgba(148,163,184,0.08);vertical-align:middle;">{content}</td>'
+        rows_html.append(f'<tr style="transition:background 0.15s;">{cells_html}</tr>')
 
-    return f'''<div style="overflow-x:auto;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.06),0 0 0 1px {accent_color}20;margin:16px 0;">
-<table style="width:100%;min-width:600px;border-collapse:separate;border-spacing:0;">
-<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e293b);">{header_html}</tr></thead>
+    return f'''<div style="overflow-x:auto;border-radius:10px;margin:14px 0;background:#1e293b;border:1px solid rgba(148,163,184,0.1);">
+<table style="width:100%;min-width:500px;border-collapse:collapse;">
+<thead><tr>{header_html}</tr></thead>
 <tbody>{"".join(rows_html)}</tbody>
 </table></div>'''
 
@@ -133,14 +132,39 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
         nonlocal list_items
         if list_items:
             items = "".join(
-                f'<li style="margin:8px 0;line-height:1.7;padding-left:20px;position:relative;"><span style="position:absolute;left:0;color:{accent_color};font-weight:bold;">•</span>{item}</li>'
+                f'<li style="margin:7px 0;line-height:1.65;padding-left:18px;position:relative;font-size:13px;color:#cbd5e1;"><span style="position:absolute;left:0;color:{accent_color};font-weight:bold;font-size:14px;">›</span>{item}</li>'
                 for item in list_items
             )
-            parts.append(f'<ul style="margin:12px 0;padding-left:0;list-style:none;">{items}</ul>')
+            parts.append(f'<ul style="margin:10px 0;padding-left:0;list-style:none;">{items}</ul>')
             list_items = []
+
+    in_code_block = False
+    code_lines = []
+
+    def flush_code():
+        nonlocal code_lines, in_code_block
+        if code_lines:
+            code_text = _escape("\n".join(code_lines))
+            parts.append(f'<pre style="margin:12px 0;padding:14px 16px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(148,163,184,0.1);overflow-x:auto;"><code style="font-family:\'SF Mono\',SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:#94a3b8;line-height:1.6;">{code_text}</code></pre>')
+            code_lines = []
+        in_code_block = False
 
     for line in lines:
         stripped = line.strip()
+
+        if stripped.startswith("```"):
+            if in_code_block:
+                flush_code()
+            else:
+                flush_table()
+                flush_list()
+                in_code_block = True
+            continue
+
+        if in_code_block:
+            code_lines.append(line.rstrip())
+            continue
+
         if not stripped:
             flush_table()
             flush_list()
@@ -154,27 +178,25 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
         flush_table()
 
         if stripped.startswith("- ") or stripped.startswith("• ") or stripped.startswith("* "):
-            item = stripped[2:]
-            item = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', item)
-            list_items.append(item)
+            item_raw = stripped[2:]
+            item_safe = _escape(item_raw)
+            item_safe = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;font-weight:600;">\1</strong>', item_safe)
+            list_items.append(item_safe)
             continue
 
         flush_list()
 
-        if stripped.startswith("```"):
+        safe = _escape(stripped)
+
+        if re.match(r"^(Chain|Path|Length|Risk|Weakest|Downstream|Cluster|Score|Complexity|Weighted)", stripped, re.IGNORECASE):
+            text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;">\1</strong>', safe)
+            parts.append(f'<p style="margin:5px 0;color:#94a3b8;line-height:1.6;font-size:12px;font-family:\'SF Mono\',SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,0.2);padding:6px 12px;border-radius:6px;border-left:2px solid {accent_color};">{text}</p>')
             continue
 
-        bold_line = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', _escape(stripped))
-        bold_line = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', stripped)
+        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;font-weight:600;">\1</strong>', safe)
+        parts.append(f'<p style="margin:7px 0;color:#cbd5e1;line-height:1.7;font-size:14px;">{text}</p>')
 
-        if re.match(r"^(Chain|Path|Length|Risk|Weakest|Downstream|Cluster)", stripped, re.IGNORECASE):
-            text = re.sub(r"\*\*([^*]+)\*\*", r'<strong>\1</strong>', stripped)
-            parts.append(f'<p style="margin:6px 0;color:#334155;line-height:1.6;font-size:14px;font-family:monospace;background:rgba(0,0,0,0.03);padding:6px 12px;border-radius:8px;border-left:3px solid {accent_color};">{text}</p>')
-            continue
-
-        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', stripped)
-        parts.append(f'<p style="margin:8px 0;color:#334155;line-height:1.7;font-size:15px;">{text}</p>')
-
+    flush_code()
     flush_table()
     flush_list()
     return "".join(parts)
@@ -199,44 +221,44 @@ def _build_metrics_bar(insight_data: Dict, language: str) -> str:
     delay_max = _safe_int(delay_max)
 
     metrics = [
-        {"value": insight_data.get("overdue_count") or 0, "label": "Forfalden" if language == "da" else "Overdue", "color": "#ef4444"},
-        {"value": insight_data.get("anomaly_count") or 0, "label": "Anomalier" if language == "da" else "Anomalies", "color": "#f59e0b"},
-        {"value": insight_data.get("chain_risk_count") or 0, "label": "Kæderisici" if language == "da" else "Chain Risks", "color": "#8b5cf6"},
-        {"value": insight_data.get("bottleneck_count") or 0, "label": "Flaskehalse" if language == "da" else "Bottlenecks", "color": "#f97316"},
-        {"value": insight_data.get("cluster_count") or 0, "label": "Klynger" if language == "da" else "Clusters", "color": "#06b6d4"},
-        {"value": insight_data.get("long_duration_count") or 0, "label": "Lang Varighed" if language == "da" else "Long Duration", "color": "#dc2626"},
+        {"value": insight_data.get("overdue_count") or 0, "label": "Forfalden" if language == "da" else "Overdue", "color": "#f87171"},
+        {"value": insight_data.get("anomaly_count") or 0, "label": "Anomalier" if language == "da" else "Anomalies", "color": "#fbbf24"},
+        {"value": insight_data.get("chain_risk_count") or 0, "label": "Kæderisici" if language == "da" else "Chain Risks", "color": "#a78bfa"},
+        {"value": insight_data.get("bottleneck_count") or 0, "label": "Flaskehalse" if language == "da" else "Bottlenecks", "color": "#fb923c"},
+        {"value": insight_data.get("cluster_count") or 0, "label": "Klynger" if language == "da" else "Clusters", "color": "#22d3ee"},
+        {"value": insight_data.get("long_duration_count") or 0, "label": "Lang Varighed" if language == "da" else "Long Duration", "color": "#f87171"},
     ]
 
     metrics_html = "".join(
-        f'<div style="text-align:center;padding:16px 8px;background:linear-gradient(135deg,{m["color"]}0d,{m["color"]}05);border-radius:14px;border:1px solid {m["color"]}20;min-width:90px;">'
-        f'<div style="font-size:28px;font-weight:800;color:{m["color"]};">{m["value"]}</div>'
-        f'<div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:4px;font-weight:600;letter-spacing:0.5px;">{m["label"]}</div></div>'
+        f'<div style="text-align:center;padding:14px 6px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid {m["color"]}15;min-width:80px;">'
+        f'<div style="font-size:26px;font-weight:800;color:{m["color"]};line-height:1;">{m["value"]}</div>'
+        f'<div style="font-size:9px;color:#64748b;text-transform:uppercase;margin-top:5px;font-weight:700;letter-spacing:0.8px;">{m["label"]}</div></div>'
         for m in metrics
     )
 
     risk_label = risk_level.upper()
-    delay_text = f"{delay_min}-{delay_max} {'dage' if language == 'da' else 'days'}" if delay_max > 0 else "N/A"
+    delay_text = f"{delay_min}–{delay_max} {'dage' if language == 'da' else 'days'}" if delay_max > 0 else "N/A"
 
     return f'''
-<div style="margin:24px 0;padding:24px;background:linear-gradient(135deg,{risk_colors["bg"]},rgba(255,255,255,0.9));border-radius:20px;border:2px solid {risk_colors["border"]};">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px;">
+<div style="margin:0 0 20px 0;padding:22px;background:#1e293b;border-radius:14px;border:1px solid {risk_colors["border"]};">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px;">
     <div>
-      <div style="font-size:12px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-bottom:4px;">{"Forsinkelsesrisiko" if language == "da" else "Delay Risk"}</div>
-      <div style="font-size:32px;font-weight:900;color:{risk_colors["color"]};">{risk_pct}%</div>
+      <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1.2px;margin-bottom:4px;">{"Forsinkelsesrisiko" if language == "da" else "Delay Risk"}</div>
+      <div style="font-size:36px;font-weight:900;color:{risk_colors["color"]};line-height:1;">{risk_pct}<span style="font-size:18px;color:#64748b;">%</span></div>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;border-radius:50px;background:{risk_colors["bg"]};border:2px solid {risk_colors["border"]};">
-      <div style="width:12px;height:12px;border-radius:50%;background:{risk_colors["color"]};box-shadow:0 0 8px {risk_colors["color"]}80;"></div>
-      <span style="font-size:15px;font-weight:700;color:{risk_colors["color"]};">{risk_label}</span>
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 18px;border-radius:8px;background:rgba(0,0,0,0.25);border:1px solid {risk_colors["border"]};">
+      <div style="width:8px;height:8px;border-radius:50%;background:{risk_colors["color"]};box-shadow:0 0 10px {risk_colors["color"]};"></div>
+      <span style="font-size:12px;font-weight:700;color:{risk_colors["color"]};text-transform:uppercase;letter-spacing:0.8px;">{risk_label}</span>
     </div>
     <div style="text-align:right;">
-      <div style="font-size:12px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-bottom:4px;">{"Estimeret Forsinkelse" if language == "da" else "Est. Delay Window"}</div>
-      <div style="font-size:20px;font-weight:700;color:#1e293b;">{delay_text}</div>
+      <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1.2px;margin-bottom:4px;">{"Estimeret Forsinkelse" if language == "da" else "Est. Delay"}</div>
+      <div style="font-size:20px;font-weight:700;color:#e2e8f0;">{delay_text}</div>
     </div>
   </div>
-  <div style="width:100%;height:8px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden;margin-bottom:20px;">
-    <div style="width:{min(risk_pct, 100)}%;height:100%;background:linear-gradient(90deg,{risk_colors["color"]},{risk_colors["color"]}cc);border-radius:4px;transition:width 0.5s ease;"></div>
+  <div style="width:100%;height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden;margin-bottom:18px;">
+    <div style="width:{min(risk_pct, 100)}%;height:100%;background:linear-gradient(90deg,{risk_colors["color"]},transparent);border-radius:3px;"></div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;">{metrics_html}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:8px;">{metrics_html}</div>
 </div>'''
 
 
@@ -276,7 +298,7 @@ def format_predictive_as_html(markdown: str, language: str = "en") -> str:
         import logging
         logging.getLogger(__name__).error(f"Predictive HTML formatter error: {e}")
         safe_text = _escape(markdown)
-        return f'<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;padding:24px;"><h2 style="color:#0f172a;margin-bottom:16px;">Nova Insight Report</h2><div style="white-space:pre-wrap;color:#334155;line-height:1.7;font-size:14px;">{safe_text}</div></div>'
+        return f'<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;padding:24px;background:#0f172a;border-radius:16px;"><h2 style="color:#e2e8f0;margin-bottom:16px;">Nova Insight Report</h2><div style="white-space:pre-wrap;color:#94a3b8;line-height:1.7;font-size:13px;">{safe_text}</div></div>'
 
 
 def _format_predictive_internal(markdown: str, language: str) -> str:
@@ -287,20 +309,23 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
     html_parts = [f'''
 <style>
-.nova-report .module-card:hover {{ box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; }}
-.nova-report table tr:hover {{ background: rgba(0,214,214,0.04) !important; }}
-.nova-report .table-scroll::-webkit-scrollbar {{ height:8px; }}
-.nova-report .table-scroll::-webkit-scrollbar-track {{ background:rgba(0,0,0,0.03);border-radius:8px; }}
-.nova-report .table-scroll::-webkit-scrollbar-thumb {{ background:linear-gradient(135deg,#00D6D6,#00B8B8);border-radius:8px; }}
+.nova-report .module-card:hover {{ border-color: rgba(148,163,184,0.2) !important; }}
+.nova-report table tr:hover {{ background: rgba(148,163,184,0.06) !important; }}
+.nova-report ::-webkit-scrollbar {{ height:6px; }}
+.nova-report ::-webkit-scrollbar-track {{ background:rgba(0,0,0,0.2);border-radius:6px; }}
+.nova-report ::-webkit-scrollbar-thumb {{ background:rgba(148,163,184,0.3);border-radius:6px; }}
 </style>
-<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:24px;background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:20px;box-shadow:0 12px 40px rgba(15,23,42,0.25);">
-    <div style="width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00D6D6,#06b6d4);box-shadow:0 8px 24px rgba(0,214,214,0.35);">
+<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;border-radius:20px;padding:28px;border:1px solid rgba(148,163,184,0.1);">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(148,163,184,0.1);">
+    <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00D6D6,#0891b2);box-shadow:0 0 24px rgba(0,214,214,0.2);">
       <span style="color:white;">{NOVA_ICONS["report"]}</span>
     </div>
-    <div>
-      <h2 style="font-size:24px;font-weight:800;color:white;margin:0;">{report_title}</h2>
-      <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:4px 0 0 0;">{"Forudsigende risikoanalyse drevet af GPT-5.2" if language == "da" else "Predictive risk analysis powered by GPT-5.2"}</p>
+    <div style="flex:1;">
+      <h2 style="font-size:20px;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-0.3px;">{report_title}</h2>
+      <p style="font-size:12px;color:#64748b;margin:3px 0 0 0;letter-spacing:0.3px;">{"Forudsigende risikoanalyse · GPT-5.2" if language == "da" else "Predictive risk analysis · GPT-5.2"}</p>
+    </div>
+    <div style="padding:6px 14px;border-radius:6px;background:rgba(0,214,214,0.1);border:1px solid rgba(0,214,214,0.2);">
+      <span style="font-size:10px;font-weight:700;color:#00D6D6;text-transform:uppercase;letter-spacing:1px;">AI</span>
     </div>
   </div>''']
 
@@ -309,8 +334,8 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
     for section_key, section_body in sections:
         if section_key == "_PREAMBLE":
-            html_parts.append(f'<div style="margin:16px 0;padding:16px 20px;background:rgba(0,214,214,0.04);border-radius:12px;border-left:4px solid #00D6D6;">')
-            html_parts.append(_render_content_block(section_body.split("\n"), "#0ea5e9"))
+            html_parts.append(f'<div style="margin:0 0 16px 0;padding:14px 18px;background:rgba(0,214,214,0.04);border-radius:10px;border-left:3px solid #00D6D6;">')
+            html_parts.append(_render_content_block(section_body.split("\n"), "#22d3ee"))
             html_parts.append('</div>')
             continue
 
@@ -334,12 +359,12 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
         content_html = _render_content_block(section_body.split("\n"), color)
 
         html_parts.append(f'''
-  <div class="module-card" style="margin:20px 0;padding:24px;background:linear-gradient(135deg,{color}08,rgba(255,255,255,0.95));border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.05),0 0 0 1px {color}18;transition:box-shadow 0.3s ease;">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}cc);box-shadow:0 4px 12px {color}30;">
-        <span style="color:white;">{icon_svg}</span>
+  <div class="module-card" style="margin:0 0 16px 0;padding:20px;background:#1e293b;border-radius:14px;border:1px solid rgba(148,163,184,0.08);border-left:3px solid {color};transition:border-color 0.2s ease;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{color}18;">
+        <span style="color:{color};">{icon_svg}</span>
       </div>
-      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin:0;">{label}</h3>
+      <h3 style="font-size:15px;font-weight:700;color:#f1f5f9;margin:0;letter-spacing:-0.2px;">{label}</h3>
     </div>
     {content_html}
   </div>''')
