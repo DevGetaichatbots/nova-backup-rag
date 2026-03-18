@@ -157,35 +157,47 @@ Match by **week number + work type + responsible trade**:
 **EVERY comparison response MUST have ALL THREE sections in this exact order:**
 
 ### Section 1: COMPARISON TABLES
-- ONE table per category (never mix categories)
+- **SEPARATE markdown heading + table for each category** — never mix categories into one table
 - Use `—` for missing values
 - Include the task identifier (Id or Entydigt id) in every table row
+- Each category MUST have its own `### Category Name` heading followed by its own table
+- If a category has zero matching tasks, output the heading with text "No [category] tasks found in the retrieved data" — do NOT skip the heading
+
+**EXACT FORMAT REQUIRED (each category gets its own heading + table):**
 
 **For MS Project format:**
 
-**Added Tasks table:**
-| Id | Opgavenavn | Area (Omr.) | Slutdato (B) | Varighed (B) | Notes |
-
-**Removed Tasks table:**
+### Removed Tasks
 | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Varighed (A) | Notes |
+|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... |
 
-**Delayed Tasks table:**
+### Added Tasks
+| Id | Opgavenavn | Area (Omr.) | Slutdato (B) | Varighed (B) | Notes |
+|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... |
+
+### Delayed Tasks
 | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | Notes |
+|---|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... | ... |
 
-**Accelerated Tasks table:**
+### Accelerated Tasks
 | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | Notes |
+|---|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... | ... |
 
-**Modified Tasks table:**
+### Modified Tasks
 | Id | Opgavenavn | Area (Omr.) | Change Type | Old Value | New Value | Notes |
+|---|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... | ... |
 
 **For Detailtidsplan format:**
-
-**Added Tasks table:**
-| Entydigt id | Opgavenavn | Etage | Ansvarlig | Slutdato (B) | Varighed (B) | Notes |
-
-**Removed/Delayed/Accelerated/Modified** — same columns with Entydigt id and Etage.
+Same structure with separate headings, using Entydigt id and Etage columns.
 
 **For Unstructured format:**
+Same structure with separate headings:
+### [Category] Tasks
 | Uge | Days | Work Description | Responsible | Notes |
 
 ### Section 2: SUMMARY (exact header required)
@@ -481,8 +493,26 @@ C. Unstructured format: match by week + work type + responsible
 
 D. Mixed format: match by Opgavenavn + date overlap as best-effort, flag uncertainty
 
-STEP 3 — BUILD TABLES
-Output one table per category using the correct table format for the detected document type.
+STEP 3 — BUILD SEPARATE TABLES (ONE PER CATEGORY)
+For each category, output a ### heading then its own markdown table:
+  ### Removed Tasks
+  | Id | ... |
+  |---|---|
+  | ... |
+
+  ### Added Tasks
+  | Id | ... |
+
+  ### Delayed Tasks
+  | Id | ... |
+
+  ### Accelerated Tasks
+  | Id | ... |
+
+  ### Modified Tasks
+  | Id | ... |
+
+NEVER combine multiple categories into one table. Each category MUST have its own ### heading followed by its own table.
 Show exact dates from the retrieved data — never approximate.
 
 STEP 4 — MANDATORY SECTIONS
@@ -491,7 +521,7 @@ After all tables, output ## SUMMARY_OF_CHANGES then ## PROJECT_HEALTH as defined
 CRITICAL RULES:
 - Only use data present in the retrieved context above
 - Never invent or approximate task data
-- If a category has zero tasks, write "No [category] tasks found in the retrieved data"
+- If a category has zero tasks, write "No [category] tasks found in the retrieved data" under its ### heading
 - Include the appropriate task identifier in every table row for traceability
 ═══════════════════════════════════════════════════════════"""
         else:

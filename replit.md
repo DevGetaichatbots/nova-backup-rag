@@ -26,6 +26,8 @@ src/
 ├── vector_store.py      # Vector store management
 ├── agent.py             # RAG agent with dual vector store querying (GPT-5.2)
 ├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.2)
+├── html_formatter.py    # Section-grouped HTML converter for comparison responses (separate card per category)
+├── predictive_html_formatter.py  # Module-card HTML converter for Nova Insight reports
 └── main.py              # FastAPI application with parallel agent execution
 ```
 
