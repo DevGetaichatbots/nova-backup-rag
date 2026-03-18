@@ -184,19 +184,27 @@ def _build_metrics_bar(insight_data: Dict, language: str) -> str:
     if not insight_data:
         return ""
 
-    risk_level = insight_data.get("delay_risk", "low")
+    risk_level = insight_data.get("delay_risk") or "low"
     risk_colors = _get_risk_color(risk_level)
-    risk_pct = insight_data.get("delay_risk_percent", 0)
-    delay_min = insight_data.get("estimated_delay_days_min", 0)
-    delay_max = insight_data.get("estimated_delay_days_max", 0)
+    risk_pct = insight_data.get("delay_risk_percent") or 0
+    delay_min = insight_data.get("estimated_delay_days_min") or 0
+    delay_max = insight_data.get("estimated_delay_days_max") or 0
+    def _safe_int(val):
+        try:
+            return int(round(float(val)))
+        except (ValueError, TypeError):
+            return 0
+    risk_pct = _safe_int(risk_pct)
+    delay_min = _safe_int(delay_min)
+    delay_max = _safe_int(delay_max)
 
     metrics = [
-        {"value": insight_data.get("overdue_count", 0), "label": "Forfalden" if language == "da" else "Overdue", "color": "#ef4444"},
-        {"value": insight_data.get("anomaly_count", 0), "label": "Anomalier" if language == "da" else "Anomalies", "color": "#f59e0b"},
-        {"value": insight_data.get("chain_risk_count", 0), "label": "Kæderisici" if language == "da" else "Chain Risks", "color": "#8b5cf6"},
-        {"value": insight_data.get("bottleneck_count", 0), "label": "Flaskehalse" if language == "da" else "Bottlenecks", "color": "#f97316"},
-        {"value": insight_data.get("cluster_count", 0), "label": "Klynger" if language == "da" else "Clusters", "color": "#06b6d4"},
-        {"value": insight_data.get("long_duration_count", 0), "label": "Lang Varighed" if language == "da" else "Long Duration", "color": "#dc2626"},
+        {"value": insight_data.get("overdue_count") or 0, "label": "Forfalden" if language == "da" else "Overdue", "color": "#ef4444"},
+        {"value": insight_data.get("anomaly_count") or 0, "label": "Anomalier" if language == "da" else "Anomalies", "color": "#f59e0b"},
+        {"value": insight_data.get("chain_risk_count") or 0, "label": "Kæderisici" if language == "da" else "Chain Risks", "color": "#8b5cf6"},
+        {"value": insight_data.get("bottleneck_count") or 0, "label": "Flaskehalse" if language == "da" else "Bottlenecks", "color": "#f97316"},
+        {"value": insight_data.get("cluster_count") or 0, "label": "Klynger" if language == "da" else "Clusters", "color": "#06b6d4"},
+        {"value": insight_data.get("long_duration_count") or 0, "label": "Lang Varighed" if language == "da" else "Long Duration", "color": "#dc2626"},
     ]
 
     metrics_html = "".join(
@@ -262,6 +270,16 @@ def format_predictive_as_html(markdown: str, language: str = "en") -> str:
     if not markdown or not markdown.strip():
         return ""
 
+    try:
+        return _format_predictive_internal(markdown, language)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Predictive HTML formatter error: {e}")
+        safe_text = _escape(markdown)
+        return f'<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;padding:24px;"><h2 style="color:#0f172a;margin-bottom:16px;">Nova Insight Report</h2><div style="white-space:pre-wrap;color:#334155;line-height:1.7;font-size:14px;">{safe_text}</div></div>'
+
+
+def _format_predictive_internal(markdown: str, language: str) -> str:
     insight_data = _parse_insight_data(markdown)
     sections = _split_sections(markdown)
 
