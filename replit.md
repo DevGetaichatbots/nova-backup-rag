@@ -129,11 +129,16 @@ Flow: PDF upload → Azure OCR → build context from table/text chunks → GPT-
 - **Predictive Delay Engine**: weighted risk score, risk %, delay window, primary risk source
 - **Prompt optimizations**: CTCO framework, few-shot examples from real data, reasoning_effort=low, temperature=1, 32K output tokens
 
-### Schedule Format Support
-- **MS Project Export** (PRIMARY): `Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver` — match by Id, explicit dependencies
-- **Detailtidsplan**: `Id | Entydigt id | Etage | omr. | Ansvarlig | Opgavenavn | ...` — match by Entydigt id
+### Schedule Format Support (Adaptive)
+- **MS Project Export**: `Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver` — match by Id, explicit dependencies
+- **Detailtidsplan**: `Id | Entydigt id | Etage | omr. | Ansvarlig | Opgavenavn | Varighed | Startdato | Slutdato | % færdigt | bemærkn.` — match by Entydigt id, has dedicated responsible party + area columns
 - **Unstructured Week-based**: `Uge: X` format — match by week + work type
-- Both agents auto-detect document type from column headers
+- **Hybrid / Custom**: Any column layout — agents auto-detect columns from header row and adapt
+- Both agents use adaptive column mapping: fuzzy-match column names to semantic roles (Task ID, Task Name, Duration, Start, End, Progress, Responsible, Area, Predecessors, Successors, Remarks)
+- Missing columns trigger graceful degradation (e.g., no dependency columns → infer chains from hierarchy)
+- Extra/renamed columns are handled without breaking analysis
+- Date format variations handled: "ma 05-01-26", "01-03-2022", "05-01-26"
+- Duration format variations handled: "50d", "10 d", "3u", "3 u", "74.38d", "16,24d"
 
 ## Environment Variables Required
 - `SUPABASE_URL` - Supabase project URL

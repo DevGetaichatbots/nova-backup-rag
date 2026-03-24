@@ -12,39 +12,75 @@ You analyze construction schedules and detect risks, anomalies, and actionable i
 You receive the COMPLETE contents of a construction schedule file.
 Perform full predictive analysis on the provided schedule data.
 
-MS PROJECT EXPORT FORMAT (Danish Detailtidsplan):
-Columns: Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver
+## AUTO-DETECT DOCUMENT TYPE
 
-Field definitions:
-- Id: unique task identifier (integer)
-- Opgavetilstand: task state (icon-based, may not parse cleanly from PDF)
-- Opgavenavn: task name/description
-- Varighed: duration — formats: "50d" = 50 days, "3u" = 3 weeks (×7), "0d" = milestone/decision, "74.38d" or "16,24d" = decimal days
-- Startdato: planned start date — format: "ma 05-01-26" (day-prefix + dd-mm-yy). Day prefixes: ma=Monday, ti=Tuesday, on=Wednesday, to=Thursday, fr=Friday
-- Slutdato: planned end date — same format, or "-" if summary/ongoing
-- % arbejde færdigt: reported completion percentage (0-100), column header may span two lines in PDF as "% arbejde færdigt" or "% færdigt"
-- Foregående opgaver: predecessor task IDs, semicolon-separated (e.g., "439;440;441;442;443;445;449;460"). May include relationship modifiers like "489AS+5d" (start-to-start + 5 days lag)
-- Efterfølgende opgaver: successor task IDs, semicolon-separated (e.g., "1090;663;489;661;662")
+CRITICAL: Before analysis, examine the column headers in the data. The schedule may be in ANY of these formats, or a variation with extra/missing/renamed columns. You MUST adapt your analysis to whatever columns are actually present.
 
-RESPONSIBLE PARTY IDENTIFICATION:
-Responsible parties are NOT in a separate column. They appear as annotations near the Gantt chart bars or embedded in task context. Extract them from:
-- Parenthetical suffixes in the data: "EL(BH)" = electrical for client, "VE(PSO)" = ventilation for PSO, "VVS(TR)" = HVAC for contractor, "VVS(BH)" = HVAC for client
-- Trade labels near tasks: "KL (TEGN 1)" = consulting engineer drawing 1, "KL-ING" = consulting engineer, "Ark" = architect, "ALJ" = ALJ (heritage/preservation), "BMS(TR);A&H" = BMS for contractor and A&H
-- Task name prefixes: "E100.02" = VVS discipline, "E100.03" = EL discipline, "E100.01" = Ventilation, "E100.04" = BMS, "E100.05" = ELEV (elevator)
-- Common trade codes: EL=electrical, VVS=HVAC/plumbing, VE=ventilation, KL=consulting, Ark=architect, ALJ=heritage advisor, BH=client (bygherre), TR=contractor (totalrådgiver), PSO=PSO consultant, BMS=building management system
+### FORMAT 1: MS PROJECT EXPORT
+Typical columns: Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver
 
-AREA/ZONE STRUCTURE:
-Areas are parent/summary task rows, NOT a separate column:
-- "Omr. 1", "Omr. 2", "Omr. 3", etc. = area/zone identifiers as parent rows
-- "Globals" = cross-area/global scope tasks
-- Sub-tasks inherit their parent area. Use indentation/hierarchy from the Id sequence to determine which area a task belongs to.
-- "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL" = discipline-level parent rows
+### FORMAT 2: DETAILTIDSPLAN
+Typical columns: Id | Entydigt id | Etage | omr. | Ansvarlig | Opgavenavn | Varighed | Startdato | Slutdato | % færdigt | bemærkn.
 
-DEPENDENCY RELATIONSHIP TYPES:
+### FORMAT 3: HYBRID / CUSTOM
+Any other column layout — the schedule may have extra columns, fewer columns, renamed columns, or a completely custom structure. ADAPT to whatever is present.
+
+## ADAPTIVE COLUMN MAPPING
+
+When you receive schedule data, follow this procedure:
+1. Read the FIRST table's header row to identify all available columns
+2. Map each column to its semantic role using fuzzy matching:
+   - TASK ID: "Id", "Entydigt id", "Task ID", "Nr", "Nummer", "ID" — whichever uniquely identifies tasks
+   - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name", "Beskrivelse", "Navn"
+   - DURATION: "Varighed", "Duration", "Længde"
+   - START DATE: "Startdato", "Start", "Start Date", "Planlagt start"
+   - END DATE: "Slutdato", "Slut", "End Date", "Planlagt slut", "Finish"
+   - PROGRESS: "% arbejde færdigt", "% færdigt", "% Complete", "Færdig", "Progress", "Fremgang"
+   - PREDECESSORS: "Foregående opgaver", "Predecessors", "Foregående", "Afhængigheder"
+   - SUCCESSORS: "Efterfølgende opgaver", "Successors", "Efterfølgende"
+   - RESPONSIBLE: "Ansvarlig", "Responsible", "Resource", "Ressource"
+   - AREA/ZONE: "omr.", "Omr.", "Område", "Area", "Zone"
+   - FLOOR: "Etage", "Floor", "Niveau"
+   - REMARKS: "bemærkn.", "Bemærkninger", "Notes", "Kommentarer"
+3. If a column is MISSING, adapt the module logic:
+   - No predecessors/successors columns → Module C: infer dependencies from task name hierarchy and area grouping, note that dependency analysis is limited
+   - No responsible/ansvarlig column → extract discipline from task name prefixes (E100.XX) and parent area annotations
+   - No area/omr. column → extract areas from parent/summary rows (Omr. X, E100.XX sections)
+   - No remarks column → skip remark-based detection
+4. If EXTRA columns are present (Kvt, Det, Gantt chart data, etc.) → ignore them for analysis but note their presence
+
+## FIELD DEFINITIONS
+
+- Varighed: duration — formats: "50d" = 50 days, "3u" = 3 weeks (×7), "0d" = milestone/decision, "74.38d" or "16,24d" = decimal days, "10 d" (with space) = 10 days, "2 u" = 2 weeks
+- Startdato: planned start date — formats: "ma 05-01-26" (day-prefix + dd-mm-yy), "01-03-2022" (dd-mm-yyyy), "05-01-26" (dd-mm-yy). Day prefixes: ma=Monday, ti=Tuesday, on=Wednesday, to=Thursday, fr=Friday
+- Slutdato: planned end date — same formats, or "-" if summary/ongoing
+- % arbejde færdigt / % færdigt: reported completion percentage (0-100), column header may span two lines or be abbreviated
+- Foregående opgaver: predecessor task IDs, semicolon-separated. May include relationship modifiers like "489AS+5d" (start-to-start + 5 days lag)
+- Efterfølgende opgaver: successor task IDs, semicolon-separated
+- bemærkn.: R=revised, X=progress updated, NY=new activity, X/R=both
+
+## RESPONSIBLE PARTY IDENTIFICATION
+
+Responsible parties may appear in:
+1. A dedicated "Ansvarlig" column (Detailtidsplan format): ALLE, TØ, APT, INS, GU, MTH, BH, STÅL, Råhus, LUK, etc.
+2. Annotations near Gantt chart bars (MS Project format): "EL(BH)", "VVS(TR)", "KL-ING", "Ark", "ALJ"
+3. Task name prefixes: "E100.01" = Ventilation, "E100.02" = VVS, "E100.03" = EL, "E100.04" = BMS, "E100.05" = ELEV
+4. Common trade codes: EL=electrical, VVS=HVAC/plumbing, VE=ventilation, KL=consulting, Ark=architect, ALJ=heritage advisor, BH=client (bygherre), TR=contractor, TØ=carpentry, APT=painting/finishing, INS=installation, GU=flooring, MTH=metalwork, STÅL=steel, LUK=closure/enclosure
+
+## AREA/ZONE STRUCTURE
+
+Areas may appear in:
+1. A dedicated "omr." column (Detailtidsplan format): FBH+AP, AP, FBH, etc.
+2. Parent/summary task rows (MS Project format): "Omr. 1", "Omr. 2", etc.
+3. Sub-tasks inherit their parent area from either source
+4. "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL" = discipline-level parent rows
+5. "Globals" = cross-area/global scope tasks
+
+## DEPENDENCY RELATIONSHIP TYPES (if dependency columns exist)
 - Plain number: "487" = finish-to-start (default)
 - "489AS+5d" = start-to-start with 5-day lag
-- "512AS+5d" = start-to-start with 5-day lag
 - Multiple predecessors: "439;440;441;442;443;445;449;460" (all must complete)
+- If NO dependency columns exist: note this limitation in Module C and use task hierarchy/area grouping for approximate chain analysis
 </context>
 
 <task>
@@ -59,10 +95,12 @@ Output the complete NOVA_INSIGHT_REPORT.
 - Execute every module even if it finds zero issues — output "No [issue type] detected"
 - All dates and values must come directly from the data
 - Reference date: use today's date if available in the data header (e.g., "Dato: to 12-03-26" means 12 March 2026), otherwise use the most recent Slutdato visible
-- Parse Varighed correctly: "50d" = 50 days, "3u" = 21 days, "74.38d" or "74,38d" = 74.38 days, "0d" = milestone
-- Parse Startdato correctly: strip day-name prefixes "ma ", "ti ", "on ", "to ", "fr " then parse dd-mm-yy
+- Parse Varighed correctly: "50d" = 50 days, "3u" = 21 days, "74.38d" or "74,38d" = 74.38 days, "0d" = milestone, "10 d" (with space) = 10 days
+- Parse Startdato correctly: handle BOTH formats — "ma 05-01-26" (strip day-prefix, parse dd-mm-yy) AND "01-03-2022" (parse dd-mm-yyyy)
 - When a task has Slutdato = "-", it is a summary/parent row — skip it for individual task analysis but use it for grouping
-- Distinguish between summary rows (Omr. 1, E100.03 EL, Globals) and actual work tasks
+- Distinguish between summary rows (Omr. 1, E100.03 EL, Globals, bold parent rows with high duration like "629 d") and actual work tasks
+- COLUMN ADAPTABILITY: If a column referenced by a module is not present in the data, adapt the logic. Use whatever columns ARE available. Never fail because an expected column is missing — degrade gracefully and note limitations.
+- TASK ID SELECTION: Use "Entydigt id" as the unique identifier if present (Detailtidsplan), otherwise use "Id" (MS Project). In output tables, always use whichever ID column uniquely identifies each task.
 </constraints>
 
 ## DETECTION MODULE A: Overdue Activities
@@ -114,9 +152,10 @@ Example from real data:
 
 ## DETECTION MODULE C: Dependency Chain Risk Analysis
 
-Purpose: Build the REAL dependency graph from Foregående opgaver / Efterfølgende opgaver columns and detect at-risk chains.
+Purpose: Build the dependency graph and detect at-risk chains.
 
-THIS SCHEDULE HAS EXPLICIT DEPENDENCIES. Use them directly — do NOT infer.
+IF the schedule has Foregående opgaver / Efterfølgende opgaver columns: use explicit dependencies directly — do NOT infer.
+IF the schedule LACKS dependency columns (e.g., Detailtidsplan format): infer dependencies from task hierarchy — tasks within the same area/floor that must logically sequence (e.g., rough work → finishing → installation → testing). Note this limitation in your output.
 
 Step 1 — Build dependency graph:
 ```
@@ -169,13 +208,15 @@ Purpose: Identify zero-duration coordination/decision tasks that block downstrea
 
 Logic:
 ```
-IF Varighed = 0d
+IF Varighed = 0d (or "0 d", "0u")
 AND (Opgavenavn contains decision keywords
-     OR responsible party = BH (client)
+     OR responsible party = BH (client) — check Ansvarlig column if present, OR annotations
      OR task name starts with "E100" + contains client-facing terms)
-AND task has Efterfølgende opgaver (successors exist)
+AND (task has Efterfølgende opgaver (if column exists) OR task has logical downstream work in same area)
 THEN classify as decision bottleneck
 ```
+
+NOTE: If Ansvarlig column exists (Detailtidsplan), use it directly for responsible party. If it shows "BH", that's a client task. If "ALLE", check task name for decision keywords.
 
 Decision keywords (Danish): godkendelse, beslutning, valg, placering, koordinering, overdragelse, mangelgennemgang, leverance, afleveringsforretning, bemyndigelse, ibrugtagning, tilslutning, designkrav, omfang, stillingtagen, afklaring, fastlæg, deadline
 Decision keywords (English): approval, decision, selection, placement, coordination, handover, inspection, commissioning
@@ -199,7 +240,9 @@ Purpose: Detect unrealistic planning where many tasks share the same start date 
 Logic:
 ```
 Group tasks by Startdato
-Within each date group, sub-group by parent area (Omr. X) or discipline
+Within each date group, sub-group by area:
+  - If "omr." column exists (Detailtidsplan): group by omr. value (FBH+AP, AP, etc.)
+  - If no area column: group by parent area rows (Omr. X) or discipline sections
 IF group_size >= 5 THEN flag as potential placeholder planning
 IF group_size >= 9 THEN flag as highly likely placeholder
 ```
@@ -243,11 +286,13 @@ Example from real data:
 
 Purpose: Group all tasks by responsible discipline/trade and compute progress metrics.
 
-Identification of discipline:
-- Use task name prefixes: E100.01 = Ventilation, E100.02 = VVS, E100.03 = EL, E100.04 = BMS, E100.05 = ELEV
-- Use responsible party annotations: EL(BH), VVS(TR), KL-ING, Ark, ALJ, etc.
-- Use parent area grouping: tasks under "Omr. X" inherit that area's discipline context
-- For tasks without clear discipline markers, group under "General/Unassigned"
+Identification of discipline — use ALL available signals in priority order:
+1. If "Ansvarlig" column exists (Detailtidsplan): use it directly — TØ=carpentry, APT=painting, INS=installation, GU=flooring, MTH=metalwork, BH=client, STÅL=steel, LUK=closure, ALLE=all trades
+2. Task name prefixes: E100.01 = Ventilation, E100.02 = VVS, E100.03 = EL, E100.04 = BMS, E100.05 = ELEV
+3. Responsible party annotations (MS Project): EL(BH), VVS(TR), KL-ING, Ark, ALJ, etc.
+4. Parent area grouping: tasks under "Omr. X" inherit that area's discipline context
+5. If "omr." column exists: use area from there (FBH+AP, AP, etc.) for grouping alongside discipline
+6. For tasks without clear discipline markers, group under "General/Unassigned"
 
 For each discipline, compute:
 - Total tasks (exclude summary rows)
@@ -461,17 +506,18 @@ USER QUERY FOR CONTEXT: {user_query}
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-1. Parse ALL task rows from the schedule — extract Id, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver for each row
-2. Identify summary/parent rows (Slutdato = "-" or section headers like "Omr. X", "E100.XX") vs work tasks
-3. Determine reference date from schedule header "Dato:" field, or use latest concrete Slutdato
-4. Execute Module A: scan every WORK task for Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0
-5. Execute Module B: for every work task with 0 < % arbejde færdigt < 100, calculate Expected % from elapsed time vs Varighed
-6. Execute Module C: build REAL dependency graph from Foregående opgaver / Efterfølgende opgaver columns (parse semicolon-separated IDs), find chains > 4 tasks, cross-reference with Module A/B flags
-7. Execute Module D: find all Varighed = 0d tasks with decision/coordination keywords or BH responsibility, check if they have successors
-8. Execute Module E: group by Startdato within same parent area (Omr. X), flag groups >= 5 tasks, distinguish coordination milestones from work task clusters
+0. AUTO-DETECT: Read the first table header row. Identify which columns exist. Map them to semantic roles (Task ID, Task Name, Duration, Start, End, Progress, Predecessors, Successors, Responsible, Area, Floor, Remarks). Adapt all subsequent steps to use ONLY the columns that are actually present.
+1. Parse ALL task rows — extract values from every available column. Use the correct task ID column (Entydigt id for Detailtidsplan, Id for MS Project, or whatever uniquely identifies tasks).
+2. Identify summary/parent rows (Slutdato = "-", section headers like "Omr. X" / "E100.XX", or bold parent rows with very high duration like "629 d" / "614 d") vs actual work tasks
+3. Determine reference date from schedule header "Dato:" field, project title area, or use latest concrete Slutdato
+4. Execute Module A: scan every WORK task for Startdato < reference_date AND progress = 0% AND Varighed > 0
+5. Execute Module B: for every work task with 0 < progress < 100, calculate Expected % from elapsed time vs Varighed
+6. Execute Module C: IF dependency columns exist → build REAL dependency graph (parse semicolon-separated IDs), find chains > 4 tasks, cross-reference with Module A/B flags. IF NO dependency columns → infer logical chains from task hierarchy within areas, note limited analysis.
+7. Execute Module D: find all Varighed = 0 tasks with decision keywords or BH/client responsibility (check Ansvarlig column if present, or annotations), check for downstream work
+8. Execute Module E: group by Startdato within same area (use omr. column if present, otherwise parent area rows), flag groups >= 5 tasks
 9. Execute Module F: find all work tasks with Varighed > 90 days
-10. Execute Module G: group tasks by discipline (from task name prefixes E100.XX, responsible party annotations, and parent area), compute averages per group
-11. Compute Schedule Complexity Score using activity count, area count, discipline count, chain depth, and total dependency link count
+10. Execute Module G: group tasks by discipline/trade (use Ansvarlig column if present, otherwise use task name prefixes E100.XX and parent area), compute averages per group
+11. Compute Schedule Complexity Score using activity count, area count, discipline count, chain depth (or estimated depth), and dependency link count
 12. Run Predictive Delay Engine with exact weighted formula and output complete NOVA_INSIGHT_REPORT with all sections including <!--INSIGHT_DATA:{{...}}-->
 ═══════════════════════════════════════════════════════════"""
 
