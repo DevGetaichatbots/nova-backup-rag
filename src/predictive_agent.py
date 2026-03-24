@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 PREDICTIVE_SYSTEM_PROMPT = """<context>
 You analyze construction schedules and detect risks, anomalies, and actionable insights.
-You receive COMPLETE contents of two construction schedule files (OLD and NEW).
-Focus predictive analysis on the NEW schedule. Use OLD schedule only as historical baseline for comparison.
+You receive the COMPLETE contents of a construction schedule file.
+Perform full predictive analysis on the provided schedule data.
 
 MS PROJECT EXPORT FORMAT (Danish Detailtidsplan):
 Columns: Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver
@@ -48,7 +48,7 @@ DEPENDENCY RELATIONSHIP TYPES:
 </context>
 
 <task>
-Execute ALL 7 detection modules sequentially on the NEW schedule data.
+Execute ALL 7 detection modules sequentially on the provided schedule data.
 Then compute Schedule Complexity Score.
 Then run Predictive Delay Engine.
 Output the complete NOVA_INSIGHT_REPORT.
@@ -272,7 +272,7 @@ Example from real data:
 ## SCHEDULE COMPLEXITY SCORE
 
 Compute from:
-- Total number of work activities in NEW schedule (exclude summary rows)
+- Total number of work activities in the schedule (exclude summary rows)
 - Number of distinct areas (Omr. X count)
 - Number of distinct disciplines (from Module G)
 - Longest dependency chain length (from Module C)
@@ -435,8 +435,7 @@ class PredictiveAgent:
         context: str,
         user_query: str,
         language: str = "en",
-        old_filename: str = None,
-        new_filename: str = None
+        schedule_filename: str = None
     ) -> dict:
         logger.info(f"  [PredictiveAgent] Starting analysis with {self.deployment}...")
 
@@ -445,15 +444,14 @@ class PredictiveAgent:
         )
         system_prompt = f"{PREDICTIVE_SYSTEM_PROMPT}\n\n{lang_instruction}"
 
-        old_label = old_filename if old_filename else "Old Schedule"
-        new_label = new_filename if new_filename else "New Schedule"
+        schedule_label = schedule_filename if schedule_filename else "Schedule"
 
         user_message = f"""Analyze the following construction schedule data. Produce a complete Nova Insight predictive report.
 
-IMPORTANT: Throughout your report, refer to the old schedule as "{old_label}" and the new schedule as "{new_label}". Use these exact file names in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
+IMPORTANT: Throughout your report, refer to the schedule as "{schedule_label}". Use this exact file name in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
 
 ═══════════════════════════════════════════════════════════
-COMPLETE SCHEDULE DATA FROM BOTH VECTOR STORES:
+COMPLETE SCHEDULE DATA:
 ═══════════════════════════════════════════════════════════
 {context}
 ═══════════════════════════════════════════════════════════
@@ -463,7 +461,7 @@ USER QUERY FOR CONTEXT: {user_query}
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-1. Parse ALL task rows from the NEW schedule — extract Id, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver for each row
+1. Parse ALL task rows from the schedule — extract Id, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver for each row
 2. Identify summary/parent rows (Slutdato = "-" or section headers like "Omr. X", "E100.XX") vs work tasks
 3. Determine reference date from schedule header "Dato:" field, or use latest concrete Slutdato
 4. Execute Module A: scan every WORK task for Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0

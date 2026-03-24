@@ -72,24 +72,22 @@ curl -X POST "https://your-domain/query" \
 
 Response fields: `response`, `sources`, `context_chunks`, `format`
 
-### POST /predictive - Nova Insight predictive analysis (standalone, accepts PDFs directly)
+### POST /predictive - Nova Insight predictive analysis (standalone, accepts single PDF)
 ```bash
 curl -X POST "https://your-domain/predictive" \
-  -F "old_schedule=@old_schedule.pdf" \
-  -F "new_schedule=@new_schedule.pdf" \
+  -F "schedule=@schedule.pdf" \
   -F "language=da" \
   -F "format=html"
 ```
 | Field | Description |
 |-------|-------------|
-| old_schedule | The old PDF file |
-| new_schedule | The new PDF file |
+| schedule | The PDF schedule file to analyze |
 | language | "da" (Danish) or "en" (English) |
 | format | "markdown" or "html" (default: "html") |
 
-Response fields: `predictive_insights` (HTML), `predictive_status`, `predictive_model`, `old_filename`, `new_filename`, `format`, `processing_time_seconds`
+Response fields: `predictive_insights` (HTML), `predictive_status`, `predictive_model`, `filename`, `format`, `processing_time_seconds`
 
-Flow: PDF upload → Azure OCR (parallel) → build context from table/text chunks → GPT-5.2 predictive analysis → HTML formatting → single response. No vector store or embeddings needed.
+Flow: PDF upload → Azure OCR → build context from table/text chunks → GPT-5.2 predictive analysis → HTML formatting → single response. No vector store or embeddings needed.
 
 ### GET /health - Health check
 
@@ -103,10 +101,10 @@ Flow: PDF upload → Azure OCR (parallel) → build context from table/text chun
 7. Agent retrieves from both stores and provides comparison analysis
 
 ## Predictive Agent Flow (Standalone)
-1. User uploads two PDFs directly to `/predictive`
-2. Both PDFs are OCR'd in parallel using Azure Document Intelligence
+1. User uploads a single PDF schedule to `/predictive`
+2. PDF is OCR'd using Azure Document Intelligence
 3. Table chunks are extracted (falls back to text chunks if no tables found)
-4. Context is assembled in the same format the predictive LLM expects
+4. Context is assembled in the format the predictive LLM expects
 5. GPT-5.2 runs all 7 detection modules + delay engine
 6. Response is formatted as dark analytics dashboard HTML
 7. Complete results returned in a single response (~30-90s)
