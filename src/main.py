@@ -276,88 +276,68 @@ async def query_agent(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def _build_predictive_context(old_chunks: list[dict], new_chunks: list[dict],
-                               old_filename: str, new_filename: str) -> str:
+def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
+    doc_label = f"Schedule ({filename})"
 
-    for label, chunks, fname in [
-        ("OLD", old_chunks, old_filename),
-        ("NEW", new_chunks, new_filename),
-    ]:
-        doc_label = f"{label} Schedule ({fname})"
+    table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
+    text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
-        table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
-        text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
+    if not table_chunks and not text_chunks:
+        context_parts.append(f"\n[{doc_label}]\nNo content extracted.\n")
+        return "\n".join(context_parts)
 
-        if not table_chunks and not text_chunks:
-            context_parts.append(f"\n[{doc_label}]\nNo content extracted.\n")
-            continue
+    if table_chunks:
+        context_parts.append(f"\n[{doc_label}] — {len(table_chunks)} table chunks (structured data)")
+        for i, chunk in enumerate(table_chunks, 1):
+            context_parts.append(f"--- Table {i} ---")
+            context_parts.append(chunk["content"])
+            context_parts.append("")
 
-        if table_chunks:
-            context_parts.append(f"\n[{doc_label}] — {len(table_chunks)} table chunks (structured data)")
-            for i, chunk in enumerate(table_chunks, 1):
-                context_parts.append(f"--- Table {i} ---")
-                context_parts.append(chunk["content"])
-                context_parts.append("")
-
-        if text_chunks:
-            context_parts.append(f"\n[{doc_label}] — {len(text_chunks)} text chunks (headers, metadata, notes)")
-            for i, chunk in enumerate(text_chunks, 1):
-                context_parts.append(f"--- Text {i} ---")
-                context_parts.append(chunk["content"])
-                context_parts.append("")
+    if text_chunks:
+        context_parts.append(f"\n[{doc_label}] — {len(text_chunks)} text chunks (headers, metadata, notes)")
+        for i, chunk in enumerate(text_chunks, 1):
+            context_parts.append(f"--- Text {i} ---")
+            context_parts.append(chunk["content"])
+            context_parts.append("")
 
     return "\n".join(context_parts)
 
 
 @app.post("/predictive")
 async def predictive_analysis(
-    old_schedule: UploadFile = File(...),
-    new_schedule: UploadFile = File(...),
+    schedule: UploadFile = File(...),
     language: str = Form("en"),
     format: str = Form("html")
 ):
     start_time = time.time()
 
-    old_filename = old_schedule.filename or "old_schedule.pdf"
-    new_filename = new_schedule.filename or "new_schedule.pdf"
-    old_filename_clean = old_filename.replace(".pdf", "").replace(".PDF", "")
-    new_filename_clean = new_filename.replace(".pdf", "").replace(".PDF", "")
+    filename = schedule.filename or "schedule.pdf"
+    filename_clean = filename.replace(".pdf", "").replace(".PDF", "")
 
     logger.info(f"=== PREDICTIVE REQUEST ===")
-    logger.info(f"Old: {old_filename} | New: {new_filename} | Language: {language}")
+    logger.info(f"Schedule: {filename} | Language: {language}")
 
-    if not old_filename.lower().endswith('.pdf') or not new_filename.lower().endswith('.pdf'):
+    if not filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
 
     try:
-        old_pdf_bytes = await old_schedule.read()
-        new_pdf_bytes = await new_schedule.read()
-        logger.info(f"  Files read: old={len(old_pdf_bytes)} bytes, new={len(new_pdf_bytes)} bytes")
+        pdf_bytes = await schedule.read()
+        logger.info(f"  File read: {len(pdf_bytes)} bytes")
 
         loop = asyncio.get_event_loop()
 
-        logger.info(f"  Running OCR on both PDFs in parallel...")
-        old_ocr_future = loop.run_in_executor(
+        logger.info(f"  Running OCR on PDF...")
+        chunks = await loop.run_in_executor(
             _query_executor,
-            lambda: process_pdf_binary(old_pdf_bytes, old_filename)
-        )
-        new_ocr_future = loop.run_in_executor(
-            _query_executor,
-            lambda: process_pdf_binary(new_pdf_bytes, new_filename)
+            lambda: process_pdf_binary(pdf_bytes, filename)
         )
 
-        old_chunks, new_chunks = await asyncio.gather(old_ocr_future, new_ocr_future)
-
-        old_table_count = sum(1 for c in old_chunks if c.get("metadata", {}).get("type") == "table")
-        new_table_count = sum(1 for c in new_chunks if c.get("metadata", {}).get("type") == "table")
+        table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
         ocr_elapsed = time.time() - start_time
-        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): old={len(old_chunks)} chunks ({old_table_count} tables), new={len(new_chunks)} chunks ({new_table_count} tables)")
+        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({table_count} tables)")
 
-        context = _build_predictive_context(
-            old_chunks, new_chunks,
-            old_filename_clean, new_filename_clean
-        )
+        context = _build_predictive_context(chunks, filename_clean)
         logger.info(f"  Context built: {len(context)} chars")
 
         logger.info(f"  Running Nova Insight predictive analysis...")
@@ -367,8 +347,7 @@ async def predictive_analysis(
                 context=context,
                 user_query="Perform complete predictive schedule analysis",
                 language=language,
-                old_filename=old_filename_clean,
-                new_filename=new_filename_clean
+                schedule_filename=filename_clean
             )
         )
 
@@ -387,8 +366,7 @@ async def predictive_analysis(
             "predictive_insights": predictive_text,
             "predictive_status": predictive_status,
             "predictive_model": predictive_model,
-            "old_filename": old_filename,
-            "new_filename": new_filename,
+            "filename": filename,
             "format": format,
             "processing_time_seconds": round(elapsed, 1)
         }
