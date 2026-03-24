@@ -22,13 +22,70 @@ Typical columns: Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutd
 ### FORMAT 2: DETAILTIDSPLAN
 Typical columns: Id | Entydigt id | Etage | omr. | Ansvarlig | Opgavenavn | Varighed | Startdato | Slutdato | % færdigt | bemærkn.
 
-### FORMAT 3: HYBRID / CUSTOM
-Any other column layout — the schedule may have extra columns, fewer columns, renamed columns, or a completely custom structure. ADAPT to whatever is present.
+### FORMAT 3: UNSTRUCTURED WEEK-BASED SCHEDULE
+No table/columns. Free-text Danish construction schedule organized by week numbers:
+```
+Projekt # 11479
+Vigen 3 - Enø
+4736 Karrebæksminde
+Sommerhus T103
+
+Uge: 47
+Mandag-Fredag: Tømrer opstart Råhus @mareks@lamafix.eu
+
+Uge: 48
+Mandag-Fredag: Tømrer Råhus Her skal være Stillads til tagdækker torsdag. @mareks@lamafix.eu
+Torsdag-Fredag: Underpap @Bjarne.Nielsen@phonixtag.dk
+
+Uge: 49
+Mandag-Fredag: Tømrer Råhus. @mareks@lamafix.eu
+Fredag: EL. Grov montering Loft og ydervægge færdig fredag (Casper SIF) @Casper Jaug
+
+Uge: 51
+Mandag-Fredag: Over pap @Bjarne.Nielsen@phonixtag.dk
+Torsdag: EL. Grov montering Indervægge (Casper SIF) @Casper Jaug
+
+Uge: 52
+Juleferie
+
+Uge: 8
+Mandag-Onsdag: Montering af Køkken @Thomas Veber
+Torsdag-Fredag: EL. slutmontering (Casper SIF) @Casper Jaug
+Torsdag-Fredag: VVS. slutmontering @Christian Olsen
+
+Uge: 10
+Aflevering.
+```
+
+Key patterns to extract:
+- **Week identifier**: "Uge: X" — this is the primary time unit (no exact dates, use week numbers)
+- **Day range**: "Mandag-Fredag:", "Torsdag-Fredag:", "Fredag:", "Mandag-Onsdag:", "Tirsdag-onsdag:" — which days within the week
+- **Work type**: free-text description after the day range — "Tømrer opstart Råhus", "EL. Grov montering", "VVS. slutmontering", "Maler Inde", "Montering af Køkken"
+- **Responsible person**: identified by @email or @Name — "@mareks@lamafix.eu", "@Casper Jaug", "@Christian Olsen", "@Bjarne.Nielsen@phonixtag.dk"
+- **Trade/discipline**: extract from work description — Tømrer=carpentry, EL=electrical, VVS=plumbing/HVAC, Maler=painter, Flisemurer=tiler, Tagdækker=roofer, Underpap/Over pap=roofing felt
+- **Holidays/breaks**: "Juleferie" = Christmas holiday (no work)
+- **Milestones**: "Aflevering" = handover/delivery, "klar til tagdækker" = ready for roofer (dependency signal)
+- **Project info**: "Projekt # XXXXX" = project number, address lines, building type (Sommerhus = summer house)
+- **Inline dependencies**: "klar til el. torsdag" = ready for electrician Thursday, "klar til VVS'er fredag" = ready for plumber Friday, "klar til Flisemurer fredag" = ready for tiler Friday, "klar til tagdækker" = ready for roofer
+
+For predictive analysis of unstructured schedules:
+- Total activities = count of distinct work entries (each "Day-range: Description" line)
+- Duration per activity = count of days in the day range (Mandag-Fredag = 5 days, Torsdag-Fredag = 2 days, Fredag = 1 day)
+- Dependencies = infer from "klar til X" phrases and trade sequencing logic (structural → electrical rough → plumbing → finishing → painting → final installation)
+- Overdue detection = compare current week to scheduled week (if week has passed and work is presumably not done)
+- Scheduling clusters = multiple trades starting same week
+- Long duration = same trade spanning multiple consecutive weeks
+- Areas = typically single area for these small project schedules
+
+### FORMAT 4: HYBRID / CUSTOM
+Any other layout — the schedule may have extra columns, fewer columns, renamed columns, or a completely custom structure. ADAPT to whatever is present.
 
 ## ADAPTIVE COLUMN MAPPING
 
 When you receive schedule data, follow this procedure:
-1. Read the FIRST table's header row to identify all available columns
+1. Determine format type FIRST:
+   - If data contains "Uge: X" week headers with free-text task lines → UNSTRUCTURED FORMAT (skip column mapping, use week-based parsing instead)
+   - If data contains markdown tables with column headers → read the FIRST table's header row to identify all available columns
 2. Map each column to its semantic role using fuzzy matching:
    - TASK ID: "Id", "Entydigt id", "Task ID", "Nr", "Nummer", "ID" — whichever uniquely identifies tasks
    - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name", "Beskrivelse", "Navn"
@@ -506,19 +563,38 @@ USER QUERY FOR CONTEXT: {user_query}
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-0. AUTO-DETECT: Read the first table header row. Identify which columns exist. Map them to semantic roles (Task ID, Task Name, Duration, Start, End, Progress, Predecessors, Successors, Responsible, Area, Floor, Remarks). Adapt all subsequent steps to use ONLY the columns that are actually present.
-1. Parse ALL task rows — extract values from every available column. Use the correct task ID column (Entydigt id for Detailtidsplan, Id for MS Project, or whatever uniquely identifies tasks).
-2. Identify summary/parent rows (Slutdato = "-", section headers like "Omr. X" / "E100.XX", or bold parent rows with very high duration like "629 d" / "614 d") vs actual work tasks
-3. Determine reference date from schedule header "Dato:" field, project title area, or use latest concrete Slutdato
-4. Execute Module A: scan every WORK task for Startdato < reference_date AND progress = 0% AND Varighed > 0
-5. Execute Module B: for every work task with 0 < progress < 100, calculate Expected % from elapsed time vs Varighed
-6. Execute Module C: IF dependency columns exist → build REAL dependency graph (parse semicolon-separated IDs), find chains > 4 tasks, cross-reference with Module A/B flags. IF NO dependency columns → infer logical chains from task hierarchy within areas, note limited analysis.
-7. Execute Module D: find all Varighed = 0 tasks with decision keywords or BH/client responsibility (check Ansvarlig column if present, or annotations), check for downstream work
-8. Execute Module E: group by Startdato within same area (use omr. column if present, otherwise parent area rows), flag groups >= 5 tasks
-9. Execute Module F: find all work tasks with Varighed > 90 days
-10. Execute Module G: group tasks by discipline/trade (use Ansvarlig column if present, otherwise use task name prefixes E100.XX and parent area), compute averages per group
-11. Compute Schedule Complexity Score using activity count, area count, discipline count, chain depth (or estimated depth), and dependency link count
-12. Run Predictive Delay Engine with exact weighted formula and output complete NOVA_INSIGHT_REPORT with all sections including <!--INSIGHT_DATA:{{...}}-->
+0. AUTO-DETECT FORMAT: Check if data has "Uge: X" week headers → UNSTRUCTURED format (parse week entries, extract day ranges, work types, @responsible persons, and inline dependencies like "klar til X"). If data has markdown tables → check column headers and map to semantic roles. Adapt all subsequent steps to the detected format.
+1. Parse ALL task entries:
+   - STRUCTURED: extract values from every available column. Use correct task ID (Entydigt id for Detailtidsplan, Id for MS Project).
+   - UNSTRUCTURED: each "Day-range: Description @person" line under an "Uge: X" header = one activity. Duration = day count in range (Mandag-Fredag=5d, Torsdag-Fredag=2d, Fredag=1d). Responsible = @mention. Trade = from description keywords (Tømrer, EL, VVS, Maler, etc.).
+2. Identify summary/parent rows:
+   - STRUCTURED: Slutdato = "-", section headers like "Omr. X" / "E100.XX", bold parent rows with very high duration
+   - UNSTRUCTURED: "Juleferie" = holiday break, "Aflevering" = project handover milestone
+3. Determine reference date: from header "Dato:" field, or current date, or latest concrete Slutdato. For UNSTRUCTURED: use current week number as reference.
+4. Execute Module A (Overdue):
+   - STRUCTURED: Startdato < reference_date AND progress = 0% AND Varighed > 0
+   - UNSTRUCTURED: scheduled week < current week (activity should have happened already). Since no progress % exists, flag all activities in past weeks as potentially overdue.
+5. Execute Module B (Progress Anomalies):
+   - STRUCTURED: for work tasks with 0 < progress < 100, calculate Expected % from elapsed time vs Varighed
+   - UNSTRUCTURED: no progress data available — skip or note "not applicable for unstructured schedules"
+6. Execute Module C (Dependency Chains):
+   - STRUCTURED with dependency columns: build REAL dependency graph, find chains > 4 tasks, cross-reference with Module A/B
+   - STRUCTURED without dependency columns: infer from task hierarchy
+   - UNSTRUCTURED: extract inline dependencies from "klar til X" phrases (e.g., "klar til tagdækker" = carpentry → roofing, "klar til el." = carpentry → electrical). Build trade sequence chain.
+7. Execute Module D (Decision Bottlenecks):
+   - STRUCTURED: find Varighed = 0 tasks with decision keywords or BH/client responsibility
+   - UNSTRUCTURED: identify delivery/coordination entries (e.g., "@Irina Bengtsen Læs 2" = material delivery, "Levering af køkken" = kitchen delivery, "Rengøring" = cleaning before handover)
+8. Execute Module E (Scheduling Clusters):
+   - STRUCTURED: group by Startdato/area, flag groups >= 5
+   - UNSTRUCTURED: check for weeks with many overlapping trades (e.g., Uge 8 has køkken + EL + VVS + tømrer + skorsten = 5 trades same week → potential resource conflict)
+9. Execute Module F (Long Duration):
+   - STRUCTURED: Varighed > 90 days
+   - UNSTRUCTURED: same trade spanning 3+ consecutive weeks (e.g., Tømrer Råhus weeks 47-50 = ~4 weeks continuous)
+10. Execute Module G (Discipline Progress):
+   - STRUCTURED: group by Ansvarlig/discipline, compute averages
+   - UNSTRUCTURED: group by trade extracted from descriptions (Tømrer, EL, VVS, Maler, Tagdækker, Flisemurer, etc.), count activities per trade, compute total scheduled days per trade
+11. Compute Schedule Complexity Score using activity count, trade count, total weeks span, dependency complexity
+12. Run Predictive Delay Engine with weighted formula and output complete NOVA_INSIGHT_REPORT with all sections including <!--INSIGHT_DATA:{{...}}-->
 ═══════════════════════════════════════════════════════════"""
 
         messages: List[ChatCompletionMessageParam] = [
