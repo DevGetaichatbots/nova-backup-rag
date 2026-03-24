@@ -250,7 +250,7 @@ def _build_hero_metrics(insight_data: Dict, language: str) -> str:
             </linearGradient>
           </defs>
           <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="12" stroke-linecap="round"/>
-          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="{gauge_dash} 251.2">
+          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 251.2">
             <animate attributeName="stroke-dasharray" from="0 251.2" to="{gauge_dash} 251.2" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
           </path>
           <text x="100" y="75" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:32px;font-weight:900;fill:{risk_colors["color"]};">{risk_pct}%</text>
@@ -324,11 +324,14 @@ def _build_analytics_charts(insight_data: Dict, language: str) -> str:
         y = 160 - bar_h
 
         bars_svg += f'''
-        <rect x="{x}%" y="{y}" width="{w}%" height="{bar_h}" rx="4" fill="{f["color"]}" opacity="0.85">
+        <rect x="{x}%" y="160" width="{w}%" height="0" rx="4" fill="{f["color"]}" opacity="0.85">
           <animate attributeName="height" from="0" to="{bar_h}" dur="0.8s" begin="{i * 0.1}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
           <animate attributeName="y" from="160" to="{y}" dur="0.8s" begin="{i * 0.1}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
         </rect>
-        <text x="{x + w / 2}%" y="{y - 8}" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:13px;font-weight:700;fill:{f["color"]};">{val}</text>'''
+        <text x="{x + w / 2}%" y="{y - 8}" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:13px;font-weight:700;fill:{f["color"]};opacity:0;">
+          {val}
+          <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="{i * 0.1 + 0.5}s" fill="freeze"/>
+        </text>'''
         labels_svg += f'<text x="{x + w / 2}%" y="178" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:8px;font-weight:600;fill:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{f["label"]}</text>'
 
     risk_pct = _safe_int(insight_data.get("delay_risk_percent") or 0)
@@ -348,7 +351,7 @@ def _build_analytics_charts(insight_data: Dict, language: str) -> str:
         seg_len = pct * donut_circ
         gap_len = donut_circ - seg_len
         donut_segments += f'''<circle cx="60" cy="60" r="{donut_r}" fill="none" stroke="{f["color"]}" stroke-width="14"
-          stroke-dasharray="{seg_len} {gap_len}" stroke-dashoffset="{-offset}" stroke-linecap="round" opacity="0.85">
+          stroke-dasharray="0 {donut_circ}" stroke-dashoffset="{-offset}" stroke-linecap="round" opacity="0.85">
           <animate attributeName="stroke-dasharray" from="0 {donut_circ}" to="{seg_len} {gap_len}" dur="1s" begin="{i * 0.15}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
         </circle>'''
         offset += seg_len
@@ -483,6 +486,10 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
     if insight_data:
         html_parts.append(_build_hero_metrics(insight_data, language))
+
+    if not insight_data:
+        no_data_label = "Analytiske data ikke tilgængelige — diagrammer kan ikke vises." if language == "da" else "Analytical data unavailable — charts cannot be rendered."
+        html_parts.append(f'<div style="margin:0 0 16px 0;padding:14px 20px;background:rgba(251,191,36,0.06);border-radius:12px;border:1px solid rgba(251,191,36,0.15);"><p style="margin:0;color:#fbbf24;font-size:12px;font-weight:600;">{no_data_label}</p></div>')
 
     module_index = 0
     for section_key, section_body in sections:
