@@ -24,6 +24,7 @@ from src.predictive_agent import predictive_agent
 from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
 from src.html_formatter import format_response_as_html
 from src.predictive_html_formatter import format_predictive_as_html
+from src.pdf_processor import process_pdf_binary
 
 app = FastAPI(
     title="RAG Agent SaaS",
@@ -63,8 +64,9 @@ async def root():
     return {
         "message": "RAG Agent SaaS API",
         "endpoints": {
-            "upload": "POST /upload - Upload 2 PDF schedules",
-            "query": "POST /query - Query the AI agent",
+            "upload": "POST /upload - Upload 2 PDF schedules for comparison agent",
+            "query": "POST /query - Query the comparison AI agent",
+            "predictive": "POST /predictive - Upload 2 PDFs for Nova Insight predictive analysis",
             "health": "GET /health - Health check"
         }
     }
@@ -237,83 +239,18 @@ async def query_agent(
         
         loop = asyncio.get_event_loop()
         
-        if is_comparison:
-            context = await loop.run_in_executor(
-                _query_executor,
-                lambda: rag_agent._retrieve_context(query, table_names, old_filename=old_filename, new_filename=new_filename)
+        result = await loop.run_in_executor(
+            _query_executor,
+            lambda: rag_agent.query(
+                user_query=query,
+                table_names=table_names,
+                session_id=vs_table,
+                language=language,
+                top_k=10,
+                old_filename=old_filename_clean,
+                new_filename=new_filename_clean
             )
-            
-            logger.info(f"  Running comparison + predictive in parallel...")
-            
-            async def _run_comparison():
-                return await loop.run_in_executor(
-                    _query_executor,
-                    lambda: rag_agent.query(
-                        user_query=query,
-                        table_names=table_names,
-                        session_id=vs_table,
-                        language=language,
-                        top_k=10,
-                        preloaded_context=context,
-                        old_filename=old_filename_clean,
-                        new_filename=new_filename_clean
-                    )
-                )
-            
-            async def _run_predictive():
-                return await loop.run_in_executor(
-                    _query_executor,
-                    lambda: predictive_agent.analyze(
-                        context=context,
-                        user_query=query,
-                        language=language,
-                        old_filename=old_filename_clean,
-                        new_filename=new_filename_clean
-                    )
-                )
-            
-            comparison_result, predictive_result = await asyncio.gather(
-                _run_comparison(),
-                _run_predictive(),
-                return_exceptions=True
-            )
-            
-            if isinstance(comparison_result, Exception):
-                logger.error(f"  Comparison agent failed: {comparison_result}")
-                raise comparison_result
-            
-            result = comparison_result
-            
-            if isinstance(predictive_result, Exception):
-                logger.error(f"  Predictive agent failed: {predictive_result}")
-                predictive_text = ""
-                predictive_status = "error"
-                predictive_model = ""
-            else:
-                predictive_text = predictive_result.get("predictive_insights", "")
-                predictive_status = predictive_result.get("status", "error")
-                predictive_model = predictive_result.get("model", "")
-            
-            if format == "html" and predictive_text:
-                predictive_text = format_predictive_as_html(predictive_text, language)
-            
-            logger.info(f"  Predictive complete: {len(predictive_text)} chars, status: {predictive_status}")
-        else:
-            result = await loop.run_in_executor(
-                _query_executor,
-                lambda: rag_agent.query(
-                    user_query=query,
-                    table_names=table_names,
-                    session_id=vs_table,
-                    language=language,
-                    top_k=10,
-                    old_filename=old_filename_clean,
-                    new_filename=new_filename_clean
-                )
-            )
-            predictive_text = None
-            predictive_status = None
-            predictive_model = None
+        )
         
         response_text = result["response"]
         
@@ -327,25 +264,138 @@ async def query_agent(
         logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")
         
-        response_payload = {
+        return {
             "response": response_text,
             "sources": result["sources"],
             "context_chunks": result["context_chunks"],
             "format": format
         }
         
-        if is_comparison:
-            response_payload["predictive_insights"] = predictive_text or ""
-            response_payload["predictive_status"] = predictive_status
-            response_payload["predictive_model"] = predictive_model or ""
-        
-        return response_payload
-        
     except Exception as e:
         logger.error(f"Query failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _build_predictive_context(old_chunks: list[dict], new_chunks: list[dict],
+                               old_filename: str, new_filename: str) -> str:
+    context_parts = []
+
+    for label, chunks, fname in [
+        ("OLD", old_chunks, old_filename),
+        ("NEW", new_chunks, new_filename),
+    ]:
+        doc_label = f"{label} Schedule ({fname})"
+
+        table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
+        text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
+
+        if not table_chunks and not text_chunks:
+            context_parts.append(f"\n[{doc_label}]\nNo content extracted.\n")
+            continue
+
+        if table_chunks:
+            context_parts.append(f"\n[{doc_label}] — {len(table_chunks)} table chunks (structured data)")
+            for i, chunk in enumerate(table_chunks, 1):
+                context_parts.append(f"--- Table {i} ---")
+                context_parts.append(chunk["content"])
+                context_parts.append("")
+
+        if text_chunks:
+            context_parts.append(f"\n[{doc_label}] — {len(text_chunks)} text chunks (headers, metadata, notes)")
+            for i, chunk in enumerate(text_chunks, 1):
+                context_parts.append(f"--- Text {i} ---")
+                context_parts.append(chunk["content"])
+                context_parts.append("")
+
+    return "\n".join(context_parts)
+
+
+@app.post("/predictive")
+async def predictive_analysis(
+    old_schedule: UploadFile = File(...),
+    new_schedule: UploadFile = File(...),
+    language: str = Form("en"),
+    format: str = Form("html")
+):
+    start_time = time.time()
+
+    old_filename = old_schedule.filename or "old_schedule.pdf"
+    new_filename = new_schedule.filename or "new_schedule.pdf"
+    old_filename_clean = old_filename.replace(".pdf", "").replace(".PDF", "")
+    new_filename_clean = new_filename.replace(".pdf", "").replace(".PDF", "")
+
+    logger.info(f"=== PREDICTIVE REQUEST ===")
+    logger.info(f"Old: {old_filename} | New: {new_filename} | Language: {language}")
+
+    if not old_filename.lower().endswith('.pdf') or not new_filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    try:
+        old_pdf_bytes = await old_schedule.read()
+        new_pdf_bytes = await new_schedule.read()
+        logger.info(f"  Files read: old={len(old_pdf_bytes)} bytes, new={len(new_pdf_bytes)} bytes")
+
+        loop = asyncio.get_event_loop()
+
+        logger.info(f"  Running OCR on both PDFs in parallel...")
+        old_ocr_future = loop.run_in_executor(
+            _query_executor,
+            lambda: process_pdf_binary(old_pdf_bytes, old_filename)
+        )
+        new_ocr_future = loop.run_in_executor(
+            _query_executor,
+            lambda: process_pdf_binary(new_pdf_bytes, new_filename)
+        )
+
+        old_chunks, new_chunks = await asyncio.gather(old_ocr_future, new_ocr_future)
+
+        old_table_count = sum(1 for c in old_chunks if c.get("metadata", {}).get("type") == "table")
+        new_table_count = sum(1 for c in new_chunks if c.get("metadata", {}).get("type") == "table")
+        ocr_elapsed = time.time() - start_time
+        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): old={len(old_chunks)} chunks ({old_table_count} tables), new={len(new_chunks)} chunks ({new_table_count} tables)")
+
+        context = _build_predictive_context(
+            old_chunks, new_chunks,
+            old_filename_clean, new_filename_clean
+        )
+        logger.info(f"  Context built: {len(context)} chars")
+
+        logger.info(f"  Running Nova Insight predictive analysis...")
+        predictive_result = await loop.run_in_executor(
+            _query_executor,
+            lambda: predictive_agent.analyze(
+                context=context,
+                user_query="Perform complete predictive schedule analysis",
+                language=language,
+                old_filename=old_filename_clean,
+                new_filename=new_filename_clean
+            )
+        )
+
+        predictive_text = predictive_result.get("predictive_insights", "")
+        predictive_status = predictive_result.get("status", "error")
+        predictive_model = predictive_result.get("model", "")
+
+        if format == "html" and predictive_text:
+            predictive_text = format_predictive_as_html(predictive_text, language)
+
+        elapsed = time.time() - start_time
+        logger.info(f"  Predictive response: {len(predictive_text)} chars, status: {predictive_status}")
+        logger.info(f"=== PREDICTIVE COMPLETE ({elapsed:.1f}s) ===")
+
+        return {
+            "predictive_insights": predictive_text,
+            "predictive_status": predictive_status,
+            "predictive_model": predictive_model,
+            "old_filename": old_filename,
+            "new_filename": new_filename,
+            "format": format,
+            "processing_time_seconds": round(elapsed, 1)
+        }
+
+    except Exception as e:
+        logger.error(f"Predictive analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
