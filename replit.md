@@ -10,9 +10,10 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **LLM (Comparison)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
 - **LLM (Predictive)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
-- **Dual-Agent**: Both agents run in parallel via `asyncio.gather`, single response (~60s), no polling needed
+- **Separated Agents**: Comparison and Predictive agents are fully independent endpoints
 - **DB Connection Pooling**: ThreadedConnectionPool (2-8 connections), batch embedding conversion
 - **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
+- **Deployment**: Gunicorn with 1 worker (LLM-bound workload), 300s timeout
 
 ## Project Structure
 ```
@@ -24,16 +25,16 @@ src/
 ├── azure_ocr.py         # Azure Document Intelligence OCR for PDF table extraction
 ├── pdf_processor.py     # PDF processing with Azure Document Intelligence OCR
 ├── vector_store.py      # Vector store management
-├── agent.py             # RAG agent with dual vector store querying (GPT-5.2)
+├── agent.py             # RAG comparison agent with dual vector store querying (GPT-5.2)
 ├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.2)
 ├── html_formatter.py    # Section-grouped HTML converter for comparison responses (separate card per category)
-├── predictive_html_formatter.py  # Module-card HTML converter for Nova Insight reports
-└── main.py              # FastAPI application with parallel agent execution
+├── predictive_html_formatter.py  # Dark analytics dashboard HTML for Nova Insight reports
+└── main.py              # FastAPI application with separated agent endpoints
 ```
 
 ## API Endpoints
 
-### POST /upload - Upload two PDF schedules
+### POST /upload - Upload two PDF schedules (for comparison agent)
 ```bash
 curl -X POST "https://your-domain/upload" \
   -F "session_id=session_abc123" \
@@ -50,7 +51,7 @@ curl -X POST "https://your-domain/upload" \
 | new_session_id | Vector store table name for new file |
 | new_schedule | The new PDF file |
 
-### POST /query - Query the AI agent
+### POST /query - Query the comparison AI agent (comparison-only, no predictive)
 ```bash
 curl -X POST "https://your-domain/query" \
   -F "query=Compare the two schedules" \
@@ -69,16 +70,46 @@ curl -X POST "https://your-domain/query" \
 | new_session_id | Reference to new file's vector store |
 | format | "markdown" (default) or "html" (premium styled) |
 
+Response fields: `response`, `sources`, `context_chunks`, `format`
+
+### POST /predictive - Nova Insight predictive analysis (standalone, accepts PDFs directly)
+```bash
+curl -X POST "https://your-domain/predictive" \
+  -F "old_schedule=@old_schedule.pdf" \
+  -F "new_schedule=@new_schedule.pdf" \
+  -F "language=da" \
+  -F "format=html"
+```
+| Field | Description |
+|-------|-------------|
+| old_schedule | The old PDF file |
+| new_schedule | The new PDF file |
+| language | "da" (Danish) or "en" (English) |
+| format | "markdown" or "html" (default: "html") |
+
+Response fields: `predictive_insights` (HTML), `predictive_status`, `predictive_model`, `old_filename`, `new_filename`, `format`, `processing_time_seconds`
+
+Flow: PDF upload → Azure OCR (parallel) → build context from table/text chunks → GPT-5.2 predictive analysis → HTML formatting → single response. No vector store or embeddings needed.
+
 ### GET /health - Health check
 
-## Flow
+## Comparison Agent Flow
 1. User uploads PDF files via `/upload` with a `session_id`
 2. Each PDF gets its own vector store table (e.g., `vs_{session_id}_{filename}`)
 3. Binary PDF is parsed using Azure Document Intelligence OCR (preserves tables/structure)
 4. Text is chunked and embedded via Azure OpenAI
 5. Embeddings stored in Supabase pgvector
-6. User queries via `/query` with list of vector store tables
+6. User queries via `/query` with vector store table references
 7. Agent retrieves from both stores and provides comparison analysis
+
+## Predictive Agent Flow (Standalone)
+1. User uploads two PDFs directly to `/predictive`
+2. Both PDFs are OCR'd in parallel using Azure Document Intelligence
+3. Table chunks are extracted (falls back to text chunks if no tables found)
+4. Context is assembled in the same format the predictive LLM expects
+5. GPT-5.2 runs all 7 detection modules + delay engine
+6. Response is formatted as dark analytics dashboard HTML
+7. Complete results returned in a single response (~30-90s)
 
 ## Table Extraction (Construction Schedules)
 - Uses Azure Document Intelligence structured table output (analyzeResult.tables)
@@ -86,16 +117,6 @@ curl -X POST "https://your-domain/query" \
 - Table chunks include: markdown + embedded structured JSON
 - Row chunks include: page_number, cells_data with coordinates
 - Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
-
-## Query Response (Parallel Dual-Agent)
-Both agents run in parallel via `asyncio.gather` — response time = max(comparison, predictive), not sum.
-For comparison queries, the `/query` endpoint returns everything in a single response:
-- `response` — GPT-5.2 comparison analysis
-- `predictive_insights` — GPT-5.2 Nova Insight predictive report
-- `predictive_status` — "success" or "error"
-- `predictive_model` — model name used for predictions
-- Non-comparison queries skip the predictive agent entirely
-- Both agents use `reasoning_effort="low"` for optimal speed
 
 ### Nova Insight Modules (GPT-5.2, CTCO-optimized prompt)
 - **Module A**: Overdue activities (Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0)
