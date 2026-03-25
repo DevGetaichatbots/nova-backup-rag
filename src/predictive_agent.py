@@ -424,16 +424,7 @@ EXECUTION STEPS:
                 "max_completion_tokens": 32768,
             }
 
-            try:
-                api_params["reasoning_effort"] = "low"
-                response = self.client.chat.completions.create(**api_params)
-            except Exception as reasoning_err:
-                if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
-                    logger.warning(f"  [PredictiveAgent] reasoning_effort not supported, falling back without it")
-                    del api_params["reasoning_effort"]
-                    response = self.client.chat.completions.create(**api_params)
-                else:
-                    raise reasoning_err
+            response = self.client.chat.completions.create(**api_params)
 
             choice = response.choices[0]
             insight_response = choice.message.content or ""
