@@ -99,6 +99,28 @@ The reference date is automatically extracted from the uploaded PDF filename. Su
 - `2026_03_12test.pdf` → 12-03-2026
 If no date found in filename, the agent uses the date from the schedule data header or today's date.
 
+### GET /predictive/progress/{analysis_id} - Live progress tracking
+```bash
+curl "https://your-domain/predictive/progress/abc123def456"
+```
+Returns the current analysis stage with a friendly, non-technical message.
+
+**Response:**
+```json
+{
+  "analysis_id": "abc123def456",
+  "stage": "analyzing",
+  "step": 4,
+  "total_steps": 6,
+  "message": "AI is analyzing your schedule — checking every activity for delays...",
+  "detail": "134 activities"
+}
+```
+
+**Stages (in order):** `received` → `reading` → `extracting` → `analyzing` → `formatting` → `complete` (or `error`)
+
+**Usage:** Pass `analysis_id` in the `/predictive` form data, then poll this endpoint every 2-3 seconds. If no `analysis_id` is sent, one is auto-generated and returned in the `/predictive` response.
+
 ### GET /health - Health check
 
 ## Comparison Agent Flow
