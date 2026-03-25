@@ -344,6 +344,47 @@ def _extract_reference_date(filename: str) -> Optional[str]:
     return None
 
 
+_GANTT_NOISE_PATTERN = re.compile(
+    r'^('
+    r'\d{1,2}-\d{2}$|'
+    r'\d{2}-\d{2}-\d{2,4}$|'
+    r'Kvt\d|'
+    r'Side \d|'
+    r'\d{4}$|'
+    r'[A-ZÆØÅ]{1,5}\([A-ZÆØÅ0-9&;]+\)$|'
+    r'[A-ZÆØÅ]{2,4}\s*-\s*[A-ZÆØÅ]{2,4}$|'
+    r'[A-ZÆØÅ]{2,6}\s*\(TEGN\s*\d+\)$|'
+    r'[A-ZÆØÅ]{1,5}\([A-ZÆØÅ0-9&;]+\)\s*-\s*[A-ZÆØÅ]{1,5}\([A-ZÆØÅ0-9&;]+\)$|'
+    r'KL-ING$|'
+    r'KL$|'
+    r'Ark$|'
+    r'ALJ$'
+    r')',
+    re.IGNORECASE
+)
+
+
+def _clean_gantt_noise(text: str) -> str:
+    lines = text.split("\n")
+    clean_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if len(stripped) < 3:
+            continue
+        if _GANTT_NOISE_PATTERN.match(stripped):
+            continue
+        if len(stripped) <= 15 and re.match(r'^[\w\s\-().;/&]+$', stripped) and not any(c.isdigit() and len(stripped) > 8 for c in stripped):
+            has_letter = any(c.isalpha() for c in stripped)
+            has_colon = ':' in stripped
+            has_pipe = '|' in stripped
+            if has_letter and not has_colon and not has_pipe and stripped.count(' ') <= 2:
+                continue
+        clean_lines.append(line)
+    return "\n".join(clean_lines)
+
+
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
@@ -368,15 +409,20 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
             content = chunk["content"]
             if "[STRUCTURED:" in content:
                 content = content[:content.index("[STRUCTURED:")]
-            context_parts.append(content.strip())
+            cleaned = _clean_gantt_noise(content.strip())
+            context_parts.append(cleaned)
             context_parts.append("")
         return "\n".join(context_parts)
 
     if text_chunks:
         context_parts.append(f"[{doc_label}] — TEXT DATA (no structured tables found)")
         for i, chunk in enumerate(text_chunks, 1):
-            context_parts.append(chunk["content"])
-            context_parts.append("")
+            cleaned = _clean_gantt_noise(chunk["content"])
+            if cleaned.strip():
+                context_parts.append(cleaned)
+                context_parts.append("")
+        if len(context_parts) <= 1:
+            context_parts.append("No schedule data could be extracted after filtering.\n")
         return "\n".join(context_parts)
 
     context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
