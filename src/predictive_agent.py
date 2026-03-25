@@ -143,8 +143,8 @@ The output must be clear, actionable, and trustworthy.
 - Reference date: USE THE REFERENCE DATE PROVIDED IN THE USER MESSAGE. If none provided, use today's date or "Dato:" field from data header.
 - Parse Varighed correctly: "50d" = 50 days, "3u" = 21 days, "74.38d" or "74,38d" = 74.38 days, "0d" = milestone, "10 d" (with space) = 10 days
 - Parse Startdato correctly: handle BOTH formats — "ma 05-01-26" (strip day-prefix, parse dd-mm-yy) AND "01-03-2022" (parse dd-mm-yyyy)
-- When a task has Slutdato = "-", it is a summary/parent row — skip it for individual task analysis but use it for grouping
-- Distinguish between summary rows (Omr. 1, E100.03 EL, Globals, bold parent rows with high duration like "629 d") and actual work tasks
+- Slutdato = "-" does NOT automatically mean summary row. Some real tasks have Slutdato = "-" (e.g., ID 1187 "Oversigt projekteringstidsplan" with 200d duration). Only skip a row if it is clearly a GROUPING HEADER: named like "Omr. X", "E100.XX [Discipline]", "Globals", or is a parent row with no real start date.
+- Summary/parent grouping rows are identified by: being section headers (Omr. 1, E100.03 EL, Globals), having unrealistically high duration that spans sub-tasks (like "629 d" covering an entire area), AND having no meaningful work content
 - COLUMN ADAPTABILITY: If a column referenced is not present in the data, adapt the logic. Use whatever columns ARE available. Never fail because an expected column is missing — degrade gracefully and note limitations.
 - TASK ID SELECTION: Use "Entydigt id" as the unique identifier if present (Detailtidsplan), otherwise use "Id" (MS Project). In output tables, always use whichever ID column uniquely identifies each task.
 - Identification MUST be strictly based on the activity's unique ID, not just its name
@@ -161,17 +161,20 @@ This is the FOUNDATIONAL analysis — it must be executed with absolute precisio
 
 Logic:
 ```
-IF Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0
+IF Startdato < reference_date AND % arbejde færdigt = 0
 THEN flag as DELAYED
 Calculate: Days_Overdue = reference_date - Startdato (in calendar days)
 ```
 
+IMPORTANT: Do NOT filter by Varighed/duration. Zero-duration tasks (0d) like coordination milestones and dependency gates MUST be included if they meet both conditions above. Only summary/parent ROWS are excluded.
+
 ### Filtering rules:
-1. Skip summary/parent rows (Varighed = "0d" with Slutdato = "-")
-2. Skip ALL zero-duration tasks (Varighed = "0d" or "0 d") — these are milestones/coordination points, not work tasks
+1. Skip summary/parent GROUPING rows ONLY — these are section headers (e.g. "Omr. 1", "E100.03 EL", "Globals") or parent rows with very high duration (like "629 d") that group sub-tasks. Slutdato = "-" alone does NOT mean summary row — real tasks like ID 1187 can have Slutdato = "-"
+2. INCLUDE zero-duration tasks (Varighed = "0d") — these are real coordination/decision tasks, not summaries. Examples: "Afhængigheder" (0d), "Fancoils for dim af kabling" (0d), decision gates, dependency markers
 3. Only include tasks where BOTH conditions are met simultaneously
-4. Do NOT include tasks whose Startdato is ON or AFTER the reference date
+4. Do NOT include tasks whose Startdato is ON or AFTER the reference date (strictly BEFORE only)
 5. Do NOT include tasks with any progress > 0% (even 1%)
+6. Date parsing must be accurate — format is typically DD-MM-YY or DD-MM-YYYY
 
 ### For UNSTRUCTURED schedules:
 - Overdue = scheduled week < current week number
@@ -183,13 +186,16 @@ Output per flagged task — include ALL of these columns:
 
 ### Sorting: Sort by Days_Overdue DESCENDING (most overdue first)
 
-Example from real data (reference date: 12-03-2026):
+Example from real data (reference date: 12-03-2026, expected 34 delayed activities):
 | 1187 | Oversigt projekteringstidsplan - projekt til prisvalidering | 08-09-2025 | - | 200d | 0% | 185 days |
 | 21 | E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral | 30-09-2025 | 28-11-2025 | 44d | 0% | 163 days |
 | 29 | E100.12 - Solafskærmning/Mørklægning, funktionskrav | 03-11-2025 | 21-11-2025 | 15d | 0% | 130 days |
 | 20 | E100.02 - Vandbehandling og vandingsanlæg til haverne | 05-11-2025 | 18-11-2025 | 10d | 0% | 128 days |
-| 39 | Sikringsprojekt | 03-11-2025 | 20-02-2026 | 80d | 0% | 130 days |
 | 519 | Afhængigheder | 09-02-2026 | 09-02-2026 | 0d | 0% | 31 days |
+| 520 | Fancoils for dim af kabling | 09-02-2026 | 09-02-2026 | 0d | 0% | 31 days |
+
+Note: IDs 519, 520, etc. have 0d duration but are REAL coordination tasks (not summary rows) and MUST be included.
+The complete list of expected IDs for this schedule: 20, 21, 23, 24, 25, 26, 27, 29, 30, 33, 36, 39, 40, 41, 42, 461, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 586, 644, 645, 648, 651, 1185, 1187 (34 total).
 
 ### IMPORTANT EXCLUSIONS — verify these are NOT in your output:
 - ID 34: Startdato = 12-03-2026 → NOT before reference date → EXCLUDE
@@ -334,18 +340,19 @@ EXECUTION STEPS:
 1. Parse ALL task entries:
    - STRUCTURED: extract values from every available column. Use correct task ID (Entydigt id for Detailtidsplan, Id for MS Project).
    - UNSTRUCTURED: each "Day-range: Description @person" line under an "Uge: X" header = one activity.
-2. Identify and EXCLUDE summary/parent rows:
-   - Slutdato = "-", section headers like "Omr. X" / "E100.XX", bold parent rows with very high duration
+2. Identify and EXCLUDE summary/parent GROUPING rows ONLY:
+   - Section headers like "Omr. X" / "E100.XX [Discipline]" / "Globals" — these group sub-tasks
+   - Parent rows with very high duration (like "629 d") that span entire sub-task ranges
+   - DO NOT exclude a row just because Slutdato = "-" — some real tasks (e.g., ID 1187) have Slutdato = "-" but ARE valid delayed activities
    - For UNSTRUCTURED: "Juleferie" = holiday break, "Aflevering" = project handover milestone
 3. Determine reference date: USE THE REFERENCE DATE PROVIDED ABOVE. If none provided, extract from "Dato:" field in data header, or use today's date.
 4. Execute Module A (Delayed Activities Identification):
    - For EVERY task in the schedule:
-     a. Check: Is Startdato STRICTLY BEFORE reference_date? If no → skip
-     b. Check: Is % arbejde færdigt EXACTLY 0%? If no → skip
-     c. Check: Is Varighed > 0? If no → skip (unless it's a meaningful decision task)
-     d. Check: Is this a summary/parent row? If yes → skip
-     e. If ALL conditions pass → add to delayed list
-     f. Calculate Days_Overdue = reference_date - Startdato
+     a. Check: Is this a summary/parent GROUPING row (section header like "Omr. X"/"E100.XX"/"Globals" with very high duration)? If yes → skip. NOTE: Slutdato = "-" alone does NOT make it a summary row.
+     b. Check: Is Startdato STRICTLY BEFORE reference_date? If no → skip
+     c. Check: Is % arbejde færdigt EXACTLY 0%? If no → skip
+     d. If ALL conditions pass → add to delayed list (INCLUDING zero-duration tasks like 0d coordination/decision tasks)
+     e. Calculate Days_Overdue = reference_date - Startdato
    - UNSTRUCTURED: scheduled week < current reference week AND no completion indicator
 5. Sort results by Days_Overdue DESCENDING (most overdue first)
 6. Count total delayed activities

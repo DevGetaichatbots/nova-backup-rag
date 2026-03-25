@@ -128,11 +128,12 @@ If no date found in filename, the agent uses the date from the schedule data hea
 
 ### Nova Insight — Current Active Module
 - **Module A (ACTIVE)**: Delayed Activities Identification
-  - Criteria: `Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0`
+  - Criteria: `Startdato < reference_date AND % arbejde færdigt = 0` (NO Varighed filter — 0d tasks included, only grouping headers excluded)
+  - Slutdato = "-" does NOT make a row a summary — only named section headers (Omr. X, E100.XX, Globals) with very high durations are excluded
   - Reference date: extracted from uploaded PDF filename
   - Output: sorted table (most overdue first) with ID, Activity Name, Start Date, End Date, Duration, Progress, Days Overdue
   - Summary: count by area/discipline, top 5 critical delays, professional assessment
-  - HTML: dark dashboard with animated hero stats (delayed count, reference date, progress bar), styled table with severity-colored overdue indicators
+  - HTML: light/white theme with teal accents (#0d9488), animated hero stats, severity-colored overdue indicators, clean white cards
 
 ### Commented Out Modules (Future Iterations)
 - Module B: Unrealistic progress reporting
