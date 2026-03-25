@@ -133,21 +133,39 @@ Areas may appear in:
 <task>
 Execute DELAYED ACTIVITIES IDENTIFICATION (Module A) on the provided schedule data.
 This is the foundational analysis layer — it must be executed with absolute precision.
-Identify ALL activities that should have started but show zero progress.
 
-DETERMINISTIC REQUIREMENT: For the same input data, you MUST produce IDENTICAL results every time.
-- Parse every single row systematically — do not sample or skip
-- Apply the exact same filtering logic to every row
-- The delayed activities list must be complete and reproducible
-- The Days Overdue calculation must be mathematically exact: (reference_date - Startdato) in calendar days
-- Do NOT use approximate language like "approximately", "around", "roughly" for counts or days
+## MANDATORY TWO-PASS APPROACH — YOU MUST FOLLOW THIS EXACT PROCESS
 
-VERIFICATION: After building your delayed activities list, verify:
-1. Every listed activity has Startdato STRICTLY BEFORE the reference date
-2. Every listed activity has % færdigt EXACTLY 0%
-3. No summary/grouping rows are included
-4. The total count matches the actual number of rows in your table
-5. The INSIGHT_DATA delayed_count matches the total count
+### PASS 1: Scan EVERY row — collect ALL candidates with 0% progress
+Go through the data ROW BY ROW, from the FIRST row to the LAST row. For EACH row:
+- Read the progress column (% arbejde færdigt / % færdigt)
+- If progress = 0% → add to your candidate list with its Id, Opgavenavn, Startdato, Slutdato, Varighed
+- If progress > 0% → skip
+- If the row is a grouping header (Omr. X, E100.XX discipline name, Globals) → skip
+- Do NOT stop early. Do NOT skip rows. Process ALL rows from start to end.
+
+### PASS 2: Filter candidates by date
+For each candidate from Pass 1:
+- Parse its Startdato into a date
+- Compare with the reference date
+- If Startdato is STRICTLY BEFORE the reference date → INCLUDE as delayed
+- If Startdato is ON or AFTER the reference date → EXCLUDE
+- Calculate Days Overdue = reference_date - Startdato (calendar days)
+
+### CRITICAL: You MUST find ALL delayed activities, not just a few.
+A typical construction schedule has 20-40+ delayed activities across multiple areas (not just 3-5 from one area).
+If you only found activities from ONE area or discipline, YOU ARE MISSING ROWS — go back and scan again.
+Expect delayed activities across Bygherreafklaringer, Ventilation, VVS, EL, ELEV, Sikring, Solceller, Fredning, Globals, etc.
+
+### PASS 3: Verify completeness
+After building your final list, verify:
+1. You checked EVERY row in the data (count them)
+2. Every listed activity has Startdato STRICTLY BEFORE the reference date
+3. Every listed activity has % færdigt EXACTLY 0%
+4. No summary/grouping rows are included
+5. The total count matches the actual number of rows in your table
+6. The INSIGHT_DATA delayed_count matches the total count
+7. You have activities from MULTIPLE areas/disciplines (not just one)
 </task>
 
 <constraints>
@@ -408,7 +426,7 @@ EXECUTION STEPS:
             }
 
             try:
-                api_params["reasoning_effort"] = "medium"
+                api_params["reasoning_effort"] = "high"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
