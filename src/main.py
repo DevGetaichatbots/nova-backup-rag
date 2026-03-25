@@ -10,8 +10,74 @@ import re
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
+import threading
+
 _query_executor = ThreadPoolExecutor(max_workers=4)
 _upload_progress: Dict[str, Dict[str, Any]] = {}
+_predictive_progress: Dict[str, Dict[str, Any]] = {}
+_progress_lock = threading.Lock()
+
+PROGRESS_STAGES = {
+    "received": {
+        "step": 1,
+        "total_steps": 6,
+        "en": "We've received your schedule — starting the analysis now...",
+        "da": "Vi har modtaget din tidsplan — starter analysen nu..."
+    },
+    "reading": {
+        "step": 2,
+        "total_steps": 6,
+        "en": "Reading and scanning your document — extracting tables and data...",
+        "da": "Læser og scanner dit dokument — henter tabeller og data ud..."
+    },
+    "extracting": {
+        "step": 3,
+        "total_steps": 6,
+        "en": "Found your schedule data — identifying all activities...",
+        "da": "Fandt dine tidsplandata — identificerer alle aktiviteter..."
+    },
+    "analyzing": {
+        "step": 4,
+        "total_steps": 6,
+        "en": "AI is analyzing your schedule — checking every activity for delays...",
+        "da": "AI analyserer din tidsplan — tjekker hver aktivitet for forsinkelser..."
+    },
+    "formatting": {
+        "step": 5,
+        "total_steps": 6,
+        "en": "Almost there — building your report...",
+        "da": "Næsten klar — opbygger din rapport..."
+    },
+    "complete": {
+        "step": 6,
+        "total_steps": 6,
+        "en": "Your analysis is ready!",
+        "da": "Din analyse er klar!"
+    },
+    "error": {
+        "step": -1,
+        "total_steps": 6,
+        "en": "Something went wrong during the analysis. Please try again.",
+        "da": "Noget gik galt under analysen. Prøv venligst igen."
+    }
+}
+
+
+def _update_progress(analysis_id: str, stage: str, language: str = "en", detail: str = None):
+    if stage not in PROGRESS_STAGES:
+        return
+    stage_info = PROGRESS_STAGES[stage]
+    msg = stage_info.get(language, stage_info["en"])
+    with _progress_lock:
+        _predictive_progress[analysis_id] = {
+            "analysis_id": analysis_id,
+            "stage": stage,
+            "step": stage_info["step"],
+            "total_steps": stage_info["total_steps"],
+            "message": msg,
+            "detail": detail,
+            "timestamp": time.time()
+        }
 
 logging.basicConfig(
     level=logging.INFO,
@@ -433,24 +499,34 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
 async def predictive_analysis(
     schedule: UploadFile = File(...),
     language: str = Form("en"),
-    format: str = Form("html")
+    format: str = Form("html"),
+    analysis_id: str = Form(None)
 ):
     start_time = time.time()
+
+    if not analysis_id:
+        analysis_id = str(uuid.uuid4())[:12]
 
     filename = schedule.filename or "schedule.pdf"
     filename_clean = filename.replace(".pdf", "").replace(".PDF", "")
 
     reference_date = _extract_reference_date(filename)
 
-    logger.info(f"=== PREDICTIVE REQUEST ===")
+    _update_progress(analysis_id, "received", language)
+
+    logger.info(f"=== PREDICTIVE REQUEST [{analysis_id}] ===")
     logger.info(f"Schedule: {filename} | Language: {language} | Reference date: {reference_date or 'not found in filename'}")
 
     if not filename.lower().endswith('.pdf'):
+        _update_progress(analysis_id, "error", language)
+        _schedule_progress_cleanup(analysis_id, delay=60)
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
 
     try:
         pdf_bytes = await schedule.read()
         logger.info(f"  File read: {len(pdf_bytes)} bytes")
+
+        _update_progress(analysis_id, "reading", language, f"{len(pdf_bytes) // 1024} KB")
 
         loop = asyncio.get_event_loop()
 
@@ -460,12 +536,17 @@ async def predictive_analysis(
             lambda: process_pdf_binary(pdf_bytes, filename)
         )
 
+        row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
         table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
         ocr_elapsed = time.time() - start_time
         logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({table_count} tables)")
 
+        _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
+
         context = _build_predictive_context(chunks, filename_clean)
         logger.info(f"  Context built: {len(context)} chars")
+
+        _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
         logger.info(f"  Running Nova Insight predictive analysis...")
         predictive_result = await loop.run_in_executor(
@@ -483,14 +564,21 @@ async def predictive_analysis(
         predictive_status = predictive_result.get("status", "error")
         predictive_model = predictive_result.get("model", "")
 
+        _update_progress(analysis_id, "formatting", language)
+
         if format == "html" and predictive_text:
             predictive_text = format_predictive_as_html(predictive_text, language)
 
         elapsed = time.time() - start_time
         logger.info(f"  Predictive response: {len(predictive_text)} chars, status: {predictive_status}")
-        logger.info(f"=== PREDICTIVE COMPLETE ({elapsed:.1f}s) ===")
+        logger.info(f"=== PREDICTIVE COMPLETE [{analysis_id}] ({elapsed:.1f}s) ===")
+
+        _update_progress(analysis_id, "complete", language)
+
+        _schedule_progress_cleanup(analysis_id)
 
         return {
+            "analysis_id": analysis_id,
             "predictive_insights": predictive_text,
             "predictive_status": predictive_status,
             "predictive_model": predictive_model,
@@ -502,7 +590,31 @@ async def predictive_analysis(
 
     except Exception as e:
         logger.error(f"Predictive analysis failed: {e}")
+        _update_progress(analysis_id, "error", language, str(e))
+        _schedule_progress_cleanup(analysis_id, delay=120)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def _schedule_progress_cleanup(analysis_id: str, delay: int = 300):
+    def cleanup():
+        time.sleep(delay)
+        with _progress_lock:
+            _predictive_progress.pop(analysis_id, None)
+    threading.Thread(target=cleanup, daemon=True).start()
+
+
+@app.get("/predictive/progress/{analysis_id}")
+async def get_predictive_progress(analysis_id: str):
+    with _progress_lock:
+        progress = _predictive_progress.get(analysis_id)
+
+    if not progress:
+        raise HTTPException(
+            status_code=404,
+            detail="No analysis found with this ID. It may have completed or expired."
+        )
+
+    return progress
 
 
 if __name__ == "__main__":
