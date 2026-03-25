@@ -455,19 +455,14 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
 
-    row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
     table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
+    row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
-    total_chunks = len(row_chunks) + len(table_chunks) + len(text_chunks)
-    context_parts.append(f"[{doc_label}] — COMPLETE DATA: {total_chunks} chunks ({len(row_chunks)} rows, {len(table_chunks)} tables, {len(text_chunks)} text sections)")
-    context_parts.append("")
-
     if table_chunks:
-        context_parts.append("=" * 60)
-        context_parts.append("SECTION 1: STRUCTURED TABLE DATA (full table markdown)")
-        context_parts.append("=" * 60)
-        for i, chunk in enumerate(table_chunks, 1):
+        context_parts.append(f"[{doc_label}] — COMPLETE STRUCTURED TABLE DATA ({len(table_chunks)} table sections)")
+        context_parts.append("")
+        for chunk in table_chunks:
             content = chunk["content"]
             if "[STRUCTURED:" in content:
                 content = content[:content.index("[STRUCTURED:")]
@@ -475,30 +470,30 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
             if cleaned.strip():
                 context_parts.append(cleaned)
                 context_parts.append("")
+        return "\n".join(context_parts)
 
     if row_chunks:
-        context_parts.append("=" * 60)
-        context_parts.append(f"SECTION 2: INDIVIDUAL ROW DATA ({len(row_chunks)} activities)")
-        context_parts.append("Each line = one activity. Format: Row N (Page P): Header: value | Header: value | ...")
-        context_parts.append("ALL columns shown for every row (including empty). You MUST check EVERY row.")
-        context_parts.append("=" * 60)
+        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities (row data)")
+        context_parts.append("Format: Row N (Page P): Header: value | Header: value | ...")
+        context_parts.append("")
         for chunk in row_chunks:
             context_parts.append(chunk["content"])
         context_parts.append("")
+        return "\n".join(context_parts)
 
     if text_chunks:
-        context_parts.append("=" * 60)
-        context_parts.append("SECTION 3: PAGE TEXT DATA")
-        context_parts.append("=" * 60)
+        context_parts.append(f"[{doc_label}] — TEXT DATA")
+        context_parts.append("")
         for chunk in text_chunks:
             cleaned = _clean_gantt_noise(chunk["content"])
             if cleaned.strip():
                 context_parts.append(cleaned)
                 context_parts.append("")
+        if len(context_parts) <= 2:
+            context_parts.append("No schedule data could be extracted after filtering.\n")
+        return "\n".join(context_parts)
 
-    if not table_chunks and not row_chunks and not text_chunks:
-        context_parts.append(f"No content extracted from {filename}.\n")
-
+    context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
     return "\n".join(context_parts)
 
 
