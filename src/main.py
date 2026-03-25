@@ -459,6 +459,15 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
+    if row_chunks:
+        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities (row data)")
+        context_parts.append("Format: Row N (Page P): Header: value | Header: value | ...")
+        context_parts.append("")
+        for chunk in row_chunks:
+            context_parts.append(chunk["content"])
+        context_parts.append("")
+        return "\n".join(context_parts)
+
     if table_chunks:
         context_parts.append(f"[{doc_label}] — COMPLETE STRUCTURED TABLE DATA ({len(table_chunks)} table sections)")
         context_parts.append("")
@@ -469,15 +478,6 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
             if content.strip():
                 context_parts.append(content.strip())
                 context_parts.append("")
-        return "\n".join(context_parts)
-
-    if row_chunks:
-        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities (row data)")
-        context_parts.append("Format: Row N (Page P): Header: value | Header: value | ...")
-        context_parts.append("")
-        for chunk in row_chunks:
-            context_parts.append(chunk["content"])
-        context_parts.append("")
         return "\n".join(context_parts)
 
     if text_chunks:
