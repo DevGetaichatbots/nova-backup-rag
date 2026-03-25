@@ -39,8 +39,8 @@ PROGRESS_STAGES = {
     "analyzing": {
         "step": 4,
         "total_steps": 6,
-        "en": "AI is analyzing your schedule — checking every activity for delays...",
-        "da": "AI analyserer din tidsplan — tjekker hver aktivitet for forsinkelser..."
+        "en": "Nova is analyzing your schedule — checking every activity for delays...",
+        "da": "Nova analyserer din tidsplan — tjekker hver aktivitet for forsinkelser..."
     },
     "formatting": {
         "step": 5,
