@@ -404,7 +404,6 @@ EXECUTION STEPS:
             api_params = {
                 "model": self.deployment,
                 "messages": messages,
-                "temperature": 0,
                 "max_completion_tokens": 32768,
             }
 
