@@ -251,27 +251,11 @@ def _build_hero_section(insight_data: Dict, language: str) -> str:
 
       <div style="text-align:center;flex-shrink:0;min-width:100px;">
         <div style="font-size:48px;font-weight:900;color:{status_color};line-height:1;">
-          <span style="display:inline-block;">0</span>
+          {delayed_count}
         </div>
         <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1.5px;margin-top:4px;">
           {"FORSINKEDE" if language == "da" else "DELAYED"}
         </div>
-        <script>
-          (function() {{
-            var el = document.currentScript.parentElement.querySelector('span');
-            var target = {delayed_count};
-            var duration = 1200;
-            var start = performance.now();
-            function animate(now) {{
-              var elapsed = now - start;
-              var progress = Math.min(elapsed / duration, 1);
-              var eased = 1 - Math.pow(1 - progress, 3);
-              el.textContent = Math.round(eased * target);
-              if (progress < 1) requestAnimationFrame(animate);
-            }}
-            requestAnimationFrame(animate);
-          }})();
-        </script>
       </div>
 
       <div style="flex:1;min-width:200px;">
@@ -285,9 +269,7 @@ def _build_hero_section(insight_data: Dict, language: str) -> str:
             <span style="font-size:12px;color:#1a202c;font-weight:700;">{delayed_count}/{total_activities} ({pct}%)</span>
           </div>
           <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:0%;background:{bar_color};border-radius:4px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);">
-              <script>(function(){{ var el = document.currentScript.parentElement; setTimeout(function(){{ el.style.width = '{bar_width}%'; }}, 300); }})();</script>
-            </div>
+            <div style="height:100%;width:{bar_width}%;background:{bar_color};border-radius:4px;"></div>
           </div>
         </div>
 

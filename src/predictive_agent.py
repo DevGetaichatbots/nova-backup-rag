@@ -276,7 +276,7 @@ STRICT RULES:
 ### SCHEDULE_OVERVIEW
 - Schedule: [filename as provided]
 - Reference date: [dd-mm-yyyy]
-- Total activities analyzed: [X] (excluding summary/grouping rows)
+- Total activities in schedule: [X] (count ALL work rows in the entire PDF, excluding ONLY summary/grouping headers — this is the TOTAL number of rows, NOT the delayed count)
 - Areas covered: [list all areas/disciplines found]
 - Format detected: [MS Project Export / Detailtidsplan / Unstructured / Hybrid]
 
@@ -307,6 +307,7 @@ STRICT RULES:
 [2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken. Be specific — mention actual area names and counts.]
 
 <!--INSIGHT_DATA:{"total_activities":X,"delayed_count":X,"reference_date":"dd-mm-yyyy","most_overdue_days":X,"areas_affected":X,"format_detected":"...","schedule_name":"..."}-->
+IMPORTANT: total_activities = count of ALL work rows in the entire schedule (e.g., 105), delayed_count = only the rows matching the delay criteria (e.g., 34). These MUST be different numbers unless every single activity is delayed.
 ```
 </output>"""
 
