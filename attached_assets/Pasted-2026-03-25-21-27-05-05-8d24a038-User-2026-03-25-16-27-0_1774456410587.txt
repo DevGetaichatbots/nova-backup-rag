@@ -1,0 +1,148 @@
+2026-03-25 21:27:05.05
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [33] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+2026-03-25 21:27:05.05
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [33] [INFO] Shutting down
+2026-03-25 21:27:05.15
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [33] [INFO] Application shutdown complete.
+2026-03-25 21:27:05.15
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [33] [INFO] Finished server process [33]
+2026-03-25 21:27:05.15
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [33] [INFO] Waiting for application shutdown.
+2026-03-25 21:27:05.16
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [28] [INFO] Worker (pid:33) was sent SIGTERM!
+2026-03-25 21:27:05.26
+8d24a038
+User
+[2026-03-25 16:27:05 +0000] [28] [INFO] Shutting down: Master
+2026-03-25 21:27:05.30
+8d24a038
+System
+main done, exiting
+2026-03-25 21:27:05.30
+8d24a038
+System
+command finished successfully with exit code 0
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | Running OCR on PDF...
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | File read: 160504 bytes
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | === PREDICTIVE REQUEST [sa_d60660e0d1eea0ec] ===
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | Schedule: 2026-03-12 Samlet tidsplan_1side.pdf | Language: en | Reference date: 12-03-2026
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Submitting PDF to Azure (160504 bytes)...
+2026-03-25 21:27:30.60
+45b5cd0b
+User
+16:27:30 | INFO | Azure Document Intelligence initialized
+2026-03-25 21:27:31.09
+45b5cd0b
+User
+16:27:31 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Operation started
+2026-03-25 21:27:31.35
+45b5cd0b
+User
+16:27:31 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 0.0s)
+2026-03-25 21:27:34.61
+45b5cd0b
+User
+16:27:34 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 3.3s)
+2026-03-25 21:27:37.87
+45b5cd0b
+User
+16:27:37 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 6.5s)
+2026-03-25 21:27:41.55
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extraction complete!
+2026-03-25 21:27:41.55
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: succeeded (elapsed: 9.8s)
+2026-03-25 21:27:41.56
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 1 structured tables
+2026-03-25 21:27:41.56
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 21137 chars, 1 tables, 1 pages
+2026-03-25 21:27:41.56
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Large table 0 split into 1 chunks (was 136725 chars)
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Created 136 chunks (1 tables, 1 pages)
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | Context built: 11304 chars (all sections included)
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | OCR complete (11.1s): 136 chunks (112 rows, 1 tables, 23 text)
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | Running Nova Insight predictive analysis...
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 21:27:41.69
+45b5cd0b
+User
+16:27:41 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 21:32:24.55
+45b5cd0b
+User
+16:32:24 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 500 Internal Server Error"
+2026-03-25 21:32:24.55
+45b5cd0b
+User
+16:32:24 | INFO | Retrying request to /chat/completions in 0.493266 seconds
+2026-03-25 21:32:24.55
+45b5cd0b
+User
+16:32:24 | INFO | Retrying request to /chat/completions in 0.493266 seconds
+2026-03-25 21:32:24.55
+45b5cd0b
+User
+16:32:24 | INFO | Retrying request to /chat/completions in 0.493266 seconds

@@ -466,9 +466,8 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
             content = chunk["content"]
             if "[STRUCTURED:" in content:
                 content = content[:content.index("[STRUCTURED:")]
-            cleaned = _clean_gantt_noise(content.strip())
-            if cleaned.strip():
-                context_parts.append(cleaned)
+            if content.strip():
+                context_parts.append(content.strip())
                 context_parts.append("")
         return "\n".join(context_parts)
 
