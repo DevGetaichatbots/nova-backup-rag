@@ -39,8 +39,22 @@ PROGRESS_STAGES = {
     "analyzing": {
         "step": 4,
         "total_steps": 6,
-        "en": "Nova is analyzing your schedule — checking every activity for delays...",
-        "da": "Nova analyserer din tidsplan — tjekker hver aktivitet for forsinkelser..."
+        "en": [
+            "Nova is analyzing your schedule — reading every single row...",
+            "Still working — checking each activity against the reference date...",
+            "Going through all activities — comparing start dates and progress...",
+            "Deep analysis in progress — making sure no activity is missed...",
+            "Cross-referencing all rows — identifying delayed activities across every area...",
+            "Almost done analyzing — verifying completeness of the delay list...",
+        ],
+        "da": [
+            "Nova analyserer din tidsplan — læser hver eneste række...",
+            "Arbejder stadig — tjekker hver aktivitet mod referencedatoen...",
+            "Gennemgår alle aktiviteter — sammenligner startdatoer og fremdrift...",
+            "Dybdeanalyse i gang — sikrer at ingen aktivitet overses...",
+            "Krydstjekker alle rækker — identificerer forsinkelser på tværs af alle områder...",
+            "Næsten færdig med analysen — verificerer fuldstændighed af forsinkelseslisten...",
+        ]
     },
     "formatting": {
         "step": 5,
@@ -67,17 +81,37 @@ def _update_progress(analysis_id: str, stage: str, language: str = "en", detail:
     if stage not in PROGRESS_STAGES:
         return
     stage_info = PROGRESS_STAGES[stage]
-    msg = stage_info.get(language, stage_info["en"])
-    with _progress_lock:
-        _predictive_progress[analysis_id] = {
-            "analysis_id": analysis_id,
-            "stage": stage,
-            "step": stage_info["step"],
-            "total_steps": stage_info["total_steps"],
-            "message": msg,
-            "detail": detail,
-            "timestamp": time.time()
-        }
+    msg_value = stage_info.get(language, stage_info["en"])
+    if isinstance(msg_value, list):
+        with _progress_lock:
+            prev = _predictive_progress.get(analysis_id)
+            prev_idx = prev.get("_msg_idx", -1) if prev and prev.get("stage") == stage else -1
+            next_idx = (prev_idx + 1) % len(msg_value)
+            msg = msg_value[next_idx]
+            _predictive_progress[analysis_id] = {
+                "analysis_id": analysis_id,
+                "stage": stage,
+                "step": stage_info["step"],
+                "total_steps": stage_info["total_steps"],
+                "message": msg,
+                "detail": detail,
+                "timestamp": time.time(),
+                "_msg_idx": next_idx,
+                "_language": language
+            }
+    else:
+        msg = msg_value
+        with _progress_lock:
+            _predictive_progress[analysis_id] = {
+                "analysis_id": analysis_id,
+                "stage": stage,
+                "step": stage_info["step"],
+                "total_steps": stage_info["total_steps"],
+                "message": msg,
+                "detail": detail,
+                "timestamp": time.time(),
+                "_language": language
+            }
 
 logging.basicConfig(
     level=logging.INFO,
@@ -616,7 +650,14 @@ async def get_predictive_progress(analysis_id: str):
             detail="No analysis found with this ID. It may have completed or expired."
         )
 
-    return progress
+    if progress.get("stage") == "analyzing":
+        lang = progress.get("_language", "en")
+        _update_progress(analysis_id, "analyzing", lang, progress.get("detail"))
+        with _progress_lock:
+            progress = _predictive_progress.get(analysis_id, progress)
+
+    resp = {k: v for k, v in progress.items() if not k.startswith("_")}
+    return resp
 
 
 if __name__ == "__main__":
