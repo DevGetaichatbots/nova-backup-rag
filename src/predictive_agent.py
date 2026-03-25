@@ -331,12 +331,14 @@ COMPLETE SCHEDULE DATA:
 {context}
 ═══════════════════════════════════════════════════════════
 
+DATA PRIORITY: The data above may contain both a STRUCTURED TABLE (markdown table) and INDIVIDUAL ROW DATA (one line per row with "ColumnHeader: value" format). If both exist, use the INDIVIDUAL ROW DATA as the PRIMARY source — it contains cleaner, more reliable values. Cross-reference with the markdown table only if needed. Ignore any Gantt chart noise (random abbreviations, bare dates, color labels).
+
 USER QUERY FOR CONTEXT: {user_query}
 
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-0. AUTO-DETECT FORMAT: Check if data has "Uge: X" week headers → UNSTRUCTURED format. If data has markdown tables → check column headers and map to semantic roles. Adapt all subsequent steps to the detected format.
+0. AUTO-DETECT FORMAT: Check if data has "Uge: X" week headers → UNSTRUCTURED format. If data has INDIVIDUAL ROW DATA lines (format "Row N (Page P): Header: value | Header: value | ...") → use these as primary source. If data has markdown tables → check column headers and map to semantic roles. Adapt all subsequent steps to the detected format.
 1. Parse ALL task entries:
    - STRUCTURED: extract values from every available column. Use correct task ID (Entydigt id for Detailtidsplan, Id for MS Project).
    - UNSTRUCTURED: each "Day-range: Description @person" line under an "Uge: X" header = one activity.

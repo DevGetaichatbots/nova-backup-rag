@@ -1,0 +1,148 @@
+2026-03-25 19:43:44.62
+d2ef17a1
+User
+[2026-03-25 14:43:44 +0000] [31] [INFO] Waiting for application startup.
+2026-03-25 19:43:44.62
+d2ef17a1
+User
+[2026-03-25 14:43:44 +0000] [31] [INFO] Started server process [31]
+2026-03-25 19:43:44.62
+d2ef17a1
+User
+[2026-03-25 14:43:44 +0000] [31] [INFO] Waiting for application startup.
+2026-03-25 19:43:44.62
+d2ef17a1
+User
+[2026-03-25 14:43:44 +0000] [31] [INFO] Started server process [31]
+2026-03-25 19:43:44.62
+d2ef17a1
+User
+[2026-03-25 14:43:44 +0000] [31] [INFO] Waiting for application startup.
+2026-03-25 19:43:47.44
+d2ef17a1
+User
+[2026-03-25 14:43:47 +0000] [31] [INFO] Application startup complete.
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | === PREDICTIVE REQUEST ===
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | Running OCR on PDF...
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | Schedule: 2026-03-12 Samlet tidsplan_1side.pdf | Language: en | Reference date: 12-03-2026
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | File read: 160504 bytes
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | Azure Document Intelligence initialized
+2026-03-25 19:43:47.51
+d2ef17a1
+User
+14:43:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Submitting PDF to Azure (160504 bytes)...
+2026-03-25 19:43:47.97
+d2ef17a1
+User
+14:43:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Operation started
+2026-03-25 19:43:48.24
+d2ef17a1
+User
+14:43:48 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 0.0s)
+2026-03-25 19:43:51.49
+d2ef17a1
+User
+14:43:51 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 3.3s)
+2026-03-25 19:43:54.77
+d2ef17a1
+User
+14:43:54 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 6.5s)
+2026-03-25 19:43:58.00
+d2ef17a1
+User
+14:43:58 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 9.8s)
+2026-03-25 19:44:01.67
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extraction complete!
+2026-03-25 19:44:01.67
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: succeeded (elapsed: 13.0s)
+2026-03-25 19:44:01.67
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 1 structured tables
+2026-03-25 19:44:01.67
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 21138 chars, 1 tables, 1 pages
+2026-03-25 19:44:01.68
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Large table 0 split into 1 chunks (was 136738 chars)
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Created 136 chunks (1 tables, 1 pages)
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | Context built: 32921 chars
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | OCR complete (14.3s): 136 chunks (1 tables)
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | Running Nova Insight predictive analysis...
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | Context built: 32921 chars
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | OCR complete (14.3s): 136 chunks (1 tables)
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 19:44:01.78
+d2ef17a1
+User
+14:44:01 | INFO | Running Nova Insight predictive analysis...
+2026-03-25 19:44:33.42
+d2ef17a1
+User
+14:44:33 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-25 19:44:33.42
+d2ef17a1
+User
+14:44:33 | INFO | [PredictiveAgent] Response received: 2247 chars, model: gpt-5.2-2025-12-11, tokens: prompt=21574, completion=1340
+2026-03-25 19:44:33.43
+d2ef17a1
+User
+14:44:33 | INFO | === PREDICTIVE COMPLETE (45.9s) ===
+2026-03-25 19:44:33.43
+d2ef17a1
+User
+14:44:33 | INFO | Predictive response: 16489 chars, status: success
+2026-03-25 19:44:33.43
+d2ef17a1
+User
+14:44:33 | INFO | === PREDICTIVE COMPLETE (45.9s) ===
+2026-03-25 19:44:33.43
+d2ef17a1
+User
+14:44:33 | INFO | Predictive response: 16489 chars, status: success
