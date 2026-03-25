@@ -348,41 +348,38 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
 
-    table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
     row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
+    table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
-    has_structured = bool(table_chunks) or bool(row_chunks)
-
-    if not has_structured and not text_chunks:
-        context_parts.append(f"\n[{doc_label}]\nNo content extracted.\n")
+    if row_chunks:
+        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities extracted (structured row data)")
+        context_parts.append("EVERY row below is one schedule activity. ALL columns are shown for each row (empty columns included).")
+        context_parts.append("Format: ColumnHeader: value | ColumnHeader: value | ...")
+        context_parts.append("You MUST analyze EVERY row below. Do not skip any.\n")
+        for chunk in row_chunks:
+            context_parts.append(chunk["content"])
+        context_parts.append("")
         return "\n".join(context_parts)
 
     if table_chunks:
-        context_parts.append(f"\n[{doc_label}] — STRUCTURED TABLE ({len(table_chunks)} chunks)")
+        context_parts.append(f"[{doc_label}] — TABLE DATA (no individual rows available, using markdown table)")
         for i, chunk in enumerate(table_chunks, 1):
             content = chunk["content"]
             if "[STRUCTURED:" in content:
                 content = content[:content.index("[STRUCTURED:")]
-            context_parts.append(f"--- Table {i} ---")
             context_parts.append(content.strip())
             context_parts.append("")
+        return "\n".join(context_parts)
 
-    if row_chunks:
-        context_parts.append(f"\n[{doc_label}] — INDIVIDUAL ROW DATA ({len(row_chunks)} rows)")
-        context_parts.append("Each line below shows ColumnHeader: value for one schedule row.")
-        context_parts.append("Use this data as the PRIMARY source for identifying activities.\n")
-        for chunk in row_chunks:
-            context_parts.append(chunk["content"])
-        context_parts.append("")
-
-    if not has_structured and text_chunks:
-        context_parts.append(f"\n[{doc_label}] — {len(text_chunks)} text chunks (fallback — no structured tables found)")
+    if text_chunks:
+        context_parts.append(f"[{doc_label}] — TEXT DATA (no structured tables found)")
         for i, chunk in enumerate(text_chunks, 1):
-            context_parts.append(f"--- Text {i} ---")
             context_parts.append(chunk["content"])
             context_parts.append("")
+        return "\n".join(context_parts)
 
+    context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
     return "\n".join(context_parts)
 
 
