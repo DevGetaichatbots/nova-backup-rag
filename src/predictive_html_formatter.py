@@ -380,7 +380,7 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
     sections = _split_sections(markdown)
 
     report_title = "Nova Insight — Forsinkede Aktiviteter" if language == "da" else "Nova Insight — Delayed Activities"
-    subtitle = "Forsinkelsesanalyse drevet af GPT-5.2" if language == "da" else "Delay analysis powered by GPT-5.2"
+    subtitle = "Forsinkelsesanalyse drevet af Nova Insight" if language == "da" else "Delay analysis powered by Nova Insight"
 
     html_parts = [f'''
 <style>
@@ -408,10 +408,7 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
         <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;letter-spacing:0.3px;">{subtitle}</p>
       </div>
     </div>
-    <div style="display:inline-flex;gap:6px;margin-top:6px;">
-      <span style="padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700;background:#f0fdfa;color:#0d9488;border:1px solid #99f6e4;letter-spacing:0.5px;">MODULE A</span>
-      <span style="padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700;background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd;letter-spacing:0.5px;">GPT-5.2</span>
-    </div>
+    
   </div>''']
 
     if insight_data:
