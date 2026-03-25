@@ -13,7 +13,7 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Separated Agents**: Comparison and Predictive agents are fully independent endpoints
 - **DB Connection Pooling**: ThreadedConnectionPool (2-8 connections), batch embedding conversion
 - **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
-- **LLM Settings**: temperature=0 (deterministic), reasoning_effort=medium, max_completion_tokens=32768
+- **LLM Settings**: temperature=1 (GPT-5.2 default, only supported value), reasoning_effort=medium, max_completion_tokens=32768
 - **Deployment**: Gunicorn with 1 worker (LLM-bound workload), 300s timeout
 
 ## Project Structure

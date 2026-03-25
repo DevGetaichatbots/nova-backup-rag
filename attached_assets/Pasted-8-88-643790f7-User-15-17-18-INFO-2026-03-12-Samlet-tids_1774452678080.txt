@@ -1,0 +1,102 @@
+8.88
+643790f7
+User
+15:17:18 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Submitting PDF to Azure (160504 bytes)...
+2026-03-25 20:17:19.41
+643790f7
+User
+15:17:19 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Operation started
+2026-03-25 20:17:19.65
+643790f7
+User
+15:17:19 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 0.0s)
+2026-03-25 20:17:22.91
+643790f7
+User
+15:17:22 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 3.2s)
+2026-03-25 20:17:26.16
+643790f7
+User
+15:17:26 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 6.5s)
+2026-03-25 20:17:29.83
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: succeeded (elapsed: 9.8s)
+2026-03-25 20:17:29.83
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extraction complete!
+2026-03-25 20:17:29.83
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 1 structured tables
+2026-03-25 20:17:29.83
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 21137 chars, 1 tables, 1 pages
+2026-03-25 20:17:29.83
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Large table 0 split into 1 chunks (was 136725 chars)
+2026-03-25 20:17:29.97
+643790f7
+User
+15:17:29 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Created 136 chunks (1 tables, 1 pages)
+2026-03-25 20:17:29.97
+643790f7
+User
+15:17:29 | INFO | OCR complete (11.1s): 136 chunks (1 tables)
+2026-03-25 20:17:29.97
+643790f7
+User
+15:17:29 | INFO | Running Nova Insight predictive analysis...
+2026-03-25 20:17:29.97
+643790f7
+User
+15:17:29 | INFO | Context built: 18359 chars
+2026-03-25 20:17:29.97
+643790f7
+User
+15:17:29 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2...
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 400 Bad Request"
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | === PREDICTIVE COMPLETE [sa_2338e7ee969b957d] (13.5s) ===
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | ERROR | [PredictiveAgent] Error: Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | Predictive response: 0 chars, status: error
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | Predictive response: 0 chars, status: error
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | ERROR | [PredictiveAgent] Error: Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | === PREDICTIVE COMPLETE [sa_2338e7ee969b957d] (13.5s) ===
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | Predictive response: 0 chars, status: error
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | ERROR | [PredictiveAgent] Error: Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+2026-03-25 20:17:32.40
+643790f7
+User
+15:17:32 | INFO | === PREDICTIVE COMPLETE [sa_2338e7ee969b957d] (13.5s) ===
+Wrap
+Colors
