@@ -376,17 +376,20 @@ COMPLETE SCHEDULE DATA:
 {context}
 ═══════════════════════════════════════════════════════════
 
-DATA FORMAT: The data above contains ONE LINE PER ACTIVITY. Each line follows the format:
-Row N (Page P): ColumnHeader1: value1 | ColumnHeader2: value2 | ...
-ALL columns are shown for every row (including empty ones). You MUST parse EVERY row and extract the values by column header name. Map column headers to semantic roles (Id/Entydigt id → task identifier, Opgavenavn → task name, Startdato → start date, Slutdato → end date, Varighed → duration, % arbejde færdigt/% færdigt → progress, etc.). Do NOT skip any rows. Do NOT claim data is corrupted — every row is structured and readable.
+DATA FORMAT: The data above contains the COMPLETE schedule from ALL pages of the PDF. It is organized in sections:
+- SECTION 1 (STRUCTURED TABLE DATA): Full markdown table with headers and all rows — use this to SEE the complete schedule at a glance
+- SECTION 2 (INDIVIDUAL ROW DATA): One line per activity in format "Row N (Page P): Header: value | Header: value | ..." — use this to parse each activity's exact column values
+- SECTION 3 (PAGE TEXT DATA): Additional text content from PDF pages
+
+You MUST cross-reference Section 1 and Section 2 to ensure you process EVERY activity. Map column headers to semantic roles (Id/Entydigt id → task identifier, Opgavenavn → task name, Startdato → start date, Slutdato → end date, Varighed → duration, % arbejde færdigt/% færdigt → progress, etc.). Do NOT skip any rows. Do NOT claim data is corrupted or incomplete — ALL pages of the PDF are included above.
 
 USER QUERY FOR CONTEXT: {user_query}
 
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-0. AUTO-DETECT FORMAT: The data will typically be in ROW DATA format: "Row N (Page P): Header: value | Header: value | ...". Parse each line to extract all column values. If data has "Uge: X" week headers → UNSTRUCTURED format. If data is a markdown table → parse column headers. Adapt all subsequent steps to the detected format.
-1. Parse ALL rows — EVERY "Row N" line is one activity:
+0. AUTO-DETECT FORMAT: The data includes MULTIPLE sections. Read SECTION 1 (table markdown) to understand the schedule structure and column headers. Use SECTION 2 (row data) to parse each activity individually. If data has "Uge: X" week headers → UNSTRUCTURED format. Adapt all subsequent steps to the detected format.
+1. Parse ALL rows — EVERY "Row N" line in SECTION 2 is one activity (cross-reference with SECTION 1 table):
    - Extract EVERY column value by its header name
    - Map headers to roles: Id/Entydigt id → task ID, Opgavenavn → name, Startdato → start, Slutdato → end, Varighed → duration, % arbejde færdigt/% færdigt → progress, Foregående opgaver → predecessors, Efterfølgende opgaver → successors
    - Use "Entydigt id" as unique identifier if present (Detailtidsplan), otherwise "Id" (MS Project)
