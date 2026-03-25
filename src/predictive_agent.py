@@ -376,20 +376,15 @@ COMPLETE SCHEDULE DATA:
 {context}
 ═══════════════════════════════════════════════════════════
 
-DATA FORMAT: The data above contains the COMPLETE schedule from ALL pages of the PDF. It is organized in sections:
-- SECTION 1 (STRUCTURED TABLE DATA): Full markdown table with headers and all rows — use this to SEE the complete schedule at a glance
-- SECTION 2 (INDIVIDUAL ROW DATA): One line per activity in format "Row N (Page P): Header: value | Header: value | ..." — use this to parse each activity's exact column values
-- SECTION 3 (PAGE TEXT DATA): Additional text content from PDF pages
-
-You MUST cross-reference Section 1 and Section 2 to ensure you process EVERY activity. Map column headers to semantic roles (Id/Entydigt id → task identifier, Opgavenavn → task name, Startdato → start date, Slutdato → end date, Varighed → duration, % arbejde færdigt/% færdigt → progress, etc.). Do NOT skip any rows. Do NOT claim data is corrupted or incomplete — ALL pages of the PDF are included above.
+DATA FORMAT: The data above contains the COMPLETE structured table data from ALL pages of the PDF. It is a markdown table with headers and all rows. Map column headers to semantic roles (Id/Entydigt id → task identifier, Opgavenavn → task name, Startdato → start date, Slutdato → end date, Varighed → duration, % arbejde færdigt/% færdigt → progress, etc.). You MUST process EVERY row in the table. Do NOT skip any rows. Do NOT claim data is corrupted or incomplete — ALL pages of the PDF are included above.
 
 USER QUERY FOR CONTEXT: {user_query}
 
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-0. AUTO-DETECT FORMAT: The data includes MULTIPLE sections. Read SECTION 1 (table markdown) to understand the schedule structure and column headers. Use SECTION 2 (row data) to parse each activity individually. If data has "Uge: X" week headers → UNSTRUCTURED format. Adapt all subsequent steps to the detected format.
-1. Parse ALL rows — EVERY "Row N" line in SECTION 2 is one activity (cross-reference with SECTION 1 table):
+0. AUTO-DETECT FORMAT: The data is a structured markdown table with headers and rows. Parse the column headers from the first row. If data has "Uge: X" week headers → UNSTRUCTURED format. Adapt all subsequent steps to the detected format.
+1. Parse ALL rows — EVERY row in the table is one activity:
    - Extract EVERY column value by its header name
    - Map headers to roles: Id/Entydigt id → task ID, Opgavenavn → name, Startdato → start, Slutdato → end, Varighed → duration, % arbejde færdigt/% færdigt → progress, Foregående opgaver → predecessors, Efterfølgende opgaver → successors
    - Use "Entydigt id" as unique identifier if present (Detailtidsplan), otherwise "Id" (MS Project)
@@ -429,7 +424,7 @@ EXECUTION STEPS:
             }
 
             try:
-                api_params["reasoning_effort"] = "high"
+                api_params["reasoning_effort"] = "medium"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
