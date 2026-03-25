@@ -6,6 +6,8 @@ import asyncio
 import logging
 import time
 import uuid
+import re
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 _query_executor = ThreadPoolExecutor(max_workers=4)
@@ -276,6 +278,72 @@ async def query_agent(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _extract_reference_date(filename: str) -> Optional[str]:
+    name = filename.replace(".pdf", "").replace(".PDF", "").strip()
+
+    m = re.search(r"(\d{4})-(\d{2})-(\d{2})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    m = re.search(r"(\d{2})-(\d{2})-(\d{4})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            try:
+                dt = datetime(int(m.group(3)), int(m.group(1)), int(m.group(2)))
+                return dt.strftime("%d-%m-%Y")
+            except ValueError:
+                pass
+
+    m = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    m = re.search(r"(\d{4})\.(\d{2})\.(\d{2})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    m = re.search(r"(\d{2})_(\d{2})_(\d{4})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    m = re.search(r"(\d{4})_(\d{2})_(\d{2})", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    m = re.search(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)", name)
+    if m:
+        try:
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return dt.strftime("%d-%m-%Y")
+        except ValueError:
+            pass
+
+    return None
+
+
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
@@ -315,8 +383,10 @@ async def predictive_analysis(
     filename = schedule.filename or "schedule.pdf"
     filename_clean = filename.replace(".pdf", "").replace(".PDF", "")
 
+    reference_date = _extract_reference_date(filename)
+
     logger.info(f"=== PREDICTIVE REQUEST ===")
-    logger.info(f"Schedule: {filename} | Language: {language}")
+    logger.info(f"Schedule: {filename} | Language: {language} | Reference date: {reference_date or 'not found in filename'}")
 
     if not filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
@@ -345,9 +415,10 @@ async def predictive_analysis(
             _query_executor,
             lambda: predictive_agent.analyze(
                 context=context,
-                user_query="Perform complete predictive schedule analysis",
+                user_query="Identify all delayed activities in this schedule",
                 language=language,
-                schedule_filename=filename_clean
+                schedule_filename=filename_clean,
+                reference_date=reference_date
             )
         )
 
@@ -367,6 +438,7 @@ async def predictive_analysis(
             "predictive_status": predictive_status,
             "predictive_model": predictive_model,
             "filename": filename,
+            "reference_date": reference_date,
             "format": format,
             "processing_time_seconds": round(elapsed, 1)
         }

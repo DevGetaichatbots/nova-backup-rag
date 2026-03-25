@@ -26,10 +26,10 @@ src/
 ├── pdf_processor.py     # PDF processing with Azure Document Intelligence OCR
 ├── vector_store.py      # Vector store management
 ├── agent.py             # RAG comparison agent with dual vector store querying (GPT-5.2)
-├── predictive_agent.py  # Nova Insight predictive risk agent (GPT-5.2)
+├── predictive_agent.py  # Nova Insight predictive agent — currently Module A only (delayed activities)
 ├── html_formatter.py    # Section-grouped HTML converter for comparison responses (separate card per category)
-├── predictive_html_formatter.py  # Dark analytics dashboard HTML for Nova Insight reports
-└── main.py              # FastAPI application with separated agent endpoints
+├── predictive_html_formatter.py  # Dark analytics dashboard HTML for Nova Insight delayed activities report
+└── main.py              # FastAPI application with separated agent endpoints + reference date extraction
 ```
 
 ## API Endpoints
@@ -72,22 +72,31 @@ curl -X POST "https://your-domain/query" \
 
 Response fields: `response`, `sources`, `context_chunks`, `format`
 
-### POST /predictive - Nova Insight predictive analysis (standalone, accepts single PDF)
+### POST /predictive - Nova Insight delayed activities analysis (standalone, accepts single PDF)
 ```bash
 curl -X POST "https://your-domain/predictive" \
-  -F "schedule=@schedule.pdf" \
+  -F "schedule=@2026-03-12Samlettidsplan.pdf" \
   -F "language=da" \
   -F "format=html"
 ```
 | Field | Description |
 |-------|-------------|
-| schedule | The PDF schedule file to analyze |
+| schedule | The PDF schedule file to analyze (filename should start with reference date) |
 | language | "da" (Danish) or "en" (English) |
 | format | "markdown" or "html" (default: "html") |
 
-Response fields: `predictive_insights` (HTML), `predictive_status`, `predictive_model`, `filename`, `format`, `processing_time_seconds`
+Response fields: `predictive_insights` (HTML), `predictive_status`, `predictive_model`, `filename`, `reference_date`, `format`, `processing_time_seconds`
 
-Flow: PDF upload → Azure OCR → build context from table/text chunks → GPT-5.2 predictive analysis → HTML formatting → single response. No vector store or embeddings needed.
+Flow: PDF upload → extract reference date from filename → Azure OCR → build context from table/text chunks → GPT-5.2 Module A analysis → HTML formatting → single response. No vector store or embeddings needed.
+
+### Reference Date Extraction from Filename
+The reference date is automatically extracted from the uploaded PDF filename. Supported formats:
+- `2026-03-12Samlettidsplan.pdf` → 12-03-2026
+- `12-03-2026_schedule.pdf` → 12-03-2026
+- `2026.03.12_plan.pdf` → 12-03-2026
+- `20260312plan.pdf` → 12-03-2026
+- `2026_03_12test.pdf` → 12-03-2026
+If no date found in filename, the agent uses the date from the schedule data header or today's date.
 
 ### GET /health - Health check
 
@@ -100,14 +109,15 @@ Flow: PDF upload → Azure OCR → build context from table/text chunks → GPT-
 6. User queries via `/query` with vector store table references
 7. Agent retrieves from both stores and provides comparison analysis
 
-## Predictive Agent Flow (Standalone)
-1. User uploads a single PDF schedule to `/predictive`
-2. PDF is OCR'd using Azure Document Intelligence
-3. Table chunks are extracted (falls back to text chunks if no tables found)
-4. Context is assembled in the format the predictive LLM expects
-5. GPT-5.2 runs all 7 detection modules + delay engine
-6. Response is formatted as dark analytics dashboard HTML
-7. Complete results returned in a single response (~30-90s)
+## Predictive Agent Flow (Standalone — Currently Module A Only)
+1. User uploads a single PDF schedule to `/predictive` (filename contains reference date)
+2. Reference date extracted from filename (e.g., "2026-03-12..." → March 12, 2026)
+3. PDF is OCR'd using Azure Document Intelligence
+4. Table chunks are extracted (falls back to text chunks if no tables found)
+5. Context is assembled in the format the predictive LLM expects
+6. GPT-5.2 runs Module A: Delayed Activities Identification
+7. Response is formatted as dark analytics dashboard HTML with delayed activities table
+8. Complete results returned in a single response (~30-90s)
 
 ## Table Extraction (Construction Schedules)
 - Uses Azure Document Intelligence structured table output (analyzeResult.tables)
@@ -116,18 +126,23 @@ Flow: PDF upload → Azure OCR → build context from table/text chunks → GPT-
 - Row chunks include: page_number, cells_data with coordinates
 - Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
 
-### Nova Insight Modules (GPT-5.2, CTCO-optimized prompt)
-- **Module A**: Overdue activities (Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0)
-- **Module B**: Unrealistic progress reporting (deviation > 25%, over/under-reported sub-types)
-- **Module C**: Dependency chain risk — uses REAL dependency graph from Foregående/Efterfølgende opgaver columns (semicolon-separated task IDs), chains > 4 tasks
-- **Module D**: Decision bottlenecks (Varighed = 0d + Danish/English decision keywords + BH client tasks + has successors)
-- **Module E**: Artificial scheduling clusters (5+ tasks same Startdato per Omr./area, distinguishes coordination milestones from work clusters)
-- **Module F**: Long duration risks (Varighed > 90 days elevated, > 120 days critical, excludes summary rows)
-- **Module G**: Discipline progress dashboard (grouped by E100.XX prefix + responsible party annotations, health scoring)
-- **Schedule Health Overview**: Quick-glance summary of all findings
-- **Complexity Score**: Low/Medium/High/Very High (activities + areas + disciplines + chain depth + dependency links)
-- **Predictive Delay Engine**: weighted risk score, risk %, delay window, primary risk source
-- **Prompt optimizations**: CTCO framework, few-shot examples from real data, reasoning_effort=low, temperature=1, 32K output tokens
+### Nova Insight — Current Active Module
+- **Module A (ACTIVE)**: Delayed Activities Identification
+  - Criteria: `Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0`
+  - Reference date: extracted from uploaded PDF filename
+  - Output: sorted table (most overdue first) with ID, Activity Name, Start Date, End Date, Duration, Progress, Days Overdue
+  - Summary: count by area/discipline, top 5 critical delays, professional assessment
+  - HTML: dark dashboard with animated hero stats (delayed count, reference date, progress bar), styled table with severity-colored overdue indicators
+
+### Commented Out Modules (Future Iterations)
+- Module B: Unrealistic progress reporting
+- Module C: Dependency chain risk analysis
+- Module D: Decision bottlenecks
+- Module E: Artificial scheduling clusters
+- Module F: Long duration risks
+- Module G: Discipline progress dashboard
+- Schedule Complexity Score
+- Predictive Delay Engine (weighted risk score, gauge/bar/donut charts)
 
 ### Schedule Format Support (Adaptive)
 - **MS Project Export**: `Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver` — match by Id, explicit dependencies

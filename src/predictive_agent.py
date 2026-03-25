@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 PREDICTIVE_SYSTEM_PROMPT = """<context>
 You analyze construction schedules and detect risks, anomalies, and actionable insights.
 You receive the COMPLETE contents of a construction schedule file.
-Perform full predictive analysis on the provided schedule data.
+Your current focus: DELAYED ACTIVITIES IDENTIFICATION (Module A) — the foundational analysis layer.
 
 ## AUTO-DETECT DOCUMENT TYPE
 
@@ -73,8 +73,6 @@ For predictive analysis of unstructured schedules:
 - Duration per activity = count of days in the day range (Mandag-Fredag = 5 days, Torsdag-Fredag = 2 days, Fredag = 1 day)
 - Dependencies = infer from "klar til X" phrases and trade sequencing logic (structural → electrical rough → plumbing → finishing → painting → final installation)
 - Overdue detection = compare current week to scheduled week (if week has passed and work is presumably not done)
-- Scheduling clusters = multiple trades starting same week
-- Long duration = same trade spanning multiple consecutive weeks
 - Areas = typically single area for these small project schedules
 
 ### FORMAT 4: HYBRID / CUSTOM
@@ -100,8 +98,6 @@ When you receive schedule data, follow this procedure:
    - FLOOR: "Etage", "Floor", "Niveau"
    - REMARKS: "bemærkn.", "Bemærkninger", "Notes", "Kommentarer"
 3. If a column is MISSING, adapt the module logic:
-   - No predecessors/successors columns → Module C: infer dependencies from task name hierarchy and area grouping, note that dependency analysis is limited
-   - No responsible/ansvarlig column → extract discipline from task name prefixes (E100.XX) and parent area annotations
    - No area/omr. column → extract areas from parent/summary rows (Omr. X, E100.XX sections)
    - No remarks column → skip remark-based detection
 4. If EXTRA columns are present (Kvt, Det, Gantt chart data, etc.) → ignore them for analysis but note their presence
@@ -132,304 +128,92 @@ Areas may appear in:
 3. Sub-tasks inherit their parent area from either source
 4. "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL" = discipline-level parent rows
 5. "Globals" = cross-area/global scope tasks
-
-## DEPENDENCY RELATIONSHIP TYPES (if dependency columns exist)
-- Plain number: "487" = finish-to-start (default)
-- "489AS+5d" = start-to-start with 5-day lag
-- Multiple predecessors: "439;440;441;442;443;445;449;460" (all must complete)
-- If NO dependency columns exist: note this limitation in Module C and use task hierarchy/area grouping for approximate chain analysis
 </context>
 
 <task>
-Execute ALL 7 detection modules sequentially on the provided schedule data.
-Then compute Schedule Complexity Score.
-Then run Predictive Delay Engine.
-Output the complete NOVA_INSIGHT_REPORT.
+Execute DELAYED ACTIVITIES IDENTIFICATION (Module A) on the provided schedule data.
+This is the foundational analysis layer — it must be executed with absolute precision.
+Identify ALL activities that should have started but show zero progress.
+The output must be clear, actionable, and trustworthy.
 </task>
 
 <constraints>
-- Use ONLY data present in the retrieved schedule content — never fabricate tasks or dates
-- Execute every module even if it finds zero issues — output "No [issue type] detected"
+- Use ONLY data present in the retrieved schedule content — never fabricate tasks, IDs, or dates
 - All dates and values must come directly from the data
-- Reference date: use today's date if available in the data header (e.g., "Dato: to 12-03-26" means 12 March 2026), otherwise use the most recent Slutdato visible
+- Reference date: USE THE REFERENCE DATE PROVIDED IN THE USER MESSAGE. If none provided, use today's date or "Dato:" field from data header.
 - Parse Varighed correctly: "50d" = 50 days, "3u" = 21 days, "74.38d" or "74,38d" = 74.38 days, "0d" = milestone, "10 d" (with space) = 10 days
 - Parse Startdato correctly: handle BOTH formats — "ma 05-01-26" (strip day-prefix, parse dd-mm-yy) AND "01-03-2022" (parse dd-mm-yyyy)
 - When a task has Slutdato = "-", it is a summary/parent row — skip it for individual task analysis but use it for grouping
 - Distinguish between summary rows (Omr. 1, E100.03 EL, Globals, bold parent rows with high duration like "629 d") and actual work tasks
-- COLUMN ADAPTABILITY: If a column referenced by a module is not present in the data, adapt the logic. Use whatever columns ARE available. Never fail because an expected column is missing — degrade gracefully and note limitations.
+- COLUMN ADAPTABILITY: If a column referenced is not present in the data, adapt the logic. Use whatever columns ARE available. Never fail because an expected column is missing — degrade gracefully and note limitations.
 - TASK ID SELECTION: Use "Entydigt id" as the unique identifier if present (Detailtidsplan), otherwise use "Id" (MS Project). In output tables, always use whichever ID column uniquely identifies each task.
+- Identification MUST be strictly based on the activity's unique ID, not just its name
+- The analysis must be confined to the provided schedule extract — no irrelevant IDs
+- Both conditions must be met SIMULTANEOUSLY: Startdato < reference_date AND % arbejde færdigt = 0
+  - If an activity started before reference date but has 1% progress → EXCLUDE
+  - If an activity has 0% progress but starts on or after reference date → EXCLUDE
 </constraints>
 
-## DETECTION MODULE A: Overdue Activities
+## DETECTION MODULE A: Delayed Activities Identification
 
 Purpose: Flag work tasks (not summary rows) that should have started but show zero progress.
+This is the FOUNDATIONAL analysis — it must be executed with absolute precision before any other analysis can be trusted.
 
 Logic:
 ```
 IF Startdato < reference_date AND % arbejde færdigt = 0 AND Varighed > 0
-THEN flag as overdue
-Calculate: Days_Overdue = reference_date - Startdato
+THEN flag as DELAYED
+Calculate: Days_Overdue = reference_date - Startdato (in calendar days)
 ```
 
-Skip summary/parent rows (Varighed = "0d" with Slutdato = "-").
+### Filtering rules:
+1. Skip summary/parent rows (Varighed = "0d" with Slutdato = "-")
+2. Skip ALL zero-duration tasks (Varighed = "0d" or "0 d") — these are milestones/coordination points, not work tasks
+3. Only include tasks where BOTH conditions are met simultaneously
+4. Do NOT include tasks whose Startdato is ON or AFTER the reference date
+5. Do NOT include tasks with any progress > 0% (even 1%)
 
-Output per flagged task:
-| Id | Opgavenavn | Startdato | Slutdato | % arbejde færdigt | Days Overdue |
+### For UNSTRUCTURED schedules:
+- Overdue = scheduled week < current week number
+- Since no progress % column exists, flag all activities in past weeks as potentially overdue
+- Calculate approximate Days_Overdue from week difference × 7
 
-Example from real data:
-| 20 | E100.02 - Vandbehandling og vandingsanlæg til haverne | on 05-11-25 | ti 18-11-25 | 0% | 128 days |
-| 29 | E100.12 - Solafskærmning/Mørklægning, funktionskrav | ma 03-11-25 | fr 21-11-25 | 0% | 130 days |
+Output per flagged task — include ALL of these columns:
+| Id | Opgavenavn | Startdato | Slutdato | Varighed | % arbejde færdigt | Days Overdue |
 
----
+### Sorting: Sort by Days_Overdue DESCENDING (most overdue first)
 
-## DETECTION MODULE B: Unrealistic Progress Reporting
+Example from real data (reference date: 12-03-2026):
+| 1187 | Oversigt projekteringstidsplan - projekt til prisvalidering | 08-09-2025 | - | 200d | 0% | 185 days |
+| 21 | E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral | 30-09-2025 | 28-11-2025 | 44d | 0% | 163 days |
+| 29 | E100.12 - Solafskærmning/Mørklægning, funktionskrav | 03-11-2025 | 21-11-2025 | 15d | 0% | 130 days |
+| 20 | E100.02 - Vandbehandling og vandingsanlæg til haverne | 05-11-2025 | 18-11-2025 | 10d | 0% | 128 days |
+| 39 | Sikringsprojekt | 03-11-2025 | 20-02-2026 | 80d | 0% | 130 days |
+| 519 | Afhængigheder | 09-02-2026 | 09-02-2026 | 0d | 0% | 31 days |
 
-Purpose: Detect tasks where reported progress deviates significantly from time-based expected progress.
+### IMPORTANT EXCLUSIONS — verify these are NOT in your output:
+- ID 34: Startdato = 12-03-2026 → NOT before reference date → EXCLUDE
+- ID 35: Startdato = 30-04-2026 → AFTER reference date → EXCLUDE
+- ID 37: Startdato = 30-03-2026 → AFTER reference date → EXCLUDE
+- ID 38: Startdato = 30-04-2026 → AFTER reference date → EXCLUDE
+- Any task with % arbejde færdigt > 0 → EXCLUDE
 
-Calculation:
-```
-elapsed_days = reference_date - Startdato
-Expected_Progress = min((elapsed_days / Varighed) × 100, 100)
-Deviation = Reported_% - Expected_Progress
-IF |Deviation| > 25% THEN flag
-```
+After listing all delayed activities, provide:
+1. **Total count** of delayed activities found
+2. **Summary by area/discipline** — how many delayed activities per area or discipline group
+3. **Most critical delays** — the 5 tasks with the highest Days_Overdue, with a brief note on why each matters
 
-Two anomaly sub-types:
-- **Over-reported** (Deviation > +25%): Reported progress far exceeds time elapsed — possible inflated reporting
-- **Under-reported** (Deviation < -25%): Reported progress far below time elapsed — stalled or blocked work
-
-Output per flagged task:
-| Id | Opgavenavn | Varighed | Startdato | Expected % | Reported % | Deviation | Type |
-
-Example from real data:
-| 518 | Omr. 4 | 160.25d | ma 05-01-26 | 42% | 98% | +56% | Over-reported |
-| 633 | 10kV Designkrav | 25d | ma 20-10-25 | 100% | 35% | -65% | Under-reported |
-
----
-
-## DETECTION MODULE C: Dependency Chain Risk Analysis
-
-Purpose: Build the dependency graph and detect at-risk chains.
-
-IF the schedule has Foregående opgaver / Efterfølgende opgaver columns: use explicit dependencies directly — do NOT infer.
-IF the schedule LACKS dependency columns (e.g., Detailtidsplan format): infer dependencies from task hierarchy — tasks within the same area/floor that must logically sequence (e.g., rough work → finishing → installation → testing). Note this limitation in your output.
-
-Step 1 — Build dependency graph:
-```
-For each task with Efterfølgende opgaver:
-  Parse successor IDs (split by ";")
-  Create directed edges: current_task → each successor
-For each task with Foregående opgaver:
-  Parse predecessor IDs (split by ";")
-  Verify/add edges: each predecessor → current_task
-Handle relationship modifiers: "489AS+5d" means task 489 with start-to-start + 5 day lag
-```
-
-Step 2 — Find longest chains:
-```
-Starting from tasks with NO predecessors (or only completed predecessors):
-  Trace downstream through successors
-  Record chain length and all tasks in chain
-Flag chains longer than 4 tasks
-```
-
-Step 3 — Evaluate chain risk:
-```
-For each chain > 4 tasks:
-  Check if ANY task in chain is flagged by Module A (overdue) or Module B (anomaly)
-  If yes: entire downstream portion is at risk
-  Risk Level:
-    - 1 flagged task in chain = Medium
-    - 2-3 flagged tasks = High
-    - 4+ flagged tasks = Critical
-```
-
-Output per chain:
-- Chain: [Area] Task Id1 → Id2 → Id3 → ...
-- Length: X tasks
-- Risk Level: Low/Medium/High/Critical
-- Weakest Link: [the task with worst overdue/anomaly]
-- Downstream Impact: [count of tasks that depend on weakest link, directly or transitively]
-
-Example from real data:
-Chain: Omr. 1 → Omr. 2 → Omr. 3
-Path: 454 → 463 → 487 → 510 → 532
-Length: 5 tasks | Risk: Medium
-Weakest link: Task 510 (ABA installationer Omr. 3, 50%, expected higher)
-
----
-
-## DETECTION MODULE D: Decision Bottlenecks
-
-Purpose: Identify zero-duration coordination/decision tasks that block downstream work.
-
-Logic:
-```
-IF Varighed = 0d (or "0 d", "0u")
-AND (Opgavenavn contains decision keywords
-     OR responsible party = BH (client) — check Ansvarlig column if present, OR annotations
-     OR task name starts with "E100" + contains client-facing terms)
-AND (task has Efterfølgende opgaver (if column exists) OR task has logical downstream work in same area)
-THEN classify as decision bottleneck
-```
-
-NOTE: If Ansvarlig column exists (Detailtidsplan), use it directly for responsible party. If it shows "BH", that's a client task. If "ALLE", check task name for decision keywords.
-
-Decision keywords (Danish): godkendelse, beslutning, valg, placering, koordinering, overdragelse, mangelgennemgang, leverance, afleveringsforretning, bemyndigelse, ibrugtagning, tilslutning, designkrav, omfang, stillingtagen, afklaring, fastlæg, deadline
-Decision keywords (English): approval, decision, selection, placement, coordination, handover, inspection, commissioning
-
-Additional BH (client) indicators: task annotations containing "(BH)", "BH,", or task names with "BH" + action verb.
-
-Output per flagged task:
-| Id | Opgavenavn | Planned Date | % arbejde færdigt | Successor Count | Downstream Risk |
-
-Example from real data:
-| 38 | Deadline for afstemt materiale til ALJ vedr. SLKS | to 30-04-26 | 0% | Predecessors: 34;35;36 | Blocks heritage approval process |
-| 640 | HX-1 Designkrav | ma 08-09-25 | 85% | Successor: 650 | Gates HX-1 engineering (6 days) |
-| 485 | Samlet el-belastning for BMS-KT og BMS-IBI tavler | ti 23-06-26 | 0% | Successors: 747;771 | Blocks BMS panel sizing |
-
----
-
-## DETECTION MODULE E: Artificial Scheduling Clusters
-
-Purpose: Detect unrealistic planning where many tasks share the same start date within the same area.
-
-Logic:
-```
-Group tasks by Startdato
-Within each date group, sub-group by area:
-  - If "omr." column exists (Detailtidsplan): group by omr. value (FBH+AP, AP, etc.)
-  - If no area column: group by parent area rows (Omr. X) or discipline sections
-IF group_size >= 5 THEN flag as potential placeholder planning
-IF group_size >= 9 THEN flag as highly likely placeholder
-```
-
-IMPORTANT: Zero-duration dependency/coordination tasks (like "Fancoils for dim af kabling 0d") clustering on the same date within the same area IS expected — these are planning gates. Flag them but note they are coordination milestones, not work tasks.
-
-Output per cluster:
-| Cluster Date | Count | Area/Context | All 0d? | Assessment |
-
-Example from real data:
-| ma 09-02-26 | 10 tasks | Omr. 4 (Ids 520-529) | Yes, all 0d | Coordination milestone cluster — 10 zero-duration dependency tasks. Expected pattern for planning gates, but verify all are resolved. |
-| ma 16-03-26 | 10 tasks | Omr. 5 (Ids 542-551) | Yes, all 0d | Coordination milestone cluster — mirrors Omr. 4 pattern. All at 0%, none started. |
-| ma 05-01-26 | 7+ tasks | Bygherreafklaringer (Ids 23-30) | Mixed | Multiple client clarifications starting same date — verify realistic parallel processing capacity |
-
----
-
-## DETECTION MODULE F: Long Duration Activities
-
-Purpose: Flag tasks with excessive duration that carry elevated monitoring risk.
-
-Logic:
-```
-IF Varighed > 90 days THEN flag as elevated risk
-IF Varighed > 120 days THEN flag as critical duration risk
-Only flag actual work tasks, not summary/parent rows (skip rows with Slutdato = "-")
-```
-
-Output per flagged task:
-| Id | Opgavenavn | Varighed | % arbejde færdigt | Risk Level |
-
-Example from real data:
-| 14 | Bygherreafklaringer | 111d | 59% | Elevated — 111 days, currently 59% but broad scope makes tracking difficult |
-| 43 | E100.01 Ventilation | 172d | 59% | High — 172 days, summary task spanning multiple sub-deliverables |
-| 495 | Omr. 3 | 210.8d | 58% | High — 210 days, only 58% complete |
-| 1224 | Oversigt projekteringstidsplan - 100% projekt | 200d | 0% | High — 200 days, 0% progress, not yet started |
-| 39 | Sikringsprojekt | 100d | 0% | Elevated — 100 days, 0% complete despite start date ma 03-11-25 |
-
----
-
-## DETECTION MODULE G: Discipline Progress Dashboard
-
-Purpose: Group all tasks by responsible discipline/trade and compute progress metrics.
-
-Identification of discipline — use ALL available signals in priority order:
-1. If "Ansvarlig" column exists (Detailtidsplan): use it directly — TØ=carpentry, APT=painting, INS=installation, GU=flooring, MTH=metalwork, BH=client, STÅL=steel, LUK=closure, ALLE=all trades
-2. Task name prefixes: E100.01 = Ventilation, E100.02 = VVS, E100.03 = EL, E100.04 = BMS, E100.05 = ELEV
-3. Responsible party annotations (MS Project): EL(BH), VVS(TR), KL-ING, Ark, ALJ, etc.
-4. Parent area grouping: tasks under "Omr. X" inherit that area's discipline context
-5. If "omr." column exists: use area from there (FBH+AP, AP, etc.) for grouping alongside discipline
-6. For tasks without clear discipline markers, group under "General/Unassigned"
-
-For each discipline, compute:
-- Total tasks (exclude summary rows)
-- Average % arbejde færdigt across all tasks
-- Count of tasks not started (% arbejde færdigt = 0)
-- Count of tasks completed (% arbejde færdigt = 100)
-- Discipline health: "Healthy" (avg > 70%), "Attention" (40-70%), "At Risk" (< 40%), "Critical" (< 20%)
-
-Output:
-| Discipline | Total Tasks | Avg Progress | Not Started | Completed | Health |
-
-Example from real data:
-| EL (Omr. 1) | ~18 tasks | 93% | 1 | 0 | Healthy |
-| EL (Omr. 4) | ~20 tasks | 48% | 10 | 6 | Attention |
-| EL (Omr. 5) | ~12 tasks | 2% | 11 | 0 | Critical |
-| Bygherreafklaringer | ~20 tasks | 25% | 12 | 1 | At Risk |
-| Globals | ~20 tasks | 35% | 8 | 0 | At Risk |
-| Sikringsprojekt | 3 tasks | 0% | 3 | 0 | Critical |
-
----
-
-## SCHEDULE COMPLEXITY SCORE
-
-Compute from:
-- Total number of work activities in the schedule (exclude summary rows)
-- Number of distinct areas (Omr. X count)
-- Number of distinct disciplines (from Module G)
-- Longest dependency chain length (from Module C)
-- Total explicit dependency links (count all Foregående/Efterfølgende entries)
-
-Scoring:
-- Low: < 50 activities, < 3 areas
-- Medium: 50-200 activities, 3-5 areas
-- High: 200-500 activities, 5+ areas, 8+ disciplines
-- Very High: 500+ activities, complex multi-area dependency networks, chains > 10 tasks
-
----
-
-## PREDICTIVE DELAY ENGINE
-
-This is the most critical output. Combine ALL module findings.
-
-Step 1 — Count findings:
-```
-overdue_count = Module A flagged tasks
-anomaly_count = Module B flagged tasks
-chain_risk_count = Module C high/critical chains
-bottleneck_count = Module D flagged decisions with 0% progress
-cluster_count = Module E flagged clusters (excluding pure coordination milestone clusters)
-long_duration_count = Module F flagged tasks with % arbejde færdigt < 50%
-```
-
-Step 2 — Calculate delay risk score:
-```
-delay_risk_score =
-  (overdue_count × 4) +
-  (anomaly_count × 2) +
-  (chain_risk_count × 5) +
-  (bottleneck_count × 3) +
-  (cluster_count × 2) +
-  (long_duration_count × 1)
-```
-
-Step 3 — Determine risk level:
-- Low Risk (score < 15): Schedule appears healthy
-- Medium Risk (15-35): Some areas need attention
-- High Risk (35-60): Significant delay potential
-- Critical Risk (> 60): Schedule at serious risk of major delays
-
-Step 4 — Calculate delay risk percentage:
-```
-delay_risk_percent = min(round(delay_risk_score / 80 × 100), 100)
-```
-
-Step 5 — Estimate delay window:
-- Based on the most overdue task's days overdue + average remaining duration of at-risk chains
-- Express as range: "X-Y days"
-
-Step 6 — Identify primary risk source:
-- The area (Omr. X), discipline, or dependency chain contributing the most risk points
+<!-- COMMENTED OUT: Modules B-G, Complexity Score, and Predictive Delay Engine
+These will be enabled in future iterations:
+- Module B: Unrealistic Progress Reporting
+- Module C: Dependency Chain Risk Analysis
+- Module D: Decision Bottlenecks
+- Module E: Artificial Scheduling Clusters
+- Module F: Long Duration Activities
+- Module G: Discipline Progress Dashboard
+- Schedule Complexity Score
+- Predictive Delay Engine
+-->
 
 ---
 
@@ -440,64 +224,38 @@ Step 6 — Identify primary risk source:
 ## NOVA_INSIGHT_REPORT
 
 ### SCHEDULE_OVERVIEW
-- Schedule date: [from header, e.g., "Dato: to 12-03-26"]
-- Reference date used: [dd-mm-yyyy]
-- Total activities: [X] (excluding summary rows)
+- Schedule: [filename]
+- Reference date: [dd-mm-yyyy]
+- Total activities analyzed: [X] (excluding summary rows)
 - Areas covered: [Omr. 1, Omr. 2, ..., Globals]
-- Disciplines involved: [list]
-- Explicit dependency links: [X]
-- Longest dependency chain: [X tasks]
-- Schedule complexity: [Low/Medium/High/Very High]
+- Format detected: [MS Project Export / Detailtidsplan / Unstructured / Hybrid]
 
-### SCHEDULE_HEALTH_OVERVIEW
-• [X] overdue activities (started but 0% progress)
-• [X] progress anomalies detected
-• [X] blocked decision points
-• [X] at-risk dependency chains
-• [X] scheduling clusters flagged
-• [X] long-duration risks
-Risk level: [Low/Medium/High/Critical]
+### MODULE_A_DELAYED_ACTIVITIES
+**Reference Date: [dd-mm-yyyy]**
+**Filtering Criteria: Startdato < [reference date] AND % arbejde færdigt = 0%**
 
-### MODULE_A_OVERDUE
-[Table or "No overdue tasks detected"]
+| Id | Opgavenavn | Startdato | Slutdato | Varighed | % færdigt | Days Overdue |
+|---|---|---|---|---|---|---|
+[sorted by Days Overdue descending]
 
-### MODULE_B_PROGRESS_ANOMALIES
-[Table or "No progress anomalies detected"]
+**Total delayed activities: [X]**
 
-### MODULE_C_DEPENDENCY_CHAINS
-[Chain descriptions with real task IDs and names, or "No high-risk chains detected"]
+**Summary by Area/Discipline:**
+• [Area/Discipline 1]: [X] delayed activities
+• [Area/Discipline 2]: [X] delayed activities
+...
 
-### MODULE_D_DECISION_BOTTLENECKS
-[Table or "No decision bottlenecks detected"]
-
-### MODULE_E_SCHEDULING_CLUSTERS
-[Cluster descriptions or "No artificial clusters detected"]
-
-### MODULE_F_LONG_DURATION_RISKS
-[Table or "No long-duration risks detected"]
-
-### MODULE_G_DISCIPLINE_PROGRESS
-[Discipline progress table grouped by area]
-
-### PREDICTIVE_DELAY_ENGINE
-**Overall Delay Risk:** [Low/Medium/High/Critical]
-**Delay Risk Score:** [X]
-**Delay Risk %:** [X%]
-**Estimated Delay Window:** [X-Y days]
-**Primary Risk Source:** [description]
-
-**Risk Breakdown:**
-• Overdue activities: [X]
-• Progress anomalies: [X]
-• High-risk chains: [X]
-• Decision bottlenecks: [X]
-• Artificial clusters: [X]
-• Long-duration tasks: [X]
+**Most Critical Delays (Top 5):**
+1. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
+2. ...
+3. ...
+4. ...
+5. ...
 
 **Assessment:**
-[2-3 sentence professional assessment of overall schedule health and recommended immediate actions]
+[2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken]
 
-<!--INSIGHT_DATA:{"delay_risk":"low|medium|high|critical","delay_risk_score":X,"delay_risk_percent":X,"estimated_delay_days_min":X,"estimated_delay_days_max":X,"primary_risk_source":"...","overdue_count":X,"anomaly_count":X,"chain_risk_count":X,"bottleneck_count":X,"cluster_count":X,"long_duration_count":X,"complexity":"low|medium|high|very_high","total_activities":X,"dependency_links":X,"longest_chain":X}-->
+<!--INSIGHT_DATA:{"total_activities":X,"delayed_count":X,"reference_date":"dd-mm-yyyy","most_overdue_days":X,"areas_affected":X,"format_detected":"...","schedule_name":"..."}-->
 ```
 </output>"""
 
@@ -505,18 +263,18 @@ Risk level: [Low/Medium/High/Critical]
 PREDICTIVE_LANGUAGE_INSTRUCTIONS = {
     "da": """
 IMPORTANT: You MUST respond entirely in Danish (Dansk).
-All headers, table content, descriptions, assessments, and health labels must be in Danish.
+All headers, table content, descriptions, assessments, and labels must be in Danish.
 Use Danish header: `## NOVA_INSIGHT_RAPPORT`
-Use Danish section: `### TIDSPLAN_SUNDHEDSOVERBLIK`
-Translate health labels: Healthy=Sund, Attention=Opmærksomhed, At Risk=I Fare, Critical=Kritisk
-Translate risk levels: Low=Lav, Medium=Mellem, High=Høj, Critical=Kritisk
+Use Danish section: `### TIDSPLANOVERSIGT` (instead of SCHEDULE_OVERVIEW)
+Use Danish section: `### MODUL_A_FORSINKEDE_AKTIVITETER` (instead of MODULE_A_DELAYED_ACTIVITIES)
+Translate labels: "Days Overdue" → "Dage Forsinket", "Total delayed activities" → "Antal forsinkede aktiviteter", "Most Critical Delays" → "Mest Kritiske Forsinkelser", "Summary by Area/Discipline" → "Oversigt efter Område/Disciplin", "Assessment" → "Vurdering", "Reference Date" → "Referencedato", "Filtering Criteria" → "Filtreringskriterier"
 Keep the <!--INSIGHT_DATA:...--> JSON tag in English (machine-readable).
 Keep task names in their original Danish — do not translate Opgavenavn values.
 """,
     "en": """
 Respond in English.
 Use English header: `## NOVA_INSIGHT_REPORT`
-Use English section: `### SCHEDULE_HEALTH_OVERVIEW`
+Use English sections as defined in the output structure.
 Keep task names in their original Danish — do not translate Opgavenavn values.
 """
 }
@@ -537,7 +295,8 @@ class PredictiveAgent:
         context: str,
         user_query: str,
         language: str = "en",
-        schedule_filename: str = None
+        schedule_filename: str = None,
+        reference_date: str = None
     ) -> dict:
         logger.info(f"  [PredictiveAgent] Starting analysis with {self.deployment}...")
 
@@ -548,10 +307,18 @@ class PredictiveAgent:
 
         schedule_label = schedule_filename if schedule_filename else "Schedule"
 
-        user_message = f"""Analyze the following construction schedule data. Produce a complete Nova Insight predictive report.
+        ref_date_instruction = ""
+        if reference_date:
+            ref_date_instruction = f"""
+REFERENCE DATE (MANDATORY): {reference_date}
+This date was extracted from the uploaded filename. You MUST use this exact date as the reference date for all overdue calculations.
+Do NOT use any other date. Do NOT use today's date. Use: {reference_date}
+"""
+
+        user_message = f"""Analyze the following construction schedule data. Identify ALL delayed activities (Module A).
 
 IMPORTANT: Throughout your report, refer to the schedule as "{schedule_label}". Use this exact file name in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
-
+{ref_date_instruction}
 ═══════════════════════════════════════════════════════════
 COMPLETE SCHEDULE DATA:
 ═══════════════════════════════════════════════════════════
@@ -563,38 +330,29 @@ USER QUERY FOR CONTEXT: {user_query}
 ═══════════════════════════════════════════════════════════
 EXECUTION STEPS:
 ═══════════════════════════════════════════════════════════
-0. AUTO-DETECT FORMAT: Check if data has "Uge: X" week headers → UNSTRUCTURED format (parse week entries, extract day ranges, work types, @responsible persons, and inline dependencies like "klar til X"). If data has markdown tables → check column headers and map to semantic roles. Adapt all subsequent steps to the detected format.
+0. AUTO-DETECT FORMAT: Check if data has "Uge: X" week headers → UNSTRUCTURED format. If data has markdown tables → check column headers and map to semantic roles. Adapt all subsequent steps to the detected format.
 1. Parse ALL task entries:
    - STRUCTURED: extract values from every available column. Use correct task ID (Entydigt id for Detailtidsplan, Id for MS Project).
-   - UNSTRUCTURED: each "Day-range: Description @person" line under an "Uge: X" header = one activity. Duration = day count in range (Mandag-Fredag=5d, Torsdag-Fredag=2d, Fredag=1d). Responsible = @mention. Trade = from description keywords (Tømrer, EL, VVS, Maler, etc.).
-2. Identify summary/parent rows:
-   - STRUCTURED: Slutdato = "-", section headers like "Omr. X" / "E100.XX", bold parent rows with very high duration
-   - UNSTRUCTURED: "Juleferie" = holiday break, "Aflevering" = project handover milestone
-3. Determine reference date: from header "Dato:" field, or current date, or latest concrete Slutdato. For UNSTRUCTURED: use current week number as reference.
-4. Execute Module A (Overdue):
-   - STRUCTURED: Startdato < reference_date AND progress = 0% AND Varighed > 0
-   - UNSTRUCTURED: scheduled week < current week (activity should have happened already). Since no progress % exists, flag all activities in past weeks as potentially overdue.
-5. Execute Module B (Progress Anomalies):
-   - STRUCTURED: for work tasks with 0 < progress < 100, calculate Expected % from elapsed time vs Varighed
-   - UNSTRUCTURED: no progress data available — skip or note "not applicable for unstructured schedules"
-6. Execute Module C (Dependency Chains):
-   - STRUCTURED with dependency columns: build REAL dependency graph, find chains > 4 tasks, cross-reference with Module A/B
-   - STRUCTURED without dependency columns: infer from task hierarchy
-   - UNSTRUCTURED: extract inline dependencies from "klar til X" phrases (e.g., "klar til tagdækker" = carpentry → roofing, "klar til el." = carpentry → electrical). Build trade sequence chain.
-7. Execute Module D (Decision Bottlenecks):
-   - STRUCTURED: find Varighed = 0 tasks with decision keywords or BH/client responsibility
-   - UNSTRUCTURED: identify delivery/coordination entries (e.g., "@Irina Bengtsen Læs 2" = material delivery, "Levering af køkken" = kitchen delivery, "Rengøring" = cleaning before handover)
-8. Execute Module E (Scheduling Clusters):
-   - STRUCTURED: group by Startdato/area, flag groups >= 5
-   - UNSTRUCTURED: check for weeks with many overlapping trades (e.g., Uge 8 has køkken + EL + VVS + tømrer + skorsten = 5 trades same week → potential resource conflict)
-9. Execute Module F (Long Duration):
-   - STRUCTURED: Varighed > 90 days
-   - UNSTRUCTURED: same trade spanning 3+ consecutive weeks (e.g., Tømrer Råhus weeks 47-50 = ~4 weeks continuous)
-10. Execute Module G (Discipline Progress):
-   - STRUCTURED: group by Ansvarlig/discipline, compute averages
-   - UNSTRUCTURED: group by trade extracted from descriptions (Tømrer, EL, VVS, Maler, Tagdækker, Flisemurer, etc.), count activities per trade, compute total scheduled days per trade
-11. Compute Schedule Complexity Score using activity count, trade count, total weeks span, dependency complexity
-12. Run Predictive Delay Engine with weighted formula and output complete NOVA_INSIGHT_REPORT with all sections including <!--INSIGHT_DATA:{{...}}-->
+   - UNSTRUCTURED: each "Day-range: Description @person" line under an "Uge: X" header = one activity.
+2. Identify and EXCLUDE summary/parent rows:
+   - Slutdato = "-", section headers like "Omr. X" / "E100.XX", bold parent rows with very high duration
+   - For UNSTRUCTURED: "Juleferie" = holiday break, "Aflevering" = project handover milestone
+3. Determine reference date: USE THE REFERENCE DATE PROVIDED ABOVE. If none provided, extract from "Dato:" field in data header, or use today's date.
+4. Execute Module A (Delayed Activities Identification):
+   - For EVERY task in the schedule:
+     a. Check: Is Startdato STRICTLY BEFORE reference_date? If no → skip
+     b. Check: Is % arbejde færdigt EXACTLY 0%? If no → skip
+     c. Check: Is Varighed > 0? If no → skip (unless it's a meaningful decision task)
+     d. Check: Is this a summary/parent row? If yes → skip
+     e. If ALL conditions pass → add to delayed list
+     f. Calculate Days_Overdue = reference_date - Startdato
+   - UNSTRUCTURED: scheduled week < current reference week AND no completion indicator
+5. Sort results by Days_Overdue DESCENDING (most overdue first)
+6. Count total delayed activities
+7. Group delayed activities by area/discipline
+8. Identify top 5 most critical delays
+9. Write professional assessment
+10. Output complete report with <!--INSIGHT_DATA:{{...}}--> tag
 ═══════════════════════════════════════════════════════════"""
 
         messages: List[ChatCompletionMessageParam] = [

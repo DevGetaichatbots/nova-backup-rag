@@ -7,30 +7,20 @@ NOVA_ICONS = {
     "report": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zM19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" fill="currentColor"/></svg>',
     "overview": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     "overdue": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#ef4444" opacity="0.15"/><path d="M12 8v4M12 16h.01" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/></svg>',
-    "anomaly": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" fill="#f59e0b" opacity="0.15"/><path d="M12 9v4M12 17h.01" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/></svg>',
-    "chain": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#8b5cf6" opacity="0.15"/><path d="M7 12h10M12 7l5 5-5 5" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    "bottleneck": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f97316" opacity="0.15"/><path d="M12 8v8M8 12h8" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/></svg>',
-    "cluster": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#06b6d4" opacity="0.15"/><circle cx="8" cy="8" r="2" fill="#06b6d4"/><circle cx="16" cy="8" r="2" fill="#06b6d4"/><circle cx="8" cy="16" r="2" fill="#06b6d4"/><circle cx="16" cy="16" r="2" fill="#06b6d4"/></svg>',
-    "duration": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#dc2626" opacity="0.15"/><path d="M12 6v6l3 3" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>',
-    "discipline": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#10b981" opacity="0.15"/><path d="M7 8h10M7 12h10M7 16h6" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>',
-    "engine": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#ef4444" opacity="0.15"/><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    "health": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    "delayed": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2" opacity="0.9"/><path d="M12 6v6l-3 3" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    "calendar": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    "warning": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" fill="#fbbf24" opacity="0.15"/><path d="M12 9v4M12 17h.01" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/></svg>',
+    "check": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#10b981" opacity="0.15"/><path d="M8 12l3 3 5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     "chart": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    "health": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 }
 
 MODULE_CONFIG = {
     "SCHEDULE_OVERVIEW": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0ea5e9", "icon": "overview"},
-    "SCHEDULE_HEALTH_OVERVIEW": {"label_en": "Schedule Health Overview", "label_da": "Tidsplan Sundhedsoverblik", "color": "#8b5cf6", "icon": "health"},
-    "TIDSPLAN_SUNDHEDSOVERBLIK": {"label_en": "Schedule Health Overview", "label_da": "Tidsplan Sundhedsoverblik", "color": "#8b5cf6", "icon": "health"},
-    "MODULE_A_OVERDUE": {"label_en": "Module A: Overdue Activities", "label_da": "Modul A: Forfaldne Aktiviteter", "color": "#ef4444", "icon": "overdue"},
-    "MODULE_B_PROGRESS_ANOMALIES": {"label_en": "Module B: Progress Anomalies", "label_da": "Modul B: Fremdriftsanomalier", "color": "#f59e0b", "icon": "anomaly"},
-    "MODULE_C_DEPENDENCY_CHAINS": {"label_en": "Module C: Dependency Chain Risks", "label_da": "Modul C: Afhængighedskæderisici", "color": "#8b5cf6", "icon": "chain"},
-    "MODULE_D_DECISION_BOTTLENECKS": {"label_en": "Module D: Decision Bottlenecks", "label_da": "Modul D: Beslutningsflaskehalse", "color": "#f97316", "icon": "bottleneck"},
-    "MODULE_E_SCHEDULING_CLUSTERS": {"label_en": "Module E: Scheduling Clusters", "label_da": "Modul E: Planlægningsklynger", "color": "#06b6d4", "icon": "cluster"},
-    "MODULE_F_LONG_DURATION_RISKS": {"label_en": "Module F: Long Duration Risks", "label_da": "Modul F: Lang Varighedsrisici", "color": "#dc2626", "icon": "duration"},
-    "MODULE_G_DISCIPLINE_PROGRESS": {"label_en": "Module G: Discipline Progress", "label_da": "Modul G: Disciplinfremdrift", "color": "#10b981", "icon": "discipline"},
-    "PREDICTIVE_DELAY_ENGINE": {"label_en": "Predictive Delay Engine", "label_da": "Forudsigende Forsinkelsesmotor", "color": "#ef4444", "icon": "engine"},
-    "SCHEDULE_COMPLEXITY_SCORE": {"label_en": "Schedule Complexity Score", "label_da": "Tidsplan Kompleksitetsscore", "color": "#8b5cf6", "icon": "overview"},
+    "TIDSPLANOVERSIGT": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0ea5e9", "icon": "overview"},
+    "MODULE_A_DELAYED_ACTIVITIES": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#ef4444", "icon": "delayed"},
+    "MODUL_A_FORSINKEDE_AKTIVITETER": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#ef4444", "icon": "delayed"},
+    "MODULE_A_OVERDUE": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#ef4444", "icon": "delayed"},
 }
 
 
@@ -50,31 +40,17 @@ def _parse_insight_data(markdown: str) -> Optional[Dict]:
     return None
 
 
-def _get_risk_color(level: str) -> dict:
-    level_lower = (level or "").lower()
-    if level_lower in ["critical", "kritisk"]:
-        return {"color": "#ff4d6a", "bg": "rgba(255, 77, 106, 0.08)", "border": "rgba(255, 77, 106, 0.25)", "glow": "rgba(255, 77, 106, 0.4)"}
-    if level_lower in ["high", "høj"]:
-        return {"color": "#f87171", "bg": "rgba(248, 113, 113, 0.08)", "border": "rgba(248, 113, 113, 0.25)", "glow": "rgba(248, 113, 113, 0.35)"}
-    if level_lower in ["medium", "mellem", "elevated"]:
-        return {"color": "#fbbf24", "bg": "rgba(251, 191, 36, 0.08)", "border": "rgba(251, 191, 36, 0.25)", "glow": "rgba(251, 191, 36, 0.3)"}
-    return {"color": "#34d399", "bg": "rgba(52, 211, 153, 0.08)", "border": "rgba(52, 211, 153, 0.25)", "glow": "rgba(52, 211, 153, 0.3)"}
+def _get_severity_color(days_overdue: int) -> dict:
+    if days_overdue >= 120:
+        return {"color": "#ff4d6a", "bg": "rgba(255, 77, 106, 0.08)", "border": "rgba(255, 77, 106, 0.25)", "label": "Critical"}
+    if days_overdue >= 60:
+        return {"color": "#f87171", "bg": "rgba(248, 113, 113, 0.08)", "border": "rgba(248, 113, 113, 0.25)", "label": "High"}
+    if days_overdue >= 30:
+        return {"color": "#fbbf24", "bg": "rgba(251, 191, 36, 0.08)", "border": "rgba(251, 191, 36, 0.25)", "label": "Medium"}
+    return {"color": "#fb923c", "bg": "rgba(251, 146, 60, 0.08)", "border": "rgba(251, 146, 60, 0.25)", "label": "Low"}
 
 
-def _health_badge(text: str) -> str:
-    lower = text.lower().strip()
-    if "critical" in lower or "kritisk" in lower:
-        return f'<span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,77,106,0.12);color:#ff4d6a;border:1px solid rgba(255,77,106,0.2);letter-spacing:0.3px;">{_escape(text)}</span>'
-    if "at risk" in lower or "i fare" in lower or "high" in lower or "høj" in lower:
-        return f'<span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2);letter-spacing:0.3px;">{_escape(text)}</span>'
-    if "attention" in lower or "opmærksomhed" in lower or "medium" in lower or "mellem" in lower or "elevated" in lower:
-        return f'<span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);letter-spacing:0.3px;">{_escape(text)}</span>'
-    if "healthy" in lower or "sund" in lower or "low" in lower or "lav" in lower or "on track" in lower:
-        return f'<span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.2);letter-spacing:0.3px;">{_escape(text)}</span>'
-    return f'<span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.15);letter-spacing:0.3px;">{_escape(text)}</span>'
-
-
-def _render_table(markdown_lines: List[str], accent_color: str) -> str:
+def _render_delayed_table(markdown_lines: List[str]) -> str:
     rows = []
     headers = []
     for line in markdown_lines:
@@ -92,28 +68,56 @@ def _render_table(markdown_lines: List[str], accent_color: str) -> str:
     if not headers:
         return ""
 
-    header_html = "".join(
-        f'<th style="padding:13px 16px;text-align:left;font-size:10px;font-weight:700;color:{accent_color};text-transform:uppercase;letter-spacing:1.2px;white-space:nowrap;border-bottom:2px solid {accent_color}25;background:rgba(0,0,0,0.15);">{_escape(h)}</th>'
-        for h in headers
-    )
+    days_col_idx = -1
+    for i, h in enumerate(headers):
+        h_lower = h.lower()
+        if "overdue" in h_lower or "forsinket" in h_lower or "days" in h_lower or "dage" in h_lower:
+            days_col_idx = i
+            break
+
+    header_html = ""
+    for i, h in enumerate(headers):
+        align = "right" if i == days_col_idx else "left"
+        width_style = "min-width:60px;" if i == days_col_idx else ("min-width:280px;" if i == 1 else "")
+        header_html += f'<th style="padding:14px 16px;text-align:{align};font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.2px;white-space:nowrap;border-bottom:2px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);{width_style}">{_escape(h)}</th>'
 
     rows_html = []
     for idx, row in enumerate(rows):
-        bg = "rgba(0,0,0,0.06)" if idx % 2 == 0 else "transparent"
+        bg = "rgba(0,0,0,0.08)" if idx % 2 == 0 else "transparent"
+
+        days_val = 0
+        if days_col_idx >= 0 and days_col_idx < len(row):
+            days_match = re.search(r"(\d+)", row[days_col_idx])
+            if days_match:
+                days_val = int(days_match.group(1))
+
+        severity = _get_severity_color(days_val)
+
         cells_html = ""
         for ci, cell in enumerate(row):
-            h_name = headers[ci].lower() if ci < len(headers) else ""
-            if any(k in h_name for k in ["health", "risk", "sundhed", "risiko", "type", "assessment", "level", "status"]):
-                content = _health_badge(cell)
-            elif ci == 0:
-                content = f'<span style="font-weight:600;color:#e2e8f0;font-size:13px;">{_escape(cell)}</span>'
+            if ci == 0:
+                content = f'<span style="font-weight:700;color:#e2e8f0;font-size:13px;font-family:\'SF Mono\',SFMono-Regular,Menlo,monospace;">{_escape(cell)}</span>'
+            elif ci == days_col_idx:
+                content = f'<span style="display:inline-flex;align-items:center;gap:6px;font-weight:700;color:{severity["color"]};font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:{severity["color"]};flex-shrink:0;box-shadow:0 0 6px {severity["color"]}40;"></span>{_escape(cell)}</span>'
+            elif "0%" in cell:
+                content = f'<span style="color:#f87171;font-weight:600;font-size:13px;">{_escape(cell)}</span>'
             else:
                 content = f'<span style="color:#94a3b8;font-size:13px;">{_escape(cell)}</span>'
-            cells_html += f'<td style="padding:12px 16px;border-bottom:1px solid rgba(148,163,184,0.06);vertical-align:middle;">{content}</td>'
-        rows_html.append(f'<tr style="background:{bg};transition:background 0.15s;">{cells_html}</tr>')
 
-    return f'''<div style="overflow-x:auto;border-radius:12px;margin:14px 0;background:#162032;border:1px solid rgba(148,163,184,0.08);">
-<table style="width:100%;min-width:500px;border-collapse:collapse;">
+            align = "right" if ci == days_col_idx else "left"
+            cells_html += f'<td style="padding:13px 16px;border-bottom:1px solid rgba(148,163,184,0.06);vertical-align:middle;text-align:{align};">{content}</td>'
+
+        rows_html.append(f'<tr style="background:{bg};transition:all 0.15s ease;" onmouseover="this.style.background=\'rgba(239,68,68,0.04)\'" onmouseout="this.style.background=\'{bg}\'">{cells_html}</tr>')
+
+    row_count = len(rows)
+    count_label = f"{row_count} delayed activit{'y' if row_count == 1 else 'ies'}"
+
+    return f'''<div style="overflow-x:auto;border-radius:14px;margin:16px 0;background:#0f1729;border:1px solid rgba(239,68,68,0.12);box-shadow:0 4px 24px rgba(0,0,0,0.2);">
+<div style="padding:12px 16px;background:rgba(239,68,68,0.04);border-bottom:1px solid rgba(239,68,68,0.08);display:flex;align-items:center;justify-content:space-between;">
+  <span style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.5px;">{count_label}</span>
+  <span style="font-size:10px;color:#475569;letter-spacing:0.5px;">sorted by days overdue ↓</span>
+</div>
+<table style="width:100%;min-width:700px;border-collapse:collapse;">
 <thead><tr>{header_html}</tr></thead>
 <tbody>{"".join(rows_html)}</tbody>
 </table></div>'''
@@ -127,7 +131,7 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
     def flush_table():
         nonlocal table_lines
         if table_lines:
-            parts.append(_render_table(table_lines, accent_color))
+            parts.append(_render_delayed_table(table_lines))
             table_lines = []
 
     def flush_list():
@@ -186,14 +190,33 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
             list_items.append(item_safe)
             continue
 
+        if re.match(r"^\d+\.\s+", stripped):
+            num_match = re.match(r"^(\d+)\.\s+(.*)", stripped)
+            if num_match:
+                num = num_match.group(1)
+                item_raw = num_match.group(2)
+                item_safe = _escape(item_raw)
+                item_safe = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;font-weight:600;">\1</strong>', item_safe)
+                list_items.append(f'<span style="color:{accent_color};font-weight:700;margin-right:6px;">{num}.</span>{item_safe}')
+                continue
+
         flush_list()
 
         safe = _escape(stripped)
 
-        if re.match(r"^(Chain|Path|Length|Risk|Weakest|Downstream|Cluster|Score|Complexity|Weighted)", stripped, re.IGNORECASE):
-            text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;">\1</strong>', safe)
-            parts.append(f'<p style="margin:5px 0;color:#94a3b8;line-height:1.6;font-size:12px;font-family:\'SF Mono\',SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,0.2);padding:8px 14px;border-radius:8px;border-left:3px solid {accent_color};">{text}</p>')
-            continue
+        bold_line = re.match(r"^\*\*(.+?)\*\*$", stripped)
+        if bold_line:
+            text = _escape(bold_line.group(1))
+            if any(k in text.lower() for k in ["total", "antal", "reference", "referencedato", "filtering", "filtrering", "summary", "oversigt", "most critical", "mest kritiske", "assessment", "vurdering"]):
+                is_count = any(k in text.lower() for k in ["total", "antal"])
+                is_heading = any(k in text.lower() for k in ["summary", "oversigt", "most critical", "mest kritiske", "assessment", "vurdering"])
+                if is_count:
+                    parts.append(f'<div style="margin:18px 0 12px;padding:14px 18px;background:rgba(239,68,68,0.06);border-radius:12px;border:1px solid rgba(239,68,68,0.12);"><p style="margin:0;color:#f87171;font-size:15px;font-weight:700;">{text}</p></div>')
+                elif is_heading:
+                    parts.append(f'<h4 style="margin:22px 0 10px;color:#e2e8f0;font-size:14px;font-weight:700;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,0.1);">{text}</h4>')
+                else:
+                    parts.append(f'<p style="margin:10px 0;color:#e2e8f0;font-size:14px;font-weight:600;">{text}</p>')
+                continue
 
         text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#e2e8f0;font-weight:600;">\1</strong>', safe)
         parts.append(f'<p style="margin:7px 0;color:#cbd5e1;line-height:1.7;font-size:14px;">{text}</p>')
@@ -211,188 +234,123 @@ def _safe_int(val) -> int:
         return 0
 
 
-def _build_hero_metrics(insight_data: Dict, language: str) -> str:
+def _build_hero_section(insight_data: Dict, language: str) -> str:
     if not insight_data:
         return ""
 
-    risk_level = insight_data.get("delay_risk") or "low"
-    risk_colors = _get_risk_color(risk_level)
-    risk_pct = _safe_int(insight_data.get("delay_risk_percent") or 0)
-    risk_score = _safe_int(insight_data.get("delay_risk_score") or 0)
-    delay_min = _safe_int(insight_data.get("estimated_delay_days_min") or 0)
-    delay_max = _safe_int(insight_data.get("estimated_delay_days_max") or 0)
+    delayed_count = _safe_int(insight_data.get("delayed_count") or 0)
     total_activities = _safe_int(insight_data.get("total_activities") or 0)
-    dep_links = _safe_int(insight_data.get("dependency_links") or 0)
-    longest_chain = _safe_int(insight_data.get("longest_chain") or 0)
-    complexity = (insight_data.get("complexity") or "medium").capitalize()
+    most_overdue = _safe_int(insight_data.get("most_overdue_days") or 0)
+    areas_affected = _safe_int(insight_data.get("areas_affected") or 0)
+    ref_date = _escape(str(insight_data.get("reference_date") or ""))
+    schedule_name = _escape(str(insight_data.get("schedule_name") or ""))
+    format_detected = _escape(str(insight_data.get("format_detected") or ""))
 
-    risk_pct = max(0, min(risk_pct, 100))
-    risk_label = _escape(risk_level.upper())
-    delay_text = f"{delay_min}–{delay_max}" if delay_max > 0 else "N/A"
-    delay_unit = "dage" if language == "da" else "days"
-    complexity = _escape(complexity)
+    if delayed_count == 0:
+        status_color = "#34d399"
+        status_glow = "rgba(52,211,153,0.4)"
+        status_label = "Ingen forsinkelser" if language == "da" else "No Delays"
+        status_bg = "rgba(52,211,153,0.06)"
+        status_border = "rgba(52,211,153,0.2)"
+    elif delayed_count <= 10:
+        status_color = "#fbbf24"
+        status_glow = "rgba(251,191,36,0.4)"
+        status_label = "Moderat" if language == "da" else "Moderate"
+        status_bg = "rgba(251,191,36,0.06)"
+        status_border = "rgba(251,191,36,0.2)"
+    elif delayed_count <= 25:
+        status_color = "#f87171"
+        status_glow = "rgba(248,113,113,0.4)"
+        status_label = "Alvorlig" if language == "da" else "Serious"
+        status_bg = "rgba(248,113,113,0.06)"
+        status_border = "rgba(248,113,113,0.2)"
+    else:
+        status_color = "#ff4d6a"
+        status_glow = "rgba(255,77,106,0.4)"
+        status_label = "Kritisk" if language == "da" else "Critical"
+        status_bg = "rgba(255,77,106,0.06)"
+        status_border = "rgba(255,77,106,0.2)"
 
-    gauge_dash = (risk_pct / 100) * 251.2
+    pct = min(round((delayed_count / max(total_activities, 1)) * 100), 100) if total_activities > 0 else 0
+
+    bar_width = min(pct, 100)
 
     return f'''
-<div style="margin:0 0 24px 0;background:linear-gradient(145deg,#162032,#1a2742);border-radius:20px;border:1px solid {risk_colors["border"]};overflow:hidden;position:relative;">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,{risk_colors["color"]},{risk_colors["color"]},transparent);opacity:0.6;"></div>
+<div style="margin:0 0 24px 0;background:linear-gradient(145deg,#162032,#1a2742);border-radius:20px;border:1px solid {status_border};overflow:hidden;position:relative;">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,{status_color},{status_color},transparent);opacity:0.6;"></div>
+
   <div style="padding:28px 28px 20px;">
-    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
-      <div style="position:relative;width:140px;height:80px;flex-shrink:0;">
-        <svg viewBox="0 0 200 110" style="width:100%;height:100%;">
-          <defs>
-            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#34d399"/>
-              <stop offset="40%" style="stop-color:#fbbf24"/>
-              <stop offset="70%" style="stop-color:#f87171"/>
-              <stop offset="100%" style="stop-color:#ff4d6a"/>
-            </linearGradient>
-          </defs>
-          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="12" stroke-linecap="round"/>
-          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 251.2">
-            <animate attributeName="stroke-dasharray" from="0 251.2" to="{gauge_dash} 251.2" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
-          </path>
-          <text x="100" y="75" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:32px;font-weight:900;fill:{risk_colors["color"]};">{risk_pct}%</text>
-          <text x="100" y="100" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:11px;font-weight:600;fill:#64748b;text-transform:uppercase;letter-spacing:1.5px;">{"RISIKO" if language == "da" else "RISK"}</text>
-        </svg>
-      </div>
-      <div style="flex:1;min-width:200px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <div style="width:10px;height:10px;border-radius:50%;background:{risk_colors["color"]};box-shadow:0 0 12px {risk_colors["glow"]};"></div>
-          <span style="font-size:14px;font-weight:800;color:{risk_colors["color"]};text-transform:uppercase;letter-spacing:1px;">{risk_label}</span>
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+
+      <div style="text-align:center;flex-shrink:0;min-width:120px;">
+        <div style="font-size:52px;font-weight:900;color:{status_color};line-height:1;text-shadow:0 0 30px {status_glow};">
+          <span style="display:inline-block;animation:novaFadeIn 0.6s ease-out;">0</span>
         </div>
-        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1.5px;margin-top:6px;">
+          {"FORSINKEDE" if language == "da" else "DELAYED"}
+        </div>
+        <script>
+          (function() {{
+            var el = document.currentScript.parentElement.querySelector('span');
+            var target = {delayed_count};
+            var duration = 1200;
+            var start = performance.now();
+            function animate(now) {{
+              var elapsed = now - start;
+              var progress = Math.min(elapsed / duration, 1);
+              var eased = 1 - Math.pow(1 - progress, 3);
+              el.textContent = Math.round(eased * target);
+              if (progress < 1) requestAnimationFrame(animate);
+            }}
+            requestAnimationFrame(animate);
+          }})();
+        </script>
+      </div>
+
+      <div style="flex:1;min-width:200px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:{status_color};box-shadow:0 0 12px {status_glow};"></div>
+          <span style="font-size:14px;font-weight:800;color:{status_color};text-transform:uppercase;letter-spacing:1px;">{status_label}</span>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:10px;color:#475569;font-weight:600;">{"Forsinkede af total" if language == "da" else "Delayed of total"}</span>
+            <span style="font-size:11px;color:#94a3b8;font-weight:700;">{delayed_count}/{total_activities} ({pct}%)</span>
+          </div>
+          <div style="height:8px;background:rgba(148,163,184,0.08);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:0%;background:linear-gradient(90deg,{status_color},{status_color}dd);border-radius:4px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);">
+              <script>(function(){{ var el = document.currentScript.parentElement; setTimeout(function(){{ el.style.width = '{bar_width}%'; }}, 300); }})();</script>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
           <div>
-            <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:1px;">{"Score" if language == "da" else "Score"}</div>
-            <div style="font-size:22px;font-weight:800;color:#e2e8f0;margin-top:2px;">{risk_score}</div>
+            <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:1px;">{"Referencedato" if language == "da" else "Ref. Date"}</div>
+            <div style="font-size:15px;font-weight:700;color:#e2e8f0;margin-top:2px;">{ref_date}</div>
           </div>
           <div>
-            <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:1px;">{"Est. Forsinkelse" if language == "da" else "Est. Delay"}</div>
-            <div style="font-size:22px;font-weight:800;color:#e2e8f0;margin-top:2px;">{delay_text} <span style="font-size:12px;color:#475569;">{delay_unit}</span></div>
+            <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:1px;">{"Mest Forsinket" if language == "da" else "Most Overdue"}</div>
+            <div style="font-size:15px;font-weight:700;color:#f87171;margin-top:2px;">{most_overdue} <span style="font-size:11px;color:#475569;">{"dage" if language == "da" else "days"}</span></div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(148,163,184,0.06);">
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(148,163,184,0.06);">
     <div style="padding:16px;text-align:center;border-right:1px solid rgba(148,163,184,0.06);">
       <div style="font-size:20px;font-weight:800;color:#e2e8f0;">{total_activities}</div>
       <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Aktiviteter" if language == "da" else "Activities"}</div>
     </div>
     <div style="padding:16px;text-align:center;border-right:1px solid rgba(148,163,184,0.06);">
-      <div style="font-size:20px;font-weight:800;color:#e2e8f0;">{dep_links}</div>
-      <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Afhængigheder" if language == "da" else "Dependencies"}</div>
-    </div>
-    <div style="padding:16px;text-align:center;border-right:1px solid rgba(148,163,184,0.06);">
-      <div style="font-size:20px;font-weight:800;color:#e2e8f0;">{longest_chain}</div>
-      <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Længste Kæde" if language == "da" else "Longest Chain"}</div>
+      <div style="font-size:20px;font-weight:800;color:{status_color};">{delayed_count}</div>
+      <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Forsinkede" if language == "da" else "Delayed"}</div>
     </div>
     <div style="padding:16px;text-align:center;">
-      <div style="font-size:20px;font-weight:800;color:#e2e8f0;">{complexity}</div>
-      <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Kompleksitet" if language == "da" else "Complexity"}</div>
-    </div>
-  </div>
-</div>'''
-
-
-def _build_analytics_charts(insight_data: Dict, language: str) -> str:
-    if not insight_data:
-        return ""
-
-    findings = [
-        {"key": "overdue_count", "label": "Forfaldne" if language == "da" else "Overdue", "color": "#f87171"},
-        {"key": "anomaly_count", "label": "Anomalier" if language == "da" else "Anomalies", "color": "#fbbf24"},
-        {"key": "chain_risk_count", "label": "Kæderisici" if language == "da" else "Chain Risks", "color": "#a78bfa"},
-        {"key": "bottleneck_count", "label": "Flaskehalse" if language == "da" else "Bottlenecks", "color": "#fb923c"},
-        {"key": "cluster_count", "label": "Klynger" if language == "da" else "Clusters", "color": "#22d3ee"},
-        {"key": "long_duration_count", "label": "Lang Var." if language == "da" else "Long Dur.", "color": "#f87171"},
-    ]
-
-    max_val = max((_safe_int(insight_data.get(f["key"])) for f in findings), default=1)
-    if max_val == 0:
-        max_val = 1
-
-    bar_width = 100 / len(findings)
-    bars_svg = ""
-    labels_svg = ""
-    for i, f in enumerate(findings):
-        val = _safe_int(insight_data.get(f["key"]))
-        bar_h = max((val / max_val) * 130, 4)
-        x = i * bar_width + bar_width * 0.2
-        w = bar_width * 0.6
-        y = 160 - bar_h
-
-        bars_svg += f'''
-        <rect x="{x}%" y="160" width="{w}%" height="0" rx="4" fill="{f["color"]}" opacity="0.85">
-          <animate attributeName="height" from="0" to="{bar_h}" dur="0.8s" begin="{i * 0.1}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
-          <animate attributeName="y" from="160" to="{y}" dur="0.8s" begin="{i * 0.1}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
-        </rect>
-        <text x="{x + w / 2}%" y="{y - 8}" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:13px;font-weight:700;fill:{f["color"]};opacity:0;">
-          {val}
-          <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="{i * 0.1 + 0.5}s" fill="freeze"/>
-        </text>'''
-        labels_svg += f'<text x="{x + w / 2}%" y="178" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:8px;font-weight:600;fill:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{f["label"]}</text>'
-
-    risk_pct = _safe_int(insight_data.get("delay_risk_percent") or 0)
-    risk_level = insight_data.get("delay_risk") or "low"
-    risk_colors = _get_risk_color(risk_level)
-
-    total_findings = sum(_safe_int(insight_data.get(f["key"])) for f in findings)
-    donut_segments = ""
-    offset = 0
-    donut_r = 40
-    donut_circ = 2 * 3.14159 * donut_r
-    for i, f in enumerate(findings):
-        val = _safe_int(insight_data.get(f["key"]))
-        if val == 0 or total_findings == 0:
-            continue
-        pct = val / total_findings
-        seg_len = pct * donut_circ
-        gap_len = donut_circ - seg_len
-        donut_segments += f'''<circle cx="60" cy="60" r="{donut_r}" fill="none" stroke="{f["color"]}" stroke-width="14"
-          stroke-dasharray="0 {donut_circ}" stroke-dashoffset="{-offset}" stroke-linecap="round" opacity="0.85">
-          <animate attributeName="stroke-dasharray" from="0 {donut_circ}" to="{seg_len} {gap_len}" dur="1s" begin="{i * 0.15}s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
-        </circle>'''
-        offset += seg_len
-
-    legend_items = ""
-    for f in findings:
-        val = _safe_int(insight_data.get(f["key"]))
-        if val > 0:
-            legend_items += f'<div style="display:flex;align-items:center;gap:8px;margin:4px 0;"><div style="width:8px;height:8px;border-radius:50%;background:{f["color"]};flex-shrink:0;"></div><span style="font-size:11px;color:#94a3b8;">{f["label"]}</span><span style="font-size:11px;font-weight:700;color:#e2e8f0;margin-left:auto;">{val}</span></div>'
-
-    chart_title = "Risikofordeling" if language == "da" else "Risk Distribution"
-    bar_title = "Fundoversigt" if language == "da" else "Findings Overview"
-
-    return f'''
-<div class="module-card" style="margin:0 0 16px 0;padding:24px;background:#1e293b;border-radius:16px;border:1px solid rgba(148,163,184,0.08);border-left:3px solid #00D6D6;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-    <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,214,214,0.12);">
-      <span style="color:#00D6D6;">{NOVA_ICONS["chart"]}</span>
-    </div>
-    <h3 style="font-size:15px;font-weight:700;color:#f1f5f9;margin:0;">{"Visuel Analyse" if language == "da" else "Visual Analytics"}</h3>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-    <div style="background:#162032;border-radius:14px;padding:20px;border:1px solid rgba(148,163,184,0.06);">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:14px;">{bar_title}</div>
-      <svg viewBox="0 0 100 185" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;">
-        <line x1="0" y1="160" x2="100" y2="160" stroke="rgba(148,163,184,0.1)" stroke-width="0.5"/>
-        {bars_svg}
-        {labels_svg}
-      </svg>
-    </div>
-    <div style="background:#162032;border-radius:14px;padding:20px;border:1px solid rgba(148,163,184,0.06);">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:14px;">{chart_title}</div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <svg viewBox="0 0 120 120" style="width:100px;height:100px;flex-shrink:0;">
-          <circle cx="60" cy="60" r="{donut_r}" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="14"/>
-          {donut_segments}
-          <text x="60" y="57" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:22px;font-weight:900;fill:#e2e8f0;">{total_findings}</text>
-          <text x="60" y="72" text-anchor="middle" style="font-family:-apple-system,sans-serif;font-size:8px;font-weight:600;fill:#64748b;text-transform:uppercase;letter-spacing:1px;">{"FUND" if language == "da" else "FOUND"}</text>
-        </svg>
-        <div style="flex:1;">{legend_items}</div>
-      </div>
+      <div style="font-size:20px;font-weight:800;color:#e2e8f0;">{areas_affected}</div>
+      <div style="font-size:9px;color:#475569;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Områder" if language == "da" else "Areas"}</div>
     </div>
   </div>
 </div>'''
@@ -441,27 +399,20 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
     insight_data = _parse_insight_data(markdown)
     sections = _split_sections(markdown)
 
-    report_title = "Nova Insight Rapport" if language == "da" else "Nova Insight Report"
-    subtitle = "Forudsigende risikoanalyse drevet af GPT-5.2" if language == "da" else "Predictive risk analysis powered by GPT-5.2"
+    report_title = "Nova Insight — Forsinkede Aktiviteter" if language == "da" else "Nova Insight — Delayed Activities"
+    subtitle = "Forsinkelsesanalyse drevet af GPT-5.2" if language == "da" else "Delay analysis powered by GPT-5.2"
 
     html_parts = [f'''
 <style>
 @keyframes novaFadeIn {{ from {{ opacity:0;transform:translateY(12px); }} to {{ opacity:1;transform:translateY(0); }} }}
 @keyframes novaPulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:0.6; }} }}
-@keyframes novaSlide {{ from {{ transform:scaleX(0); }} to {{ transform:scaleX(1); }} }}
 .nova-report .module-card {{ animation:novaFadeIn 0.5s ease-out backwards; }}
 .nova-report .module-card:nth-child(2) {{ animation-delay:0.1s; }}
 .nova-report .module-card:nth-child(3) {{ animation-delay:0.15s; }}
 .nova-report .module-card:nth-child(4) {{ animation-delay:0.2s; }}
 .nova-report .module-card:nth-child(5) {{ animation-delay:0.25s; }}
-.nova-report .module-card:nth-child(6) {{ animation-delay:0.3s; }}
-.nova-report .module-card:nth-child(7) {{ animation-delay:0.35s; }}
-.nova-report .module-card:nth-child(8) {{ animation-delay:0.4s; }}
-.nova-report .module-card:nth-child(9) {{ animation-delay:0.45s; }}
-.nova-report .module-card:nth-child(10) {{ animation-delay:0.5s; }}
-.nova-report .module-card:nth-child(11) {{ animation-delay:0.55s; }}
 .nova-report .module-card:hover {{ border-color:rgba(148,163,184,0.2) !important;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.3); }}
-.nova-report table tr:hover {{ background:rgba(148,163,184,0.04) !important; }}
+.nova-report table tr:hover {{ background:rgba(239,68,68,0.04) !important; }}
 .nova-report ::-webkit-scrollbar {{ height:6px; }}
 .nova-report ::-webkit-scrollbar-track {{ background:rgba(0,0,0,0.2);border-radius:6px; }}
 .nova-report ::-webkit-scrollbar-thumb {{ background:rgba(148,163,184,0.25);border-radius:6px; }}
@@ -470,8 +421,8 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
   <div style="text-align:center;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid rgba(148,163,184,0.08);">
     <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:12px;">
-      <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00D6D6,#0891b2);box-shadow:0 0 30px rgba(0,214,214,0.25);">
-        <span style="color:white;">{NOVA_ICONS["report"]}</span>
+      <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 30px rgba(239,68,68,0.25);">
+        <span style="color:white;">{NOVA_ICONS["delayed"]}</span>
       </div>
       <div style="text-align:left;">
         <h2 style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-0.5px;">{report_title}</h2>
@@ -479,23 +430,23 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
       </div>
     </div>
     <div style="display:inline-flex;gap:8px;margin-top:8px;">
-      <span style="padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,214,214,0.1);color:#00D6D6;border:1px solid rgba(0,214,214,0.15);letter-spacing:0.5px;">NOVA INSIGHT</span>
+      <span style="padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.15);letter-spacing:0.5px;">MODULE A</span>
       <span style="padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.15);letter-spacing:0.5px;">GPT-5.2</span>
     </div>
   </div>''']
 
     if insight_data:
-        html_parts.append(_build_hero_metrics(insight_data, language))
+        html_parts.append(_build_hero_section(insight_data, language))
 
     if not insight_data:
-        no_data_label = "Analytiske data ikke tilgængelige — diagrammer kan ikke vises." if language == "da" else "Analytical data unavailable — charts cannot be rendered."
+        no_data_label = "Analytiske data ikke tilgængelige — oversigtsmetrikker kan ikke vises." if language == "da" else "Analytical data unavailable — summary metrics cannot be rendered."
         html_parts.append(f'<div style="margin:0 0 16px 0;padding:14px 20px;background:rgba(251,191,36,0.06);border-radius:12px;border:1px solid rgba(251,191,36,0.15);"><p style="margin:0;color:#fbbf24;font-size:12px;font-weight:600;">{no_data_label}</p></div>')
 
     module_index = 0
     for section_key, section_body in sections:
         if section_key == "_PREAMBLE":
-            html_parts.append(f'<div class="module-card" style="margin:0 0 16px 0;padding:18px 22px;background:rgba(0,214,214,0.04);border-radius:14px;border:1px solid rgba(0,214,214,0.1);border-left:3px solid #00D6D6;transition:all 0.2s ease;">')
-            html_parts.append(_render_content_block(section_body.split("\n"), "#22d3ee"))
+            html_parts.append(f'<div class="module-card" style="margin:0 0 16px 0;padding:18px 22px;background:rgba(14,165,233,0.04);border-radius:14px;border:1px solid rgba(14,165,233,0.1);border-left:3px solid #0ea5e9;transition:all 0.2s ease;">')
+            html_parts.append(_render_content_block(section_body.split("\n"), "#0ea5e9"))
             html_parts.append('</div>')
             continue
 
@@ -518,14 +469,11 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
         content_html = _render_content_block(section_body.split("\n"), color)
 
-        module_letter = ""
-        mod_match = re.match(r"MODULE_([A-G])", config_key)
-        if mod_match:
-            module_letter = mod_match.group(1)
+        is_module_a = any(k in config_key for k in ["MODULE_A", "MODUL_A", "DELAYED", "OVERDUE", "FORSINKEDE"])
 
         module_badge = ""
-        if module_letter:
-            module_badge = f'<span style="font-size:10px;font-weight:800;color:{color};background:{color}15;padding:3px 8px;border-radius:6px;letter-spacing:0.5px;">{module_letter}</span>'
+        if is_module_a:
+            module_badge = f'<span style="font-size:10px;font-weight:800;color:{color};background:{color}15;padding:3px 8px;border-radius:6px;letter-spacing:0.5px;">A</span>'
 
         module_index += 1
 
@@ -541,15 +489,12 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
     {content_html}
   </div>''')
 
-    if insight_data:
-        html_parts.append(_build_analytics_charts(insight_data, language))
-
     timestamp_label = "Genereret af Nova Insight AI" if language == "da" else "Generated by Nova Insight AI"
     html_parts.append(f'''
   <div style="margin-top:8px;padding-top:16px;border-top:1px solid rgba(148,163,184,0.06);display:flex;align-items:center;justify-content:center;gap:8px;">
-    <div style="width:6px;height:6px;border-radius:50%;background:#00D6D6;box-shadow:0 0 8px rgba(0,214,214,0.4);"></div>
+    <div style="width:6px;height:6px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.4);"></div>
     <span style="font-size:10px;color:#475569;letter-spacing:0.5px;">{timestamp_label}</span>
   </div>
 </div>''')
 
-    return "".join(html_parts)
+    return "\n".join(html_parts)
