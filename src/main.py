@@ -459,39 +459,46 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
-    if row_chunks:
-        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities extracted (structured row data)")
-        context_parts.append("EVERY row below is one schedule activity. ALL columns are shown for each row (empty columns included).")
-        context_parts.append("Format: ColumnHeader: value | ColumnHeader: value | ...")
-        context_parts.append("You MUST analyze EVERY row below. Do not skip any.\n")
-        for chunk in row_chunks:
-            context_parts.append(chunk["content"])
-        context_parts.append("")
-        return "\n".join(context_parts)
+    total_chunks = len(row_chunks) + len(table_chunks) + len(text_chunks)
+    context_parts.append(f"[{doc_label}] — COMPLETE DATA: {total_chunks} chunks ({len(row_chunks)} rows, {len(table_chunks)} tables, {len(text_chunks)} text sections)")
+    context_parts.append("")
 
     if table_chunks:
-        context_parts.append(f"[{doc_label}] — TABLE DATA (no individual rows available, using markdown table)")
+        context_parts.append("=" * 60)
+        context_parts.append("SECTION 1: STRUCTURED TABLE DATA (full table markdown)")
+        context_parts.append("=" * 60)
         for i, chunk in enumerate(table_chunks, 1):
             content = chunk["content"]
             if "[STRUCTURED:" in content:
                 content = content[:content.index("[STRUCTURED:")]
             cleaned = _clean_gantt_noise(content.strip())
-            context_parts.append(cleaned)
-            context_parts.append("")
-        return "\n".join(context_parts)
+            if cleaned.strip():
+                context_parts.append(cleaned)
+                context_parts.append("")
+
+    if row_chunks:
+        context_parts.append("=" * 60)
+        context_parts.append(f"SECTION 2: INDIVIDUAL ROW DATA ({len(row_chunks)} activities)")
+        context_parts.append("Each line = one activity. Format: Row N (Page P): Header: value | Header: value | ...")
+        context_parts.append("ALL columns shown for every row (including empty). You MUST check EVERY row.")
+        context_parts.append("=" * 60)
+        for chunk in row_chunks:
+            context_parts.append(chunk["content"])
+        context_parts.append("")
 
     if text_chunks:
-        context_parts.append(f"[{doc_label}] — TEXT DATA (no structured tables found)")
-        for i, chunk in enumerate(text_chunks, 1):
+        context_parts.append("=" * 60)
+        context_parts.append("SECTION 3: PAGE TEXT DATA")
+        context_parts.append("=" * 60)
+        for chunk in text_chunks:
             cleaned = _clean_gantt_noise(chunk["content"])
             if cleaned.strip():
                 context_parts.append(cleaned)
                 context_parts.append("")
-        if len(context_parts) <= 1:
-            context_parts.append("No schedule data could be extracted after filtering.\n")
-        return "\n".join(context_parts)
 
-    context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
+    if not table_chunks and not row_chunks and not text_chunks:
+        context_parts.append(f"No content extracted from {filename}.\n")
+
     return "\n".join(context_parts)
 
 
@@ -538,13 +545,14 @@ async def predictive_analysis(
 
         row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
         table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
+        text_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "text")
         ocr_elapsed = time.time() - start_time
-        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({table_count} tables)")
+        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({row_count} rows, {table_count} tables, {text_count} text)")
 
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
 
         context = _build_predictive_context(chunks, filename_clean)
-        logger.info(f"  Context built: {len(context)} chars")
+        logger.info(f"  Context built: {len(context)} chars (all sections included)")
 
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
