@@ -254,12 +254,15 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
                         break
             
             row_content_parts = []
+            has_any_value = False
             for i, cell_val in enumerate(row):
-                if cell_val:
-                    header = header_row[i] if i < len(header_row) else f"Col{i+1}"
-                    row_content_parts.append(f"{header}: {cell_val}")
+                header = header_row[i] if i < len(header_row) else f"Col{i+1}"
+                val = str(cell_val).strip() if cell_val else ""
+                row_content_parts.append(f"{header}: {val}")
+                if val:
+                    has_any_value = True
             
-            if row_content_parts:
+            if has_any_value:
                 row_content = f"Row {row_idx} (Page {row_page}): " + " | ".join(row_content_parts)
                 chunks.append({
                     "content": row_content,
