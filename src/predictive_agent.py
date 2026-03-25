@@ -134,7 +134,20 @@ Areas may appear in:
 Execute DELAYED ACTIVITIES IDENTIFICATION (Module A) on the provided schedule data.
 This is the foundational analysis layer — it must be executed with absolute precision.
 Identify ALL activities that should have started but show zero progress.
-The output must be clear, actionable, and trustworthy.
+
+DETERMINISTIC REQUIREMENT: For the same input data, you MUST produce IDENTICAL results every time.
+- Parse every single row systematically — do not sample or skip
+- Apply the exact same filtering logic to every row
+- The delayed activities list must be complete and reproducible
+- The Days Overdue calculation must be mathematically exact: (reference_date - Startdato) in calendar days
+- Do NOT use approximate language like "approximately", "around", "roughly" for counts or days
+
+VERIFICATION: After building your delayed activities list, verify:
+1. Every listed activity has Startdato STRICTLY BEFORE the reference date
+2. Every listed activity has % færdigt EXACTLY 0%
+3. No summary/grouping rows are included
+4. The total count matches the actual number of rows in your table
+5. The INSIGHT_DATA delayed_count matches the total count
 </task>
 
 <constraints>
@@ -224,16 +237,29 @@ These will be enabled in future iterations:
 ---
 
 <output>
-## MANDATORY OUTPUT STRUCTURE
+## MANDATORY OUTPUT STRUCTURE — FOLLOW EXACTLY, NO DEVIATIONS
+
+You MUST produce output in EXACTLY this structure. Do NOT add extra sections, do NOT skip sections, do NOT change section headers, do NOT reorder sections. Every run for the same data MUST produce the same results.
+
+STRICT RULES:
+1. Use EXACTLY these section headers: ## NOVA_INSIGHT_REPORT, ### SCHEDULE_OVERVIEW, ### MODULE_A_DELAYED_ACTIVITIES
+2. The delayed activities table MUST have EXACTLY these 7 columns in this order: Id | Opgavenavn | Startdato | Slutdato | Varighed | % færdigt | Days Overdue
+3. Days Overdue column: show the integer number followed by " days" (e.g., "185 days", "31 days")
+4. Dates in output: always dd-mm-yyyy format (e.g., 08-09-2025, not 08-09-25)
+5. Sort the table STRICTLY by Days Overdue descending (highest first)
+6. After the table: Total count, Summary by Area, Top 5, Assessment — in that exact order
+7. The <!--INSIGHT_DATA:{...}--> tag MUST be the LAST line, with accurate counts matching your table
+8. Do NOT add any commentary before ## NOVA_INSIGHT_REPORT
+9. Do NOT add sections beyond what is specified below
 
 ```
 ## NOVA_INSIGHT_REPORT
 
 ### SCHEDULE_OVERVIEW
-- Schedule: [filename]
+- Schedule: [filename as provided]
 - Reference date: [dd-mm-yyyy]
-- Total activities analyzed: [X] (excluding summary rows)
-- Areas covered: [Omr. 1, Omr. 2, ..., Globals]
+- Total activities analyzed: [X] (excluding summary/grouping rows)
+- Areas covered: [list all areas/disciplines found]
 - Format detected: [MS Project Export / Detailtidsplan / Unstructured / Hybrid]
 
 ### MODULE_A_DELAYED_ACTIVITIES
@@ -242,24 +268,25 @@ These will be enabled in future iterations:
 
 | Id | Opgavenavn | Startdato | Slutdato | Varighed | % færdigt | Days Overdue |
 |---|---|---|---|---|---|---|
-[sorted by Days Overdue descending]
+| [id] | [full task name] | [dd-mm-yyyy] | [dd-mm-yyyy or -] | [Xd] | 0% | [N] days |
+[... all delayed activities sorted by Days Overdue DESC ...]
 
 **Total delayed activities: [X]**
 
 **Summary by Area/Discipline:**
 • [Area/Discipline 1]: [X] delayed activities
 • [Area/Discipline 2]: [X] delayed activities
-...
+[... one bullet per area, sorted by count descending ...]
 
 **Most Critical Delays (Top 5):**
 1. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
-2. ...
-3. ...
-4. ...
-5. ...
+2. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
+3. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
+4. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
+5. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
 
 **Assessment:**
-[2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken]
+[2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken. Be specific — mention actual area names and counts.]
 
 <!--INSIGHT_DATA:{"total_activities":X,"delayed_count":X,"reference_date":"dd-mm-yyyy","most_overdue_days":X,"areas_affected":X,"format_detected":"...","schedule_name":"..."}-->
 ```
@@ -377,12 +404,12 @@ EXECUTION STEPS:
             api_params = {
                 "model": self.deployment,
                 "messages": messages,
-                "temperature": 1,
+                "temperature": 0,
                 "max_completion_tokens": 32768,
             }
 
             try:
-                api_params["reasoning_effort"] = "low"
+                api_params["reasoning_effort"] = "medium"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 if "reasoning_effort" in str(reasoning_err) or "Unrecognized" in str(reasoning_err):
