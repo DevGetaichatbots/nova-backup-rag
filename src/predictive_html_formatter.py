@@ -10,6 +10,16 @@ def _escape(text: str) -> str:
     return html.escape(str(text))
 
 
+def _bold_markdown(text: str, color: str = "#1a202c") -> str:
+    return re.sub(r"\*\*([^*]+)\*\*", rf'<strong style="color:{color};font-weight:700;">\1</strong>', text)
+
+
+def _process_inline_markdown(raw_text: str) -> str:
+    safe = _escape(raw_text)
+    safe = _bold_markdown(safe)
+    return safe
+
+
 def _parse_insight_data(markdown: str) -> Optional[Dict]:
     match = re.search(r"<!--INSIGHT_DATA:(.*?)-->", markdown, re.DOTALL)
     if match:
@@ -50,6 +60,17 @@ TASK_TYPE_STYLES = {
     "Indkøb": {"color": "#d97706", "bg": "#fffbeb"},
     "Milestone": {"color": "#64748b", "bg": "#f8fafc"},
     "Milepæl": {"color": "#64748b", "bg": "#f8fafc"},
+}
+
+RESOURCE_ICONS = {
+    "coordination": ("🔗", "#7c3aed"),
+    "koordinering": ("🔗", "#7c3aed"),
+    "design": ("📐", "#2563eb"),
+    "bygherre": ("👤", "#c026d3"),
+    "production": ("🏗️", "#059669"),
+    "produktion": ("🏗️", "#059669"),
+    "management": ("📋", "#ea580c"),
+    "ledelse": ("📋", "#ea580c"),
 }
 
 
@@ -114,7 +135,7 @@ def _render_delayed_table(markdown_lines: List[str]) -> str:
             if ci == 0:
                 content = f'<span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',SFMono-Regular,Menlo,monospace;">{_escape(cell)}</span>'
             elif ci == days_col_idx:
-                content = f'<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;color:{severity["color"]};background:{severity["bg"]};border:1px solid {severity["border"]};">{_escape(cell)}</span></span>'
+                content = f'<span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;color:{severity["color"]};background:{severity["bg"]};border:1px solid {severity["border"]};">{_escape(cell)}</span>'
             elif ci == priority_col_idx:
                 p_style = PRIORITY_STYLES.get(cell.strip(), {"color": "#64748b", "bg": "#f8fafc", "border": "#e2e8f0"})
                 content = f'<span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;color:{p_style["color"]};background:{p_style["bg"]};border:1px solid {p_style["border"]};white-space:nowrap;">{_escape(cell)}</span>'
@@ -132,10 +153,298 @@ def _render_delayed_table(markdown_lines: List[str]) -> str:
         rows_html.append(f'<tr style="background:{bg};transition:background 0.15s;" onmouseover="this.style.background=\'#edf2f7\'" onmouseout="this.style.background=\'{bg}\'">{cells_html}</tr>')
 
     return f'''<div style="overflow-x:auto;border-radius:12px;margin:16px 0;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-<table style="width:100%;min-width:800px;border-collapse:collapse;">
+<table style="width:100%;min-width:900px;border-collapse:collapse;">
 <thead><tr>{header_html}</tr></thead>
 <tbody>{"".join(rows_html)}</tbody>
 </table></div>'''
+
+
+def _render_root_cause_section(lines: List[str], accent_color: str) -> str:
+    parts = []
+    current_rc_lines = []
+    current_rc_header = None
+    downstream_lines = []
+    in_downstream = False
+
+    def flush_rc():
+        nonlocal current_rc_lines, current_rc_header
+        if current_rc_header:
+            detail_html = _render_rc_detail_card(current_rc_header, current_rc_lines)
+            parts.append(detail_html)
+        current_rc_lines = []
+        current_rc_header = None
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        rc_match = re.match(r"^\*\*(ROOT CAUSE|GRUNDÅRSAG):\s*(.+?)\*\*$", stripped)
+        if rc_match:
+            flush_rc()
+            in_downstream = False
+            current_rc_header = (rc_match.group(1), rc_match.group(2))
+            continue
+
+        ds_match = re.match(r"^\*\*(Downstream consequences|Afledte konsekvenser).*?\*\*", stripped)
+        if ds_match:
+            flush_rc()
+            in_downstream = True
+            continue
+
+        if in_downstream:
+            if stripped.startswith("- ") or stripped.startswith("• ") or stripped.startswith("* "):
+                item = stripped[2:]
+                if not re.search(r'\bID\s+N/?A\b', item, re.IGNORECASE):
+                    downstream_lines.append(item)
+            continue
+
+        if current_rc_header:
+            if stripped.startswith("- "):
+                current_rc_lines.append(stripped[2:])
+            else:
+                current_rc_lines.append(stripped)
+
+    flush_rc()
+
+    if downstream_lines:
+        ds_label = "Afledte konsekvenser" if any("GRUNDÅRSAG" in str(p) for p in parts) else "Downstream consequences"
+        ds_sublabel = "Løses når grundårsagen er adresseret" if "Afledte" in ds_label else "Will likely resolve when root cause is addressed"
+        items_html = ""
+        for item in downstream_lines:
+            item_safe = _process_inline_markdown(item)
+            items_html += f'<div style="padding:8px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;line-height:1.6;display:flex;align-items:flex-start;gap:8px;"><span style="color:#94a3b8;font-size:14px;flex-shrink:0;margin-top:1px;">↳</span><span>{item_safe}</span></div>'
+        parts.append(f'''<div style="margin:20px 0 8px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;">
+  <div style="padding:12px 16px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;">
+    <h4 style="margin:0;color:#475569;font-size:13px;font-weight:700;">{_escape(ds_label)}</h4>
+    <p style="margin:3px 0 0;color:#94a3b8;font-size:11px;">{_escape(ds_sublabel)}</p>
+  </div>
+  {items_html}
+</div>''')
+
+    return "".join(parts)
+
+
+def _render_rc_detail_card(header: tuple, detail_lines: List[str]) -> str:
+    label, detail = header
+    detail_safe = _escape(detail)
+
+    id_match = re.search(r"ID\s+(\d+)", detail)
+    id_badge = ""
+    if id_match:
+        id_badge = f'<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;margin-right:8px;font-family:\'SF Mono\',monospace;">ID {id_match.group(1)}</span>'
+
+    field_html = ""
+    for line in detail_lines:
+        field_match = re.match(r"^(Status|Problem type|Problemtype|Why it matters|Hvorfor det er vigtigt|Downstream impact|Nedstrømseffekt|Likely consequence if unresolved|Sandsynlig konsekvens hvis uløst):\s*(.*)", line, re.IGNORECASE)
+        if field_match:
+            field_name = _escape(field_match.group(1))
+            field_val = _process_inline_markdown(field_match.group(2))
+
+            icon = "📊"
+            field_color = "#4a5568"
+            if "status" in field_name.lower():
+                icon = "⏱️"
+                field_color = "#dc2626"
+            elif "problem" in field_name.lower():
+                icon = "🔍"
+                field_color = "#7c3aed"
+            elif "why" in field_name.lower() or "hvorfor" in field_name.lower():
+                icon = "⚡"
+                field_color = "#d97706"
+            elif "downstream" in field_name.lower() or "nedstrøm" in field_name.lower():
+                icon = "🔗"
+                field_color = "#2563eb"
+            elif "consequence" in field_name.lower() or "konsekvens" in field_name.lower():
+                icon = "⚠️"
+                field_color = "#ea580c"
+
+            field_html += f'''<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f4;align-items:flex-start;">
+  <span style="font-size:14px;flex-shrink:0;margin-top:1px;">{icon}</span>
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:11px;font-weight:700;color:{field_color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px;">{field_name}</div>
+    <div style="font-size:13px;color:#374151;line-height:1.6;">{field_val}</div>
+  </div>
+</div>'''
+        else:
+            text = _process_inline_markdown(line)
+            field_html += f'<p style="margin:6px 0;color:#4a5568;font-size:13px;line-height:1.6;">{text}</p>'
+
+    return f'''<div style="margin:14px 0;background:#ffffff;border-radius:12px;border:1px solid #fecaca;border-left:4px solid #dc2626;overflow:hidden;box-shadow:0 1px 3px rgba(220,38,38,0.08);">
+  <div style="padding:14px 18px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-bottom:1px solid #fecaca;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:16px;">🔴</span>
+      {id_badge}
+      <span style="font-size:13px;font-weight:700;color:#991b1b;">{detail_safe}</span>
+    </div>
+  </div>
+  <div style="padding:6px 18px 14px;">{field_html}</div>
+</div>'''
+
+
+def _render_resource_section(lines: List[str], accent_color: str) -> str:
+    parts = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("- ") or stripped.startswith("• ") or stripped.startswith("* "):
+            item = stripped[2:]
+        else:
+            item = stripped
+
+        if re.search(r'\bID\s+N/?A\b', item, re.IGNORECASE):
+            continue
+
+        id_match = re.match(r"^\*\*(?:ID\s+)?(\d+)\*\*\s*:?\s*(.*)", item)
+        if not id_match:
+            id_match = re.match(r"^(?:ID\s+)?(\d+)\s*:?\s*[-–—]?\s*(.*)", item)
+
+        if id_match:
+            task_id = id_match.group(1)
+            desc = id_match.group(2)
+            desc_safe = _process_inline_markdown(desc)
+            desc_lower = desc.lower()
+
+            icon = "📋"
+            type_color = "#64748b"
+            type_bg = "#f8fafc"
+            type_label = ""
+            if any(k in desc_lower for k in ["coordination", "koordinering", "bottleneck", "flaskehals"]):
+                icon = "🔗"
+                type_color = "#7c3aed"
+                type_bg = "#f5f3ff"
+                type_label = "Coordination"
+            elif any(k in desc_lower for k in ["design", "input", "specification"]):
+                icon = "📐"
+                type_color = "#2563eb"
+                type_bg = "#eff6ff"
+                type_label = "Design"
+            elif any(k in desc_lower for k in ["bygherre", "client", "klient", "escalat", "eskalering"]):
+                icon = "👤"
+                type_color = "#c026d3"
+                type_bg = "#fdf4ff"
+                type_label = "Bygherre"
+            elif any(k in desc_lower for k in ["production", "produktion", "manpower", "mandskab", "labour", "arbejdskraft"]):
+                icon = "🏗️"
+                type_color = "#059669"
+                type_bg = "#ecfdf5"
+                type_label = "Production"
+            elif any(k in desc_lower for k in ["management", "ledelse", "attention", "opmærksomhed"]):
+                icon = "📋"
+                type_color = "#ea580c"
+                type_bg = "#fff7ed"
+                type_label = "Management"
+
+            resource_keywords = ["manpower", "management attention", "site labour", "labour", "escalation",
+                                 "coordination bottleneck", "design dependency", "production delay",
+                                 "mandskab", "ledelsens opmærksomhed", "arbejdskraft", "eskalering",
+                                 "koordineringsflaskehals", "designafhængighed", "produktionsforsinkelse"]
+            for kw in resource_keywords:
+                if kw.lower() in desc_safe.lower():
+                    idx_kw = desc_safe.lower().index(kw.lower())
+                    original_kw = desc_safe[idx_kw:idx_kw + len(kw)]
+                    desc_safe = desc_safe.replace(original_kw, f'<strong style="color:#0d9488;">{original_kw}</strong>', 1)
+                    break
+
+            type_badge = f'<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;color:{type_color};background:{type_bg};margin-left:8px;">{type_label}</span>' if type_label else ""
+
+            parts.append(f'''<div style="display:flex;gap:12px;padding:14px 16px;margin:8px 0;background:#ffffff;border-radius:10px;border:1px solid #e2e8f0;align-items:flex-start;transition:all 0.15s;" onmouseover="this.style.borderColor='#cbd5e1';this.style.boxShadow='0 2px 6px rgba(0,0,0,0.04)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+  <span style="font-size:18px;flex-shrink:0;margin-top:1px;">{icon}</span>
+  <div style="flex:1;min-width:0;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+      <span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',monospace;">ID {task_id}</span>
+      {type_badge}
+    </div>
+    <p style="margin:0;color:#4a5568;font-size:13px;line-height:1.7;">{desc_safe}</p>
+  </div>
+</div>''')
+        else:
+            text = _process_inline_markdown(item)
+            parts.append(f'<p style="margin:8px 0;color:#4a5568;font-size:14px;line-height:1.8;">{text}</p>')
+
+    return "".join(parts)
+
+
+def _render_actions_section(lines: List[str], accent_color: str) -> str:
+    parts = []
+    current_items = []
+
+    def flush_items():
+        nonlocal current_items
+        if not current_items:
+            return
+        items_html = ""
+        for num, text in current_items:
+            items_html += f'''<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;align-items:flex-start;">
+  <div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0891b2);color:white;font-size:13px;font-weight:800;flex-shrink:0;box-shadow:0 2px 4px rgba(13,148,136,0.2);">{num}</div>
+  <div style="flex:1;padding-top:4px;font-size:14px;color:#374151;line-height:1.7;">{text}</div>
+</div>'''
+        parts.append(f'<div style="margin:8px 0;">{items_html}</div>')
+        current_items = []
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        num_match = re.match(r"^(\d+)\.\s+(.*)", stripped)
+        if num_match:
+            item_raw = num_match.group(2)
+            if re.search(r'\bID\s+N/?A\b', item_raw, re.IGNORECASE):
+                continue
+            num = num_match.group(1)
+            item_safe = _process_inline_markdown(item_raw)
+            current_items.append((num, item_safe))
+        elif stripped.startswith("- ") or stripped.startswith("• "):
+            text = _process_inline_markdown(stripped[2:])
+            parts.append(f'<p style="margin:6px 0 6px 44px;color:#64748b;font-size:13px;line-height:1.6;">→ {text}</p>')
+        else:
+            flush_items()
+            text = _process_inline_markdown(stripped)
+            parts.append(f'<p style="margin:8px 0;color:#4a5568;font-size:14px;line-height:1.8;">{text}</p>')
+
+    flush_items()
+    return "".join(parts)
+
+
+def _render_area_summary_section(lines: List[str], accent_color: str) -> str:
+    parts = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("• ") or stripped.startswith("- ") or stripped.startswith("* "):
+            item = stripped[2:]
+        else:
+            item = stripped
+
+        area_match = re.match(r"^(.+?):\s*(\d+)\s+(?:delayed|forsinkede?)\s*\((.+?)\)\s*[-–—]\s*(.*)", item, re.IGNORECASE)
+        if area_match:
+            area_name = _escape(area_match.group(1).strip())
+            delayed_n = area_match.group(2)
+            breakdown = _escape(area_match.group(3))
+            summary = _process_inline_markdown(area_match.group(4))
+
+            crit_match = re.search(r"(\d+)\s*(?:critical|kritisk)", breakdown, re.IGNORECASE)
+            bar_color = "#dc2626" if crit_match and int(crit_match.group(1)) > 0 else ("#d97706" if int(delayed_n) > 2 else "#0d9488")
+
+            parts.append(f'''<div style="display:flex;gap:14px;padding:14px 16px;margin:6px 0;background:#ffffff;border-radius:10px;border:1px solid #e2e8f0;border-left:4px solid {bar_color};align-items:flex-start;">
+  <div style="text-align:center;flex-shrink:0;min-width:40px;">
+    <div style="font-size:22px;font-weight:800;color:{bar_color};line-height:1;">{_escape(delayed_n)}</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-top:2px;">delayed</div>
+  </div>
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:14px;font-weight:700;color:#1a202c;margin-bottom:3px;">{area_name}</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:4px;">{breakdown}</div>
+    <div style="font-size:13px;color:#4a5568;line-height:1.6;">{summary}</div>
+  </div>
+</div>''')
+        else:
+            text = _process_inline_markdown(item)
+            parts.append(f'<p style="margin:6px 0;color:#4a5568;font-size:14px;line-height:1.7;">{text}</p>')
+
+    return "".join(parts)
 
 
 def _render_content_block(lines: List[str], accent_color: str) -> str:
@@ -153,38 +462,14 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
         nonlocal list_items
         if list_items:
             items = "".join(
-                f'<li style="margin:8px 0;line-height:1.7;padding-left:20px;position:relative;font-size:14px;color:#4a5568;"><span style="position:absolute;left:0;color:{accent_color};font-weight:bold;font-size:16px;line-height:1.35;">›</span>{item}</li>'
+                f'<li style="margin:8px 0;line-height:1.7;padding-left:22px;position:relative;font-size:14px;color:#4a5568;"><span style="position:absolute;left:0;color:{accent_color};font-weight:bold;font-size:16px;line-height:1.35;">›</span>{item}</li>'
                 for item in list_items
             )
             parts.append(f'<ul style="margin:12px 0;padding-left:0;list-style:none;">{items}</ul>')
             list_items = []
 
-    in_code_block = False
-    code_lines = []
-
-    def flush_code():
-        nonlocal code_lines, in_code_block
-        if code_lines:
-            code_text = _escape("\n".join(code_lines))
-            parts.append(f'<pre style="margin:12px 0;padding:14px 16px;background:#f7fafc;border-radius:8px;border:1px solid #e2e8f0;overflow-x:auto;"><code style="font-family:\'SF Mono\',SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:#4a5568;line-height:1.6;">{code_text}</code></pre>')
-            code_lines = []
-        in_code_block = False
-
     for line in lines:
         stripped = line.strip()
-
-        if stripped.startswith("```"):
-            if in_code_block:
-                flush_code()
-            else:
-                flush_table()
-                flush_list()
-                in_code_block = True
-            continue
-
-        if in_code_block:
-            code_lines.append(line.rstrip())
-            continue
 
         if not stripped:
             flush_table()
@@ -198,26 +483,9 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
 
         flush_table()
 
-        root_cause_match = re.match(r"^\*\*(ROOT CAUSE|GRUNDÅRSAG):\s*(.+?)\*\*$", stripped)
-        if root_cause_match:
-            flush_list()
-            label = root_cause_match.group(1)
-            detail = _escape(root_cause_match.group(2))
-            parts.append(f'''<div style="margin:18px 0 10px;padding:14px 18px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;border-left:4px solid #dc2626;">
-<p style="margin:0;color:#991b1b;font-size:14px;font-weight:700;"><span style="margin-right:8px;">🔴</span>{_escape(label)}: {detail}</p></div>''')
-            continue
-
-        downstream_match = re.match(r"^\*\*(Downstream consequences|Afledte konsekvenser).*?\*\*", stripped)
-        if downstream_match:
-            flush_list()
-            text = _escape(downstream_match.group(0).strip("*"))
-            parts.append(f'<h4 style="margin:22px 0 10px;color:#64748b;font-size:13px;font-weight:700;padding:10px 16px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">{text}</h4>')
-            continue
-
         if stripped.startswith("- ") or stripped.startswith("• ") or stripped.startswith("* "):
             item_raw = stripped[2:]
-            item_safe = _escape(item_raw)
-            item_safe = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1a202c;font-weight:600;">\1</strong>', item_safe)
+            item_safe = _process_inline_markdown(item_raw)
 
             if re.search(r'\bID\s+N/?A\b', item_raw, re.IGNORECASE):
                 continue
@@ -225,15 +493,6 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
             for pkey, pstyle in PRIORITY_STYLES.items():
                 if pkey in item_safe:
                     item_safe = item_safe.replace(_escape(pkey), f'<span style="display:inline-block;padding:1px 8px;border-radius:6px;font-size:11px;font-weight:700;color:{pstyle["color"]};background:{pstyle["bg"]};border:1px solid {pstyle["border"]};">{_escape(pkey)}</span>')
-                    break
-
-            resource_keywords = ["manpower", "management attention", "site labour", "labour", "escalation", "client", "coordination bottleneck", "design dependency", "production delay",
-                                 "mandskab", "ledelsens opmærksomhed", "arbejdskraft", "eskalering", "koordineringsflaskehals", "designafhængighed"]
-            for kw in resource_keywords:
-                if kw.lower() in item_safe.lower():
-                    idx_kw = item_safe.lower().index(kw.lower())
-                    original_kw = item_safe[idx_kw:idx_kw+len(kw)]
-                    item_safe = item_safe.replace(original_kw, f'<strong style="color:#0d9488;">{original_kw}</strong>', 1)
                     break
 
             list_items.append(item_safe)
@@ -246,14 +505,11 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
                 if re.search(r'\bID\s+N/?A\b', item_raw, re.IGNORECASE):
                     continue
                 num = num_match.group(1)
-                item_safe = _escape(item_raw)
-                item_safe = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1a202c;font-weight:600;">\1</strong>', item_safe)
+                item_safe = _process_inline_markdown(item_raw)
                 list_items.append(f'<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0d9488;color:white;font-size:12px;font-weight:700;margin-right:10px;flex-shrink:0;">{num}</span>{item_safe}')
                 continue
 
         flush_list()
-
-        safe = _escape(stripped)
 
         bold_line = re.match(r"^\*\*(.+?)\*\*$", stripped)
         if bold_line:
@@ -269,10 +525,9 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
                 parts.append(f'<p style="margin:8px 0;color:#4a5568;font-size:13px;font-weight:600;background:#f7fafc;padding:8px 14px;border-radius:8px;border-left:3px solid {accent_color};">{text}</p>')
                 continue
 
-        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1a202c;font-weight:600;">\1</strong>', safe)
+        text = _process_inline_markdown(stripped)
         parts.append(f'<p style="margin:8px 0;color:#4a5568;line-height:1.8;font-size:14px;">{text}</p>')
 
-    flush_code()
     flush_table()
     flush_list()
     return "".join(parts)
@@ -309,50 +564,42 @@ def _build_hero_section(insight_data: Dict, language: str) -> str:
         status_color = "#d97706"
         status_bg = "#fffbeb"
         status_border = "#fde68a"
-        status_label = "Moderat" if language == "da" else "Moderate"
+        status_label = "Moderat risiko" if language == "da" else "Moderate Risk"
     elif critical_count <= 8:
         status_color = "#ea580c"
         status_bg = "#fff7ed"
         status_border = "#fed7aa"
-        status_label = "Alvorlig" if language == "da" else "Serious"
+        status_label = "Alvorlig risiko" if language == "da" else "Serious Risk"
     else:
         status_color = "#dc2626"
         status_bg = "#fef2f2"
         status_border = "#fecaca"
-        status_label = "Kritisk" if language == "da" else "Critical"
+        status_label = "Kritisk risiko" if language == "da" else "Critical Risk"
 
     pct = min(round((delayed_count / max(total_activities, 1)) * 100), 100) if total_activities > 0 else 0
     bar_width = min(pct, 100)
     bar_color = "#0d9488" if pct < 15 else ("#d97706" if pct < 30 else ("#ea580c" if pct < 50 else "#dc2626"))
 
-    priority_breakdown = ""
-    if critical_count > 0 or important_count > 0 or monitor_count > 0:
-        crit_label = "Kritisk" if language == "da" else "Critical"
-        imp_label = "Vigtig" if language == "da" else "Important"
-        mon_label = "Overvåg" if language == "da" else "Monitor"
-        priority_breakdown = f'''
-    <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#dc2626;"></span>
-        <span style="font-size:12px;color:#4a5568;font-weight:600;">{critical_count} {crit_label}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d97706;"></span>
-        <span style="font-size:12px;color:#4a5568;font-weight:600;">{important_count} {imp_label}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0891b2;"></span>
-        <span style="font-size:12px;color:#4a5568;font-weight:600;">{monitor_count} {mon_label}</span>
-      </div>
+    primary_risk_html = ""
+    if primary_risk and primary_risk.lower() not in ("none", "n/a", ""):
+        risk_label = "Primær risiko" if language == "da" else "Primary Risk"
+        primary_risk_html = f'''
+    <div style="margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;">
+      <div style="font-size:10px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-bottom:3px;">{risk_label}</div>
+      <div style="font-size:13px;color:#991b1b;font-weight:600;line-height:1.5;">{primary_risk}</div>
     </div>'''
 
-    return f'''
-<div style="margin:0 0 20px 0;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-  <div style="background:linear-gradient(135deg,#f0fdfa,#ecfeff);padding:24px 28px 20px;border-bottom:1px solid #e2e8f0;">
-    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    crit_label = "Kritisk" if language == "da" else "Critical"
+    imp_label = "Vigtig" if language == "da" else "Important"
+    mon_label = "Overvåg" if language == "da" else "Monitor"
 
-      <div style="text-align:center;flex-shrink:0;min-width:100px;">
-        <div style="font-size:48px;font-weight:900;color:{status_color};line-height:1;">
+    return f'''
+<div style="margin:0 0 22px 0;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+  <div style="background:linear-gradient(135deg,#f0fdfa,#ecfeff);padding:28px 28px 22px;border-bottom:1px solid #e2e8f0;">
+    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+
+      <div style="text-align:center;flex-shrink:0;min-width:110px;">
+        <div style="font-size:56px;font-weight:900;color:{status_color};line-height:1;">
           {delayed_count}
         </div>
         <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:1.5px;margin-top:4px;">
@@ -360,77 +607,84 @@ def _build_hero_section(insight_data: Dict, language: str) -> str:
         </div>
       </div>
 
-      <div style="flex:1;min-width:200px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;color:{status_color};background:{status_bg};border:1px solid {status_border};">{status_label}</span>
+      <div style="flex:1;min-width:220px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;color:{status_color};background:{status_bg};border:1px solid {status_border};">{status_label}</span>
         </div>
-        <div style="margin-bottom:8px;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:11px;color:#64748b;font-weight:600;">{"Forsinkede af total" if language == "da" else "Delayed of total"}</span>
             <span style="font-size:12px;color:#1a202c;font-weight:700;">{delayed_count}/{total_activities} ({pct}%)</span>
           </div>
-          <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:{bar_width}%;background:{bar_color};border-radius:4px;"></div>
+          <div style="height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;">
+            <div style="height:100%;width:{bar_width}%;background:linear-gradient(90deg,{bar_color},{bar_color}cc);border-radius:5px;"></div>
           </div>
         </div>
-        {priority_breakdown}
 
-        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;">
-          <div>
-            <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:0.8px;">{"Referencedato" if language == "da" else "Ref. Date"}</div>
-            <div style="font-size:14px;font-weight:700;color:#1a202c;margin-top:2px;">{ref_date}</div>
+        <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#dc2626;"></span>
+            <span style="font-size:12px;color:#991b1b;font-weight:700;">{critical_count}</span>
+            <span style="font-size:11px;color:#991b1b;font-weight:600;">{crit_label}</span>
           </div>
-          <div>
-            <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:0.8px;">{"Mest Forsinket" if language == "da" else "Most Overdue"}</div>
-            <div style="font-size:14px;font-weight:700;color:#dc2626;margin-top:2px;">{most_overdue} <span style="font-size:11px;color:#64748b;font-weight:600;">{"dage" if language == "da" else "days"}</span></div>
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#fffbeb;border-radius:8px;border:1px solid #fde68a;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;"></span>
+            <span style="font-size:12px;color:#92400e;font-weight:700;">{important_count}</span>
+            <span style="font-size:11px;color:#92400e;font-weight:600;">{imp_label}</span>
           </div>
-          <div>
-            <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:0.8px;">{"Grundårsager" if language == "da" else "Root Causes"}</div>
-            <div style="font-size:14px;font-weight:700;color:#7c3aed;margin-top:2px;">{root_cause_count}</div>
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#ecfeff;border-radius:8px;border:1px solid #a5f3fc;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0891b2;"></span>
+            <span style="font-size:12px;color:#155e75;font-weight:700;">{monitor_count}</span>
+            <span style="font-size:11px;color:#155e75;font-weight:600;">{mon_label}</span>
           </div>
         </div>
+        {primary_risk_html}
       </div>
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #edf2f7;">
-    <div style="padding:14px;text-align:center;border-right:1px solid #edf2f7;">
-      <div style="font-size:20px;font-weight:800;color:#1a202c;">{total_activities}</div>
-      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:2px;">{"Aktiviteter" if language == "da" else "Activities"}</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #edf2f7;">
+    <div style="padding:16px;text-align:center;border-right:1px solid #edf2f7;">
+      <div style="font-size:22px;font-weight:800;color:#1a202c;">{total_activities}</div>
+      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Aktiviteter" if language == "da" else "Activities"}</div>
     </div>
-    <div style="padding:14px;text-align:center;border-right:1px solid #edf2f7;">
-      <div style="font-size:20px;font-weight:800;color:{status_color};">{delayed_count}</div>
-      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:2px;">{"Forsinkede" if language == "da" else "Delayed"}</div>
+    <div style="padding:16px;text-align:center;border-right:1px solid #edf2f7;">
+      <div style="font-size:22px;font-weight:800;color:{status_color};">{delayed_count}</div>
+      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Forsinkede" if language == "da" else "Delayed"}</div>
     </div>
-    <div style="padding:14px;text-align:center;border-right:1px solid #edf2f7;">
-      <div style="font-size:20px;font-weight:800;color:#dc2626;">{critical_count}</div>
-      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:2px;">{"Kritiske" if language == "da" else "Critical"}</div>
+    <div style="padding:16px;text-align:center;border-right:1px solid #edf2f7;">
+      <div style="font-size:22px;font-weight:800;color:#dc2626;">{critical_count}</div>
+      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Kritiske" if language == "da" else "Critical"}</div>
     </div>
-    <div style="padding:14px;text-align:center;">
-      <div style="font-size:20px;font-weight:800;color:#1a202c;">{areas_affected}</div>
-      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:2px;">{"Områder" if language == "da" else "Areas"}</div>
+    <div style="padding:16px;text-align:center;border-right:1px solid #edf2f7;">
+      <div style="font-size:22px;font-weight:800;color:#7c3aed;">{root_cause_count}</div>
+      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Grundårsager" if language == "da" else "Root Causes"}</div>
+    </div>
+    <div style="padding:16px;text-align:center;">
+      <div style="font-size:22px;font-weight:800;color:#1a202c;">{areas_affected}</div>
+      <div style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-top:3px;">{"Områder" if language == "da" else "Areas"}</div>
     </div>
   </div>
 </div>'''
 
 
 MODULE_CONFIG = {
-    "MANAGEMENT_CONCLUSION": {"label_en": "Management Conclusion", "label_da": "Ledelseskonklusion", "color": "#0d9488", "icon": "management"},
-    "LEDELSESKONKLUSION": {"label_en": "Management Conclusion", "label_da": "Ledelseskonklusion", "color": "#0d9488", "icon": "management"},
-    "SCHEDULE_OVERVIEW": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0d9488", "icon": "overview"},
-    "TIDSPLANOVERSIGT": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0d9488", "icon": "overview"},
-    "DELAYED_ACTIVITIES": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed"},
-    "FORSINKEDE_AKTIVITETER": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed"},
-    "MODULE_A_DELAYED_ACTIVITIES": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed"},
-    "MODUL_A_FORSINKEDE_AKTIVITETER": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed"},
-    "ROOT_CAUSE_ANALYSIS": {"label_en": "Root Cause Analysis", "label_da": "Årsagsanalyse", "color": "#7c3aed", "icon": "rootcause"},
-    "ÅRSAGSANALYSE": {"label_en": "Root Cause Analysis", "label_da": "Årsagsanalyse", "color": "#7c3aed", "icon": "rootcause"},
-    "PRIORITY_ACTIONS": {"label_en": "Priority Actions", "label_da": "Prioriterede Handlinger", "color": "#059669", "icon": "actions"},
-    "PRIORITEREDE_HANDLINGER": {"label_en": "Priority Actions", "label_da": "Prioriterede Handlinger", "color": "#059669", "icon": "actions"},
-    "RESOURCE_ASSESSMENT": {"label_en": "Resource Assessment", "label_da": "Ressourcevurdering", "color": "#d97706", "icon": "resource"},
-    "RESSOURCEVURDERING": {"label_en": "Resource Assessment", "label_da": "Ressourcevurdering", "color": "#d97706", "icon": "resource"},
-    "SUMMARY_BY_AREA": {"label_en": "Summary by Area", "label_da": "Oversigt efter Område", "color": "#2563eb", "icon": "area"},
-    "OVERSIGT_EFTER_OMRÅDE": {"label_en": "Summary by Area", "label_da": "Oversigt efter Område", "color": "#2563eb", "icon": "area"},
+    "MANAGEMENT_CONCLUSION": {"label_en": "Management Conclusion", "label_da": "Ledelseskonklusion", "color": "#0d9488", "icon": "management", "renderer": None},
+    "LEDELSESKONKLUSION": {"label_en": "Management Conclusion", "label_da": "Ledelseskonklusion", "color": "#0d9488", "icon": "management", "renderer": None},
+    "SCHEDULE_OVERVIEW": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0d9488", "icon": "overview", "renderer": None},
+    "TIDSPLANOVERSIGT": {"label_en": "Schedule Overview", "label_da": "Tidsplanoversigt", "color": "#0d9488", "icon": "overview", "renderer": None},
+    "DELAYED_ACTIVITIES": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed", "renderer": None},
+    "FORSINKEDE_AKTIVITETER": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed", "renderer": None},
+    "MODULE_A_DELAYED_ACTIVITIES": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed", "renderer": None},
+    "MODUL_A_FORSINKEDE_AKTIVITETER": {"label_en": "Delayed Activities", "label_da": "Forsinkede Aktiviteter", "color": "#dc2626", "icon": "delayed", "renderer": None},
+    "ROOT_CAUSE_ANALYSIS": {"label_en": "Root Cause Analysis", "label_da": "Årsagsanalyse", "color": "#7c3aed", "icon": "rootcause", "renderer": "rootcause"},
+    "ÅRSAGSANALYSE": {"label_en": "Root Cause Analysis", "label_da": "Årsagsanalyse", "color": "#7c3aed", "icon": "rootcause", "renderer": "rootcause"},
+    "PRIORITY_ACTIONS": {"label_en": "Priority Actions", "label_da": "Prioriterede Handlinger", "color": "#059669", "icon": "actions", "renderer": "actions"},
+    "PRIORITEREDE_HANDLINGER": {"label_en": "Priority Actions", "label_da": "Prioriterede Handlinger", "color": "#059669", "icon": "actions", "renderer": "actions"},
+    "RESOURCE_ASSESSMENT": {"label_en": "Resource Assessment", "label_da": "Ressourcevurdering", "color": "#d97706", "icon": "resource", "renderer": "resource"},
+    "RESSOURCEVURDERING": {"label_en": "Resource Assessment", "label_da": "Ressourcevurdering", "color": "#d97706", "icon": "resource", "renderer": "resource"},
+    "SUMMARY_BY_AREA": {"label_en": "Summary by Area", "label_da": "Oversigt efter Område", "color": "#2563eb", "icon": "area", "renderer": "area"},
+    "OVERSIGT_EFTER_OMRÅDE": {"label_en": "Summary by Area", "label_da": "Oversigt efter Område", "color": "#2563eb", "icon": "area", "renderer": "area"},
 }
 
 SECTION_ICONS = {
@@ -441,6 +695,13 @@ SECTION_ICONS = {
     "actions": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
     "resource": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     "area": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+}
+
+RENDERERS = {
+    "rootcause": _render_root_cause_section,
+    "actions": _render_actions_section,
+    "resource": _render_resource_section,
+    "area": _render_area_summary_section,
 }
 
 
@@ -493,45 +754,44 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
 
     html_parts = [f'''
 <style>
-@keyframes novaFadeIn {{ from {{ opacity:0;transform:translateY(8px); }} to {{ opacity:1;transform:translateY(0); }} }}
-.nova-report .module-card {{ animation:novaFadeIn 0.4s ease-out backwards; }}
-.nova-report .module-card:nth-child(2) {{ animation-delay:0.08s; }}
+@keyframes novaFadeIn {{ from {{ opacity:0;transform:translateY(10px); }} to {{ opacity:1;transform:translateY(0); }} }}
+.nova-report .module-card {{ animation:novaFadeIn 0.45s ease-out backwards; }}
+.nova-report .module-card:nth-child(2) {{ animation-delay:0.06s; }}
 .nova-report .module-card:nth-child(3) {{ animation-delay:0.12s; }}
-.nova-report .module-card:nth-child(4) {{ animation-delay:0.16s; }}
-.nova-report .module-card:nth-child(5) {{ animation-delay:0.2s; }}
-.nova-report .module-card:nth-child(6) {{ animation-delay:0.24s; }}
-.nova-report .module-card:nth-child(7) {{ animation-delay:0.28s; }}
-.nova-report .module-card:hover {{ border-color:#cbd5e1 !important;box-shadow:0 4px 12px rgba(0,0,0,0.06); }}
+.nova-report .module-card:nth-child(4) {{ animation-delay:0.18s; }}
+.nova-report .module-card:nth-child(5) {{ animation-delay:0.24s; }}
+.nova-report .module-card:nth-child(6) {{ animation-delay:0.30s; }}
+.nova-report .module-card:nth-child(7) {{ animation-delay:0.36s; }}
+.nova-report .module-card:nth-child(8) {{ animation-delay:0.42s; }}
+.nova-report .module-card:hover {{ border-color:#cbd5e1 !important;box-shadow:0 4px 16px rgba(0,0,0,0.06) !important; }}
 .nova-report table tr:hover {{ background:#edf2f7 !important; }}
 .nova-report ::-webkit-scrollbar {{ height:6px; }}
 .nova-report ::-webkit-scrollbar-track {{ background:#f1f5f9;border-radius:6px; }}
 .nova-report ::-webkit-scrollbar-thumb {{ background:#cbd5e1;border-radius:6px; }}
 </style>
-<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#ffffff;border-radius:20px;padding:28px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+<div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;border-radius:20px;padding:32px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
 
-  <div style="text-align:center;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #edf2f7;">
-    <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:10px;">
-      <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 2px 8px rgba(13,148,136,0.2);">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l-3 3"/></svg>
+  <div style="text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:2px solid #edf2f7;">
+    <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:10px;">
+      <div style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 4px 12px rgba(13,148,136,0.25);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l-3 3"/></svg>
       </div>
       <div style="text-align:left;">
-        <h2 style="font-size:20px;font-weight:800;color:#1a202c;margin:0;letter-spacing:-0.3px;">{report_title}</h2>
-        <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;letter-spacing:0.3px;">{subtitle}</p>
+        <h2 style="font-size:22px;font-weight:800;color:#1a202c;margin:0;letter-spacing:-0.4px;">{report_title}</h2>
+        <p style="font-size:12px;color:#94a3b8;margin:3px 0 0 0;letter-spacing:0.3px;font-weight:500;">{subtitle}</p>
       </div>
     </div>
-    
   </div>''']
 
     if insight_data:
         html_parts.append(_build_hero_section(insight_data, language))
-
-    if not insight_data:
+    else:
         no_data_label = "Analytiske data ikke tilgængelige — oversigtsmetrikker kan ikke vises." if language == "da" else "Analytical data unavailable — summary metrics cannot be rendered."
-        html_parts.append(f'<div style="margin:0 0 16px 0;padding:12px 18px;background:#fffbeb;border-radius:10px;border:1px solid #fde68a;"><p style="margin:0;color:#92400e;font-size:12px;font-weight:600;">{no_data_label}</p></div>')
+        html_parts.append(f'<div style="margin:0 0 20px 0;padding:14px 18px;background:#fffbeb;border-radius:10px;border:1px solid #fde68a;"><p style="margin:0;color:#92400e;font-size:12px;font-weight:600;">{no_data_label}</p></div>')
 
     for section_key, section_body in sections:
         if section_key == "_PREAMBLE":
-            html_parts.append(f'<div class="module-card" style="margin:0 0 14px 0;padding:16px 20px;background:#f0fdfa;border-radius:12px;border:1px solid #99f6e4;border-left:3px solid #0d9488;transition:all 0.2s ease;">')
+            html_parts.append(f'<div class="module-card" style="margin:0 0 16px 0;padding:18px 22px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-radius:14px;border:1px solid #99f6e4;border-left:4px solid #0d9488;transition:all 0.2s ease;box-shadow:0 1px 2px rgba(0,0,0,0.04);">')
             html_parts.append(_render_content_block(section_body.split("\n"), "#0d9488"))
             html_parts.append('</div>')
             continue
@@ -546,43 +806,67 @@ def _format_predictive_internal(markdown: str, language: str) -> str:
                     break
 
         if not config:
-            config = {"label_en": section_key.replace("_", " ").title(), "label_da": section_key.replace("_", " ").title(), "color": "#64748b", "icon": "overview"}
+            config = {"label_en": section_key.replace("_", " ").title(), "label_da": section_key.replace("_", " ").title(), "color": "#64748b", "icon": "overview", "renderer": None}
 
         label = config["label_da"] if language == "da" else config["label_en"]
         color = config["color"]
         icon_key = config.get("icon", "overview")
         icon_svg = SECTION_ICONS.get(icon_key, SECTION_ICONS["overview"])
 
-        content_html = _render_content_block(section_body.split("\n"), color)
+        renderer_key = config.get("renderer")
+        if renderer_key and renderer_key in RENDERERS:
+            content_html = RENDERERS[renderer_key](section_body.split("\n"), color)
+        else:
+            content_html = _render_content_block(section_body.split("\n"), color)
 
         is_management = any(k in config_key for k in ["MANAGEMENT", "LEDELSE"])
         is_root_cause = any(k in config_key for k in ["ROOT_CAUSE", "ÅRSAG"])
         is_actions = any(k in config_key for k in ["PRIORITY_ACTIONS", "PRIORITEREDE"])
+        is_resource = any(k in config_key for k in ["RESOURCE", "RESSOURCE"])
 
+        card_bg = "#ffffff"
         extra_style = ""
         if is_management:
-            extra_style = "background:linear-gradient(135deg,#f0fdfa,#ecfeff);border:1px solid #99f6e4;border-left:4px solid #0d9488;"
+            card_bg = "linear-gradient(135deg,#f0fdfa,#ecfeff)"
+            extra_style = "border:1px solid #99f6e4;border-left:5px solid #0d9488;"
         elif is_root_cause:
-            extra_style = "border-left:4px solid #7c3aed;"
+            extra_style = "border-left:5px solid #7c3aed;"
         elif is_actions:
-            extra_style = "border-left:4px solid #059669;"
+            extra_style = "border-left:5px solid #059669;"
+        elif is_resource:
+            extra_style = "border-left:5px solid #d97706;"
+
+        section_desc = ""
+        if is_management:
+            section_desc = "Overordnet vurdering og anbefaling" if language == "da" else "Executive assessment and recommendation"
+        elif is_root_cause:
+            section_desc = "Grundårsager vs. afledte konsekvenser" if language == "da" else "Root causes vs. downstream consequences"
+        elif is_actions:
+            section_desc = "Prioriteret handlingsrækkefølge" if language == "da" else "Prioritized action sequence"
+        elif is_resource:
+            section_desc = "Mandskab vs. koordinering vs. beslutning" if language == "da" else "Manpower vs. coordination vs. decision"
+
+        desc_html = f'<p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{section_desc}</p>' if section_desc else ""
 
         html_parts.append(f'''
-  <div class="module-card" style="margin:0 0 14px 0;padding:20px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0;{extra_style}transition:all 0.2s ease;box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{color}10;border:1px solid {color}20;">
+  <div class="module-card" style="margin:0 0 16px 0;padding:22px 24px;background:{card_bg};border-radius:14px;border:1px solid #e2e8f0;{extra_style}transition:all 0.2s ease;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
+      <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:{color}12;border:1px solid {color}22;">
         <span style="color:{color};">{icon_svg}</span>
       </div>
-      <h3 style="font-size:15px;font-weight:700;color:#1a202c;margin:0;flex:1;letter-spacing:-0.2px;">{label}</h3>
+      <div style="flex:1;">
+        <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;letter-spacing:-0.2px;">{label}</h3>
+        {desc_html}
+      </div>
     </div>
     {content_html}
   </div>''')
 
     timestamp_label = "Genereret af Nova Insight AI" if language == "da" else "Generated by Nova Insight AI"
     html_parts.append(f'''
-  <div style="margin-top:8px;padding-top:14px;border-top:1px solid #edf2f7;display:flex;align-items:center;justify-content:center;gap:8px;">
-    <div style="width:6px;height:6px;border-radius:50%;background:#0d9488;box-shadow:0 0 6px rgba(13,148,136,0.3);"></div>
-    <span style="font-size:10px;color:#94a3b8;letter-spacing:0.5px;">{timestamp_label}</span>
+  <div style="margin-top:12px;padding-top:16px;border-top:2px solid #edf2f7;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <div style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 0 8px rgba(13,148,136,0.3);"></div>
+    <span style="font-size:11px;color:#94a3b8;letter-spacing:0.5px;font-weight:500;">{timestamp_label}</span>
   </div>
 </div>''')
 
