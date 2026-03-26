@@ -186,13 +186,13 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
                 header_row = rows[check_idx]
                 best_header_idx = check_idx
         
-        if best_header_idx > 0:
+        MIN_HEADER_SCORE = 3
+
+        if best_header_idx > 0 and best_score >= MIN_HEADER_SCORE:
             logger.info(f"[{filename}] Table {table_id}: Header found at row {best_header_idx} (score={best_score}), not row 0")
             rows = [header_row] + [r for i, r in enumerate(rows) if i != best_header_idx and i != 0]
-
-        if best_score == 0:
-            non_empty_cols = sum(1 for v in raw_header if str(v).strip())
-            logger.warning(f"[{filename}] Table {table_id}: Header detection FAILED (score=0). Trying MS Project fallback for {col_count} columns (non-empty={non_empty_cols})...")
+        elif best_score < MIN_HEADER_SCORE:
+            logger.warning(f"[{filename}] Table {table_id}: Header detection FAILED (best_score={best_score} < {MIN_HEADER_SCORE}). Using MS Project fallback for {col_count} columns...")
 
             fallback = MS_PROJECT_HEADERS.get(col_count)
             if not fallback:
@@ -206,14 +206,26 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
             header_row = fallback
             logger.info(f"[{filename}] Table {table_id}: Using fallback headers: {header_row}")
 
-            first_data = rows[0]
-            first_id = str(first_data[0]).strip() if first_data else ""
-            if first_id.isdigit() or first_id == "":
-                pass
-            else:
-                rows = rows[1:]
+            skip_rows = set()
+            for ri in range(min(5, len(rows))):
+                row_vals = [str(v).strip().lower() for v in rows[ri] if str(v).strip()]
+                is_data = False
+                for v in row_vals:
+                    if v.isdigit():
+                        is_data = True
+                        break
+                if not is_data and row_vals:
+                    skip_rows.add(ri)
+            if skip_rows:
+                logger.info(f"[{filename}] Table {table_id}: Skipping non-data rows at indices {skip_rows}")
+
+            rows = [r for i, r in enumerate(rows) if i not in skip_rows]
         
-        logger.info(f"[{filename}] Table {table_id} headers: {[str(h).strip() for h in header_row]}")
+        logger.info(f"[{filename}] Table {table_id} headers (score={best_score}): {[str(h).strip() for h in header_row]}")
+        if rows:
+            sample_row = rows[0]
+            sample_mapped = " | ".join(f"{header_row[i] if i < len(header_row) else f'Col{i}'}: {str(sample_row[i]).strip()[:30]}" for i in range(min(len(sample_row), len(header_row))))
+            logger.info(f"[{filename}] Table {table_id} first data row: {sample_mapped}")
         
         MAX_TABLE_CHUNK_CHARS = 20000
         
