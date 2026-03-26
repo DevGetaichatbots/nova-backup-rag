@@ -506,8 +506,23 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
         context_parts.append("Format: ColumnHeader: value | ColumnHeader: value | ...")
         context_parts.append("IMPORTANT: The 'Id' column contains the REAL activity ID. Use that as the task identifier, NOT the row sequence number.")
         context_parts.append("")
+
+        zero_pct_count = 0
         for chunk in row_chunks:
-            context_parts.append(chunk["content"])
+            content = chunk["content"]
+            context_parts.append(content)
+            content_lower = content.lower()
+            if ("% arbejde færdigt: 0" in content_lower or "% færdigt: 0" in content_lower
+                or "% arbejde færdigt: 0%" in content or "% færdigt: 0%" in content):
+                zero_pct_count += 1
+
+        import logging as _log
+        _log.getLogger(__name__).info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
+        if row_chunks:
+            _log.getLogger(__name__).info(f"  Sample row 1: {row_chunks[0]['content'][:200]}")
+            if len(row_chunks) > 5:
+                _log.getLogger(__name__).info(f"  Sample row 6: {row_chunks[5]['content'][:200]}")
+
         context_parts.append("")
         return "\n".join(context_parts)
 
