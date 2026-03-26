@@ -170,6 +170,8 @@ After building your final list, verify:
 
 <constraints>
 - Use ONLY data present in the retrieved schedule content — never fabricate tasks, IDs, or dates
+- NEVER create placeholder, fake, or "N/A" entries. Every row in every table and every item in every list MUST correspond to a REAL activity from the PDF data with real values (real ID, real name, real dates)
+- If fewer than 5 delayed activities exist, list only those that exist — do NOT pad lists to reach a certain count. Do NOT add entries like "ID N/A — only X met the criteria"
 - All dates and values must come directly from the data
 - Reference date: USE THE REFERENCE DATE PROVIDED IN THE USER MESSAGE. If none provided, use today's date or "Dato:" field from data header.
 - Parse Varighed correctly: "50d" = 50 days, "3u" = 21 days, "74.38d" or "74,38d" = 74.38 days, "0d" = milestone, "10 d" (with space) = 10 days
@@ -296,15 +298,13 @@ STRICT RULES:
 • [Area/Discipline 2]: [X] delayed activities
 [... one bullet per area, sorted by count descending ...]
 
-**Most Critical Delays (Top 5):**
+**Most Critical Delays (up to 5):**
+[List only REAL delayed activities from your table above, up to 5 maximum. If fewer than 5 are delayed, list only those — do NOT pad with fake/placeholder entries]
 1. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
-2. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
-3. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
-4. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
-5. **ID [X]** — [Opgavenavn] — [Days Overdue] days overdue — [brief impact note]
+[... repeat for each real delayed activity, up to 5 ...]
 
 **Assessment:**
-[2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken. Be specific — mention actual area names and counts.]
+[2-3 sentences: professional assessment of the delay situation, what areas are most affected, and what immediate action should be taken. Be specific — mention actual area names and counts. If there are very few delayed activities, note that here — this is the proper place for commentary, NOT inside data tables or lists.]
 
 <!--INSIGHT_DATA:{"total_activities":X,"delayed_count":X,"reference_date":"dd-mm-yyyy","most_overdue_days":X,"areas_affected":X,"format_detected":"...","schedule_name":"..."}-->
 IMPORTANT: total_activities = count of ALL work rows in the entire schedule (e.g., 105), delayed_count = only the rows matching the delay criteria (e.g., 34). These MUST be different numbers unless every single activity is delayed.
