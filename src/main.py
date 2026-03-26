@@ -607,6 +607,25 @@ async def predictive_analysis(
         context = _build_predictive_context(chunks, filename_clean)
         logger.info(f"  Context built: {len(context)} chars (all sections included)")
 
+        import datetime as _dt
+        _ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        _ctx_filename = f"ocr_context_{_ts}_{analysis_id}.txt"
+        _ctx_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _ctx_filename)
+        try:
+            with open(_ctx_path, "w", encoding="utf-8") as _f:
+                _f.write(f"=== OCR CONTEXT FOR LLM ===\n")
+                _f.write(f"File: {filename}\n")
+                _f.write(f"Reference Date: {reference_date}\n")
+                _f.write(f"Analysis ID: {analysis_id}\n")
+                _f.write(f"Timestamp: {_dt.datetime.now().isoformat()}\n")
+                _f.write(f"Context Length: {len(context)} chars\n")
+                _f.write(f"Chunks: {row_count} rows, {table_count} tables, {text_count} text\n")
+                _f.write(f"{'='*60}\n\n")
+                _f.write(context)
+            logger.info(f"  OCR context saved to: {_ctx_filename}")
+        except Exception as _e:
+            logger.warning(f"  Failed to save OCR context file: {_e}")
+
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
         logger.info(f"  Running Nova Insight predictive analysis...")
