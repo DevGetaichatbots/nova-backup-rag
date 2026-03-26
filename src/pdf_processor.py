@@ -263,7 +263,7 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
                     has_any_value = True
             
             if has_any_value:
-                row_content = f"Row {row_idx} (Page {row_page}): " + " | ".join(row_content_parts)
+                row_content = " | ".join(row_content_parts)
                 chunks.append({
                     "content": row_content,
                     "metadata": {

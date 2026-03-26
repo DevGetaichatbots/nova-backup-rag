@@ -16,6 +16,44 @@ def _safe_int(val) -> int:
         return 0
 
 
+def _svg(name: str, size: int = 16, color: str = "currentColor") -> str:
+    icons = {
+        "clock": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        "alert-circle": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+        "alert-triangle": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        "activity": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+        "search": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+        "check-square": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+        "users": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        "grid": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+        "link": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+        "compass": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+        "pen-tool": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+        "user": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+        "tool": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+        "package": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+        "flag": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+        "zap": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        "target": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        "arrow-right": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+        "pause": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+        "refresh": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+        "play": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+        "clipboard": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+        "calendar": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        "bar-chart": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>',
+        "file-text": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+        "shield": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        "trending-up": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+        "circle-dot": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="{color}"/></svg>',
+    }
+    return icons.get(name, "")
+
+
+def _icon_box(icon_name: str, color: str, size: int = 16) -> str:
+    return f'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;">{_svg(icon_name, size, color)}</span>'
+
+
 PRIORITY_STYLES = {
     "CRITICAL_NOW": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "label_en": "CRITICAL NOW", "label_da": "KRITISK NU"},
     "IMPORTANT_NEXT": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "label_en": "IMPORTANT NEXT", "label_da": "VIGTIG NÆSTE"},
@@ -31,32 +69,32 @@ TASK_TYPE_STYLES = {
     "Milestone": {"color": "#64748b", "bg": "#f8fafc", "label_da": "Milepæl"},
 }
 
-PROBLEM_TYPE_ICONS = {
-    "Coordination blockage": "🔗",
-    "Design input missing": "📐",
-    "Bygherre decision pending": "👤",
-    "Production delay": "🏗️",
-    "Procurement delay": "📦",
+PROBLEM_TYPE_ICON_MAP = {
+    "Coordination blockage": "link",
+    "Design input missing": "pen-tool",
+    "Bygherre decision pending": "user",
+    "Production delay": "tool",
+    "Procurement delay": "package",
 }
 
 RESOURCE_TYPE_CONFIG = {
-    "coordination_bottleneck": {"icon": "🔗", "color": "#7c3aed", "bg": "#f5f3ff", "label_en": "Coordination", "label_da": "Koordinering"},
-    "design_dependency": {"icon": "📐", "color": "#2563eb", "bg": "#eff6ff", "label_en": "Design", "label_da": "Design"},
-    "bygherre_escalation": {"icon": "👤", "color": "#c026d3", "bg": "#fdf4ff", "label_en": "Bygherre", "label_da": "Bygherre"},
-    "production_manpower": {"icon": "🏗️", "color": "#059669", "bg": "#ecfdf5", "label_en": "Production", "label_da": "Produktion"},
-    "management_attention": {"icon": "📋", "color": "#ea580c", "bg": "#fff7ed", "label_en": "Management", "label_da": "Ledelse"},
-    "procurement_dependency": {"icon": "📦", "color": "#d97706", "bg": "#fffbeb", "label_en": "Procurement", "label_da": "Indkøb"},
+    "coordination_bottleneck": {"icon": "link", "color": "#7c3aed", "bg": "#f5f3ff", "label_en": "Coordination", "label_da": "Koordinering"},
+    "design_dependency": {"icon": "pen-tool", "color": "#2563eb", "bg": "#eff6ff", "label_en": "Design", "label_da": "Design"},
+    "bygherre_escalation": {"icon": "user", "color": "#c026d3", "bg": "#fdf4ff", "label_en": "Bygherre", "label_da": "Bygherre"},
+    "production_manpower": {"icon": "tool", "color": "#059669", "bg": "#ecfdf5", "label_en": "Production", "label_da": "Produktion"},
+    "management_attention": {"icon": "clipboard", "color": "#ea580c", "bg": "#fff7ed", "label_en": "Management", "label_da": "Ledelse"},
+    "procurement_dependency": {"icon": "package", "color": "#d97706", "bg": "#fffbeb", "label_en": "Procurement", "label_da": "Indkøb"},
 }
 
-ACTION_TYPE_ICONS = {
-    "coordination": "🔗",
-    "bygherre_decision": "👤",
-    "design_input": "📐",
-    "freeze_downstream": "⏸️",
-    "reassess": "🔄",
-    "release_work": "▶️",
-    "escalation": "⚡",
-    "procurement": "📦",
+ACTION_TYPE_ICON_MAP = {
+    "coordination": "link",
+    "bygherre_decision": "user",
+    "design_input": "pen-tool",
+    "freeze_downstream": "pause",
+    "reassess": "refresh",
+    "release_work": "play",
+    "escalation": "zap",
+    "procurement": "package",
 }
 
 
@@ -80,7 +118,6 @@ def _render_hero(data: Dict, lang: str) -> str:
     root_causes = _safe_int(ins.get("root_cause_count", 0))
     most_overdue = _safe_int(ins.get("most_overdue_days", 0))
     areas = _safe_int(ins.get("areas_affected", 0))
-    ref_date = _e(ins.get("reference_date", ""))
     primary_risk = _e(ins.get("primary_risk", ""))
 
     if critical == 0 and delayed == 0:
@@ -106,7 +143,7 @@ def _render_hero(data: Dict, lang: str) -> str:
     risk_html = ""
     if primary_risk and primary_risk.lower() not in ("", "none", "n/a"):
         rl = "Primær risiko" if lang == "da" else "Primary Risk"
-        risk_html = f'<div style="margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"><div style="font-size:10px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;margin-bottom:3px;">{rl}</div><div style="font-size:13px;color:#991b1b;font-weight:600;line-height:1.5;">{primary_risk}</div></div>'
+        risk_html = f'<div style="margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">{_svg("alert-triangle", 12, "#991b1b")}<span style="font-size:10px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;">{rl}</span></div><div style="font-size:13px;color:#991b1b;font-weight:600;line-height:1.5;">{primary_risk}</div></div>'
 
     return f'''
 <div style="margin:0 0 22px;background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
@@ -155,7 +192,7 @@ def _render_management_conclusion(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-radius:14px;border:1px solid #99f6e4;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #99f6e4;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;"><span style="color:#0d9488;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("activity", 18, "#0d9488")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   <p style="margin:0;color:#374151;line-height:1.9;font-size:14.5px;font-weight:500;">{text}</p>
@@ -169,22 +206,22 @@ def _render_schedule_overview(data: Dict, lang: str) -> str:
     label = "Tidsplanoversigt" if lang == "da" else "Schedule Overview"
 
     fields = [
-        ("📋" if lang == "da" else "📋", "Tidsplan" if lang == "da" else "Schedule", _e(ov.get("schedule_name", ""))),
-        ("📅", "Referencedato" if lang == "da" else "Reference Date", _e(ov.get("reference_date", ""))),
-        ("📊", "Total aktiviteter" if lang == "da" else "Total Activities", str(ov.get("total_activities", 0))),
-        ("⚠️", "Forsinkede" if lang == "da" else "Delayed", str(ov.get("delayed_count", 0))),
-        ("🏗️", "Områder" if lang == "da" else "Areas", ", ".join(ov.get("areas_covered", []))),
-        ("📄", "Format" if lang == "da" else "Format Detected", _e(ov.get("format_detected", ""))),
+        ("clipboard", "Tidsplan" if lang == "da" else "Schedule", _e(ov.get("schedule_name", ""))),
+        ("calendar", "Referencedato" if lang == "da" else "Reference Date", _e(ov.get("reference_date", ""))),
+        ("bar-chart", "Total aktiviteter" if lang == "da" else "Total Activities", str(ov.get("total_activities", 0))),
+        ("alert-circle", "Forsinkede" if lang == "da" else "Delayed", str(ov.get("delayed_count", 0))),
+        ("tool", "Områder" if lang == "da" else "Areas", ", ".join(ov.get("areas_covered", []))),
+        ("file-text", "Format" if lang == "da" else "Format Detected", _e(ov.get("format_detected", ""))),
     ]
 
     fields_html = ""
-    for icon, name, val in fields:
-        fields_html += f'<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;"><span style="font-size:15px;flex-shrink:0;">{icon}</span><span style="font-size:12px;color:#64748b;font-weight:600;min-width:120px;">{name}</span><span style="font-size:13px;color:#1a202c;font-weight:600;">{val}</span></div>'
+    for icon_name, name, val in fields:
+        fields_html += f'<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;">{_icon_box(icon_name, "#64748b", 14)}<span style="font-size:12px;color:#64748b;font-weight:600;min-width:120px;">{name}</span><span style="font-size:13px;color:#1a202c;font-weight:600;">{val}</span></div>'
 
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;"><span style="color:#0d9488;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("clock", 18, "#0d9488")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
   </div>
   {fields_html}
@@ -224,7 +261,7 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
         days_label = f"{days} {'dage' if lang == 'da' else 'days'}"
 
         cells = [
-            f'<span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',monospace;">{_e(act.get("id",""))}</span>',
+            f'<span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',\'Cascadia Code\',monospace;">{_e(act.get("id",""))}</span>',
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("task_name",""))}</span>',
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("start_date",""))}</span>',
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("end_date",""))}</span>',
@@ -245,7 +282,7 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#dc262612;border:1px solid #dc262622;"><span style="color:#dc2626;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#dc262612;border:1px solid #dc262622;">{_svg("alert-circle", 18, "#dc2626")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   <div style="overflow-x:auto;border-radius:12px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06);">
@@ -265,31 +302,32 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
 
     cards_html = ""
     for rc in rcs:
-        icon = PROBLEM_TYPE_ICONS.get(rc.get("problem_type", ""), "🔍")
+        problem_type = rc.get("problem_type", "")
+        icon_name = PROBLEM_TYPE_ICON_MAP.get(problem_type, "search")
         affected = rc.get("affected_task_ids", [])
         affected_text = ", ".join(affected) if affected else ("Ingen" if lang == "da" else "None")
 
         fields = [
-            ("⏱️", "Status", f'{rc.get("days_overdue", 0)} {"dage forsinket" if lang == "da" else "days overdue"}, 0%', "#dc2626"),
-            ("🔍", "Problemtype" if lang == "da" else "Problem Type", _e(rc.get("problem_type", "")), "#7c3aed"),
-            ("⚡", "Hvorfor det er vigtigt" if lang == "da" else "Why It Matters", _e(rc.get("why_it_matters", "")), "#d97706"),
-            ("🔗", "Nedstrømseffekt" if lang == "da" else "Downstream Impact", _e(rc.get("downstream_impact", "")), "#2563eb"),
-            ("⚠️", "Konsekvens hvis uløst" if lang == "da" else "If Unresolved", _e(rc.get("consequence_if_unresolved", "")), "#ea580c"),
-            ("🎯", "Berørte opgaver" if lang == "da" else "Affected Tasks", affected_text, "#64748b"),
+            ("clock", "#dc2626", "Status", f'{rc.get("days_overdue", 0)} {"dage forsinket" if lang == "da" else "days overdue"}, 0%'),
+            ("search", "#7c3aed", "Problemtype" if lang == "da" else "Problem Type", _e(problem_type)),
+            ("zap", "#d97706", "Hvorfor det er vigtigt" if lang == "da" else "Why It Matters", _e(rc.get("why_it_matters", ""))),
+            ("link", "#2563eb", "Nedstrømseffekt" if lang == "da" else "Downstream Impact", _e(rc.get("downstream_impact", ""))),
+            ("alert-triangle", "#ea580c", "Konsekvens hvis uløst" if lang == "da" else "If Unresolved", _e(rc.get("consequence_if_unresolved", ""))),
+            ("target", "#64748b", "Berørte opgaver" if lang == "da" else "Affected Tasks", affected_text),
         ]
 
         fields_html = ""
-        for f_icon, f_name, f_val, f_color in fields:
+        for f_icon, f_color, f_name, f_val in fields:
             fields_html += f'''<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f4;align-items:flex-start;">
-  <span style="font-size:14px;flex-shrink:0;margin-top:1px;">{f_icon}</span>
+  {_icon_box(f_icon, f_color, 14)}
   <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:{f_color};text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">{f_name}</div><div style="font-size:13px;color:#374151;line-height:1.6;">{f_val}</div></div>
 </div>'''
 
         cards_html += f'''<div style="margin:14px 0;background:#fff;border-radius:12px;border:1px solid #fecaca;border-left:4px solid #dc2626;overflow:hidden;box-shadow:0 1px 3px rgba(220,38,38,.08);">
   <div style="padding:14px 18px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-bottom:1px solid #fecaca;">
     <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;">🔴</span>
-      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;font-family:\'SF Mono\',monospace;">ID {_e(rc.get("id",""))}</span>
+      {_svg(icon_name, 14, "#dc2626")}
+      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(rc.get("id",""))}</span>
       <span style="font-size:13px;font-weight:700;color:#991b1b;">{_e(rc.get("task_name",""))}</span>
     </div>
   </div>
@@ -302,7 +340,7 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
         dc_sub = "Løses når grundårsagen er adresseret" if lang == "da" else "Will likely resolve when root cause is addressed"
         items = ""
         for dc in dcs:
-            items += f'<div style="padding:8px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;line-height:1.6;display:flex;align-items:flex-start;gap:8px;"><span style="color:#94a3b8;font-size:14px;flex-shrink:0;margin-top:1px;">↳</span><span>ID <strong style="font-family:\'SF Mono\',monospace;color:#475569;">{_e(dc.get("id",""))}</strong> ({_e(dc.get("task_name",""))}) — {"blokeret af" if lang == "da" else "blocked by"} ID {_e(dc.get("blocked_by_id",""))}</span></div>'
+            items += f'<div style="padding:8px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;line-height:1.6;display:flex;align-items:flex-start;gap:8px;">{_svg("arrow-right", 14, "#94a3b8")}<span>ID <strong style="font-family:\'SF Mono\',\'Cascadia Code\',monospace;color:#475569;">{_e(dc.get("id",""))}</strong> ({_e(dc.get("task_name",""))}) — {"blokeret af" if lang == "da" else "blocked by"} ID {_e(dc.get("blocked_by_id",""))}</span></div>'
         dc_html = f'''<div style="margin:20px 0 8px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;">
   <div style="padding:12px 16px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;"><h4 style="margin:0;color:#475569;font-size:13px;font-weight:700;">{dc_label}</h4><p style="margin:3px 0 0;color:#94a3b8;font-size:11px;">{dc_sub}</p></div>
   {items}
@@ -311,7 +349,7 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #7c3aed;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#7c3aed12;border:1px solid #7c3aed22;"><span style="color:#7c3aed;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#7c3aed12;border:1px solid #7c3aed22;">{_svg("search", 18, "#7c3aed")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   {cards_html}
@@ -332,12 +370,12 @@ def _render_priority_actions(data: Dict, lang: str) -> str:
         step = act.get("step", 0)
         action_text = _e(act.get("action", ""))
         a_type = act.get("action_type", "coordination")
-        icon = ACTION_TYPE_ICONS.get(a_type, "📋")
+        icon_name = ACTION_TYPE_ICON_MAP.get(a_type, "clipboard")
 
         items_html += f'''<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;align-items:flex-start;">
   <div style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0891b2);color:white;font-size:14px;font-weight:800;flex-shrink:0;box-shadow:0 2px 4px rgba(13,148,136,.2);">{step}</div>
   <div style="flex:1;padding-top:5px;">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="font-size:14px;">{icon}</span><span style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:.5px;">{a_type.replace("_"," ")}</span></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_icon_box(icon_name, "#64748b", 13)}<span style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:.5px;">{a_type.replace("_"," ")}</span></div>
     <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;font-weight:500;">{action_text}</p>
   </div>
 </div>'''
@@ -345,7 +383,7 @@ def _render_priority_actions(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #059669;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#05966912;border:1px solid #05966922;"><span style="color:#059669;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#05966912;border:1px solid #05966922;">{_svg("check-square", 18, "#059669")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   {items_html}
@@ -367,10 +405,10 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
         r_label = r_config[f"label_{lang}"] if f"label_{lang}" in r_config else r_config.get("label_en", r_type)
 
         cards_html += f'''<div style="display:flex;gap:12px;padding:14px 16px;margin:8px 0;background:#fff;border-radius:10px;border:1px solid #e2e8f0;align-items:flex-start;transition:all .15s;" onmouseover="this.style.borderColor='#cbd5e1';this.style.boxShadow='0 2px 6px rgba(0,0,0,.04)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
-  <span style="font-size:18px;flex-shrink:0;margin-top:1px;">{r_config["icon"]}</span>
+  <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{r_config["bg"]};border:1px solid {r_config["color"]}22;flex-shrink:0;">{_svg(r_config["icon"], 16, r_config["color"])}</div>
   <div style="flex:1;min-width:0;">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-      <span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',monospace;">ID {_e(item.get("id",""))}</span>
+      <span style="font-weight:700;color:#1a202c;font-size:13px;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(item.get("id",""))}</span>
       <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;color:{r_config["color"]};background:{r_config["bg"]};">{r_label}</span>
     </div>
     <p style="margin:0 0 4px;color:#475569;font-size:12px;font-weight:600;">{_e(item.get("task_name",""))}</p>
@@ -381,7 +419,7 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #d97706;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#d9770612;border:1px solid #d9770622;"><span style="color:#d97706;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#d9770612;border:1px solid #d9770622;">{_svg("users", 18, "#d97706")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   {cards_html}
@@ -424,7 +462,7 @@ def _render_summary_by_area(data: Dict, lang: str) -> str:
     return f'''
 <div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#2563eb12;border:1px solid #2563eb22;"><span style="color:#2563eb;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span></div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#2563eb12;border:1px solid #2563eb22;">{_svg("grid", 18, "#2563eb")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
   </div>
   {items_html}
@@ -483,7 +521,7 @@ def _build_html(data: Dict, lang: str) -> str:
 <div class="nova-report" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;border-radius:20px;padding:32px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06);">
   <div style="text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:2px solid #edf2f7;">
     <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:10px;">
-      <div style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 4px 12px rgba(13,148,136,.25);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l-3 3"/></svg></div>
+      <div style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 4px 12px rgba(13,148,136,.25);">{_svg("clock", 24, "white")}</div>
       <div style="text-align:left;"><h2 style="font-size:22px;font-weight:800;color:#1a202c;margin:0;letter-spacing:-.4px;">{title}</h2><p style="font-size:12px;color:#94a3b8;margin:3px 0 0;letter-spacing:.3px;font-weight:500;">{subtitle}</p></div>
     </div>
   </div>''']

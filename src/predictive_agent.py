@@ -203,9 +203,11 @@ Any other layout — ADAPT to whatever is present.
 
 ## ADAPTIVE COLUMN MAPPING
 
+CRITICAL ID RULE: The data rows contain column headers like "Id: 520" or "Entydigt id: 1187". These column VALUES are the real task identifiers. NEVER use row sequence numbers, row indices, or "Row N" as IDs. Always extract the actual Id or Entydigt id column value.
+
 1. Determine format type FIRST (week-based vs table-based)
 2. Map columns to semantic roles:
-   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id"
+   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id". The VALUE of this column is the real ID.
    - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name"
    - DURATION: "Varighed", "Duration"
    - START DATE: "Startdato", "Start", "Start Date"
@@ -431,7 +433,7 @@ PHASE 2 — DECISION SUPPORT:
             }
 
             try:
-                api_params["reasoning_effort"] = "low"
+                api_params["reasoning_effort"] = "medium"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 err_str = str(reasoning_err)
