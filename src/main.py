@@ -602,17 +602,20 @@ async def predictive_analysis(
             )
         )
 
+        predictive_json = predictive_result.get("predictive_json", None)
         predictive_text = predictive_result.get("predictive_insights", "")
         predictive_status = predictive_result.get("status", "error")
         predictive_model = predictive_result.get("model", "")
 
         _update_progress(analysis_id, "formatting", language)
 
-        if format == "html" and predictive_text:
+        if format == "html" and predictive_json:
+            predictive_text = format_predictive_as_html(predictive_json, language)
+        elif format == "html" and predictive_text:
             predictive_text = format_predictive_as_html(predictive_text, language)
 
         elapsed = time.time() - start_time
-        logger.info(f"  Predictive response: {len(predictive_text)} chars, status: {predictive_status}")
+        logger.info(f"  Predictive response: {len(predictive_text)} chars, status: {predictive_status}, json={'yes' if predictive_json else 'no'}")
         logger.info(f"=== PREDICTIVE COMPLETE [{analysis_id}] ({elapsed:.1f}s) ===")
 
         _update_progress(analysis_id, "complete", language)
