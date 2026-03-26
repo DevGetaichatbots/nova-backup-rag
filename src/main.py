@@ -506,14 +506,21 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
 
     if raw_md_chunks:
         content = raw_md_chunks[0]["content"]
-        context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA (Azure OCR markdown)")
-        context_parts.append("The data below is extracted directly from the PDF. It contains markdown tables with column headers.")
-        context_parts.append("Scan EVERY row for delayed activities using the detection rule.")
+        lines = content.split("\n")
+        _logger.info(f"  Raw markdown: {len(content)} chars, {len(lines)} lines")
+        sample_start = [l[:100] for l in lines[:5]]
+        sample_end = [l[:100] for l in lines[-3:]]
+        _logger.info(f"  First lines: {sample_start}")
+        _logger.info(f"  Last lines: {sample_end}")
+
+        context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
+        context_parts.append("The data below is the COMPLETE schedule extracted from the PDF by OCR.")
+        context_parts.append("It contains a table with columns: Id, Opgavetilstand, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver.")
+        context_parts.append("Scan EVERY row for delayed activities. Count ALL rows, not just visible ones.")
         context_parts.append("")
         context_parts.append(content)
         context_parts.append("")
-        table_lines = sum(1 for line in content.split("\n") if line.strip().startswith("|"))
-        _logger.info(f"  Context: using raw Azure markdown, {len(content)} chars, ~{table_lines} table lines")
+        _logger.info(f"  Context: raw Azure markdown, {len(content)} chars")
         return "\n".join(context_parts)
 
     if text_chunks:
@@ -594,12 +601,11 @@ async def predictive_analysis(
                 _f.write(f"Total Chunks: {len(chunks)} ({row_count} rows, {table_count} tables, {text_count} text)\n")
                 _f.write(f"{'='*60}\n\n")
 
-                row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
-                if row_chunks:
-                    _f.write(f"--- TABLE ROWS ({len(row_chunks)}) ---\n\n")
-                    for i, chunk in enumerate(row_chunks, 1):
-                        _f.write(f"ROW {i}: {chunk['content']}\n")
-                    _f.write(f"\n")
+                raw_md_chunks_dump = [c for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown"]
+                if raw_md_chunks_dump:
+                    _f.write(f"--- RAW MARKDOWN ---\n\n")
+                    _f.write(raw_md_chunks_dump[0]["content"])
+                    _f.write(f"\n\n{'='*60}\n\n")
 
                 tbl_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
                 if tbl_chunks:
