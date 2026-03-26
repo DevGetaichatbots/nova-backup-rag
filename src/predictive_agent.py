@@ -39,7 +39,7 @@ NOVA_INSIGHT_SCHEMA = {
                     "total_activities": {"type": "integer", "description": "Count of ALL work rows excluding summary/grouping headers"},
                     "delayed_count": {"type": "integer", "description": "Count of rows matching Startdato < reference_date AND progress = 0"},
                     "areas_covered": {"type": "array", "items": {"type": "string"}},
-                    "format_detected": {"type": "string", "enum": ["MS Project Export", "Detailtidsplan", "Unstructured", "Hybrid"]}
+                    "format_detected": {"type": "string", "enum": ["MS Project Export", "Detailtidsplan", "Structured Table", "Unstructured", "Hybrid"]}
                 }
             },
             "delayed_activities": {
@@ -457,7 +457,7 @@ Return complete JSON matching the strict schema."""
             }
 
             try:
-                api_params["reasoning_effort"] = "medium"
+                api_params["reasoning_effort"] = "minimal"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 err_str = str(reasoning_err)
