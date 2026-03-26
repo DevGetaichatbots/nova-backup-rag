@@ -162,6 +162,12 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
             "efterfølgende opgaver", "bemærkn.", "bemærkn",
             "opg.navn", "opgavenavn/aktivitet"
         }
+
+        MS_PROJECT_HEADERS = {
+            9: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver"],
+            10: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10"],
+            11: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10", "Col11"],
+        }
         
         def _header_score(row_vals):
             if not row_vals:
@@ -183,6 +189,29 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
         if best_header_idx > 0:
             logger.info(f"[{filename}] Table {table_id}: Header found at row {best_header_idx} (score={best_score}), not row 0")
             rows = [header_row] + [r for i, r in enumerate(rows) if i != best_header_idx and i != 0]
+
+        if best_score == 0:
+            non_empty_cols = sum(1 for v in raw_header if str(v).strip())
+            logger.warning(f"[{filename}] Table {table_id}: Header detection FAILED (score=0). Trying MS Project fallback for {col_count} columns (non-empty={non_empty_cols})...")
+
+            fallback = MS_PROJECT_HEADERS.get(col_count)
+            if not fallback:
+                closest = min(MS_PROJECT_HEADERS.keys(), key=lambda k: abs(k - col_count))
+                fb = MS_PROJECT_HEADERS[closest]
+                if col_count > closest:
+                    fallback = fb + [f"Col{i+1}" for i in range(closest, col_count)]
+                else:
+                    fallback = fb[:col_count]
+
+            header_row = fallback
+            logger.info(f"[{filename}] Table {table_id}: Using fallback headers: {header_row}")
+
+            first_data = rows[0]
+            first_id = str(first_data[0]).strip() if first_data else ""
+            if first_id.isdigit() or first_id == "":
+                pass
+            else:
+                rows = rows[1:]
         
         logger.info(f"[{filename}] Table {table_id} headers: {[str(h).strip() for h in header_row]}")
         
