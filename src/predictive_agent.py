@@ -457,7 +457,7 @@ Return complete JSON matching the strict schema."""
             }
 
             try:
-                api_params["reasoning_effort"] = "high"
+                api_params["reasoning_effort"] = "medium"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 err_str = str(reasoning_err)
