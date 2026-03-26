@@ -241,9 +241,11 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
             sample_mapped = " | ".join(f"{header_row[i] if i < len(header_row) else f'Col{i}'}: {str(sample_row[i]).strip()[:30]}" for i in range(min(len(sample_row), len(header_row))))
             logger.info(f"[{filename}] Table {table_id} first data row: {sample_mapped}")
         
-        MAX_TABLE_CHUNK_CHARS = 20000
-        
-        table_md = table_to_markdown(table)
+        MAX_TABLE_CHUNK_CHARS = 120000
+
+        corrected_rows = [header_row] + rows
+        corrected_table = {**table, "rows": corrected_rows}
+        table_md = table_to_markdown(corrected_table)
         structured_json = json.dumps({"table_id": table_id, "rows": rows, "cells": cells, "pages": page_numbers})
         
         full_table_content = f"TABLE {table_id} (Pages {page_numbers})\n{table_md}\n[STRUCTURED: {structured_json}]"
