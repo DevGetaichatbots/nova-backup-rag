@@ -517,11 +517,12 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
                 zero_pct_count += 1
 
         import logging as _log
-        _log.getLogger(__name__).info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
-        if row_chunks:
-            _log.getLogger(__name__).info(f"  Sample row 1: {row_chunks[0]['content'][:200]}")
-            if len(row_chunks) > 5:
-                _log.getLogger(__name__).info(f"  Sample row 6: {row_chunks[5]['content'][:200]}")
+        _ctx_log = _log.getLogger(__name__)
+        _ctx_log.info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
+        _ctx_log.info(f"  === OCR ROW DATA START ===")
+        for row_idx, chunk in enumerate(row_chunks, 1):
+            _ctx_log.info(f"  ROW {row_idx}: {chunk['content']}")
+        _ctx_log.info(f"  === OCR ROW DATA END ({len(row_chunks)} rows) ===")
 
         context_parts.append("")
         return "\n".join(context_parts)
