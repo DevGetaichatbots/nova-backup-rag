@@ -211,7 +211,6 @@ def _render_schedule_overview(data: Dict, lang: str) -> str:
         ("bar-chart", "Total aktiviteter" if lang == "da" else "Total Activities", str(ov.get("total_activities", 0))),
         ("alert-circle", "Forsinkede" if lang == "da" else "Delayed", str(ov.get("delayed_count", 0))),
         ("tool", "Områder" if lang == "da" else "Areas", ", ".join(ov.get("areas_covered", []))),
-        ("file-text", "Format" if lang == "da" else "Format Detected", _e(ov.get("format_detected", ""))),
     ]
 
     fields_html = ""
