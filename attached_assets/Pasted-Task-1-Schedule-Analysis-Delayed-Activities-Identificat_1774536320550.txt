@@ -1,0 +1,607 @@
+Task 1: Schedule Analysis - Delayed
+Activities Identification
+Underst
+a
+nding the Client's Request
+B
+ased on the client's feedb
+ck
+a
+a
+nd the provided schedule extra
+ct, the prim
+(T
+ask 1) is to identify specific
+a
+ctivities th
+t
+a
+are f
+alling
+b
+ehind schedule. The client h
+ary objective
+as
+explicitly defined the criteria
+for these
+a
+ctivities:
+1. St
+art D
+te: The
+a
+a
+ctivity must h
+ve
+a
+a
+pla
+nned st
+art d
+b
+te
+a
+efore the reference d
+te of
+a
+M
+arch 12, 2026.
+2. Progress: The
+færdigt" = 0)
+.
+a
+ctivity must h
+ve
+a
+a reported progress of ex
+a
+ctly 0% ("%
+b
+ar
+ejde
+3. Identific
+a
+tion: The output must strictly rely on the
+a
+ctivity's unique ID, not just its
+n
+a
+me.
+4. Scope: The
+irrelev
+a
+n
+a
+alysis must
+b
+e confined to the provided schedule extra
+ct, ensuring no
+nt IDs are included.
+The client emph
+asizes th
+a
+t this t
+ask is found
+a
+tion
+precision b
+efore moving on to more complex
+n
+a
+a
+ction
+a
+ble,
+a
+nd trustworthy.
+al a
+nd must
+alyses (T
+ask 2)
+b
+e executed with
+b
+a
+solute
+. The output must be cle
+ar,
+Expected Output
+The expected output is a
+definitive list of
+a
+ctivities meeting the criteria
+, presented in
+a
+cle
+ar
+form
+a
+t. B
+ased on the provided schedule extra
+ct (2026-03-12S
+a
+mlettidspla
+n.pdf
+nd 2026-03-
+a
+12S
+a
+mlettidspla
+n_1side.pdf ), the following 34
+a
+ctivities h
+ve
+b
+a
+een identified
+as h
+a
+ving
+a st
+art
+d
+b
+te
+a
+efore M
+arch 12, 2026,
+a
+nd 0% progress:
+ID St
+art D
+a
+te Activity N
+me
+a
+20 05-11-2025 E100.02 - V
+ndb
+eh
+a
+a
+v
+a
+ndingsa
+nlæg til h
+a
+ndling og
+verne
+21 30-09-2025
+E100.02 - Indretning
+f
+a
+produktionskøkken,
+d
+t
+a
+a
+bla
+de på komponenter,
+central/decentral
+23 05-01-2026
+bE1lø0d0g.0ø
+kra
+v til kemidepot1ri n- gF?
+astlæg
+2
+4 05-01-2026 Sikringsprojekt, omf
+ng
+a
+ADK
+f
+a
+25 05-01-2026 Infovæg med glasfronter (ARK
+pkt. 3.7)
+26 05-01-2026
+E100.02 - Stillingt
+a
+gen til
+kølev
+a
+nd i terræn -
+udskiftning/relining
+27 05-01-2026 E100 Pressemøder I
+B
+a
+nksalen sk
+al a
+fklares
+29 03-11-2025
+E100.12 -
+Sola
+fskærmningMørklægning,
+funktionskra
+v
+30 05-01-2026 IKT
+33 19-01-2026 Gokendelse
+a
+f synlige
+komponeter fra
+E100.03
+36 23-02-2026 Godkendelse
+ovenlys
+a
+f indb
+ygning i
+39 03-11-2025 Sikringsprojekt
+40 03-11-2025 Pla
+cering/
+nt
+a
+al a
+f
+sikringskomponenter, lofter
+1 05-01-2026 Pla
+cering/
+nt
+a
+al a
+f
+sikringskomponenter, vægge
+2 19-01-2026 Pla
+cering/
+nt
+a
+al a
+f
+sikringskomponenter, døre
+461 23-02-2026 S
+b
+a
+mlet el-
+KT og BMS-IBI t
+elastning for BMS-
+a
+vler
+519 09-02-2026 Afhængigheder
+520 09-02-2026 F
+a
+ncoils for dim
+f k
+a
+a
+bling
+521 09-02-2026 Øvrige inst
+alla
+tioner for dim
+f k
+a
+a
+bling
+522 09-02-2026 Ar
+b
+ejdsst
+a
+tioner pla
+cering
+523 09-02-2026 Fyldningsgra
+d i spor/
+udviddelsesf
+a
+ktor
+4
+4
+52
+4 09-02-2026 Lysinst
+alla
+tion - Opdeling
+DALI inst.
+f
+a
+525 09-02-2026 Pla
+cering
+f b
+a
+elysning
+526 09-02-2026 Pla
+cering synligt udstyr fx
+tryk og pir, Input vedr. DALI
+527 09-02-2026 Kra
+ft - Pla
+cering
+komponenter, b
+f
+a
+elastning
+528 09-02-2026 Pla
+cering og v
+komponenter
+alg
+f ABA
+a
+529 09-02-2026
+Koordinering
+f AV-
+a
+inst
+alla
+tioner med isolering
+på skørter. Pla
+cering
+a
+f inst.
+Over loft sa
+mt under gulv
+586 2
+4-11-2025 Omr. 7
+644 02-12-2025 Ud
+b
+ar
+ejde not
+t om DAS/SINE
+a
+645 18-11-2025 Projektering
+a
+f DAS/Sine
+648 18-12-2025 Reet
+a
+blering
+a
+f solceller
+651 27-01-2026 Jording
+1185 03-11-2025 E100.05 ELEV
+1187 08-09-2025
+Oversigt
+projekteringstidspla
+n -
+projekt til prisv
+alidering
+(Note: IDs 34
+,
+35,
+37,
+nd 38
+a
+are correctly excluded
+as their st
+art d
+a
+tes are on or a
+fter M
+arch
+12, 20 26, or they do not h
+a
+ve 0 % progress)
+.
+T
+ask Description for Te
+a
+m Memb
+er
+T
+ask Title: Schedule An
+alysis - Identify Dela
+yed Activities (T
+ask 1)
+Objective:
+Identify
+all a
+ctivities within the provided schedule extra
+ct th
+M
+arch 12, 2026, b
+ut currently show 0% progress.
+Context:
+a
+t should h
+a
+ve st
+arted before
+The client requires a
+precise
+a
+nd relia
+ble list of dela
+yed
+a
+ctivities
+b
+ased on
+a specific
+schedule extra
+ct. This is the found
+a
+tion
+al step for our product. Accura
+cy is p
+ara
+mount,
+a
+the identific
+a
+tion must
+b
+e strictly
+b
+ased on the
+a
+ctivity ID.
+nd
+Input M
+a
+terials:
+• 2026-03-12S
+a
+mlettidspla
+n.pdf (Full schedule)
+• 2026-03-12S
+a
+mlettidspla
+n_1side.pdf (Specific extra
+ct defining the scope)
+Instructions:
+1. Scope Definition: Restrict your a
+n
+alysis strictly to the
+a
+ctivities listed in the provided
+schedule extra
+ct. Do not include
+ny
+a
+a
+ctivities outside this scope.
+2. D
+t
+a
+a
+Extra
+ction: For e
+ch
+a
+a
+ctivity, extra
+ct the following fields:
+• ID
+• Activity N
+me ("Opg
+ven
+vn"
+)
+a
+a
+a
+• St
+art D
+te ("St
+a
+artd
+a
+)
+to"
+• Progress ("%
+b
+ar
+ejde færdigt"
+)
+3. Filtering Logic: Apply the following conditions to filter the
+a
+ctivities:
+• Condition A: The "St
+artd
+a
+to" must
+b
+e strictly
+b
+efore M
+arch 12, 2026.
+• Condition B: The "%
+b
+ar
+ejde færdigt" must
+b
+e ex
+a
+ctly 0%.
+4. V
+alid
+a
+tion: Ensure th
+a
+ctivity st
+arted b
+h
+as 0% progress
+b
+b
+t
+a
+oth conditions are met simult
+a
+neously. For ex
+a
+mple, if
+a
+efore M
+arch 12
+b
+ut h
+as 1% progress, it must be excluded. If
+n
+a
+a
+ut st
+arts on or a
+fter M
+arch 12, it must be excluded.
+n
+ctivity
+5. Output Form
+only the fl
+the prim
+a
+tting: Genera
+te
+a
+cle
+a
+n, structured list (e.g.
+,
+a
+gged
+a
+a
+ctivities. The output must include the ID
+a
+t
+able or CSV) cont
+aining
+nd Activity N
+me. The ID is
+a
+ary identifier a
+nd must
+b
+e
+a
+ccura
+te.
+Delivera
+ble:
+A structured document or spre
+a
+dsheet listing the fl
+gged
+a
+a
+ctivities (ID
+nd N
+me) th
+a
+a
+a
+the specified criteria.
+t meet
+Import
+a
+nt Notes:
+• Do not rely on
+a
+ctivity n
+a
+mes for identific
+a
+tion; use the ID.
+• Ensure d
+te p
+a
+arsing is a
+ccura
+te (form
+a
+t is typic
+ally DD-MM-YY)
+.
+• This t
+ask must
+b
+e completed fl
+dura
+tion
+n
+a
+alysis)
+.
+a
+wlessly before we proceed to T
+ask 2 (progress vs.
