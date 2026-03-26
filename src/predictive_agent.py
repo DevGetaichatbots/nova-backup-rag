@@ -471,6 +471,37 @@ Return complete JSON matching the strict schema."""
             choice = response.choices[0]
             raw_content = choice.message.content or ""
 
+            reasoning_content = getattr(choice.message, 'reasoning_content', None)
+            if not reasoning_content:
+                reasoning_content = getattr(choice.message, 'reasoning', None)
+            if not reasoning_content and hasattr(choice.message, 'model_extra') and choice.message.model_extra:
+                reasoning_content = choice.message.model_extra.get('reasoning_content') or choice.message.model_extra.get('reasoning')
+
+            if reasoning_content:
+                logger.info(f"  [PredictiveAgent] === LLM REASONING START ===")
+                reasoning_str = str(reasoning_content)
+                reasoning_lines = reasoning_str.split('\n')
+                for line in reasoning_lines:
+                    logger.info(f"  [PredictiveAgent] REASONING: {line}")
+                logger.info(f"  [PredictiveAgent] === LLM REASONING END ({len(reasoning_str)} chars) ===")
+            else:
+                logger.info(f"  [PredictiveAgent] No reasoning content returned by model")
+
+            model_used = getattr(response, 'model', self.deployment)
+            usage = getattr(response, 'usage', None)
+            usage_parts = []
+            if usage:
+                usage_parts.append(f"prompt={usage.prompt_tokens}")
+                usage_parts.append(f"completion={usage.completion_tokens}")
+                reasoning_tokens = getattr(usage, 'completion_tokens_details', None)
+                if reasoning_tokens:
+                    r_tokens = getattr(reasoning_tokens, 'reasoning_tokens', None)
+                    if r_tokens is None and hasattr(reasoning_tokens, 'model_extra'):
+                        r_tokens = reasoning_tokens.model_extra.get('reasoning_tokens')
+                    if r_tokens is not None:
+                        usage_parts.append(f"reasoning={r_tokens}")
+            usage_info = f", tokens: {', '.join(usage_parts)}" if usage_parts else ""
+
             if not raw_content and hasattr(choice.message, 'refusal') and choice.message.refusal:
                 logger.warning(f"  [PredictiveAgent] Model refused: {choice.message.refusal}")
                 return {"predictive_insights": None, "model": self.deployment, "status": "error", "error": f"Model refused: {choice.message.refusal}"}
@@ -497,13 +528,12 @@ Return complete JSON matching the strict schema."""
                 logger.error(f"  [PredictiveAgent] Schema validation failed — delayed_activities is not a list")
                 return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": "Schema validation failed: delayed_activities is not a list"}
 
-            model_used = getattr(response, 'model', self.deployment)
-            usage = getattr(response, 'usage', None)
-            usage_info = f", tokens: prompt={usage.prompt_tokens}, completion={usage.completion_tokens}" if usage else ""
-
             delayed_count = len(parsed_json.get("delayed_activities", []))
             root_causes = sum(1 for a in parsed_json.get("delayed_activities", []) if a.get("is_root_cause"))
             logger.info(f"  [PredictiveAgent] JSON response: {delayed_count} delayed activities, {root_causes} root causes, model: {model_used}{usage_info}")
+
+            delayed_ids = [a.get("id", "?") for a in parsed_json.get("delayed_activities", [])]
+            logger.info(f"  [PredictiveAgent] Delayed activity IDs: {delayed_ids}")
 
             return {
                 "predictive_insights": raw_content,
