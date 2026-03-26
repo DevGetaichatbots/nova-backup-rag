@@ -526,12 +526,12 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
         context_parts.append(f"[{doc_label}] — TEXT DATA")
         context_parts.append("")
         for chunk in text_chunks:
-            cleaned = _clean_gantt_noise(chunk["content"])
-            if cleaned.strip():
-                context_parts.append(cleaned)
+            content = chunk["content"]
+            if content.strip():
+                context_parts.append(content)
                 context_parts.append("")
         if len(context_parts) <= 2:
-            context_parts.append("No schedule data could be extracted after filtering.\n")
+            context_parts.append("No schedule data could be extracted.\n")
         return "\n".join(context_parts)
 
     context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
