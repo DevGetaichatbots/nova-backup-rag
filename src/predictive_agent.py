@@ -203,11 +203,16 @@ Any other layout — ADAPT to whatever is present.
 
 ## ADAPTIVE COLUMN MAPPING
 
-CRITICAL ID RULE: The data rows contain column headers like "Id: 520" or "Entydigt id: 1187". These column VALUES are the real task identifiers. NEVER use row sequence numbers, row indices, or "Row N" as IDs. Always extract the actual Id or Entydigt id column value.
+CRITICAL ID RULE:
+Each data row is formatted as "Id: 41 | Opgavenavn: Placering af ... | Varighed: 1d | Startdato: ma 05-01-26 | ...".
+The number after "Id:" IS the real task identifier. In this example, the ID is "41".
+You MUST extract this number and use it as the "id" field in your JSON output.
+NEVER output empty IDs. NEVER use row numbers, sequence numbers, or task names as IDs.
+If the format uses "Entydigt id" instead of "Id", use that value.
 
 1. Determine format type FIRST (week-based vs table-based)
 2. Map columns to semantic roles:
-   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id". The VALUE of this column is the real ID.
+   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id". Extract the VALUE after the colon.
    - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name"
    - DURATION: "Varighed", "Duration"
    - START DATE: "Startdato", "Start", "Start Date"
@@ -249,25 +254,44 @@ Execute a COMPLETE ANALYSIS on the provided schedule data. Return your results a
 
 ## PHASE 1: DELAYED ACTIVITIES DETECTION (Module A)
 
-### PASS 1: Scan EVERY row — collect ALL candidates with 0% progress
-Go through the data ROW BY ROW, from FIRST to LAST row:
-- progress = 0% → add to candidate list
-- progress > 0% → skip
-- grouping header (Omr. X, E100.XX discipline name, Globals) → skip
-- Do NOT stop early. Process ALL rows.
+### DETECTION RULE (ABSOLUTE — NO EXCEPTIONS):
+An activity is DELAYED if BOTH are true:
+  1. Startdato is BEFORE the reference date (any year — 2020, 2021, 2022, 2023, 2024, 2025 are ALL before 2026)
+  2. Progress = 0% (or "0")
+
+That's it. No other filter. No duration filter. No importance filter.
+If an activity started in 2020 and still has 0% — it is delayed (2190+ days overdue).
+If an activity started yesterday with 0% — it is delayed (1 day overdue).
+If 50 activities have the same start date and all have 0% — ALL 50 are delayed.
+
+### WHAT TO EXCLUDE (ONLY these):
+- Grouping/summary HEADER rows: "Omr. 1", "Omr. 2", "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL", "Globals", "Afhængigheder", "Færdiggøre projektering"
+- These are section headers with very high durations that group sub-tasks
+- EVERYTHING ELSE with 0% and Startdato < reference_date is a delayed activity
+
+### PASS 1: Scan EVERY single row from first to last
+- Read EVERY row. Do NOT stop after finding a few.
+- For each row: check progress column. If 0% → candidate.
+- If progress > 0% → skip.
+- If grouping header → skip.
 
 ### PASS 2: Filter candidates by date
-- Startdato STRICTLY BEFORE reference date → INCLUDE as delayed
-- Startdato ON or AFTER reference date → EXCLUDE
-- Calculate days_overdue = reference_date - Startdato (calendar days)
+- Parse Startdato. If Startdato < reference_date → DELAYED. Include it.
+- If Startdato >= reference_date → not delayed yet. Skip.
+- Calculate days_overdue = reference_date minus Startdato in calendar days.
+- IMPORTANT: A start date in year 2025 IS before a reference date in 2026. Year 2024 IS before 2026. Etc.
 
-### CRITICAL: You MUST find ALL delayed activities across ALL areas/disciplines.
+### PASS 3: Extract the real ID
+- For each delayed activity, extract the "Id" column value (the number after "Id:").
+- This is MANDATORY. The "id" field in your output must contain this number, e.g., "41", "520", "33".
 
-### PASS 3: Verify completeness
-1. Checked EVERY row
-2. Every listed activity: Startdato < reference_date AND progress = 0%
-3. No summary/grouping rows included
-4. Activities from MULTIPLE areas/disciplines
+### PASS 4: Verify completeness
+After collecting all delayed activities, verify:
+1. You processed EVERY row in the data (not just the first page or first area)
+2. Every listed activity truly has Startdato < reference_date AND 0% progress
+3. You included activities from ALL areas/disciplines (Omr. 1, Omr. 2, Omr. 3, etc.)
+4. You did not miss any — go back and scan again if uncertain
+5. Every activity has a real numeric ID from the Id column
 
 ## PHASE 2: DECISION SUPPORT ANALYSIS
 
@@ -384,37 +408,37 @@ This date was extracted from the uploaded filename. You MUST use this exact date
 Do NOT use any other date. Do NOT use today's date. Use: {reference_date}
 """
 
-        user_message = f"""Analyze the following construction schedule data. Execute BOTH Phase 1 (detect ALL delayed activities) and Phase 2 (decision support analysis). Return your complete analysis as JSON matching the strict schema.
+        user_message = f"""Analyze the following construction schedule data.
 
 Schedule filename: "{schedule_label}"
 {ref_date_instruction}
 ═══════════════════════════════════════════════════════════
-COMPLETE SCHEDULE DATA:
+COMPLETE SCHEDULE DATA (ALL PAGES):
 ═══════════════════════════════════════════════════════════
 {context}
 ═══════════════════════════════════════════════════════════
 
-DATA FORMAT: The data above contains the COMPLETE structured data from ALL pages of the PDF. Map column headers to semantic roles. You MUST process EVERY row. Do NOT skip any rows.
+CRITICAL INSTRUCTIONS:
+1. The data above is the COMPLETE schedule from ALL pages of the PDF. Every row is included.
+2. Each row has columns separated by " | ". The first column "Id: X" contains the REAL task ID number X.
+3. You MUST output this ID number in the "id" field. Example: if a row says "Id: 41 | ...", the id is "41".
 
-═══════════════════════════════════════════════════════════
-EXECUTION STEPS:
-═══════════════════════════════════════════════════════════
-PHASE 1 — DETECTION:
-1. AUTO-DETECT FORMAT from column headers
-2. Parse ALL rows — extract every column value
-3. Exclude summary/grouping rows ONLY
-4. Find ALL delayed activities (Startdato < ref_date AND progress = 0%)
-5. Calculate days_overdue for each
+PHASE 1 — FIND ALL DELAYED ACTIVITIES:
+- A row is delayed if: Startdato < reference_date AND progress = 0%
+- Include ALL such rows. If there are 30 delayed activities, output all 30. If there are 50, output all 50.
+- Do NOT limit to 4 or 5. Scan EVERY row. Include activities from ALL areas (Omr. 1, Omr. 2, Omr. 3, etc.)
+- Activities from year 2025, 2024, 2023, etc. with 0% are ALL delayed relative to a 2026 reference date.
+- Multiple activities with the same start date? Include ALL of them if they have 0%.
+- Only skip grouping headers (Omr. X, E100.XX, Globals, Afhængigheder, Færdiggøre projektering).
 
 PHASE 2 — DECISION SUPPORT:
-6. Classify each task by type
-7. Determine root cause vs downstream consequence
-8. Assess downstream impact per root cause
-9. Assign priority (CRITICAL_NOW / IMPORTANT_NEXT / MONITOR)
-10. Generate specific action recommendations in priority order
-11. Assess resource implications
-12. Write management conclusion
-═══════════════════════════════════════════════════════════"""
+- Classify each delayed activity by task_type
+- Determine root causes vs downstream consequences
+- Assign priority (CRITICAL_NOW / IMPORTANT_NEXT / MONITOR)
+- Generate action recommendations
+- Write management conclusion
+
+Return complete JSON matching the strict schema."""
 
         messages: List[ChatCompletionMessageParam] = [
             {"role": "system", "content": system_prompt},
@@ -425,7 +449,7 @@ PHASE 2 — DECISION SUPPORT:
             api_params = {
                 "model": self.deployment,
                 "messages": messages,
-                "max_completion_tokens": 32768,
+                "max_completion_tokens": 65536,
                 "response_format": {
                     "type": "json_schema",
                     "json_schema": NOVA_INSIGHT_SCHEMA
@@ -433,7 +457,7 @@ PHASE 2 — DECISION SUPPORT:
             }
 
             try:
-                api_params["reasoning_effort"] = "medium"
+                api_params["reasoning_effort"] = "high"
                 response = self.client.chat.completions.create(**api_params)
             except Exception as reasoning_err:
                 err_str = str(reasoning_err)
