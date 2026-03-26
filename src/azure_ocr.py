@@ -165,10 +165,29 @@ class AzureDocumentIntelligence:
                 bounding_regions = table.get("boundingRegions", [])
                 page_numbers = list(set(br.get("pageNumber", 1) for br in bounding_regions))
                 
+                header_cells = [c for c in cells_data if c.get("kind") == "columnHeader"]
+                ocr_header_row = [""] * col_count
+                header_row_indices = set()
+                if header_cells:
+                    for hc in header_cells:
+                        ci = hc.get("columnIndex", 0)
+                        if 0 <= ci < col_count:
+                            ocr_header_row[ci] = hc.get("content", "").strip()
+                            header_row_indices.add(hc.get("rowIndex", 0))
+                    logger.info(f"[{filename}] Table {table_idx}: Found {len(header_cells)} columnHeader cells in rows {header_row_indices}: {ocr_header_row}")
+
                 simple_rows = []
-                for row in grid:
+                for row_idx_iter, row in enumerate(grid):
+                    if row_idx_iter in header_row_indices:
+                        continue
                     simple_row = [cell["content"] if cell["content"] and not cell["content"].startswith("^") else "" for cell in row]
                     simple_rows.append(simple_row)
+
+                if header_cells and any(h for h in ocr_header_row):
+                    simple_rows.insert(0, ocr_header_row)
+                else:
+                    first_row = [cell["content"] if cell["content"] and not cell["content"].startswith("^") else "" for cell in grid[0]]
+                    simple_rows.insert(0, first_row)
                 
                 structured_tables.append({
                     "table_id": table_idx,

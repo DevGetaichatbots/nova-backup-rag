@@ -1,0 +1,147 @@
+7:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extraction complete!
+2026-03-26 22:05:14.11
+8c308434
+User
+17:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 1 structured tables
+2026-03-26 22:05:14.11
+8c308434
+User
+17:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 21138 chars, 1 tables, 1 pages
+2026-03-26 22:05:14.11
+8c308434
+User
+17:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Table 0 headers: ['1', '', 'sod', 'ma 85-01-26', 'fr 1:0-08-26', '%', '', '', '', '', '']
+2026-03-26 22:05:14.11
+8c308434
+User
+17:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Large table 0 split into 1 chunks (was 136738 chars)
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Created 136 chunks (1 tables, 1 pages)
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | OCR complete (17.6s): 136 chunks (112 rows, 1 tables, 23 text)
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Raw OCR saved to: ocr_raw_20260326_170514_sa_da6a8735200e9dbd.txt
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context data: 112 rows, 0 rows with 0% progress
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context built: 16384 chars
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2 (strict JSON schema)...
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Running Nova Insight predictive analysis...
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context data: 112 rows, 0 rows with 0% progress
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context built: 16384 chars
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2 (strict JSON schema)...
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Running Nova Insight predictive analysis...
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context data: 112 rows, 0 rows with 0% progress
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Context built: 16384 chars
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2 (strict JSON schema)...
+2026-03-26 22:05:14.23
+8c308434
+User
+17:05:14 | INFO | Running Nova Insight predictive analysis...
+2026-03-26 22:05:26.86
+8c308434
+User
+17:05:26 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-26 22:05:26.87
+8c308434
+User
+17:05:26 | INFO | [PredictiveAgent] JSON response: 0 delayed activities, 0 root causes, model: gpt-5.2-2025-12-11, tokens: prompt=13111, completion=723, reasoning=0
+2026-03-26 22:05:26.87
+8c308434
+User
+17:05:26 | INFO | [PredictiveAgent] No reasoning content returned by model
+2026-03-26 22:05:26.87
+8c308434
+User
+17:05:26 | INFO | [PredictiveAgent] Delayed activity IDs: []
+2026-03-26 22:05:26.87
+8c308434
+User
+17:05:26 | INFO | === PREDICTIVE COMPLETE [sa_da6a8735200e9dbd] (30.2s) ===
+2026-03-26 22:05:26.87
+8c308434
+User
+17:05:26 | INFO | Predictive response: 19833 chars, status: success, json=yes
+2026-03-26 22:06:16.32
+0a86e569
+System
+system: received signal terminated
+2026-03-26 22:06:16.32
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [30] [INFO] Handling signal: term
+2026-03-26 22:06:16.41
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [35] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+2026-03-26 22:06:16.41
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [35] [INFO] Shutting down
+2026-03-26 22:06:16.51
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [35] [INFO] Waiting for application shutdown.
+2026-03-26 22:06:16.51
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [35] [INFO] Finished server process [35]
+2026-03-26 22:06:16.51
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [35] [INFO] Application shutdown complete.
+2026-03-26 22:06:16.62
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [30] [INFO] Worker (pid:35) was sent SIGTERM!
+2026-03-26 22:06:16.72
+0a86e569
+User
+[2026-03-26 17:06:16 +0000] [30] [INFO] Shutting down: Master
+2026-03-26 22:06:16.80
+0a86e569
+System
+command finished successfully with exit code 0
+2026-03-26 22:06:16.80
+0a86e569
+System
+main done, exiting
+Wrap
+Colors
