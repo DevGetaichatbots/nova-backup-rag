@@ -517,12 +517,7 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
                 zero_pct_count += 1
 
         import logging as _log
-        _ctx_log = _log.getLogger(__name__)
-        _ctx_log.info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
-        _ctx_log.info(f"  === OCR ROW DATA START ===")
-        for row_idx, chunk in enumerate(row_chunks, 1):
-            _ctx_log.info(f"  ROW {row_idx}: {chunk['content']}")
-        _ctx_log.info(f"  === OCR ROW DATA END ({len(row_chunks)} rows) ===")
+        _log.getLogger(__name__).info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
 
         context_parts.append("")
         return "\n".join(context_parts)
@@ -602,29 +597,48 @@ async def predictive_analysis(
         ocr_elapsed = time.time() - start_time
         logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({row_count} rows, {table_count} tables, {text_count} text)")
 
-        _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
-
-        context = _build_predictive_context(chunks, filename_clean)
-        logger.info(f"  Context built: {len(context)} chars (all sections included)")
-
         import datetime as _dt
         _ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        _ctx_filename = f"ocr_context_{_ts}_{analysis_id}.txt"
-        _ctx_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _ctx_filename)
+        _ocr_filename = f"ocr_raw_{_ts}_{analysis_id}.txt"
+        _ocr_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _ocr_filename)
         try:
-            with open(_ctx_path, "w", encoding="utf-8") as _f:
-                _f.write(f"=== OCR CONTEXT FOR LLM ===\n")
+            with open(_ocr_path, "w", encoding="utf-8") as _f:
+                _f.write(f"=== RAW OCR EXTRACTION ===\n")
                 _f.write(f"File: {filename}\n")
                 _f.write(f"Reference Date: {reference_date}\n")
                 _f.write(f"Analysis ID: {analysis_id}\n")
                 _f.write(f"Timestamp: {_dt.datetime.now().isoformat()}\n")
-                _f.write(f"Context Length: {len(context)} chars\n")
-                _f.write(f"Chunks: {row_count} rows, {table_count} tables, {text_count} text\n")
+                _f.write(f"OCR Time: {ocr_elapsed:.1f}s\n")
+                _f.write(f"Total Chunks: {len(chunks)} ({row_count} rows, {table_count} tables, {text_count} text)\n")
                 _f.write(f"{'='*60}\n\n")
-                _f.write(context)
-            logger.info(f"  OCR context saved to: {_ctx_filename}")
+
+                row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
+                if row_chunks:
+                    _f.write(f"--- TABLE ROWS ({len(row_chunks)}) ---\n\n")
+                    for i, chunk in enumerate(row_chunks, 1):
+                        _f.write(f"ROW {i}: {chunk['content']}\n")
+                    _f.write(f"\n")
+
+                tbl_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
+                if tbl_chunks:
+                    _f.write(f"--- TABLE CHUNKS ({len(tbl_chunks)}) ---\n\n")
+                    for i, chunk in enumerate(tbl_chunks, 1):
+                        _f.write(f"TABLE CHUNK {i}:\n{chunk['content']}\n\n")
+
+                txt_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
+                if txt_chunks:
+                    _f.write(f"--- TEXT CHUNKS ({len(txt_chunks)}) ---\n\n")
+                    for i, chunk in enumerate(txt_chunks, 1):
+                        _f.write(f"TEXT {i}:\n{chunk['content']}\n\n")
+
+            logger.info(f"  Raw OCR saved to: {_ocr_filename}")
         except Exception as _e:
-            logger.warning(f"  Failed to save OCR context file: {_e}")
+            logger.warning(f"  Failed to save raw OCR file: {_e}")
+
+        _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
+
+        context = _build_predictive_context(chunks, filename_clean)
+        logger.info(f"  Context built: {len(context)} chars")
 
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
