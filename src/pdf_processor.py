@@ -153,7 +153,38 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
         if not rows:
             continue
         
-        header_row = rows[0] if rows else []
+        raw_header = rows[0] if rows else []
+        
+        KNOWN_HEADERS = {
+            "id", "entydigt id", "etage", "omr.", "ansvarlig", "opgavenavn",
+            "opgavetilstand", "varighed", "startdato", "slutdato",
+            "% arbejde færdigt", "% færdigt", "foregående opgaver",
+            "efterfølgende opgaver", "bemærkn.", "bemærkn",
+            "opg.navn", "opgavenavn/aktivitet"
+        }
+        
+        def _header_score(row_vals):
+            if not row_vals:
+                return 0
+            cleaned = [str(v).strip().lower() for v in row_vals if str(v).strip()]
+            return sum(1 for v in cleaned if v in KNOWN_HEADERS or any(kh in v for kh in KNOWN_HEADERS))
+        
+        header_row = raw_header
+        best_score = _header_score(raw_header)
+        best_header_idx = 0
+        
+        for check_idx in range(1, min(5, len(rows))):
+            score = _header_score(rows[check_idx])
+            if score > best_score:
+                best_score = score
+                header_row = rows[check_idx]
+                best_header_idx = check_idx
+        
+        if best_header_idx > 0:
+            logger.info(f"[{filename}] Table {table_id}: Header found at row {best_header_idx} (score={best_score}), not row 0")
+            rows = [header_row] + [r for i, r in enumerate(rows) if i != best_header_idx and i != 0]
+        
+        logger.info(f"[{filename}] Table {table_id} headers: {[str(h).strip() for h in header_row]}")
         
         MAX_TABLE_CHUNK_CHARS = 20000
         

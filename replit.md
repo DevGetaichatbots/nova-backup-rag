@@ -14,7 +14,7 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **DB Connection Pooling**: ThreadedConnectionPool (2-8 connections), batch embedding conversion
 - **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
 - **Predictive Output**: Strict JSON schema via `response_format` → deterministic structured output → HTML mapping (no regex parsing)
-- **LLM Settings**: temperature=1 (GPT-5.2 default, only supported value), reasoning_effort=medium, max_completion_tokens=65536
+- **LLM Settings**: temperature=1 (GPT-5.2 default, only supported value), reasoning_effort=minimal, max_completion_tokens=65536
 - **Deployment**: Gunicorn with 1 worker (LLM-bound workload), 300s timeout
 
 ## Project Structure
