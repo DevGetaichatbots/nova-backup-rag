@@ -60,6 +60,15 @@ def _render_delayed_table(markdown_lines: List[str]) -> str:
         align = "right" if i == days_col_idx else "left"
         header_html += f'<th style="padding:12px 14px;text-align:{align};font-size:11px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;border-bottom:2px solid #e2e8f0;background:#f7fafc;">{_escape(h)}</th>'
 
+    valid_rows = []
+    for row in rows:
+        if row and row[0].strip().upper() in ("N/A", "-", ""):
+            continue
+        if any("only" in c.lower() and "met the criteria" in c.lower() for c in row):
+            continue
+        valid_rows.append(row)
+    rows = valid_rows
+
     rows_html = []
     for idx, row in enumerate(rows):
         bg = "#f7fafc" if idx % 2 == 0 else "#ffffff"
@@ -167,8 +176,10 @@ def _render_content_block(lines: List[str], accent_color: str) -> str:
         if re.match(r"^\d+\.\s+", stripped):
             num_match = re.match(r"^(\d+)\.\s+(.*)", stripped)
             if num_match:
-                num = num_match.group(1)
                 item_raw = num_match.group(2)
+                if re.search(r'\bN/?A\b', item_raw) and re.search(r'\bID\s+N/?A\b', item_raw, re.IGNORECASE):
+                    continue
+                num = num_match.group(1)
                 item_safe = _escape(item_raw)
                 item_safe = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1a202c;font-weight:600;">\1</strong>', item_safe)
                 list_items.append(f'<span style="color:{accent_color};font-weight:700;margin-right:6px;">{num}.</span>{item_safe}')
