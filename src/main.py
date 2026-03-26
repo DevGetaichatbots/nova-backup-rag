@@ -502,8 +502,9 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
     if row_chunks:
-        context_parts.append(f"[{doc_label}] — {len(row_chunks)} activities (row data)")
-        context_parts.append("Format: Row N (Page P): Header: value | Header: value | ...")
+        context_parts.append(f"[{doc_label}] — {len(row_chunks)} data rows")
+        context_parts.append("Format: ColumnHeader: value | ColumnHeader: value | ...")
+        context_parts.append("IMPORTANT: The 'Id' column contains the REAL activity ID. Use that as the task identifier, NOT the row sequence number.")
         context_parts.append("")
         for chunk in row_chunks:
             context_parts.append(chunk["content"])
