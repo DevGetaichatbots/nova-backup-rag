@@ -132,14 +132,16 @@ Returns the current analysis stage with a friendly, non-technical message.
 6. User queries via `/query` with vector store table references
 7. Agent retrieves from both stores and provides comparison analysis
 
-## Predictive Agent Flow (Standalone — Currently Module A Only)
+## Predictive Agent Flow (Decision Support System)
 1. User uploads a single PDF schedule to `/predictive` (filename contains reference date)
 2. Reference date extracted from filename (e.g., "2026-03-12..." → March 12, 2026)
 3. PDF is OCR'd using Azure Document Intelligence
 4. Table chunks are extracted (falls back to text chunks if no tables found)
 5. Context is assembled in the format the predictive LLM expects
-6. GPT-5.2 runs Module A: Delayed Activities Identification
-7. Response is formatted as dark analytics dashboard HTML with delayed activities table
+6. GPT-5.2 executes two-phase analysis:
+   - **Phase 1 (Detection)**: Module A — find ALL delayed activities with absolute precision
+   - **Phase 2 (Decision Support)**: Root cause analysis, task classification, priority ranking, action recommendations, resource assessment
+7. Response is formatted as light/white analytics dashboard HTML
 8. Complete results returned in a single response (~30-90s)
 
 ## Table Extraction (Construction Schedules)
@@ -149,14 +151,44 @@ Returns the current analysis stage with a friendly, non-technical message.
 - Row chunks include: page_number, cells_data with coordinates
 - Format: `TABLE {id} (Pages [...])\n{markdown}\n[STRUCTURED: {json}]`
 
-### Nova Insight — Current Active Module
-- **Module A (ACTIVE)**: Delayed Activities Identification
-  - Criteria: `Startdato < reference_date AND % arbejde færdigt = 0` (NO Varighed filter — 0d tasks included, only grouping headers excluded)
-  - Slutdato = "-" does NOT make a row a summary — only named section headers (Omr. X, E100.XX, Globals) with very high durations are excluded
-  - Reference date: extracted from uploaded PDF filename
-  - Output: sorted table (most overdue first) with ID, Activity Name, Start Date, End Date, Duration, Progress, Days Overdue
-  - Summary: count by area/discipline, top 5 critical delays, professional assessment
-  - HTML: light/white theme with teal accents (#0d9488), animated hero stats, severity-colored overdue indicators, clean white cards
+### Nova Insight — Decision Support Output Structure
+Report sections in order:
+1. **MANAGEMENT_CONCLUSION** — 3-5 sentence senior-level brief: primary risk driver, cascading risks, most critical areas, immediate action
+2. **SCHEDULE_OVERVIEW** — Filename, reference date, total activities, delayed count, areas, format detected
+3. **DELAYED_ACTIVITIES** — 9-column table: Id | Opgavenavn | Startdato | Slutdato | Varighed | % færdigt | Days Overdue | Task Type | Priority
+4. **ROOT_CAUSE_ANALYSIS** — Each root cause with: status, problem type, why it matters, downstream impact, consequences. Plus list of downstream consequence tasks
+5. **PRIORITY_ACTIONS** — Numbered sequence of specific action recommendations in execution order
+6. **RESOURCE_ASSESSMENT** — Per-critical-issue: manpower problem vs coordination bottleneck vs design dependency vs bygherre escalation
+7. **SUMMARY_BY_AREA** — Per-area severity summary with critical/monitor breakdown
+
+### Module A Detection Criteria
+- `Startdato < reference_date AND % arbejde færdigt = 0` (NO Varighed filter — 0d tasks included, only grouping headers excluded)
+- Slutdato = "-" does NOT make a row a summary — only named section headers (Omr. X, E100.XX, Globals) with very high durations are excluded
+- Reference date: extracted from uploaded PDF filename
+
+### Task Type Classification
+- **Coordination** — cross-discipline coordination, meetings, trade dependencies
+- **Design** — design input, technical specifications, drawings, data sheets
+- **Bygherre** — client/owner decisions, approvals, clarifications
+- **Production** — physical construction/installation work
+- **Procurement** — ordering, delivering, confirming materials/equipment
+- **Milestone** — zero-duration markers, handover points, decision gates
+
+### Priority Levels
+- **CRITICAL NOW** — Root cause, high overdue, blocks multiple downstream activities. Immediate action required.
+- **IMPORTANT NEXT** — Significant delay, may block some work. Resolve within 1-2 weeks.
+- **MONITOR** — Lower-priority, isolated impact, or downstream consequence that resolves when root cause is fixed.
+
+### INSIGHT_DATA Fields
+`total_activities`, `delayed_count`, `critical_count`, `important_count`, `monitor_count`, `root_cause_count`, `reference_date`, `most_overdue_days`, `areas_affected`, `format_detected`, `schedule_name`, `primary_risk`
+
+### HTML Theme
+- Light/white theme with teal accents (#0d9488)
+- Hero section: delayed count, priority breakdown (critical/important/monitor dots), progress bar, root cause count
+- Section cards: color-coded icons (teal=management, red=delays, purple=root cause, green=actions, amber=resources, blue=areas)
+- Priority badges: red=CRITICAL NOW, amber=IMPORTANT NEXT, cyan=MONITOR
+- Task type badges: purple=Coordination, blue=Design, magenta=Bygherre, green=Production, amber=Procurement, gray=Milestone
+- Severity-colored overdue indicators in table
 
 ### Commented Out Modules (Future Iterations)
 - Module B: Unrealistic progress reporting
