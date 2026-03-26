@@ -139,6 +139,20 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
     
     chunks = []
     chunk_index = 0
+
+    raw_markdown = extraction.get("raw_markdown", "")
+    if raw_markdown and raw_markdown.strip():
+        chunks.append({
+            "content": raw_markdown.strip(),
+            "metadata": {
+                "chunk_index": chunk_index,
+                "filename": filename,
+                "type": "raw_markdown",
+                "source": "azure_ocr"
+            }
+        })
+        chunk_index += 1
+        logger.info(f"[{filename}] Raw markdown chunk: {len(raw_markdown)} chars")
     
     tables = extraction.get("tables", [])
     for table in tables:
