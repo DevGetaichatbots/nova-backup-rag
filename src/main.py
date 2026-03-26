@@ -485,7 +485,9 @@ def _clean_gantt_noise(text: str) -> str:
             has_letter = any(c.isalpha() for c in stripped)
             has_colon = ':' in stripped
             has_pipe = '|' in stripped
-            if has_letter and not has_colon and not has_pipe and stripped.count(' ') <= 2:
+            has_at = '@' in stripped
+            looks_like_task = any(kw in stripped.lower() for kw in ['uge', 'maler', 'tømrer', 'el', 'vvs', 'pap', 'flise', 'gulv', 'loft', 'tag', 'køkken', 'bad', 'fuge', 'montage', 'aflevering'])
+            if has_letter and not has_colon and not has_pipe and not has_at and not looks_like_task and stripped.count(' ') <= 2:
                 continue
         clean_lines.append(line)
     return "\n".join(clean_lines)
