@@ -498,41 +498,22 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
 
-    table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
-    row_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table_row"]
+    raw_md_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
-    if row_chunks:
-        context_parts.append(f"[{doc_label}] — {len(row_chunks)} data rows")
-        context_parts.append("Format: ColumnHeader: value | ColumnHeader: value | ...")
-        context_parts.append("IMPORTANT: The 'Id' column contains the REAL activity ID. Use that as the task identifier, NOT the row sequence number.")
+    import logging as _log
+    _logger = _log.getLogger(__name__)
+
+    if raw_md_chunks:
+        content = raw_md_chunks[0]["content"]
+        context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA (Azure OCR markdown)")
+        context_parts.append("The data below is extracted directly from the PDF. It contains markdown tables with column headers.")
+        context_parts.append("Scan EVERY row for delayed activities using the detection rule.")
         context_parts.append("")
-
-        zero_pct_count = 0
-        for chunk in row_chunks:
-            content = chunk["content"]
-            context_parts.append(content)
-            content_lower = content.lower()
-            if ("% arbejde færdigt: 0" in content_lower or "% færdigt: 0" in content_lower
-                or "% arbejde færdigt: 0%" in content or "% færdigt: 0%" in content):
-                zero_pct_count += 1
-
-        import logging as _log
-        _log.getLogger(__name__).info(f"  Context data: {len(row_chunks)} rows, {zero_pct_count} rows with 0% progress")
-
+        context_parts.append(content)
         context_parts.append("")
-        return "\n".join(context_parts)
-
-    if table_chunks:
-        context_parts.append(f"[{doc_label}] — COMPLETE STRUCTURED TABLE DATA ({len(table_chunks)} table sections)")
-        context_parts.append("")
-        for chunk in table_chunks:
-            content = chunk["content"]
-            if "[STRUCTURED:" in content:
-                content = content[:content.index("[STRUCTURED:")]
-            if content.strip():
-                context_parts.append(content.strip())
-                context_parts.append("")
+        table_lines = sum(1 for line in content.split("\n") if line.strip().startswith("|"))
+        _logger.info(f"  Context: using raw Azure markdown, {len(content)} chars, ~{table_lines} table lines")
         return "\n".join(context_parts)
 
     if text_chunks:

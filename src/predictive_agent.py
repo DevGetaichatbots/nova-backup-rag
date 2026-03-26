@@ -419,9 +419,11 @@ COMPLETE SCHEDULE DATA (ALL PAGES):
 ═══════════════════════════════════════════════════════════
 
 CRITICAL INSTRUCTIONS:
-1. The data above is the COMPLETE schedule from ALL pages of the PDF. Every row is included.
-2. Each row has columns separated by " | ". The first column "Id: X" contains the REAL task ID number X.
-3. You MUST output this ID number in the "id" field. Example: if a row says "Id: 41 | ...", the id is "41".
+1. The data above is a COMPLETE markdown table extracted from the PDF via OCR. Every row is included.
+2. The table has column headers in the first row (e.g. Id, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, etc.)
+3. Read the "Id" column value for each row. Output that value in the "id" field.
+4. The "% arbejde færdigt" (or similar) column contains the progress percentage.
+5. The "Startdato" column contains the start date. Dates may be in formats like "ma 05-01-26", "ti 16-12-25", etc.
 
 PHASE 1 — FIND ALL DELAYED ACTIVITIES:
 - A row is delayed if: Startdato < reference_date AND progress = 0%
@@ -429,7 +431,7 @@ PHASE 1 — FIND ALL DELAYED ACTIVITIES:
 - Do NOT limit to 4 or 5. Scan EVERY row. Include activities from ALL areas (Omr. 1, Omr. 2, Omr. 3, etc.)
 - Activities from year 2025, 2024, 2023, etc. with 0% are ALL delayed relative to a 2026 reference date.
 - Multiple activities with the same start date? Include ALL of them if they have 0%.
-- Only skip grouping headers (Omr. X, E100.XX, Globals, Afhængigheder, Færdiggøre projektering).
+- Only skip grouping/summary headers (e.g. section headers like "Omr. 1", "E100.XX", "Globals", "Afhængigheder", "Færdiggøre projektering").
 
 PHASE 2 — DECISION SUPPORT:
 - Classify each delayed activity by task_type
