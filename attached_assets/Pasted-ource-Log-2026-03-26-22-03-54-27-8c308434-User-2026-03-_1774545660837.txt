@@ -1,0 +1,160 @@
+ource
+Log
+2026-03-26 22:03:54.27
+8c308434
+User
+[2026-03-26 17:03:54 +0000] [30] [INFO] Booting worker with pid: 30
+2026-03-26 22:18:40.15
+8c308434
+User
+[2026-03-26 17:18:40 +0000] [26] [INFO] Shutting down: Master
+2026-03-26 22:18:40.19
+8c308434
+System
+main done, exiting
+2026-03-26 22:18:40.19
+8c308434
+System
+command finished successfully with exit code 0
+2026-03-26 22:19:35.73
+cbd924a5
+User
+17:19:35 | INFO | File read: 160504 bytes
+2026-03-26 22:19:35.73
+cbd924a5
+User
+17:19:35 | INFO | Running OCR on PDF...
+2026-03-26 22:19:35.73
+cbd924a5
+User
+17:19:35 | INFO | Schedule: 2026-03-12 Samlet tidsplan_1side.pdf | Language: en | Reference date: 12-03-2026
+2026-03-26 22:19:35.73
+cbd924a5
+User
+17:19:35 | INFO | === PREDICTIVE REQUEST [sa_cb4b2a9553f3d0d4] ===
+2026-03-26 22:19:35.74
+cbd924a5
+User
+17:19:35 | INFO | Azure Document Intelligence initialized
+2026-03-26 22:19:35.74
+cbd924a5
+User
+17:19:35 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Submitting PDF to Azure (160504 bytes)...
+2026-03-26 22:19:36.65
+cbd924a5
+User
+17:19:36 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Operation started
+2026-03-26 22:19:36.92
+cbd924a5
+User
+17:19:36 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 0.0s)
+2026-03-26 22:19:40.18
+cbd924a5
+User
+17:19:40 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 3.3s)
+2026-03-26 22:19:43.44
+cbd924a5
+User
+17:19:43 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: running (elapsed: 6.5s)
+2026-03-26 22:19:47.17
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Status: succeeded (elapsed: 9.8s)
+2026-03-26 22:19:47.17
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extraction complete!
+2026-03-26 22:19:47.18
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 1 structured tables
+2026-03-26 22:19:47.18
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Extracted 21137 chars, 1 tables, 1 pages
+2026-03-26 22:19:47.18
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Table 0: Found 22 columnHeader cells in rows {0, 1}: ['', 'Bygherreafklaringer E300 00 - Fastlæggeke af rørmaterialer', '', 'ma 08-09-25 : 21-40-25', 'ma02-00-26\nma 10-43-25', '90%\n20', '', '', '', '', '']
+2026-03-26 22:19:47.19
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Table 0: Header found at row 4 (score=1), not row 0
+2026-03-26 22:19:47.19
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Table 0 headers: ['', '6300.01 - Fastlæg kraw til kemidepot:\nSikringuprojekt, omfang af ADIK Infavæg med glasfronter JARK pkt. 1.7]', '', 'ma 05-01-26\nma 05-01-26 ma/06-01-36', 'fr 16-01-26\nfr 16-01-26 6 06-01-26', '', '', '1078;1083:42', '', '', '']
+2026-03-26 22:19:47.19
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Large table 0 split into 1 chunks (was 136422 chars)
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | [2026-03-12 Samlet tidsplan_1side.pdf] Created 134 chunks (1 tables, 1 pages)
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | OCR complete (11.7s): 134 chunks (110 rows, 1 tables, 23 text)
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | Raw OCR saved to: ocr_raw_20260326_171947_sa_cb4b2a9553f3d0d4.txt
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | Running Nova Insight predictive analysis...
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | Context built: 33634 chars
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | Context data: 110 rows, 0 rows with 0% progress
+2026-03-26 22:19:47.40
+cbd924a5
+User
+17:19:47 | INFO | [PredictiveAgent] Starting analysis with gpt-5.2 (strict JSON schema)...
+2026-03-26 22:20:09.55
+cbd924a5
+User
+17:20:09 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-5.2/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | [PredictiveAgent] JSON response: 0 delayed activities, 0 root causes, model: gpt-5.2-2025-12-11, tokens: prompt=21121, completion=1223, reasoning=414
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | [PredictiveAgent] Delayed activity IDs: []
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | [PredictiveAgent] No reasoning content returned by model
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | === PREDICTIVE COMPLETE [sa_cb4b2a9553f3d0d4] (33.8s) ===
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | Predictive response: 20877 chars, status: success, json=yes
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | Predictive response: 20877 chars, status: success, json=yes
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | === PREDICTIVE COMPLETE [sa_cb4b2a9553f3d0d4] (33.8s) ===
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | Predictive response: 20877 chars, status: success, json=yes
+2026-03-26 22:20:09.56
+cbd924a5
+User
+17:20:09 | INFO | === PREDICTIVE COMPLETE [sa_cb4b2a9553f3d0d4] (33.8s) ===
+Wrap
+Colors
