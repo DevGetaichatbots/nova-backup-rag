@@ -447,6 +447,18 @@ Return complete JSON matching the strict schema."""
             {"role": "user", "content": user_message}
         ]
 
+        logger.info(f"  [PredictiveAgent] ╔══ LLM INPUT ══╗")
+        logger.info(f"  [PredictiveAgent] ║ System prompt: {len(system_prompt)} chars")
+        logger.info(f"  [PredictiveAgent] ║ User message: {len(user_message)} chars")
+        um_lines = user_message.split("\n")
+        logger.info(f"  [PredictiveAgent] ║ User msg first 20 lines:")
+        for li, line in enumerate(um_lines[:20]):
+            logger.info(f"  [PredictiveAgent] ║   {li}: {line[:200]}")
+        logger.info(f"  [PredictiveAgent] ║ User msg last 10 lines:")
+        for li, line in enumerate(um_lines[-10:]):
+            logger.info(f"  [PredictiveAgent] ║   {len(um_lines)-10+li}: {line[:200]}")
+        logger.info(f"  [PredictiveAgent] ╚══════════════════════════╝")
+
         try:
             api_params = {
                 "model": self.deployment,
@@ -472,6 +484,16 @@ Return complete JSON matching the strict schema."""
 
             choice = response.choices[0]
             raw_content = choice.message.content or ""
+
+            logger.info(f"  [PredictiveAgent] ╔══ RAW LLM RESPONSE ({len(raw_content)} chars) ══╗")
+            resp_lines = raw_content.split("\n")
+            for li, line in enumerate(resp_lines[:30]):
+                logger.info(f"  [PredictiveAgent] ║ {li}: {line[:300]}")
+            if len(resp_lines) > 30:
+                logger.info(f"  [PredictiveAgent] ║ ... ({len(resp_lines) - 30} more lines) ...")
+                for li, line in enumerate(resp_lines[-10:]):
+                    logger.info(f"  [PredictiveAgent] ║ {len(resp_lines)-10+li}: {line[:300]}")
+            logger.info(f"  [PredictiveAgent] ╚══════════════════════════╝")
 
             reasoning_content = getattr(choice.message, 'reasoning_content', None)
             if not reasoning_content:
