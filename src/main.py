@@ -608,6 +608,33 @@ async def predictive_analysis(
 
         logger.info(f"  ╚══════════════════════════╝")
 
+        import datetime as _dt
+        _ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        _dump_filename = f"ocr_dump_{_ts}_{analysis_id}.txt"
+        _dump_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _dump_filename)
+        try:
+            with open(_dump_path, "w", encoding="utf-8") as _f:
+                _f.write(f"=== OCR EXTRACTION DUMP ===\n")
+                _f.write(f"File: {filename}\n")
+                _f.write(f"Reference Date: {reference_date}\n")
+                _f.write(f"Analysis ID: {analysis_id}\n")
+                _f.write(f"Timestamp: {_dt.datetime.now().isoformat()}\n")
+                _f.write(f"OCR Time: {ocr_elapsed:.1f}s\n")
+                _f.write(f"Chunks: raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count}\n")
+                _f.write(f"{'='*80}\n\n")
+
+                for c in chunks:
+                    ctype = c.get("metadata", {}).get("type", "unknown")
+                    _f.write(f"\n{'─'*80}\n")
+                    _f.write(f"CHUNK TYPE: {ctype} | LENGTH: {len(c.get('content', ''))} chars\n")
+                    _f.write(f"{'─'*80}\n")
+                    _f.write(c.get("content", ""))
+                    _f.write(f"\n")
+
+            logger.info(f"  OCR dump saved: {_dump_filename}")
+        except Exception as _e:
+            logger.warning(f"  Failed to save OCR dump: {_e}")
+
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
 
         context = _build_predictive_context(chunks, filename_clean)
