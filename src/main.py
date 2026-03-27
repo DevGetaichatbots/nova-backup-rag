@@ -580,53 +580,47 @@ async def predictive_analysis(
             lambda: process_pdf_binary(pdf_bytes, filename)
         )
 
+        raw_md_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown")
         row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
         table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
         text_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "text")
         ocr_elapsed = time.time() - start_time
-        logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {len(chunks)} chunks ({row_count} rows, {table_count} tables, {text_count} text)")
+        logger.info(f"  ╔══ OCR COMPLETE ({ocr_elapsed:.1f}s) ══╗")
+        logger.info(f"  ║ Total chunks: {len(chunks)} (raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count})")
 
-        import datetime as _dt
-        _ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        _ocr_filename = f"ocr_raw_{_ts}_{analysis_id}.txt"
-        _ocr_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _ocr_filename)
-        try:
-            with open(_ocr_path, "w", encoding="utf-8") as _f:
-                _f.write(f"=== RAW OCR EXTRACTION ===\n")
-                _f.write(f"File: {filename}\n")
-                _f.write(f"Reference Date: {reference_date}\n")
-                _f.write(f"Analysis ID: {analysis_id}\n")
-                _f.write(f"Timestamp: {_dt.datetime.now().isoformat()}\n")
-                _f.write(f"OCR Time: {ocr_elapsed:.1f}s\n")
-                _f.write(f"Total Chunks: {len(chunks)} ({row_count} rows, {table_count} tables, {text_count} text)\n")
-                _f.write(f"{'='*60}\n\n")
+        for c in chunks:
+            ctype = c.get("metadata", {}).get("type", "?")
+            clen = len(c.get("content", ""))
+            if ctype == "raw_markdown":
+                content = c["content"]
+                lines = content.split("\n")
+                logger.info(f"  ║ [raw_markdown] {clen} chars, {len(lines)} lines")
+                logger.info(f"  ║ FIRST 10 LINES:")
+                for li, line in enumerate(lines[:10]):
+                    logger.info(f"  ║   L{li}: {line[:200]}")
+                logger.info(f"  ║ LAST 5 LINES:")
+                for li, line in enumerate(lines[-5:]):
+                    logger.info(f"  ║   L{len(lines)-5+li}: {line[:200]}")
+            elif ctype == "table":
+                logger.info(f"  ║ [table chunk] {clen} chars")
+            elif ctype == "text":
+                logger.info(f"  ║ [text chunk] {clen} chars: {c['content'][:80]}...")
 
-                raw_md_chunks_dump = [c for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown"]
-                if raw_md_chunks_dump:
-                    _f.write(f"--- RAW MARKDOWN ---\n\n")
-                    _f.write(raw_md_chunks_dump[0]["content"])
-                    _f.write(f"\n\n{'='*60}\n\n")
-
-                tbl_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
-                if tbl_chunks:
-                    _f.write(f"--- TABLE CHUNKS ({len(tbl_chunks)}) ---\n\n")
-                    for i, chunk in enumerate(tbl_chunks, 1):
-                        _f.write(f"TABLE CHUNK {i}:\n{chunk['content']}\n\n")
-
-                txt_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
-                if txt_chunks:
-                    _f.write(f"--- TEXT CHUNKS ({len(txt_chunks)}) ---\n\n")
-                    for i, chunk in enumerate(txt_chunks, 1):
-                        _f.write(f"TEXT {i}:\n{chunk['content']}\n\n")
-
-            logger.info(f"  Raw OCR saved to: {_ocr_filename}")
-        except Exception as _e:
-            logger.warning(f"  Failed to save raw OCR file: {_e}")
+        logger.info(f"  ╚══════════════════════════╝")
 
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
 
         context = _build_predictive_context(chunks, filename_clean)
-        logger.info(f"  Context built: {len(context)} chars")
+        logger.info(f"  ╔══ CONTEXT FOR LLM ({len(context)} chars) ══╗")
+        ctx_lines = context.split("\n")
+        logger.info(f"  ║ Total lines: {len(ctx_lines)}")
+        logger.info(f"  ║ FIRST 15 LINES:")
+        for li, line in enumerate(ctx_lines[:15]):
+            logger.info(f"  ║   {li}: {line[:200]}")
+        logger.info(f"  ║ LAST 10 LINES:")
+        for li, line in enumerate(ctx_lines[-10:]):
+            logger.info(f"  ║   {len(ctx_lines)-10+li}: {line[:200]}")
+        logger.info(f"  ╚══════════════════════════╝")
 
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
