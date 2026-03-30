@@ -1,0 +1,2273 @@
+=== OCR EXTRACTION DUMP ===
+File: 2026-03-12 Samlet tidsplan_1side.pdf
+Reference Date: 12-03-2026
+Analysis ID: sa_18bbdb0a952334bd
+Timestamp: 2026-03-27T10:49:29.464149
+OCR Time: 11.5s
+Chunks: raw_md=2, rows=108, tables=1, text=23
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: raw_markdown | LENGTH: 17920 chars
+────────────────────────────────────────────────────────────────────────────────
+# EK
+
+
+<table>
+<tr>
+<th>1</th>
+<th></th>
+<th>sod</th>
+<th>ma 85-01-26</th>
+<th>fr 1:0-08-26</th>
+<th>%</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+<tr>
+<th></th>
+<th>Bygherreafklaringer E300 00 - Fastlæggeke af rørmaterialer</th>
+<th></th>
+<th>ma 08-09-25 : 21-40-25</th>
+<th>ma02-00-26 ma 10-43-25</th>
+<th>90% 20</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+<tr>
+<td></td>
+<td>6300 00 - RH, godkendelse af rynlinge komponter</td>
+<td></td>
+<td>ma 26-01-26 an 06-45-2%</td>
+<td>fr 06-02-26 0 18-13-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300.02 - Vandbehandling og wandinga ring til haverne</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300.00 - Indretning af produktionskøkken, datablade på komponenter, central/decentral blødgaring?</td>
+<td></td>
+<td>20-09-25</td>
+<td colspan="2">ma 12-30-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300.01 - Fastlæg kraw til kemidepot: Sikringuprojekt, omfang af ADIK Infavæg med glasfronter JARK pkt. 1.7]</td>
+<td></td>
+<td>ma 05-01-26 ma 05-01-26 ma/06-01-36</td>
+<td>fr 16-01-26 fr 16-01-26 6 06-01-26</td>
+<td></td>
+<td></td>
+<td>1078;1083:42</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300.00 - Sellingtagen til kølevand i terræn - udskift ning/nelining</td>
+<td></td>
+<td>na 06-01-26</td>
+<td>12-01-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300 Pressemøder i Hankssien skal afklaret</td>
+<td></td>
+<td>ma/06-01-26</td>
+<td>fr 09-01-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>6300.00 - Afklaring af DASFSINE</td>
+<td></td>
+<td>: 36-12-25</td>
+<td>ma 02-03-26</td>
+<td>75%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>E300 12 - SolafukarmningMørkdangning funktionskni</td>
+<td>Tid</td>
+<td>ma/00-11-25</td>
+<td>fr 21-41-25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Sd</td>
+<td>ma 05-01-26</td>
+<td>fr 09-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td>M</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Fredning</td>
+<td></td>
+<td>ma 19-01-26</td>
+<td>to 20-04-7%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Goluendelse af synlige komponeter fra E 300.02</td>
+<td></td>
+<td>ma 28-01-26</td>
+<td>r 23-01-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Godkendelse af Maskinha lar matur</td>
+<td></td>
+<td>ma 36-02-36</td>
+<td>on 08-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Godkendelse af indbygning af Ris og RUD</td>
+<td></td>
+<td>ma 16-03-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Godkendelse af indbygning i "avenlyt"</td>
+<td></td>
+<td>ma 22-00-36</td>
+<td>fr 12-02-36</td>
+<td></td>
+<td></td>
+<td>126:28</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Godkendelse af kalecentralens indretning</td>
+<td></td>
+<td>ma 16-03-26</td>
+<td>on 08-04-26</td>
+<td></td>
+<td>15a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Deadline for afutamt materiale ti All wedr. SLIK5</td>
+<td></td>
+<td>ta 20-04-26</td>
+<td>to 30-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Sikringaprojekt</td>
+<td></td>
+<td>ma 80-11-25</td>
+<td>on 1:5-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering'antal af akringukomponenter, lofter</td>
+<td>200d</td>
+<td>ma/02-11-25</td>
+<td colspan="2">on 15-04-26 0</td>
+<td>1074</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering'antal af akringukomponenter, vægge</td>
+<td></td>
+<td>ma 06-01-26</td>
+<td colspan="2">ma 05-04-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering'antal af akringukomponenter, døre</td>
+<td></td>
+<td>ma 26-01-36</td>
+<td>ma 1/9-04-26</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[100.01 Ventilation</td>
+<td></td>
+<td></td>
+<td>or 19-06-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[100.00: VVS</td>
+<td></td>
+<td>ma/08-09-25</td>
+<td>-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[100.00 EL</td>
+<td></td>
+<td>na 06-09-25</td>
+<td>-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>na 08-09-25</td>
+<td>t 24-00-26</td>
+<td></td>
+<td></td>
+<td>122%</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>206,9ad</td>
+<td>na 08-09-25</td>
+<td>6 24-02-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering og valg af ARA komponenter</td>
+<td></td>
+<td>ma/08-09-25</td>
+<td>ma 08-09-25</td>
+<td>98%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Samlet el-belastning for RhtS-KT og Atts-lilita</td>
+<td>ad</td>
+<td>ma 23-00-36</td>
+<td>ti 24-00-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Færdiggare projektering ABA installationer</td>
+<td></td>
+<td>ma- 06-09-25 ma 20-40-25</td>
+<td>fr 2:1-21-25 fr 07-41-25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>AMA installationer Tavier</td>
+<td></td>
+<td>ma/08-09-25 na 27-10-25</td>
+<td>fr 26-09-25 fr 21-11-25</td>
+<td></td>
+<td>129 440:442-442-44</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Føringuveje</td>
+<td></td>
+<td>na:00-11-25</td>
+<td>fr 21-41-25</td>
+<td></td>
+<td>468 440: 441-442-442</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Kraftirstallationer</td>
+<td>26,34d</td>
+<td>na 20-10-25</td>
+<td></td>
+<td></td>
+<td>156 440 443-442-444</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Againstallationer</td>
+<td></td>
+<td>ma 00-11-25</td>
+<td colspan="2">fr 14-11-25</td>
+<td>447:445 448</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>IT og Svagstrøm</td>
+<td></td>
+<td>ma 20-10-25</td>
+<td colspan="2">fr 07-11-25</td>
+<td>142:452,452-456</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Svagtram Lar</td>
+<td></td>
+<td>na 17-11-25</td>
+<td colspan="2">on 19-51-25</td>
+<td>457 ASA</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>na 30-11-25</td>
+<td>0 22-06-26</td>
+<td></td>
+<td></td>
+<td>1228</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Ahangigheder</td>
+<td></td>
+<td>$18-55-2%</td>
+<td>0 22-06-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Fyldningigrad i spory udvidelsesfaktor Placering og valg af ARA komponenter installationer for 4. cal Chef-køkken AV installationer for d. tak mødelokaler</td>
+<td></td>
+<td>: 28-41-2% 28-41-2% tr 38-41-25 28-41-3%</td>
+<td>fr 29-11-25 fr 29-11-25 fr 18-11-25 fr 28-21-25</td>
+<td></td>
+<td>472:434:480</td>
+<td>189: 490 189: 420;491 189; 490; 49 1; 49 2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Samlet el-belastning for RAS-ETT og ButE-iRita</td>
+<td>dd</td>
+<td>: 33-06-26</td>
+<td>6 22-06-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Færdiggare projektering</td>
+<td>34,and</td>
+<td></td>
+<td>fr 13-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>ABA installationer</td>
+<td>21,5d</td>
+<td>ma 30-11-25</td>
+<td>0 09-12-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>AVA instalationer</td>
+<td></td>
+<td>ma 30-11-25</td>
+<td>0 09-12-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Taver</td>
+<td></td>
+<td>na 24-11-25</td>
+<td>fr 12-12-25</td>
+<td></td>
+<td>465 429 472-478:475</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td colspan="2">fr 12-08-26</td>
+<td></td>
+<td>15:527,724,729,720</td>
+<td></td>
+<td>.....</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Kraftinstallationer</td>
+<td></td>
+<td>na 24-11-25</td>
+<td colspan="2">6 02-43-2%</td>
+<td>444:450 454-499-472</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Egtinstallationer</td>
+<td></td>
+<td>ma 24-11-25</td>
+<td colspan="2">hr 06-12-25</td>
+<td>466 477:478:479</td>
+<td>190,12%</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>IT og Svagstrøm</td>
+<td>17,6d</td>
+<td>ma 30-11-25</td>
+<td>on 02-12-25</td>
+<td></td>
+<td>409 452 457 475 482</td>
+<td>516</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Svagdrøm Lir</td>
+<td></td>
+<td>na/06-01-26</td>
+<td>on 07-04-26</td>
+<td></td>
+<td>457 ASA</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>210,8d</td>
+<td>na 00-09-25</td>
+<td>fr 14-09-26</td>
+<td></td>
+<td></td>
+<td>1220</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Athunniigheder</td>
+<td>210,84</td>
+<td>na 06-09-25</td>
+<td>tr 14-08-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Færdiggare projektering</td>
+<td></td>
+<td>na id-11-2%</td>
+<td>to 19-08-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>ARA installationer</td>
+<td></td>
+<td>ma 04-12-25</td>
+<td>19-02-26</td>
+<td></td>
+<td>487 ARA SORSOG</td>
+<td></td>
+<td></td>
+<td>.....</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>AVA instalationer Tavier</td>
+<td></td>
+<td>: 30-07-26 na 32-01-26</td>
+<td colspan="2">ti 10-09-26 12-02-26</td>
+<td>SOR SOG</td>
+<td></td>
+<td></td>
+<td>.....</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Faringup</td>
+<td></td>
+<td>na 26-01-36</td>
+<td colspan="2">on 10-09-2℃</td>
+<td></td>
+<td>37,524 777,782-782</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Kraftinstallationer</td>
+<td>10.2d</td>
+<td>na 32-01-26</td>
+<td colspan="2">a 16-00-26</td>
+<td>148-450 454-499 500</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Lgsinstallationer</td>
+<td></td>
+<td>na 13-01-26</td>
+<td colspan="2">na 16-00-26</td>
+<td>490:5:00:504:500:500</td>
+<td>512;778</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>IT og Svagotram</td>
+<td></td>
+<td>na:04-12-25</td>
+<td colspan="2">D12-02-26</td>
+<td>199452452-500-400;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Svagstrøm Lir</td>
+<td></td>
+<td>na 36-02-26</td>
+<td colspan="2">on 18-02-26</td>
+<td>457, ASA</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Omr. d</td>
+<td>360,254</td>
+<td>na 86-01-26</td>
+<td colspan="2">or 18-09-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Ahangigheder</td>
+<td></td>
+<td></td>
+<td>fr 18-09-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Fancoil for dim af kabling Øvrige installationer far dim af kabling Arbejdutationer placering Fyldningugrad i spor/ udviddelusfaktor igtinstallation - Opdeling af DAll inst.</td>
+<td></td>
+<td>na/09-02-26 ma/09-02-26 ma 09-02-26 ma/09-02-26 ma/09-02-36</td>
+<td>ma 09-02-216 ma 09-00-216 ma 09-00-26 ma 09-00-26 ma 09-02-26</td>
+<td>0 0 0% 0% 0%</td>
+<td>$30:521:537</td>
+<td>122,534,526,526 122,524,525,506 634,527</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering af belyuning</td>
+<td></td>
+<td>ma/09-02-26</td>
+<td>ma 09-00-26</td>
+<td>0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering synligt udstyr fa tryk og pir, input vedr. DALI</td>
+<td></td>
+<td>na/09-02-26</td>
+<td>ma 09-00-26</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter</td>
+<td></td>
+<td>ma/09-02-26 ma/09-02-26</td>
+<td>ma 09-02-26</td>
+<td>0%</td>
+<td></td>
+<td>122,534,526,526</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Koordinering af AV-installationer med isolering på saarter. Placering af inat. Over want under gulw</td>
+<td>loft</td>
+<td>ma/09-02-36 18-09-26</td>
+<td>ma 09-80-26 fr 18-09-26</td>
+<td>0%</td>
+<td>852,872</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer</td>
+<td>Dd</td>
+<td>ma 85-01-26 ma 09-02-26 na 23-00-26</td>
+<td colspan="2">co 16-08-2% 19-02-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>7,68d</td>
+<td>a/09-02-26</td>
+<td colspan="2"></td>
+<td>537,448 450:454:53</td>
+<td>26;129;599</td>
+<td></td>
+<td></td>
+<td>RL (IUGN 1)</td>
+</tr>
+<tr>
+<td></td>
+<td>Kraftinstallationer</td>
+<td></td>
+<td>na 22-00-26</td>
+<td colspan="2">on 18-09-26</td>
+<td>12,448 450:454 450</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Lysinstallationer</td>
+<td>17,Gad</td>
+<td>na 23-02-26</td>
+<td colspan="2">on 18-09-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>IT og Svagstrøm</td>
+<td></td>
+<td>na 29-01-26</td>
+<td colspan="2">ma 09-02-26</td>
+<td>152,452-532-529</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Svagdrøm Lir</td>
+<td></td>
+<td>34-09-26</td>
+<td colspan="2">to 16-02-26</td>
+<td>457; ASA</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>na 26-01-26</td>
+<td colspan="2">0 20-40-26</td>
+<td></td>
+<td>1224</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Athannigigheder</td>
+<td></td>
+<td>na 36-01-26</td>
+<td colspan="2">ti 20-10-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Fancoil for dim af kabling</td>
+<td></td>
+<td>na 36-02-26</td>
+<td colspan="2">ma 16-00-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Øvrige installationer for dim af kabling</td>
+<td></td>
+<td>ma 36-07-26</td>
+<td colspan="2">ma 16-03-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Arbejdutationer placering</td>
+<td></td>
+<td>ma 36-02-26</td>
+<td colspan="2">ma 16-09-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Fyldningugrad i spor/ udvidelsesfaktor</td>
+<td></td>
+<td>ma 36-07-36</td>
+<td colspan="2">ma 16-03-26 0%</td>
+<td>542,542:549</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Againatallation - Opdeling af DALil inet.</td>
+<td></td>
+<td>ma 36-02-26</td>
+<td colspan="2">ma 16-00-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering af bielyuning</td>
+<td></td>
+<td>ma 16-07-26</td>
+<td colspan="2">ma 16-09-26 0%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering synligt udstyr fa tryk og pir, input vedr. DALI</td>
+<td></td>
+<td>na 36-07-26</td>
+<td colspan="2">ma 16-07-26 0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter</td>
+<td></td>
+<td>ma 36-07-26 Ta 36-03-26</td>
+<td colspan="2" rowspan="2">ma 16-03-26 0 ma 16-09-26 0 ma 16-09-26 0</td>
+<td rowspan="2"></td>
+<td rowspan="2">667;SER;900</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Koordinering af AV-installationer med undum welt pu skamter. Placering af inat. Over want under gulw</td>
+<td>loft</td>
+<td>ma 16-07-36</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Samlet el-belastning for RhtS-KT og Ruts-illita Færdiggare projektering</td>
+<td>Dd</td>
+<td>20-10-26 na 26-01-26</td>
+<td colspan="2">t 20-10-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>6- 20-10</td>
+</tr>
+<tr>
+<td></td>
+<td>Omr. G</td>
+<td></td>
+<td>ma 23-02-26</td>
+<td colspan="2">-</td>
+<td></td>
+<td>1226</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>ma 24-11-25</td>
+<td>-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>ma 24-11-25</td>
+<td colspan="2">-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Global:</td>
+<td></td>
+<td>ma:00-09-25</td>
+<td colspan="2">-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Atumngigheder</td>
+<td></td>
+<td>ma 08-09-25</td>
+<td colspan="2">-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>LOWV Desigrkrav</td>
+<td></td>
+<td>na 20-40-25</td>
+<td colspan="2">fr 21-41-25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DAG/Sine - Omfang af dækning</td>
+<td></td>
+<td>ma:00-07-26</td>
+<td colspan="2">ma 02-03-26 90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DAG/Sine - Placering af synlige komponenter</td>
+<td></td>
+<td>ma 22-00-26</td>
+<td colspan="2">ma 22-00-26 90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DAG/Sine - Anlargu sta meike og udformning</td>
+<td></td>
+<td>ma/08-09-25</td>
+<td>ma 08-09-2%</td>
+<td>90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Omfang - reetablering af solceller</td>
+<td></td>
+<td>ta 1:0-12-2%</td>
+<td colspan="2">to 18-42-2%</td>
+<td></td>
+<td>784</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Placering thorsten + ind/arkant generator</td>
+<td></td>
+<td>ta Q1-03-50</td>
+<td colspan="2">-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>HX-4 Deignke av</td>
+<td></td>
+<td>ma/08-09-25</td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: raw_markdown | LENGTH: 3215 chars
+────────────────────────────────────────────────────────────────────────────────
+<td colspan="2">ma 08-09-2% 25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Designkrav jording</td>
+<td></td>
+<td>ma/06-09-25</td>
+<td colspan="2">ma 08-09-2% 50%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Armaturtyper</td>
+<td></td>
+<td>ma/08-09-25</td>
+<td colspan="2">ma 08-09-2% 90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Færdiggare projektering</td>
+<td></td>
+<td>an 01-50-2%</td>
+<td colspan="2">fr 17-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Udarbejde notat om DAS/MIME Projektering af DAS/Sine</td>
+<td>Hid</td>
+<td>02-12-25 : 28-13-25</td>
+<td colspan="2">6 02-12-2%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>UPS aring</td>
+<td>Hid</td>
+<td>ma/04-12-25 an 08-52-25</td>
+<td>fr 09-01-26 on 17-52-25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Reetablering af solceller</td>
+<td></td>
+<td>to 10-13-2%</td>
+<td colspan="2">to 15-01-26 0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Generator anilang</td>
+<td></td>
+<td>ma/06-01-26</td>
+<td>ma 1/9-04-26</td>
+<td>90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>ma 29-01-36</td>
+<td>ma 26-04-26</td>
+<td>90%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Janding:</td>
+<td></td>
+<td>27-01-26</td>
+<td>da-00-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Komponentkatalog for synlige komponenter til godkendelse</td>
+<td></td>
+<td>ma/06-01-26</td>
+<td colspan="2">Y 16-01-36</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Lytarmaturer</td>
+<td></td>
+<td>an 04-02-26</td>
+<td colspan="2">fr 17-04-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Ur-aning</td>
+<td></td>
+<td>an 01-30-25</td>
+<td>0 06-01-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>£100.04 MMIS $100.0% ELEV</td>
+<td></td>
+<td>ma: 00-09-25 ma 25-08-25 ma 80-11-25</td>
+<td>- - fr 06-04-26</td>
+<td>11%</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Oversigt projekteringctiduplan - projekt til priovalidering</td>
+<td></td>
+<td>ma 08-09-25</td>
+<td>-</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Projektering efter prisvalidering er startet jt. leveranceplaner</td>
+<td></td>
+<td>n 10-06-26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Oversigt projekteringtidsplan - 300 % projekt Udføreikesprojektering -300% færdig</td>
+<td></td>
+<td>ta 26-01-26 02-00-27</td>
+<td>ti 82-00-27 02-00-27</td>
+<td></td>
+<td>1225;1228; 1230;1222</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td colspan="2"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Cide 1</td>
+</tr>
+</table>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table | LENGTH: 10854 chars
+────────────────────────────────────────────────────────────────────────────────
+TABLE 0 (Pages [1])
+| Id | Opgavetilstand | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver | Col10 | Col11 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 |  | sod | ma 85-01-26 | fr 1:0-08-26 | % |  |  |  |  |  |
+|  | 6300.01 - Fastlæg kraw til kemidepot:
+Sikringuprojekt, omfang af ADIK Infavæg med glasfronter JARK pkt. 1.7] |  | ma 05-01-26
+ma 05-01-26 ma/06-01-36 | fr 16-01-26
+fr 16-01-26 6 06-01-26 |  |  | 1078;1083:42 |  |  |  |
+|  | 6300.00 - Sellingtagen til kølevand i terræn - udskift ning/nelining |  | na 06-01-26 | 12-01-26 |  |  |  |  |  |  |
+|  | 6300 Pressemøder i Hankssien skal afklaret |  | ma/06-01-26 | fr 09-01-26 |  |  |  |  |  |  |
+|  | 6300.00 - Afklaring af DASFSINE |  | : 36-12-25 | ma 02-03-26 | 75% |  |  |  |  |  |
+|  | E300 12 - SolafukarmningMørkdangning funktionskni | Tid | ma/00-11-25 | fr 21-41-25 |  |  |  |  |  |  |
+|  |  | Sd | ma 05-01-26 | fr 09-04-26 |  |  |  | M |  |  |
+|  | Fredning |  | ma 19-01-26 | to 20-04-7% |  |  |  |  |  |  |
+|  | Goluendelse af synlige komponeter fra E 300.02 |  | ma 28-01-26 | r 23-01-26 |  |  |  |  |  |  |
+|  | Godkendelse af Maskinha lar matur |  | ma 36-02-36 | on 08-04-26 |  |  |  |  |  |  |
+|  | Godkendelse af indbygning af Ris og RUD |  | ma 16-03-26 |  |  |  |  |  |  |  |
+|  | Godkendelse af indbygning i "avenlyt" |  | ma 22-00-36 | fr 12-02-36 |  |  | 126:28 |  |  |  |
+|  | Godkendelse af kalecentralens indretning |  | ma 16-03-26 | on 08-04-26 |  | 15a |  |  |  |  |
+|  | Deadline for afutamt materiale ti All wedr. SLIK5 |  | ta 20-04-26 | to 30-04-26 |  |  |  |  |  |  |
+|  | Sikringaprojekt |  | ma 80-11-25 | on 1:5-04-26 |  |  |  |  |  |  |
+|  | Placering'antal af akringukomponenter, lofter | 200d | ma/02-11-25 | on 15-04-26 0 |  | 1074 |  |  |  |  |
+|  | Placering'antal af akringukomponenter, vægge |  | ma 06-01-26 | ma 05-04-26 0% |  |  |  |  |  |  |
+|  | Placering'antal af akringukomponenter, døre |  | ma 26-01-36 | ma 1/9-04-26 | 0 |  |  |  |  |  |
+|  | [100.01 Ventilation |  |  | or 19-06-26 |  |  |  |  |  |  |
+|  | [100.00: VVS |  | ma/08-09-25 | - |  |  |  |  |  |  |
+|  | [100.00 EL |  | na 06-09-25 | - |  |  |  |  |  |  |
+|  |  |  | na 08-09-25 | t 24-00-26 |  |  | 122% |  |  |  |
+|  |  | 206,9ad | na 08-09-25 | 6 24-02-26 |  |  |  |  |  |  |
+|  | Placering og valg af ARA komponenter |  | ma/08-09-25 | ma 08-09-25 | 98% |  |  |  |  |  |
+|  | Samlet el-belastning for RhtS-KT og Atts-lilita | ad | ma 23-00-36 | ti 24-00-26 |  |  |  |  |  |  |
+|  | Færdiggare projektering ABA installationer |  | ma- 06-09-25 ma 20-40-25 | fr 2:1-21-25 fr 07-41-25 |  |  |  |  |  |  |
+|  | AMA installationer Tavier |  | ma/08-09-25 na 27-10-25 | fr 26-09-25 fr 21-11-25 |  | 129 440:442-442-44 |  |  |  |  |
+|  | Føringuveje |  | na:00-11-25 | fr 21-41-25 |  | 468 440: 441-442-442 |  |  |  |  |
+|  | Kraftirstallationer | 26,34d | na 20-10-25 |  |  | 156 440 443-442-444 |  |  |  |  |
+|  | Againstallationer |  | ma 00-11-25 | fr 14-11-25 |  | 447:445 448 |  |  |  |  |
+|  | IT og Svagstrøm |  | ma 20-10-25 | fr 07-11-25 |  | 142:452,452-456 |  |  |  |  |
+|  | Svagtram Lar |  | na 17-11-25 | on 19-51-25 |  | 457 ASA |  |  |  |  |
+|  |  |  | na 30-11-25 | 0 22-06-26 |  |  | 1228 |  |  |  |
+|  | Ahangigheder |  | $18-55-2% | 0 22-06-26 |  |  |  |  |  |  |
+|  | Fyldningigrad i spory udvidelsesfaktor Placering og valg af ARA komponenter installationer for 4. cal Chef-køkken AV installationer for d. tak mødelokaler |  | : 28-41-2% 28-41-2% tr 38-41-25 28-41-3% | fr 29-11-25 fr 29-11-25 fr 18-11-25 fr 28-21-25 |  | 472:434:480 | 189: 490 189: 420;491 189; 490; 49 1; 49 2 |  |  |  |
+|  | Samlet el-belastning for RAS-ETT og ButE-iRita | dd | : 33-06-26 | 6 22-06-26 |  |  |  |  |  |  |
+|  | Færdiggare projektering | 34,and |  | fr 13-04-26 |  |  |  |  |  |  |
+|  | ABA installationer | 21,5d | ma 30-11-25 | 0 09-12-2% |  |  |  |  |  |  |
+|  | AVA instalationer |  | ma 30-11-25 | 0 09-12-2% |  |  |  |  |  |  |
+|  | Taver |  | na 24-11-25 | fr 12-12-25 |  | 465 429 472-478:475 |  |  |  |  |
+|  |  |  |  | fr 12-08-26 |  |  | 15:527,724,729,720 |  | ..... |  |
+|  | Kraftinstallationer |  | na 24-11-25 | 6 02-43-2% |  | 444:450 454-499-472 |  |  |  |  |
+|  | Egtinstallationer |  | ma 24-11-25 | hr 06-12-25 |  | 466 477:478:479 | 190,12% |  |  |  |
+|  | IT og Svagstrøm | 17,6d | ma 30-11-25 | on 02-12-25 |  | 409 452 457 475 482 | 516 |  |  |  |
+|  | Svagdrøm Lir |  | na/06-01-26 | on 07-04-26 |  | 457 ASA |  |  |  |  |
+|  |  | 210,8d | na 00-09-25 | fr 14-09-26 |  |  | 1220 |  |  |  |
+|  | Athunniigheder | 210,84 | na 06-09-25 | tr 14-08-26 |  |  |  |  |  |  |
+|  | Færdiggare projektering |  | na id-11-2% | to 19-08-2% |  |  |  |  |  |  |
+|  | ARA installationer |  | ma 04-12-25 | 19-02-26 |  | 487 ARA SORSOG |  |  | ..... |  |
+|  | AVA instalationer Tavier |  | : 30-07-26 na 32-01-26 | ti 10-09-26 12-02-26 |  | SOR SOG |  |  | ..... |  |
+|  | Faringup |  | na 26-01-36 | on 10-09-2℃ |  |  | 37,524 777,782-782 |  |  |  |
+|  | Kraftinstallationer | 10.2d | na 32-01-26 | a 16-00-26 |  | 148-450 454-499 500 |  |  |  |  |
+|  | Lgsinstallationer |  | na 13-01-26 | na 16-00-26 |  | 490:5:00:504:500:500 | 512;778 |  |  |  |
+|  | IT og Svagotram |  | na:04-12-25 | D12-02-26 |  | 199452452-500-400; |  |  |  |  |
+|  | Svagstrøm Lir |  | na 36-02-26 | on 18-02-26 |  | 457, ASA |  |  |  |  |
+|  | Omr. d | 360,254 | na 86-01-26 | or 18-09-26 |  |  |  |  |  |  |
+|  | Ahangigheder |  |  | fr 18-09-26 |  |  |  |  |  |  |
+|  | Fancoil for dim af kabling Øvrige installationer far dim af kabling Arbejdutationer placering Fyldningugrad i spor/ udviddelusfaktor igtinstallation - Opdeling af DAll inst. |  | na/09-02-26 ma/09-02-26 ma 09-02-26 ma/09-02-26 ma/09-02-36 | ma 09-02-216
+ma 09-00-216
+ma 09-00-26
+ma 09-00-26
+ma 09-02-26 | 0
+0
+0%
+0%
+0% | $30:521:537 | 122,534,526,526 122,524,525,506 634,527 |  |  |  |
+|  | Placering af belyuning |  | ma/09-02-26 | ma 09-00-26 | 0% |  |  |  |  |  |
+|  | Placering synligt udstyr fa tryk og pir, input vedr. DALI |  | na/09-02-26 | ma 09-00-26 | 0 |  |  |  |  |  |
+|  | Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter |  | ma/09-02-26 ma/09-02-26 | ma 09-02-26 | 0% |  | 122,534,526,526 |  |  |  |
+|  |  |  |  |  |  |  |  |  |  |  |
+|  | Koordinering af AV-installationer med
+isolering på saarter. Placering af inat. Over
+want under gulw | loft | ma/09-02-36
+18-09-26 | ma 09-80-26
+fr 18-09-26 | 0% | 852,872 |  |  |  |  |
+|  | Samiet ell-belastning for RMS-KT og RttS-lalita
+Færdiggare projektering AVA instalationer | Dd | ma 85-01-26 ma 09-02-26 na 23-00-26 | co 16-08-2% 19-02-26 |  |  |  |  |  |  |
+|  |  | 7,68d | a/09-02-26 |  |  | 537,448 450:454:53 | 26;129;599 |  |  | RL (IUGN 1) |
+|  | Kraftinstallationer |  | na 22-00-26 | on 18-09-26 |  | 12,448 450:454 450 |  |  |  |  |
+|  | Lysinstallationer | 17,Gad | na 23-02-26 | on 18-09-26 |  |  |  |  |  |  |
+|  | IT og Svagstrøm |  | na 29-01-26 | ma 09-02-26 |  | 152,452-532-529 |  |  |  |  |
+|  | Svagdrøm Lir |  | 34-09-26 | to 16-02-26 |  | 457; ASA |  |  |  |  |
+|  |  |  | na 26-01-26 | 0 20-40-26 |  |  | 1224 |  |  |  |
+|  | Athannigigheder |  | na 36-01-26 | ti 20-10-26 |  |  |  |  |  |  |
+|  | Fancoil for dim af kabling |  | na 36-02-26 | ma 16-00-26 0% |  |  |  |  |  |  |
+|  | Øvrige installationer for dim af kabling |  | ma 36-07-26 | ma 16-03-26 0% |  |  |  |  |  |  |
+|  | Arbejdutationer placering |  | ma 36-02-26 | ma 16-09-26 0% |  |  |  |  |  |  |
+|  | Fyldningugrad i spor/ udvidelsesfaktor |  | ma 36-07-36 | ma 16-03-26 0% |  | 542,542:549 |  |  |  |  |
+|  | Againatallation - Opdeling af DALil inet. |  | ma 36-02-26 | ma 16-00-26 0% |  |  |  |  |  |  |
+|  | Placering af bielyuning |  | ma 16-07-26 | ma 16-09-26 0% |  |  |  |  |  |  |
+|  | Placering synligt udstyr fa tryk og pir, input vedr. DALI |  | na 36-07-26 | ma 16-07-26 0 |  |  |  |  |  |  |
+|  | Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter |  | ma 36-07-26 Ta 36-03-26 | ma 16-03-26 0 ma 16-09-26 0 ma 16-09-26 0 |  |  | 667;SER;900 |  |  |  |
+|  | Koordinering af AV-installationer med undum welt pu skamter. Placering af inat. Over
+want under gulw | loft | ma 16-07-36 |  |  |  |  |  |  |  |
+|  | Samlet el-belastning for RhtS-KT og Ruts-illita
+Færdiggare projektering | Dd | 20-10-26 na 26-01-26 | t 20-10-26 |  |  |  |  |  | 6- 20-10 |
+|  | Omr. G |  | ma 23-02-26 | - |  |  | 1226 |  |  |  |
+|  |  |  | ma 24-11-25 | - |  |  |  |  |  |  |
+|  |  |  | ma 24-11-25 | - |  |  |  |  |  |  |
+|  | Global: |  | ma:00-09-25 | - |  |  |  |  |  |  |
+|  | Atumngigheder |  | ma 08-09-25 | - |  |  |  |  |  |  |
+|  | LOWV Desigrkrav |  | na 20-40-25 | fr 21-41-25 |  |  |  |  |  |  |
+|  | DAG/Sine - Omfang af dækning |  | ma:00-07-26 | ma 02-03-26 90% |  |  |  |  |  |  |
+|  | DAG/Sine - Placering af synlige komponenter |  | ma 22-00-26 | ma 22-00-26 90% |  |  |  |  |  |  |
+|  | DAG/Sine - Anlargu sta meike og udformning |  | ma/08-09-25 | ma 08-09-2% | 90% |  |  |  |  |  |
+|  | Omfang - reetablering af solceller |  | ta 1:0-12-2% | to 18-42-2% |  |  | 784 |  |  |  |
+|  | Placering thorsten + ind/arkant generator |  | ta Q1-03-50 | - |  |  |  |  |  |  |
+|  | HX-4 Deignke av |  | ma/08-09-25 | ma 08-09-2% 25 |  |  |  |  |  |  |
+|  | Designkrav jording |  | ma/06-09-25 | ma 08-09-2% 50% |  |  |  |  |  |  |
+|  | Armaturtyper |  | ma/08-09-25 | ma 08-09-2% 90% |  |  |  |  |  |  |
+|  | Færdiggare projektering |  | an 01-50-2% | fr 17-04-26 |  |  |  |  |  |  |
+|  | Udarbejde notat om DAS/MIME Projektering af DAS/Sine | Hid | 02-12-25 : 28-13-25 | 6 02-12-2% |  |  |  |  |  |  |
+|  | UPS aring | Hid | ma/04-12-25 an 08-52-25 | fr 09-01-26 on 17-52-25 |  |  |  |  |  |  |
+|  | Reetablering af solceller |  | to 10-13-2% | to 15-01-26 0 |  |  |  |  |  |  |
+|  | Generator anilang |  | ma/06-01-26 | ma 1/9-04-26 | 90% |  |  |  |  |  |
+|  |  |  | ma 29-01-36 | ma 26-04-26 | 90% |  |  |  |  |  |
+|  | Janding: |  | 27-01-26 | da-00-26 |  |  |  |  |  |  |
+|  | til godkendelse
+Komponentkatalog for synlige komponenter |  | ma/06-01-26 | Y 16-01-36 |  |  |  |  |  |  |
+|  | Lytarmaturer |  | an 04-02-26 | fr 17-04-26 |  |  |  |  |  |  |
+|  | Ur-aning |  | an 01-30-25 | 0 06-01-26 |  |  |  |  |  |  |
+|  | £100.04 MMIS $100.0% ELEV |  | ma: 00-09-25 ma 25-08-25 ma 80-11-25 | - - fr 06-04-26 | 11% |  |  |  |  |  |
+|  | Oversigt projekteringctiduplan - projekt til priovalidering |  | ma 08-09-25 | - |  |  |  |  |  |  |
+|  | Projektering efter prisvalidering er startet jt. leveranceplaner |  | n 10-06-26 |  |  |  |  |  |  |  |
+|  | Oversigt projekteringtidsplan - 300 % projekt Udføreikesprojektering -300% færdig |  | ta 26-01-26 02-00-27 | ti 82-00-27 02-00-27 |  | 1225;1228; 1230;1222 |  |  |  |  |
+|  |  |  |  |  |  |  |  |  |  |  |
+|  |  |  |  |  |  |  |  |  |  | Cide 1 |
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 358 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: 6300.01 - Fastlæg kraw til kemidepot:
+Sikringuprojekt, omfang af ADIK Infavæg med glasfronter JARK pkt. 1.7] | Opgavenavn:  | Varighed: ma 05-01-26
+ma 05-01-26 ma/06-01-36 | Startdato: fr 16-01-26
+fr 16-01-26 6 06-01-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 1078;1083:42 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 256 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: 6300.00 - Sellingtagen til kølevand i terræn - udskift ning/nelining | Opgavenavn:  | Varighed: na 06-01-26 | Startdato: 12-01-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 233 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: 6300 Pressemøder i Hankssien skal afklaret | Opgavenavn:  | Varighed: ma/06-01-26 | Startdato: fr 09-01-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 224 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: 6300.00 - Afklaring af DASFSINE | Opgavenavn:  | Varighed: : 36-12-25 | Startdato: ma 02-03-26 | Slutdato: 75% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 243 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: E300 12 - SolafukarmningMørkdangning funktionskni | Opgavenavn: Tid | Varighed: ma/00-11-25 | Startdato: fr 21-41-25 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn: Sd | Varighed: ma 05-01-26 | Startdato: fr 09-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver: M | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 199 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Fredning | Opgavenavn:  | Varighed: ma 19-01-26 | Startdato: to 20-04-7% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 236 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Goluendelse af synlige komponeter fra E 300.02 | Opgavenavn:  | Varighed: ma 28-01-26 | Startdato: r 23-01-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 224 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Godkendelse af Maskinha lar matur | Opgavenavn:  | Varighed: ma 36-02-36 | Startdato: on 08-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 219 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Godkendelse af indbygning af Ris og RUD | Opgavenavn:  | Varighed: ma 16-03-26 | Startdato:  | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 234 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Godkendelse af indbygning i "avenlyt" | Opgavenavn:  | Varighed: ma 22-00-36 | Startdato: fr 12-02-36 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 126:28 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 234 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Godkendelse af kalecentralens indretning | Opgavenavn:  | Varighed: ma 16-03-26 | Startdato: on 08-04-26 | Slutdato:  | % arbejde færdigt: 15a | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 240 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Deadline for afutamt materiale ti All wedr. SLIK5 | Opgavenavn:  | Varighed: ta 20-04-26 | Startdato: to 30-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 207 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Sikringaprojekt | Opgavenavn:  | Varighed: ma 80-11-25 | Startdato: on 1:5-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 246 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering'antal af akringukomponenter, lofter | Opgavenavn: 200d | Varighed: ma/02-11-25 | Startdato: on 15-04-26 0 | Slutdato:  | % arbejde færdigt: 1074 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 238 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering'antal af akringukomponenter, vægge | Opgavenavn:  | Varighed: ma 06-01-26 | Startdato: ma 05-04-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 236 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering'antal af akringukomponenter, døre | Opgavenavn:  | Varighed: ma 26-01-36 | Startdato: ma 1/9-04-26 | Slutdato: 0 | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 199 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: [100.01 Ventilation | Opgavenavn:  | Varighed:  | Startdato: or 19-06-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 193 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: [100.00: VVS | Opgavenavn:  | Varighed: ma/08-09-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 191 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: [100.00 EL | Opgavenavn:  | Varighed: na 06-09-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: na 08-09-25 | Startdato: t 24-00-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 122% | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 197 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn: 206,9ad | Varighed: na 08-09-25 | Startdato: 6 24-02-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 230 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering og valg af ARA komponenter | Opgavenavn:  | Varighed: ma/08-09-25 | Startdato: ma 08-09-25 | Slutdato: 98% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 240 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Samlet el-belastning for RhtS-KT og Atts-lilita | Opgavenavn: ad | Varighed: ma 23-00-36 | Startdato: ti 24-00-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 259 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Færdiggare projektering ABA installationer | Opgavenavn:  | Varighed: ma- 06-09-25 ma 20-40-25 | Startdato: fr 2:1-21-25 fr 07-41-25 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 258 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: AMA installationer Tavier | Opgavenavn:  | Varighed: ma/08-09-25 na 27-10-25 | Startdato: fr 26-09-25 fr 21-11-25 | Slutdato:  | % arbejde færdigt: 129 440:442-442-44 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 222 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Føringuveje | Opgavenavn:  | Varighed: na:00-11-25 | Startdato: fr 21-41-25 | Slutdato:  | % arbejde færdigt: 468 440: 441-442-442 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 224 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraftirstallationer | Opgavenavn: 26,34d | Varighed: na 20-10-25 | Startdato:  | Slutdato:  | % arbejde færdigt: 156 440 443-442-444 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 219 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Againstallationer | Opgavenavn:  | Varighed: ma 00-11-25 | Startdato: fr 14-11-25 | Slutdato:  | % arbejde færdigt: 447:445 448 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 221 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: IT og Svagstrøm | Opgavenavn:  | Varighed: ma 20-10-25 | Startdato: fr 07-11-25 | Slutdato:  | % arbejde færdigt: 142:452,452-456 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 210 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Svagtram Lar | Opgavenavn:  | Varighed: na 17-11-25 | Startdato: on 19-51-25 | Slutdato:  | % arbejde færdigt: 457 ASA | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: na 30-11-25 | Startdato: 0 22-06-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 1228 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 200 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Ahangigheder | Opgavenavn:  | Varighed: $18-55-2% | Startdato: 0 22-06-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 463 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Fyldningigrad i spory udvidelsesfaktor Placering og valg af ARA komponenter installationer for 4. cal Chef-køkken AV installationer for d. tak mødelokaler | Opgavenavn:  | Varighed: : 28-41-2% 28-41-2% tr 38-41-25 28-41-3% | Startdato: fr 29-11-25 fr 29-11-25 fr 18-11-25 fr 28-21-25 | Slutdato:  | % arbejde færdigt: 472:434:480 | Foregående opgaver: 189: 490 189: 420;491 189; 490; 49 1; 49 2 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 237 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Samlet el-belastning for RAS-ETT og ButE-iRita | Opgavenavn: dd | Varighed: : 33-06-26 | Startdato: 6 22-06-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 209 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Færdiggare projektering | Opgavenavn: 34,and | Varighed:  | Startdato: fr 13-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 213 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: ABA installationer | Opgavenavn: 21,5d | Varighed: ma 30-11-25 | Startdato: 0 09-12-2% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 207 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: AVA instalationer | Opgavenavn:  | Varighed: ma 30-11-25 | Startdato: 0 09-12-2% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 215 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Taver | Opgavenavn:  | Varighed: na 24-11-25 | Startdato: fr 12-12-25 | Slutdato:  | % arbejde færdigt: 465 429 472-478:475 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 203 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed:  | Startdato: fr 12-08-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 15:527,724,729,720 | Efterfølgende opgaver:  | Col10: ..... | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 228 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraftinstallationer | Opgavenavn:  | Varighed: na 24-11-25 | Startdato: 6 02-43-2% | Slutdato:  | % arbejde færdigt: 444:450 454-499-472 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 230 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Egtinstallationer | Opgavenavn:  | Varighed: ma 24-11-25 | Startdato: hr 06-12-25 | Slutdato:  | % arbejde færdigt: 466 477:478:479 | Foregående opgaver: 190,12% | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 233 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: IT og Svagstrøm | Opgavenavn: 17,6d | Varighed: ma 30-11-25 | Startdato: on 02-12-25 | Slutdato:  | % arbejde færdigt: 409 452 457 475 482 | Foregående opgaver: 516 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 210 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Svagdrøm Lir | Opgavenavn:  | Varighed: na/06-01-26 | Startdato: on 07-04-26 | Slutdato:  | % arbejde færdigt: 457 ASA | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 201 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn: 210,8d | Varighed: na 00-09-25 | Startdato: fr 14-09-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 1220 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 211 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Athunniigheder | Opgavenavn: 210,84 | Varighed: na 06-09-25 | Startdato: tr 14-08-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 214 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Færdiggare projektering | Opgavenavn:  | Varighed: na id-11-2% | Startdato: to 19-08-2% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 225 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: ARA installationer | Opgavenavn:  | Varighed: ma 04-12-25 | Startdato: 19-02-26 | Slutdato:  | % arbejde færdigt: 487 ARA SORSOG | Foregående opgaver:  | Efterfølgende opgaver:  | Col10: ..... | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 247 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: AVA instalationer Tavier | Opgavenavn:  | Varighed: : 30-07-26 na 32-01-26 | Startdato: ti 10-09-26 12-02-26 | Slutdato:  | % arbejde færdigt: SOR SOG | Foregående opgaver:  | Efterfølgende opgaver:  | Col10: ..... | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 217 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Faringup | Opgavenavn:  | Varighed: na 26-01-36 | Startdato: on 10-09-2℃ | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 37,524 777,782-782 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 233 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraftinstallationer | Opgavenavn: 10.2d | Varighed: na 32-01-26 | Startdato: a 16-00-26 | Slutdato:  | % arbejde færdigt: 148-450 454-499 500 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 235 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Lgsinstallationer | Opgavenavn:  | Varighed: na 13-01-26 | Startdato: na 16-00-26 | Slutdato:  | % arbejde færdigt: 490:5:00:504:500:500 | Foregående opgaver: 512;778 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 222 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: IT og Svagotram | Opgavenavn:  | Varighed: na:04-12-25 | Startdato: D12-02-26 | Slutdato:  | % arbejde færdigt: 199452452-500-400; | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 212 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Svagstrøm Lir | Opgavenavn:  | Varighed: na 36-02-26 | Startdato: on 18-02-26 | Slutdato:  | % arbejde færdigt: 457, ASA | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 204 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Omr. d | Opgavenavn: 360,254 | Varighed: na 86-01-26 | Startdato: or 18-09-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 192 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Ahangigheder | Opgavenavn:  | Varighed:  | Startdato: fr 18-09-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 524 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Fancoil for dim af kabling Øvrige installationer far dim af kabling Arbejdutationer placering Fyldningugrad i spor/ udviddelusfaktor igtinstallation - Opdeling af DAll inst. | Opgavenavn:  | Varighed: na/09-02-26 ma/09-02-26 ma 09-02-26 ma/09-02-26 ma/09-02-36 | Startdato: ma 09-02-216
+ma 09-00-216
+ma 09-00-26
+ma 09-00-26
+ma 09-02-26 | Slutdato: 0
+0
+0%
+0%
+0% | % arbejde færdigt: $30:521:537 | Foregående opgaver: 122,534,526,526 122,524,525,506 634,527 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 215 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering af belyuning | Opgavenavn:  | Varighed: ma/09-02-26 | Startdato: ma 09-00-26 | Slutdato: 0% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 249 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering synligt udstyr fa tryk og pir, input vedr. DALI | Opgavenavn:  | Varighed: na/09-02-26 | Startdato: ma 09-00-26 | Slutdato: 0 | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 301 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter | Opgavenavn:  | Varighed: ma/09-02-26 ma/09-02-26 | Startdato: ma 09-02-26 | Slutdato: 0% | % arbejde færdigt:  | Foregående opgaver: 122,534,526,526 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 324 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Koordinering af AV-installationer med
+isolering på saarter. Placering af inat. Over
+want under gulw | Opgavenavn: loft | Varighed: ma/09-02-36
+18-09-26 | Startdato: ma 09-80-26
+fr 18-09-26 | Slutdato: 0% | % arbejde færdigt: 852,872 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 315 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Samiet ell-belastning for RMS-KT og RttS-lalita
+Færdiggare projektering AVA instalationer | Opgavenavn: Dd | Varighed: ma 85-01-26 ma 09-02-26 na 23-00-26 | Startdato: co 16-08-2% 19-02-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 223 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn: 7,68d | Varighed: a/09-02-26 | Startdato:  | Slutdato:  | % arbejde færdigt: 537,448 450:454:53 | Foregående opgaver: 26;129;599 | Efterfølgende opgaver:  | Col10:  | Col11: RL (IUGN 1)
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 228 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraftinstallationer | Opgavenavn:  | Varighed: na 22-00-26 | Startdato: on 18-09-26 | Slutdato:  | % arbejde færdigt: 12,448 450:454 450 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 214 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Lysinstallationer | Opgavenavn: 17,Gad | Varighed: na 23-02-26 | Startdato: on 18-09-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 221 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: IT og Svagstrøm | Opgavenavn:  | Varighed: na 29-01-26 | Startdato: ma 09-02-26 | Slutdato:  | % arbejde færdigt: 152,452-532-529 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 208 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Svagdrøm Lir | Opgavenavn:  | Varighed: 34-09-26 | Startdato: to 16-02-26 | Slutdato:  | % arbejde færdigt: 457; ASA | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: na 26-01-26 | Startdato: 0 20-40-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 1224 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 206 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Athannigigheder | Opgavenavn:  | Varighed: na 36-01-26 | Startdato: ti 20-10-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 220 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Fancoil for dim af kabling | Opgavenavn:  | Varighed: na 36-02-26 | Startdato: ma 16-00-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 234 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Øvrige installationer for dim af kabling | Opgavenavn:  | Varighed: ma 36-07-26 | Startdato: ma 16-03-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 219 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Arbejdutationer placering | Opgavenavn:  | Varighed: ma 36-02-26 | Startdato: ma 16-09-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 243 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Fyldningugrad i spor/ udvidelsesfaktor | Opgavenavn:  | Varighed: ma 36-07-36 | Startdato: ma 16-03-26 0% | Slutdato:  | % arbejde færdigt: 542,542:549 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 235 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Againatallation - Opdeling af DALil inet. | Opgavenavn:  | Varighed: ma 36-02-26 | Startdato: ma 16-00-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 217 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering af bielyuning | Opgavenavn:  | Varighed: ma 16-07-26 | Startdato: ma 16-09-26 0% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 250 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering synligt udstyr fa tryk og pir, input vedr. DALI | Opgavenavn:  | Varighed: na 36-07-26 | Startdato: ma 16-07-26 0 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 325 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter | Opgavenavn:  | Varighed: ma 36-07-26 Ta 36-03-26 | Startdato: ma 16-03-26 0 ma 16-09-26 0 ma 16-09-26 0 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 667;SER;900 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 284 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Koordinering af AV-installationer med undum welt pu skamter. Placering af inat. Over
+want under gulw | Opgavenavn: loft | Varighed: ma 16-07-36 | Startdato:  | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 280 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Samlet el-belastning for RhtS-KT og Ruts-illita
+Færdiggare projektering | Opgavenavn: Dd | Varighed: 20-10-26 na 26-01-26 | Startdato: t 20-10-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 6- 20-10
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 191 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Omr. G | Opgavenavn:  | Varighed: ma 23-02-26 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 1226 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 181 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: ma 24-11-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 181 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: ma 24-11-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 188 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Global: | Opgavenavn:  | Varighed: ma:00-09-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Atumngigheder | Opgavenavn:  | Varighed: ma 08-09-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 206 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: LOWV Desigrkrav | Opgavenavn:  | Varighed: na 20-40-25 | Startdato: fr 21-41-25 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 223 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: DAG/Sine - Omfang af dækning | Opgavenavn:  | Varighed: ma:00-07-26 | Startdato: ma 02-03-26 90% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 238 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: DAG/Sine - Placering af synlige komponenter | Opgavenavn:  | Varighed: ma 22-00-26 | Startdato: ma 22-00-26 90% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 236 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: DAG/Sine - Anlargu sta meike og udformning | Opgavenavn:  | Varighed: ma/08-09-25 | Startdato: ma 08-09-2% | Slutdato: 90% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 229 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Omfang - reetablering af solceller | Opgavenavn:  | Varighed: ta 1:0-12-2% | Startdato: to 18-42-2% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver: 784 | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 222 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Placering thorsten + ind/arkant generator | Opgavenavn:  | Varighed: ta Q1-03-50 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 209 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: HX-4 Deignke av | Opgavenavn:  | Varighed: ma/08-09-25 | Startdato: ma 08-09-2% 25 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 213 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Designkrav jording | Opgavenavn:  | Varighed: ma/06-09-25 | Startdato: ma 08-09-2% 50% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 207 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Armaturtyper | Opgavenavn:  | Varighed: ma/08-09-25 | Startdato: ma 08-09-2% 90% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 214 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Færdiggare projektering | Opgavenavn:  | Varighed: an 01-50-2% | Startdato: fr 17-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 253 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Udarbejde notat om DAS/MIME Projektering af DAS/Sine | Opgavenavn: Hid | Varighed: 02-12-25 : 28-13-25 | Startdato: 6 02-12-2% | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 227 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: UPS aring | Opgavenavn: Hid | Varighed: ma/04-12-25 an 08-52-25 | Startdato: fr 09-01-26 on 17-52-25 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 218 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Reetablering af solceller | Opgavenavn:  | Varighed: to 10-13-2% | Startdato: to 15-01-26 0 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 212 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Generator anilang | Opgavenavn:  | Varighed: ma/06-01-26 | Startdato: ma 1/9-04-26 | Slutdato: 90% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 194 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed: ma 29-01-36 | Startdato: ma 26-04-26 | Slutdato: 90% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 193 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Janding: | Opgavenavn:  | Varighed: 27-01-26 | Startdato: da-00-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 246 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: til godkendelse
+Komponentkatalog for synlige komponenter | Opgavenavn:  | Varighed: ma/06-01-26 | Startdato: Y 16-01-36 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 203 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Lytarmaturer | Opgavenavn:  | Varighed: an 04-02-26 | Startdato: fr 17-04-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 198 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Ur-aning | Opgavenavn:  | Varighed: an 01-30-25 | Startdato: 0 06-01-26 | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 248 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: £100.04 MMIS $100.0% ELEV | Opgavenavn:  | Varighed: ma: 00-09-25 ma 25-08-25 ma 80-11-25 | Startdato: - - fr 06-04-26 | Slutdato: 11% | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 240 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Oversigt projekteringctiduplan - projekt til priovalidering | Opgavenavn:  | Varighed: ma 08-09-25 | Startdato: - | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 243 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Projektering efter prisvalidering er startet jt. leveranceplaner | Opgavenavn:  | Varighed: n 10-06-26 | Startdato:  | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 310 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand: Oversigt projekteringtidsplan - 300 % projekt Udføreikesprojektering -300% færdig | Opgavenavn:  | Varighed: ta 26-01-26 02-00-27 | Startdato: ti 82-00-27 02-00-27 | Slutdato:  | % arbejde færdigt: 1225;1228; 1230;1222 | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: 
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: table_row | LENGTH: 175 chars
+────────────────────────────────────────────────────────────────────────────────
+Id:  | Opgavetilstand:  | Opgavenavn:  | Varighed:  | Startdato:  | Slutdato:  | % arbejde færdigt:  | Foregående opgaver:  | Efterfølgende opgaver:  | Col10:  | Col11: Cide 1
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 4 chars
+────────────────────────────────────────────────────────────────────────────────
+# EK
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 996 chars
+────────────────────────────────────────────────────────────────────────────────
+<table> <tr> <th>1</th> <th></th> <th>sod</th> <th>ma 85-01-26</th> <th>fr 1:0-08-26</th> <th>%</th> <th></th> <th></th> <th></th> <th></th> <th></th> </tr> <tr> <th></th> <th>Bygherreafklaringer E300 00 - Fastlæggeke af rørmaterialer</th> <th></th> <th>ma 08-09-25 : 21-40-25</th> <th>ma02-00-26 ma 10-43-25</th> <th>90% 20</th> <th></th> <th></th> <th></th> <th></th> <th></th> </tr> <tr> <td></td> <td>6300 00 - RH, godkendelse af rynlinge komponter</td> <td></td> <td>ma 26-01-26 an 06-45-2%</td> <td>fr 06-02-26 0 18-13-2%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>6300.02 - Vandbehandling og wandinga ring til haverne</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>6300.00 - Indretning af produktionskøkken, datablade på komponenter, central/decentral blødgaring?</td> <td></td> <td>20-09-25</td> <td colspan="2">ma 12-30-2%</td> <td></td> <td></td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 981 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> </tr> <tr> <td></td> <td>6300.01 - Fastlæg kraw til kemidepot: Sikringuprojekt, omfang af ADIK Infavæg med glasfronter JARK pkt. 1.7]</td> <td></td> <td>ma 05-01-26 ma 05-01-26 ma/06-01-36</td> <td>fr 16-01-26 fr 16-01-26 6 06-01-26</td> <td></td> <td></td> <td>1078;1083:42</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>6300.00 - Sellingtagen til kølevand i terræn - udskift ning/nelining</td> <td></td> <td>na 06-01-26</td> <td>12-01-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>6300 Pressemøder i Hankssien skal afklaret</td> <td></td> <td>ma/06-01-26</td> <td>fr 09-01-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>6300.00 - Afklaring af DASFSINE</td> <td></td> <td>: 36-12-25</td> <td>ma 02-03-26</td> <td>75%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>E300 12 - SolafukarmningMørkdangning funktionskni</td> <td>Tid</td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 986 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>ma/00-11-25</td> <td>fr 21-41-25</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td>Sd</td> <td>ma 05-01-26</td> <td>fr 09-04-26</td> <td></td> <td></td> <td></td> <td>M</td> <td></td> <td></td> </tr> <tr> <td></td> <td>Fredning</td> <td></td> <td>ma 19-01-26</td> <td>to 20-04-7%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Goluendelse af synlige komponeter fra E 300.02</td> <td></td> <td>ma 28-01-26</td> <td>r 23-01-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Godkendelse af Maskinha lar matur</td> <td></td> <td>ma 36-02-36</td> <td>on 08-04-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Godkendelse af indbygning af Ris og RUD</td> <td></td> <td>ma 16-03-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Godkendelse af indbygning i
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 994 chars
+────────────────────────────────────────────────────────────────────────────────
+"avenlyt"</td> <td></td> <td>ma 22-00-36</td> <td>fr 12-02-36</td> <td></td> <td></td> <td>126:28</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Godkendelse af kalecentralens indretning</td> <td></td> <td>ma 16-03-26</td> <td>on 08-04-26</td> <td></td> <td>15a</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Deadline for afutamt materiale ti All wedr. SLIK5</td> <td></td> <td>ta 20-04-26</td> <td>to 30-04-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Sikringaprojekt</td> <td></td> <td>ma 80-11-25</td> <td>on 1:5-04-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering'antal af akringukomponenter, lofter</td> <td>200d</td> <td>ma/02-11-25</td> <td colspan="2">on 15-04-26 0</td> <td>1074</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering'antal af akringukomponenter, vægge</td> <td></td> <td>ma 06-01-26</td> <td colspan="2">ma
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 999 chars
+────────────────────────────────────────────────────────────────────────────────
+05-04-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering'antal af akringukomponenter, døre</td> <td></td> <td>ma 26-01-36</td> <td>ma 1/9-04-26</td> <td>0</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>[100.01 Ventilation</td> <td></td> <td></td> <td>or 19-06-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>[100.00: VVS</td> <td></td> <td>ma/08-09-25</td> <td>-</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>[100.00 EL</td> <td></td> <td>na 06-09-25</td> <td>-</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>na 08-09-25</td> <td>t 24-00-26</td> <td></td> <td></td> <td>122%</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td>206,9ad</td> <td>na 08-09-25</td> <td>6 24-02-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 978 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td>Placering og valg af ARA komponenter</td> <td></td> <td>ma/08-09-25</td> <td>ma 08-09-25</td> <td>98%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Samlet el-belastning for RhtS-KT og Atts-lilita</td> <td>ad</td> <td>ma 23-00-36</td> <td>ti 24-00-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Færdiggare projektering ABA installationer</td> <td></td> <td>ma- 06-09-25 ma 20-40-25</td> <td>fr 2:1-21-25 fr 07-41-25</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>AMA installationer Tavier</td> <td></td> <td>ma/08-09-25 na 27-10-25</td> <td>fr 26-09-25 fr 21-11-25</td> <td></td> <td>129 440:442-442-44</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Føringuveje</td> <td></td> <td>na:00-11-25</td> <td>fr 21-41-25</td> <td></td> <td>468 440: 441-442-442</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 985 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>Kraftirstallationer</td> <td>26,34d</td> <td>na 20-10-25</td> <td></td> <td></td> <td>156 440 443-442-444</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Againstallationer</td> <td></td> <td>ma 00-11-25</td> <td colspan="2">fr 14-11-25</td> <td>447:445 448</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>IT og Svagstrøm</td> <td></td> <td>ma 20-10-25</td> <td colspan="2">fr 07-11-25</td> <td>142:452,452-456</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Svagtram Lar</td> <td></td> <td>na 17-11-25</td> <td colspan="2">on 19-51-25</td> <td>457 ASA</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>na 30-11-25</td> <td>0 22-06-26</td> <td></td> <td></td> <td>1228</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Ahangigheder</td> <td></td> <td>$18-55-2%</td> <td>0 22-06-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 993 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>Fyldningigrad i spory udvidelsesfaktor Placering og valg af ARA komponenter installationer for 4. cal Chef-køkken AV installationer for d. tak mødelokaler</td> <td></td> <td>: 28-41-2% 28-41-2% tr 38-41-25 28-41-3%</td> <td>fr 29-11-25 fr 29-11-25 fr 18-11-25 fr 28-21-25</td> <td></td> <td>472:434:480</td> <td>189: 490 189: 420;491 189; 490; 49 1; 49 2</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Samlet el-belastning for RAS-ETT og ButE-iRita</td> <td>dd</td> <td>: 33-06-26</td> <td>6 22-06-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Færdiggare projektering</td> <td>34,and</td> <td></td> <td>fr 13-04-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>ABA installationer</td> <td>21,5d</td> <td>ma 30-11-25</td> <td>0 09-12-2%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>AVA instalationer</td> <td></td> <td>ma 30-11-25</td> <td>0
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 991 chars
+────────────────────────────────────────────────────────────────────────────────
+09-12-2%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Taver</td> <td></td> <td>na 24-11-25</td> <td>fr 12-12-25</td> <td></td> <td>465 429 472-478:475</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td></td> <td colspan="2">fr 12-08-26</td> <td></td> <td>15:527,724,729,720</td> <td></td> <td>.....</td> <td></td> </tr> <tr> <td></td> <td>Kraftinstallationer</td> <td></td> <td>na 24-11-25</td> <td colspan="2">6 02-43-2%</td> <td>444:450 454-499-472</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Egtinstallationer</td> <td></td> <td>ma 24-11-25</td> <td colspan="2">hr 06-12-25</td> <td>466 477:478:479</td> <td>190,12%</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>IT og Svagstrøm</td> <td>17,6d</td> <td>ma 30-11-25</td> <td>on 02-12-25</td> <td></td> <td>409 452 457 475 482</td> <td>516</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Svagdrøm Lir</td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 999 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td>na/06-01-26</td> <td>on 07-04-26</td> <td></td> <td>457 ASA</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td>210,8d</td> <td>na 00-09-25</td> <td>fr 14-09-26</td> <td></td> <td></td> <td>1220</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Athunniigheder</td> <td>210,84</td> <td>na 06-09-25</td> <td>tr 14-08-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Færdiggare projektering</td> <td></td> <td>na id-11-2%</td> <td>to 19-08-2%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>ARA installationer</td> <td></td> <td>ma 04-12-25</td> <td>19-02-26</td> <td></td> <td>487 ARA SORSOG</td> <td></td> <td></td> <td>.....</td> <td></td> </tr> <tr> <td></td> <td>AVA instalationer Tavier</td> <td></td> <td>: 30-07-26 na 32-01-26</td> <td colspan="2">ti 10-09-26 12-02-26</td> <td>SOR SOG</td> <td></td> <td></td> <td>.....</td> <td></td> </tr> <tr> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 995 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>Faringup</td> <td></td> <td>na 26-01-36</td> <td colspan="2">on 10-09-2℃</td> <td></td> <td>37,524 777,782-782</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Kraftinstallationer</td> <td>10.2d</td> <td>na 32-01-26</td> <td colspan="2">a 16-00-26</td> <td>148-450 454-499 500</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Lgsinstallationer</td> <td></td> <td>na 13-01-26</td> <td colspan="2">na 16-00-26</td> <td>490:5:00:504:500:500</td> <td>512;778</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>IT og Svagotram</td> <td></td> <td>na:04-12-25</td> <td colspan="2">D12-02-26</td> <td>199452452-500-400;</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Svagstrøm Lir</td> <td></td> <td>na 36-02-26</td> <td colspan="2">on 18-02-26</td> <td>457, ASA</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Omr. d</td> <td>360,254</td> <td>na 86-01-26</td> <td colspan="2">or 18-09-26</td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 997 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Ahangigheder</td> <td></td> <td></td> <td>fr 18-09-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Fancoil for dim af kabling Øvrige installationer far dim af kabling Arbejdutationer placering Fyldningugrad i spor/ udviddelusfaktor igtinstallation - Opdeling af DAll inst.</td> <td></td> <td>na/09-02-26 ma/09-02-26 ma 09-02-26 ma/09-02-26 ma/09-02-36</td> <td>ma 09-02-216 ma 09-00-216 ma 09-00-26 ma 09-00-26 ma 09-02-26</td> <td>0 0 0% 0% 0%</td> <td>$30:521:537</td> <td>122,534,526,526 122,524,525,506 634,527</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering af belyuning</td> <td></td> <td>ma/09-02-26</td> <td>ma 09-00-26</td> <td>0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering synligt udstyr fa tryk og pir, input vedr. DALI</td> <td></td> <td>na/09-02-26</td> <td>ma 09-00-26</td> <td>0</td> <td></td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 984 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td></td> </tr> <tr> <td></td> <td>Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter</td> <td></td> <td>ma/09-02-26 ma/09-02-26</td> <td>ma 09-02-26</td> <td>0%</td> <td></td> <td>122,534,526,526</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Koordinering af AV-installationer med isolering på saarter. Placering af inat. Over want under gulw</td> <td>loft</td> <td>ma/09-02-36 18-09-26</td> <td>ma 09-80-26 fr 18-09-26</td> <td>0%</td> <td>852,872</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer</td> <td>Dd</td> <td>ma 85-01-26 ma 09-02-26 na 23-00-26</td> <td colspan="2">co 16-08-2% 19-02-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td>7,68d</td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 986 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>a/09-02-26</td> <td colspan="2"></td> <td>537,448 450:454:53</td> <td>26;129;599</td> <td></td> <td></td> <td>RL (IUGN 1)</td> </tr> <tr> <td></td> <td>Kraftinstallationer</td> <td></td> <td>na 22-00-26</td> <td colspan="2">on 18-09-26</td> <td>12,448 450:454 450</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Lysinstallationer</td> <td>17,Gad</td> <td>na 23-02-26</td> <td colspan="2">on 18-09-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>IT og Svagstrøm</td> <td></td> <td>na 29-01-26</td> <td colspan="2">ma 09-02-26</td> <td>152,452-532-529</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Svagdrøm Lir</td> <td></td> <td>34-09-26</td> <td colspan="2">to 16-02-26</td> <td>457; ASA</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>na 26-01-26</td> <td colspan="2">0 20-40-26</td> <td></td> <td>1224</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 992 chars
+────────────────────────────────────────────────────────────────────────────────
+<td>Athannigigheder</td> <td></td> <td>na 36-01-26</td> <td colspan="2">ti 20-10-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Fancoil for dim af kabling</td> <td></td> <td>na 36-02-26</td> <td colspan="2">ma 16-00-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Øvrige installationer for dim af kabling</td> <td></td> <td>ma 36-07-26</td> <td colspan="2">ma 16-03-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Arbejdutationer placering</td> <td></td> <td>ma 36-02-26</td> <td colspan="2">ma 16-09-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Fyldningugrad i spor/ udvidelsesfaktor</td> <td></td> <td>ma 36-07-36</td> <td colspan="2">ma 16-03-26 0%</td> <td>542,542:549</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Againatallation - Opdeling af DALil inet.</td> <td></td> <td>ma 36-02-26</td> <td colspan="2">ma
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 998 chars
+────────────────────────────────────────────────────────────────────────────────
+16-00-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering af bielyuning</td> <td></td> <td>ma 16-07-26</td> <td colspan="2">ma 16-09-26 0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering synligt udstyr fa tryk og pir, input vedr. DALI</td> <td></td> <td>na 36-07-26</td> <td colspan="2">ma 16-07-26 0</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter</td> <td></td> <td>ma 36-07-26 Ta 36-03-26</td> <td colspan="2" rowspan="2">ma 16-03-26 0 ma 16-09-26 0 ma 16-09-26 0</td> <td rowspan="2"></td> <td rowspan="2">667;SER;900</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Koordinering af AV-installationer med undum welt pu skamter. Placering af inat. Over want under gulw</td> <td>loft</td> <td>ma 16-07-36</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Samlet el-belastning
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 1000 chars
+────────────────────────────────────────────────────────────────────────────────
+for RhtS-KT og Ruts-illita Færdiggare projektering</td> <td>Dd</td> <td>20-10-26 na 26-01-26</td> <td colspan="2">t 20-10-26</td> <td></td> <td></td> <td></td> <td></td> <td>6- 20-10</td> </tr> <tr> <td></td> <td>Omr. G</td> <td></td> <td>ma 23-02-26</td> <td colspan="2">-</td> <td></td> <td>1226</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>ma 24-11-25</td> <td>-</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>ma 24-11-25</td> <td colspan="2">-</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Global:</td> <td></td> <td>ma:00-09-25</td> <td colspan="2">-</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Atumngigheder</td> <td></td> <td>ma 08-09-25</td> <td colspan="2">-</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>LOWV Desigrkrav</td> <td></td> <td>na 20-40-25</td> <td colspan="2">fr 21-41-25</td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 995 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>DAG/Sine - Omfang af dækning</td> <td></td> <td>ma:00-07-26</td> <td colspan="2">ma 02-03-26 90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>DAG/Sine - Placering af synlige komponenter</td> <td></td> <td>ma 22-00-26</td> <td colspan="2">ma 22-00-26 90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>DAG/Sine - Anlargu sta meike og udformning</td> <td></td> <td>ma/08-09-25</td> <td>ma 08-09-2%</td> <td>90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Omfang - reetablering af solceller</td> <td></td> <td>ta 1:0-12-2%</td> <td colspan="2">to 18-42-2%</td> <td></td> <td>784</td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Placering thorsten + ind/arkant generator</td> <td></td> <td>ta Q1-03-50</td> <td colspan="2">-</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>HX-4
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 994 chars
+────────────────────────────────────────────────────────────────────────────────
+Deignke av</td> <td></td> <td>ma/08-09-25</td> <td colspan="2">ma 08-09-2% 25</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Designkrav jording</td> <td></td> <td>ma/06-09-25</td> <td colspan="2">ma 08-09-2% 50%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Armaturtyper</td> <td></td> <td>ma/08-09-25</td> <td colspan="2">ma 08-09-2% 90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Færdiggare projektering</td> <td></td> <td>an 01-50-2%</td> <td colspan="2">fr 17-04-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Udarbejde notat om DAS/MIME Projektering af DAS/Sine</td> <td>Hid</td> <td>02-12-25 : 28-13-25</td> <td colspan="2">6 02-12-2%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>UPS aring</td> <td>Hid</td> <td>ma/04-12-25 an 08-52-25</td> <td>fr 09-01-26 on 17-52-25</td> <td></td> <td></td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 993 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> <td></td> </tr> <tr> <td></td> <td>Reetablering af solceller</td> <td></td> <td>to 10-13-2%</td> <td colspan="2">to 15-01-26 0</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Generator anilang</td> <td></td> <td>ma/06-01-26</td> <td>ma 1/9-04-26</td> <td>90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td>ma 29-01-36</td> <td>ma 26-04-26</td> <td>90%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Janding:</td> <td></td> <td>27-01-26</td> <td>da-00-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Komponentkatalog for synlige komponenter til godkendelse</td> <td></td> <td>ma/06-01-26</td> <td colspan="2">Y 16-01-36</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Lytarmaturer</td> <td></td> <td>an 04-02-26</td> <td colspan="2">fr 17-04-26</td> <td></td> <td></td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 998 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> </tr> <tr> <td></td> <td>Ur-aning</td> <td></td> <td>an 01-30-25</td> <td>0 06-01-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>£100.04 MMIS $100.0% ELEV</td> <td></td> <td>ma: 00-09-25 ma 25-08-25 ma 80-11-25</td> <td>- - fr 06-04-26</td> <td>11%</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Oversigt projekteringctiduplan - projekt til priovalidering</td> <td></td> <td>ma 08-09-25</td> <td>-</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Projektering efter prisvalidering er startet jt. leveranceplaner</td> <td></td> <td>n 10-06-26</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td>Oversigt projekteringtidsplan - 300 % projekt Udføreikesprojektering -300% færdig</td> <td></td> <td>ta 26-01-26 02-00-27</td> <td>ti 82-00-27 02-00-27</td> <td></td> <td>1225;1228; 1230;1222</td> <td></td> <td></td> <td></td>
+
+────────────────────────────────────────────────────────────────────────────────
+CHUNK TYPE: text | LENGTH: 274 chars
+────────────────────────────────────────────────────────────────────────────────
+<td></td> </tr> <tr> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td></td> <td></td> <td></td> <td></td> <td colspan="2"></td> <td></td> <td></td> <td></td> <td></td> <td>Cide 1</td> </tr> </table>
