@@ -608,46 +608,10 @@ async def predictive_analysis(
 
         logger.info(f"  ╚══════════════════════════╝")
 
-        import datetime as _dt
-        _ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        _dump_filename = f"ocr_dump_{_ts}_{analysis_id}.txt"
-        _dump_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), _dump_filename)
-        try:
-            with open(_dump_path, "w", encoding="utf-8") as _f:
-                _f.write(f"=== OCR EXTRACTION DUMP ===\n")
-                _f.write(f"File: {filename}\n")
-                _f.write(f"Reference Date: {reference_date}\n")
-                _f.write(f"Analysis ID: {analysis_id}\n")
-                _f.write(f"Timestamp: {_dt.datetime.now().isoformat()}\n")
-                _f.write(f"OCR Time: {ocr_elapsed:.1f}s\n")
-                _f.write(f"Chunks: raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count}\n")
-                _f.write(f"{'='*80}\n\n")
-
-                for c in chunks:
-                    ctype = c.get("metadata", {}).get("type", "unknown")
-                    _f.write(f"\n{'─'*80}\n")
-                    _f.write(f"CHUNK TYPE: {ctype} | LENGTH: {len(c.get('content', ''))} chars\n")
-                    _f.write(f"{'─'*80}\n")
-                    _f.write(c.get("content", ""))
-                    _f.write(f"\n")
-
-            logger.info(f"  OCR dump saved: {_dump_filename}")
-        except Exception as _e:
-            logger.warning(f"  Failed to save OCR dump: {_e}")
-
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
 
         context = _build_predictive_context(chunks, filename_clean)
-        logger.info(f"  ╔══ CONTEXT FOR LLM ({len(context)} chars) ══╗")
-        ctx_lines = context.split("\n")
-        logger.info(f"  ║ Total lines: {len(ctx_lines)}")
-        logger.info(f"  ║ FIRST 15 LINES:")
-        for li, line in enumerate(ctx_lines[:15]):
-            logger.info(f"  ║   {li}: {line[:200]}")
-        logger.info(f"  ║ LAST 10 LINES:")
-        for li, line in enumerate(ctx_lines[-10:]):
-            logger.info(f"  ║   {len(ctx_lines)-10+li}: {line[:200]}")
-        logger.info(f"  ╚══════════════════════════╝")
+        logger.info(f"  Context built: {len(context)} chars")
 
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
 
@@ -678,6 +642,112 @@ async def predictive_analysis(
         elapsed = time.time() - start_time
         logger.info(f"  Predictive response: {len(predictive_text)} chars, status: {predictive_status}, json={'yes' if predictive_json else 'no'}")
         logger.info(f"=== PREDICTIVE COMPLETE [{analysis_id}] ({elapsed:.1f}s) ===")
+
+        import datetime as _dt
+        _debug_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "analysis_debug.txt")
+        try:
+            with open(_debug_path, "w", encoding="utf-8") as _f:
+                _f.write(f"{'='*90}\n")
+                _f.write(f"  NOVA INSIGHT — COMPLETE ANALYSIS ANATOMY\n")
+                _f.write(f"  Updated: {_dt.datetime.now().isoformat()}\n")
+                _f.write(f"{'='*90}\n\n")
+
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  STEP 1: REQUEST RECEIVED\n")
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  File:           {filename}\n")
+                _f.write(f"  Size:           {len(pdf_bytes)} bytes ({len(pdf_bytes)//1024} KB)\n")
+                _f.write(f"  Reference Date: {reference_date}\n")
+                _f.write(f"  Language:       {language}\n")
+                _f.write(f"  Format:         {format}\n")
+                _f.write(f"  Analysis ID:    {analysis_id}\n\n")
+
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  STEP 2: OCR EXTRACTION (Azure Document Intelligence)\n")
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  OCR Time:       {ocr_elapsed:.1f}s\n")
+                _f.write(f"  Chunks:         raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count}\n")
+                _f.write(f"  Total chunks:   {len(chunks)}\n\n")
+
+                _f.write(f"  --- COMPLETE OCR OUTPUT (all chunks) ---\n\n")
+                for ci, c in enumerate(chunks):
+                    ctype = c.get("metadata", {}).get("type", "unknown")
+                    ccontent = c.get("content", "")
+                    _f.write(f"  [CHUNK {ci} | type={ctype} | {len(ccontent)} chars]\n")
+                    _f.write(ccontent)
+                    _f.write(f"\n\n")
+
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  STEP 3: CONTEXT PASSED TO LLM ({len(context)} chars)\n")
+                _f.write(f"{'─'*90}\n\n")
+                _f.write(context)
+                _f.write(f"\n\n")
+
+                sys_prompt = predictive_result.get("system_prompt", "")
+                usr_msg = predictive_result.get("user_message", "")
+                if sys_prompt:
+                    _f.write(f"{'─'*90}\n")
+                    _f.write(f"  STEP 4A: SYSTEM PROMPT SENT TO LLM ({len(sys_prompt)} chars)\n")
+                    _f.write(f"{'─'*90}\n\n")
+                    _f.write(sys_prompt)
+                    _f.write(f"\n\n")
+
+                if usr_msg:
+                    _f.write(f"{'─'*90}\n")
+                    _f.write(f"  STEP 4B: USER MESSAGE SENT TO LLM ({len(usr_msg)} chars)\n")
+                    _f.write(f"{'─'*90}\n\n")
+                    _f.write(usr_msg)
+                    _f.write(f"\n\n")
+
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  STEP 5: RAW LLM RESPONSE\n")
+                _f.write(f"{'─'*90}\n")
+                _f.write(f"  Model:    {predictive_model}\n")
+                _f.write(f"  Status:   {predictive_status}\n")
+                _f.write(f"  Tokens:   {predictive_result.get('usage_info', 'N/A')}\n")
+                _f.write(f"  Time:     {elapsed:.1f}s total\n\n")
+
+                reasoning = predictive_result.get("reasoning_content")
+                if reasoning:
+                    _f.write(f"  --- LLM REASONING ---\n\n")
+                    _f.write(reasoning)
+                    _f.write(f"\n\n")
+
+                raw_llm = predictive_result.get("raw_llm_response", "")
+                if raw_llm:
+                    _f.write(f"  --- RAW JSON RESPONSE ({len(raw_llm)} chars) ---\n\n")
+                    try:
+                        pretty = json.dumps(json.loads(raw_llm), indent=2, ensure_ascii=False)
+                        _f.write(pretty)
+                    except Exception:
+                        _f.write(raw_llm)
+                    _f.write(f"\n\n")
+
+                if predictive_json:
+                    delayed = predictive_json.get("delayed_activities", [])
+                    _f.write(f"{'─'*90}\n")
+                    _f.write(f"  STEP 6: RESULT SUMMARY\n")
+                    _f.write(f"{'─'*90}\n")
+                    overview = predictive_json.get("schedule_overview", {})
+                    _f.write(f"  Total Activities: {overview.get('total_activities', '?')}\n")
+                    _f.write(f"  Delayed:          {overview.get('delayed_count', '?')}\n")
+                    _f.write(f"  Areas:            {', '.join(overview.get('areas_covered', []))}\n")
+                    _f.write(f"  Format:           {overview.get('format_detected', '?')}\n\n")
+                    if delayed:
+                        _f.write(f"  Delayed Activity IDs: {[a.get('id','?') for a in delayed]}\n\n")
+                        _f.write(f"  {'ID':<8} {'TASK NAME':<50} {'START':<14} {'DAYS':<6} {'PRIORITY'}\n")
+                        _f.write(f"  {'─'*8} {'─'*50} {'─'*14} {'─'*6} {'─'*15}\n")
+                        for a in delayed:
+                            _f.write(f"  {a.get('id','?'):<8} {a.get('task_name','?')[:50]:<50} {a.get('start_date','?'):<14} {a.get('days_overdue','?'):<6} {a.get('priority','?')}\n")
+                    _f.write(f"\n")
+
+                _f.write(f"{'='*90}\n")
+                _f.write(f"  END OF ANALYSIS ANATOMY\n")
+                _f.write(f"{'='*90}\n")
+
+            logger.info(f"  Debug file saved: analysis_debug.txt")
+        except Exception as _e:
+            logger.warning(f"  Failed to save debug file: {_e}")
 
         _update_progress(analysis_id, "complete", language)
 

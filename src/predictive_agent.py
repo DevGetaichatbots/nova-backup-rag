@@ -563,7 +563,12 @@ Return complete JSON matching the strict schema."""
                 "predictive_insights": raw_content,
                 "predictive_json": parsed_json,
                 "model": self.deployment,
-                "status": "success"
+                "status": "success",
+                "raw_llm_response": raw_content,
+                "reasoning_content": str(reasoning_content) if reasoning_content else None,
+                "usage_info": ", ".join(usage_parts) if usage_parts else None,
+                "system_prompt": system_prompt,
+                "user_message": user_message
             }
 
         except Exception as e:
