@@ -218,7 +218,7 @@ def _render_schedule_overview(data: Dict, lang: str) -> str:
         fields_html += f'<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;">{_icon_box(icon_name, "#64748b", 14)}<span style="font-size:12px;color:#64748b;font-weight:600;min-width:120px;">{name}</span><span style="font-size:13px;color:#1a202c;font-weight:600;">{val}</span></div>'
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("clock", 18, "#0d9488")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
@@ -243,7 +243,7 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
     header_html = ""
     for i, h in enumerate(headers):
         align = "right" if i == 6 else ("center" if i >= 7 else "left")
-        header_html += f'<th style="padding:12px 14px;text-align:{align};font-size:11px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;border-bottom:2px solid #e2e8f0;background:#f7fafc;">{h}</th>'
+        header_html += f'<th style="padding:12px 14px;text-align:{align};font-size:11px;font-weight:700;color:#134e4a;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;border-bottom:2px solid #99f6e4;background:linear-gradient(135deg,#f0fdfa,#ecfeff);">{h}</th>'
 
     rows_html = ""
     for idx, act in enumerate(activities):
@@ -279,9 +279,9 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
         rows_html += f'<tr style="background:{bg};transition:background .15s;" onmouseover="this.style.background=\'#edf2f7\'" onmouseout="this.style.background=\'{bg}\'">{tds}</tr>'
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#dc262612;border:1px solid #dc262622;">{_svg("alert-circle", 18, "#dc2626")}</div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("alert-circle", 18, "#0d9488")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   <div style="overflow-x:auto;border-radius:12px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06);">
@@ -317,17 +317,17 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
 
         fields_html = ""
         for f_icon, f_color, f_name, f_val in fields:
-            fields_html += f'''<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f4;align-items:flex-start;">
+            fields_html += f'''<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f0fdf4;align-items:flex-start;">
   {_icon_box(f_icon, f_color, 14)}
   <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:{f_color};text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">{f_name}</div><div style="font-size:13px;color:#374151;line-height:1.6;">{f_val}</div></div>
 </div>'''
 
-        cards_html += f'''<div style="margin:14px 0;background:#fff;border-radius:12px;border:1px solid #fecaca;border-left:4px solid #dc2626;overflow:hidden;box-shadow:0 1px 3px rgba(220,38,38,.08);">
-  <div style="padding:14px 18px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-bottom:1px solid #fecaca;">
+        cards_html += f'''<div style="margin:14px 0;background:#fff;border-radius:12px;border:1px solid #99f6e4;border-left:4px solid #0d9488;overflow:hidden;box-shadow:0 1px 3px rgba(13,148,136,.08);">
+  <div style="padding:14px 18px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-bottom:1px solid #99f6e4;">
     <div style="display:flex;align-items:center;gap:8px;">
-      {_svg(icon_name, 14, "#dc2626")}
-      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(rc.get("id",""))}</span>
-      <span style="font-size:13px;font-weight:700;color:#991b1b;">{_e(rc.get("task_name",""))}</span>
+      {_svg(icon_name, 14, "#0d9488")}
+      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#134e4a;background:#f0fdfa;border:1px solid #99f6e4;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(rc.get("id",""))}</span>
+      <span style="font-size:13px;font-weight:700;color:#134e4a;">{_e(rc.get("task_name",""))}</span>
     </div>
   </div>
   <div style="padding:6px 18px 14px;">{fields_html}</div>
@@ -346,9 +346,9 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #7c3aed;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#7c3aed12;border:1px solid #7c3aed22;">{_svg("search", 18, "#7c3aed")}</div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("search", 18, "#0d9488")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   {cards_html}
@@ -416,9 +416,9 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #d97706;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#d9770612;border:1px solid #d9770622;">{_svg("users", 18, "#d97706")}</div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("users", 18, "#0d9488")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
   </div>
   {cards_html}
@@ -459,9 +459,9 @@ def _render_summary_by_area(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#2563eb12;border:1px solid #2563eb22;">{_svg("grid", 18, "#2563eb")}</div>
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("grid", 18, "#0d9488")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
   </div>
   {items_html}
