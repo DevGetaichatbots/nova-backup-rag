@@ -545,6 +545,28 @@ Return complete JSON matching the strict schema."""
                 logger.error(f"  [PredictiveAgent] Schema validation failed — delayed_activities is not a list")
                 return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": "Schema validation failed: delayed_activities is not a list"}
 
+            original_count = len(parsed_json.get("delayed_activities", []))
+            valid_delayed = [a for a in parsed_json["delayed_activities"] if a.get("days_overdue", 0) > 0]
+            removed_count = original_count - len(valid_delayed)
+            if removed_count > 0:
+                removed_ids = [a.get("id", "?") for a in parsed_json["delayed_activities"] if a.get("days_overdue", 0) <= 0]
+                logger.warning(f"  [PredictiveAgent] Post-validation: removed {removed_count} false positives with days_overdue <= 0: {removed_ids}")
+                parsed_json["delayed_activities"] = valid_delayed
+                if "schedule_overview" in parsed_json:
+                    parsed_json["schedule_overview"]["delayed_count"] = len(valid_delayed)
+                if "insight_data" in parsed_json:
+                    parsed_json["insight_data"]["delayed_count"] = len(valid_delayed)
+                    parsed_json["insight_data"]["critical_count"] = sum(1 for a in valid_delayed if a.get("priority") == "CRITICAL_NOW")
+                    parsed_json["insight_data"]["important_count"] = sum(1 for a in valid_delayed if a.get("priority") == "IMPORTANT_NEXT")
+                    parsed_json["insight_data"]["monitor_count"] = sum(1 for a in valid_delayed if a.get("priority") == "MONITOR")
+
+                dc_list = parsed_json.get("downstream_consequences", [])
+                if dc_list:
+                    valid_dc = [dc for dc in dc_list if dc.get("blocked_by_id") not in set(removed_ids)]
+                    if len(valid_dc) < len(dc_list):
+                        logger.info(f"  [PredictiveAgent] Post-validation: removed {len(dc_list) - len(valid_dc)} downstream consequences linked to false positives")
+                        parsed_json["downstream_consequences"] = valid_dc
+
             delayed_count = len(parsed_json.get("delayed_activities", []))
             root_causes = sum(1 for a in parsed_json.get("delayed_activities", []) if a.get("is_root_cause"))
             logger.info(f"  [PredictiveAgent] JSON response: {delayed_count} delayed activities, {root_causes} root causes, model: {model_used}{usage_info}")
