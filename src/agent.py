@@ -568,7 +568,7 @@ Keep your response concise and helpful."""
             temperature=0,
             top_p=0.1,
             seed=42,
-            max_tokens=65536
+            max_tokens=32768
         )
         
         assistant_response = response.choices[0].message.content or ""
