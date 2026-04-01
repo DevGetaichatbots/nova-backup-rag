@@ -1,6 +1,6 @@
 ==========================================================================================
   NOVA INSIGHT — COMPLETE ANALYSIS ANATOMY
-  Updated: 2026-04-01T11:20:13.990773
+  Updated: 2026-04-01T11:44:35.027041
 ==========================================================================================
 
 ──────────────────────────────────────────────────────────────────────────────────────────
@@ -11,12 +11,12 @@
   Reference Date: 12-03-2026
   Language:       en
   Format:         html
-  Analysis ID:    sa_d375972fb796eaf4
+  Analysis ID:    sa_60685bcb038bac42
 
 ──────────────────────────────────────────────────────────────────────────────────────────
   STEP 2: OCR EXTRACTION (Azure Document Intelligence)
 ──────────────────────────────────────────────────────────────────────────────────────────
-  OCR Time:       9.0s
+  OCR Time:       11.9s
   Chunks:         raw_md=2, rows=138, tables=17, text=40
   Total chunks:   197
 
@@ -1223,7 +1223,7 @@ Fremdrift
 <td></td>
 <td></td>
 
-  [CHUNK 1 | type=raw_markdown | 16869 chars]
+  [CHUNK 1 | type=raw_markdown | 16867 chars]
 <td></td>
 <td>T</td>
 <td></td>
@@ -1939,7 +1939,7 @@ Kritisk
 </tr>
 <tr>
 <td>635</td>
-<td>18</td>
+<td></td>
 <td>DAS/Sine - Placering af synlige komponeneter</td>
 <td>0d</td>
 <td>ma 23-02-26</td>
@@ -2871,7 +2871,7 @@ Id: 538 | Opg:  | Opgavenavn: IT og Svagstrøm | Varighed: 15d | Startdato: ma 1
   [CHUNK 102 | type=table_row | 225 chars]
 Id: 539 | Opg: 50 | Opgavenavn: Svagstrøm Ur | Varighed: 3d | Startdato: ti 24-03-26 | Slutdato: to 26-03-26 | % arbejde færdigt: 95% | Foregående opgaver: 457;458 | Efterfølgende opgaver:  | :  | :  | :  | : KL (TEGN 2) | : 
 
-  [CHUNK 103 | type=table | 4816 chars]
+  [CHUNK 103 | type=table | 4814 chars]
 TABLE 3 (Pages [3])
 | Id | Opg | Opgavenavn | Varighed | Startdato | Slutdato | % arbejde færdigt | Foregående opgaver | Efterfølgende opgaver |  |  |  |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -2898,7 +2898,7 @@ TABLE 3 (Pages [3])
 | 632 |  | Afhængigheder | 0d | ma 08-09-25 | - | 35% |  |  |  |  |  |  |
 | 633 |  | 10kV Designkrav | 25d | ma 20-10-25 | fr 21-11-25 | 35% |  | 646 |  |  |  |  |
 | 634 | 8 | DAS/Sine - Omfang af dækning | 0d | ma 02-03-26 | ma 02-03-26 | 90% | 28 |  |  |  | 02-03 |  |
-| 635 | 18 | DAS/Sine - Placering af synlige komponeneter | 0d | ma 23-02-26 | ma 23-02-26 | 90% |  |  |  | · | 23-02 |  |
+| 635 |  | DAS/Sine - Placering af synlige komponeneter | 0d | ma 23-02-26 | ma 23-02-26 | 90% |  |  |  | · | 23-02 |  |
 | 636 |  | DAS/Sine - Anlægs størrelse og udformning | 0d | ma 08-09-25 | ma 08-09-25 | 90% |  | 645 |  |  |  |  |
 | 638 |  | Omfang - reetablering af solceller | 0d | to 18-12-25 | to 18-12-25 | 50% |  | 784 | 12 |  |  |  |
 | 639 |  | Placering skorsten + ind/afkast generator | 0d | to 01-01-50 | - | 0% |  |  |  |  |  |  |
@@ -2922,16 +2922,16 @@ TABLE 3 (Pages [3])
 | 1185 | S | E100.05 ELEV | 75d | ma 03-11-25 | fr 06-03-26 | 0% |  | 1225;1228;1230;1232;1234;1236; |  |  |  |  |
 
   [CHUNK 104 | type=table | 18173 chars]
-[STRUCTURED: {"table_id": 3, "rows": [["Id", "Opg", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde f\u00e6rdigt", "Foreg\u00e5ende opgaver", "Efterf\u00f8lgende opgaver", "", "", "", ""], ["", "i", "", "", "", "", "", "", "", "2026", "Kvt1 Kvt2 Kvt3 Kvt4", "", "2027 Kvt1"], ["540", "", "Omr. 5", "162,55d", "ma 26-01-26", "ti 20-10-26", "26%", "", "1234", "", "I", "1", ""], ["541", "", "Afh\u00e6ngigheder", "132,55d", "ma 16-03-26", "ti 20-10-26", "0%", "", "", "", "", "I", ""], ["542", "", "Fancoils for dim af kabling", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "9 16-03", ""], ["543", "8", "\u00d8vrige installationer for dim af kabling", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "0 16-03", ""], ["544", "8", "Arbejdsstationer placering", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "556;557;558;560", "", "", "0 16-03", ""], ["545", "18", "Fyldningsgrad i spor/ udviddelsesfaktor", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "542;543;549", "556;557", "", "", "0 16-03", ""], ["546", "TO", "Lysinstallation - Opdeling af DALI inst.", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "556;559", "", "", "9 16-03", ""], ["547", "", "Placering af belysning", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "559", "", "", "0 16-03", ""], ["548", "50", "Placering synligt udstyr fx tryk og pir, Input vedr. DALI", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "559", "", "", "0 16-03", ""], ["549", "38", "Kraft - Placering af komponenter, belastning", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "0 16-03", ""], ["550", "8", "Placering og valg af ABA komponenter", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "554;555", "", "", "0 16-03", ""], ["551", "50", "Koordinering af AV-installationer med isolering p\u00e5 sk\u00f8rter. Placering af inst. Over loft samt under gulv", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "557;558;560", "", "", "0 16-03", ""], ["552", "", "Samlet el-belastning for BMS-KT og BMS-IBI tavOd", "", "ti 20-10-26", "ti 20-10-26", "0%", "897;913", "", "", "", "\u00b7 20-10", ""], ["553", "", "F\u00e6rdigg\u00f8re projektering", "64d", "ma 26-01-26", "ti 05-05-26", "26%", "", "", "", "I", "1", ""], ["562", "", "Omr. 6", "0d", "ma 23-02-26", "-", "98%", "", "1236", "", "", "", ""], ["586", "", "Omr. 7", "0d", "ma 24-11-25", "-", "0%", "", "1238", "", "", "", ""], ["608", "", "Omr. 8", "0d", "ma 24-11-25", "-", "95%", "", "1240", "", "", "", ""], ["631", "", "Globals", "0d", "ma 08-09-25", "-", "21%", "", "", "", "", "", ""], ["632", "", "Afh\u00e6ngigheder", "0d", "ma 08-09-25", "-", "35%", "", "", "", "", "", ""], ["633", "", "10kV Designkrav", "25d", "ma 20-10-25", "fr 21-11-25", "35%", "", "646", "", "", "", ""], ["634", "8", "DAS/Sine - Omfang af d\u00e6kning", "0d", "ma 02-03-26", "ma 02-03-26", "90%", "28", "", "", "", "02-03", ""], ["635", "18", "DAS/Sine - Placering af synlige komponeneter", "0d", "ma 23-02-26", "ma 23-02-26", "90%", "", "", "", "\u00b7", "23-02", ""], ["636", "", "DAS/Sine - Anl\u00e6gs st\u00f8rrelse og udformning", "0d", "ma 08-09-25", "ma 08-09-25", "90%", "", "645", "", "", "", ""], ["638", "", "Omfang - reetablering af solceller", "0d", "to 18-12-25", "to 18-12-25", "50%", "", "784", "12", "", "", ""], ["639", "", "Placering skorsten + ind/afkast generator", "0d", "to 01-01-50", "-", "0%", "", "", "", "", "", ""], ["640", "", "HX-1 Designkrav", "0d", "ma 08-09-25", "ma 08-09-25", "85%", "", "650", "", "", "", ""], ["641", "", "Designkrav jording", "0d", "ma 08-09-25", "ma 08-09-25", "50%", "", "651", "", "", "", ""], ["642", "", "Armaturtyper", "0d", "ma 08-09-25", "ma 08-09-25", "50%", "", "", "", "", "", ""], ["643", "", "F\u00e6rdigg\u00f8re projektering", "125d", "on 01-10-25", "fr 17-04-26", "18%", "", "", "", "", "", ""], ["644", "38", "Udarbejde notat om DAS/SINE", "10d", "ti 02-12-25", "ma 15-12-25", "0%", "", "28", "", "", "", ""], ["645", "SE", "Projektering af DAS/Sine", "11d", "ti 18-11-25", "ti 02-12-25", "0%", "636", "", "", "", "", ""], ["646", "SE", "10kV", "20d", "ma 01-12-25", "fr 09-01-26", "11%", "633", "", "KL", "", "", ""], ["647", "da", "UPS anl\u00e6g", "11d", "on 03-12-25", "on 17-12-25", "80%", "637", "", "", "", "", ""], ["648", "", "Reetablering af solceller", "11d", "to 18-12-25", "to 15-01-26", "0%", "", "784", "", "KL", "", ""], ["649", "", "Generator anl\u00e6g", "11d", "ma 05-01-26", "ma 19-01-26", "50%", "", "", "", "KL", "", ""], ["650", "SE", "HX-1", "6d", "ma 19-01-26", "ma 26-01-26", "50%", "640", "", "", "KL", "", ""], ["651", "", "Jording", "6d", "ti 27-01-26", "ti 03-02-26", "0%", "641", "", "", "KL", "", ""], ["652", "8", "Komponentkatalog for synlige komponenter til godkendelse", "10d", "ma 05-01-26", "fr 16-01-26", "100%", "", "33", "", "", "", ""], ["653", "SE", "Lysarmaturer", "45d", "on 04-02-26", "fr 17-04-26", "5%", "", "", "", "", "KL", ""], ["654", "8", "Ur-anl\u00e6g", "60d", "on 01-10-25", "ti 06-01-26", "70%", "", "", "", "", "", ""], ["655", "", "E100.04 BMS", "0d", "ma 08-09-25", "-", "11%", "", "", "", "", "", ""], ["1071", "", "Ark", "0d?", "ma 25-08-25", "-", "50%", "", "", "", "", "", ""], ["1185", "S", "E100.05 ELEV", "75d", "ma 03-11-25", "fr 06-03-26", "0%", "", "1225;1228;1230;1232;1234;1236;", "", "", "", ""]], "cells": [{"content": "Id", "row": 0, "col": 0, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Opg", "row": 0, "col": 1, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "Opgavenavn", "row": 0, "col": 2, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Varighed", "row": 0, "col": 3, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Startdato", "row": 0, "col": 4, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Slutdato", "row": 0, "col": 5, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "% arbejde f\u00e6rdigt", "row": 0, "col": 6, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Foreg\u00e5ende opgaver", "row": 0, "col": 7, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Efterf\u00f8lgende opgaver", "row": 0, "col": 8, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "", "row": 0, "col": 9, "row_span": 1, "col_span": 4, "kind": "columnHeader"}, {"content": "i", "row": 1, "col": 1, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "2026", "row": 1, "col": 9, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "Kvt1 Kvt2 Kvt3 Kvt4", "row": 1, "col": 10, "row_span": 1, "col_span": 2, "kind": "columnHeader"}, {"content": "2027 Kvt1", "row": 1, "col": 12, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "540", "row": 2, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 5", "row": 2, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "162,55d", "row": 2, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 2, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 2, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "26%", "row": 2, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1234", "row": 2, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 2, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1", "row": 2, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "541", "row": 3, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Afh\u00e6ngigheder", "row": 3, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "132,55d", "row": 3, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 3, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 3, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 3, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 3, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "542", "row": 4, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Fancoils for dim af kabling", "row": 4, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 4, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 4, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 4, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 4, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 4, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "9 16-03", "row": 4, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "543", "row": 5, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 5, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00d8vrige installationer for dim af kabling", "row": 5, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 5, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 5, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 5, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 5, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 5, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 5, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "544", "row": 6, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 6, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Arbejdsstationer placering", "row": 6, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 6, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 6, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 6, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 6, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;557;558;560", "row": 6, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 6, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545", "row": 7, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "18", "row": 7, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Fyldningsgrad i spor/ udviddelsesfaktor", "row": 7, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 7, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 7, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 7, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 7, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "542;543;549", "row": 7, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;557", "row": 7, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 7, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "546", "row": 8, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "TO", "row": 8, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Lysinstallation - Opdeling af DALI inst.", "row": 8, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 8, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 8, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 8, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 8, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;559", "row": 8, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "9 16-03", "row": 8, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "547", "row": 9, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering af belysning", "row": 9, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 9, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 9, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 9, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 9, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "559", "row": 9, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 9, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "548", "row": 10, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50", "row": 10, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI", "row": 10, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 10, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 10, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 10, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 10, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "559", "row": 10, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 10, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "549", "row": 11, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "38", "row": 11, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Kraft - Placering af komponenter, belastning", "row": 11, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 11, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 11, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 11, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 11, "col": 6, "row_span":
+[STRUCTURED: {"table_id": 3, "rows": [["Id", "Opg", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde f\u00e6rdigt", "Foreg\u00e5ende opgaver", "Efterf\u00f8lgende opgaver", "", "", "", ""], ["", "i", "", "", "", "", "", "", "", "2026", "Kvt1 Kvt2 Kvt3 Kvt4", "", "2027 Kvt1"], ["540", "", "Omr. 5", "162,55d", "ma 26-01-26", "ti 20-10-26", "26%", "", "1234", "", "I", "1", ""], ["541", "", "Afh\u00e6ngigheder", "132,55d", "ma 16-03-26", "ti 20-10-26", "0%", "", "", "", "", "I", ""], ["542", "", "Fancoils for dim af kabling", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "9 16-03", ""], ["543", "8", "\u00d8vrige installationer for dim af kabling", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "0 16-03", ""], ["544", "8", "Arbejdsstationer placering", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "556;557;558;560", "", "", "0 16-03", ""], ["545", "18", "Fyldningsgrad i spor/ udviddelsesfaktor", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "542;543;549", "556;557", "", "", "0 16-03", ""], ["546", "TO", "Lysinstallation - Opdeling af DALI inst.", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "556;559", "", "", "9 16-03", ""], ["547", "", "Placering af belysning", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "559", "", "", "0 16-03", ""], ["548", "50", "Placering synligt udstyr fx tryk og pir, Input vedr. DALI", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "559", "", "", "0 16-03", ""], ["549", "38", "Kraft - Placering af komponenter, belastning", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "545;556;557;558", "", "", "0 16-03", ""], ["550", "8", "Placering og valg af ABA komponenter", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "554;555", "", "", "0 16-03", ""], ["551", "50", "Koordinering af AV-installationer med isolering p\u00e5 sk\u00f8rter. Placering af inst. Over loft samt under gulv", "0d", "ma 16-03-26", "ma 16-03-26", "0%", "", "557;558;560", "", "", "0 16-03", ""], ["552", "", "Samlet el-belastning for BMS-KT og BMS-IBI tavOd", "", "ti 20-10-26", "ti 20-10-26", "0%", "897;913", "", "", "", "\u00b7 20-10", ""], ["553", "", "F\u00e6rdigg\u00f8re projektering", "64d", "ma 26-01-26", "ti 05-05-26", "26%", "", "", "", "I", "1", ""], ["562", "", "Omr. 6", "0d", "ma 23-02-26", "-", "98%", "", "1236", "", "", "", ""], ["586", "", "Omr. 7", "0d", "ma 24-11-25", "-", "0%", "", "1238", "", "", "", ""], ["608", "", "Omr. 8", "0d", "ma 24-11-25", "-", "95%", "", "1240", "", "", "", ""], ["631", "", "Globals", "0d", "ma 08-09-25", "-", "21%", "", "", "", "", "", ""], ["632", "", "Afh\u00e6ngigheder", "0d", "ma 08-09-25", "-", "35%", "", "", "", "", "", ""], ["633", "", "10kV Designkrav", "25d", "ma 20-10-25", "fr 21-11-25", "35%", "", "646", "", "", "", ""], ["634", "8", "DAS/Sine - Omfang af d\u00e6kning", "0d", "ma 02-03-26", "ma 02-03-26", "90%", "28", "", "", "", "02-03", ""], ["635", "", "DAS/Sine - Placering af synlige komponeneter", "0d", "ma 23-02-26", "ma 23-02-26", "90%", "", "", "", "\u00b7", "23-02", ""], ["636", "", "DAS/Sine - Anl\u00e6gs st\u00f8rrelse og udformning", "0d", "ma 08-09-25", "ma 08-09-25", "90%", "", "645", "", "", "", ""], ["638", "", "Omfang - reetablering af solceller", "0d", "to 18-12-25", "to 18-12-25", "50%", "", "784", "12", "", "", ""], ["639", "", "Placering skorsten + ind/afkast generator", "0d", "to 01-01-50", "-", "0%", "", "", "", "", "", ""], ["640", "", "HX-1 Designkrav", "0d", "ma 08-09-25", "ma 08-09-25", "85%", "", "650", "", "", "", ""], ["641", "", "Designkrav jording", "0d", "ma 08-09-25", "ma 08-09-25", "50%", "", "651", "", "", "", ""], ["642", "", "Armaturtyper", "0d", "ma 08-09-25", "ma 08-09-25", "50%", "", "", "", "", "", ""], ["643", "", "F\u00e6rdigg\u00f8re projektering", "125d", "on 01-10-25", "fr 17-04-26", "18%", "", "", "", "", "", ""], ["644", "38", "Udarbejde notat om DAS/SINE", "10d", "ti 02-12-25", "ma 15-12-25", "0%", "", "28", "", "", "", ""], ["645", "SE", "Projektering af DAS/Sine", "11d", "ti 18-11-25", "ti 02-12-25", "0%", "636", "", "", "", "", ""], ["646", "SE", "10kV", "20d", "ma 01-12-25", "fr 09-01-26", "11%", "633", "", "KL", "", "", ""], ["647", "da", "UPS anl\u00e6g", "11d", "on 03-12-25", "on 17-12-25", "80%", "637", "", "", "", "", ""], ["648", "", "Reetablering af solceller", "11d", "to 18-12-25", "to 15-01-26", "0%", "", "784", "", "KL", "", ""], ["649", "", "Generator anl\u00e6g", "11d", "ma 05-01-26", "ma 19-01-26", "50%", "", "", "", "KL", "", ""], ["650", "SE", "HX-1", "6d", "ma 19-01-26", "ma 26-01-26", "50%", "640", "", "", "KL", "", ""], ["651", "", "Jording", "6d", "ti 27-01-26", "ti 03-02-26", "0%", "641", "", "", "KL", "", ""], ["652", "8", "Komponentkatalog for synlige komponenter til godkendelse", "10d", "ma 05-01-26", "fr 16-01-26", "100%", "", "33", "", "", "", ""], ["653", "SE", "Lysarmaturer", "45d", "on 04-02-26", "fr 17-04-26", "5%", "", "", "", "", "KL", ""], ["654", "8", "Ur-anl\u00e6g", "60d", "on 01-10-25", "ti 06-01-26", "70%", "", "", "", "", "", ""], ["655", "", "E100.04 BMS", "0d", "ma 08-09-25", "-", "11%", "", "", "", "", "", ""], ["1071", "", "Ark", "0d?", "ma 25-08-25", "-", "50%", "", "", "", "", "", ""], ["1185", "S", "E100.05 ELEV", "75d", "ma 03-11-25", "fr 06-03-26", "0%", "", "1225;1228;1230;1232;1234;1236;", "", "", "", ""]], "cells": [{"content": "Id", "row": 0, "col": 0, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Opg", "row": 0, "col": 1, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "Opgavenavn", "row": 0, "col": 2, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Varighed", "row": 0, "col": 3, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Startdato", "row": 0, "col": 4, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Slutdato", "row": 0, "col": 5, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "% arbejde f\u00e6rdigt", "row": 0, "col": 6, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Foreg\u00e5ende opgaver", "row": 0, "col": 7, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "Efterf\u00f8lgende opgaver", "row": 0, "col": 8, "row_span": 2, "col_span": 1, "kind": "columnHeader"}, {"content": "", "row": 0, "col": 9, "row_span": 1, "col_span": 4, "kind": "columnHeader"}, {"content": "i", "row": 1, "col": 1, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "2026", "row": 1, "col": 9, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "Kvt1 Kvt2 Kvt3 Kvt4", "row": 1, "col": 10, "row_span": 1, "col_span": 2, "kind": "columnHeader"}, {"content": "2027 Kvt1", "row": 1, "col": 12, "row_span": 1, "col_span": 1, "kind": "columnHeader"}, {"content": "540", "row": 2, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 5", "row": 2, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "162,55d", "row": 2, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 2, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 2, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "26%", "row": 2, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1234", "row": 2, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 2, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1", "row": 2, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 2, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "541", "row": 3, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Afh\u00e6ngigheder", "row": 3, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "132,55d", "row": 3, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 3, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 3, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 3, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 3, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 3, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "542", "row": 4, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Fancoils for dim af kabling", "row": 4, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 4, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 4, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 4, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 4, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 4, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "9 16-03", "row": 4, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 4, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "543", "row": 5, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 5, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00d8vrige installationer for dim af kabling", "row": 5, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 5, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 5, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 5, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 5, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 5, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 5, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 5, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "544", "row": 6, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 6, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Arbejdsstationer placering", "row": 6, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 6, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 6, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 6, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 6, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;557;558;560", "row": 6, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 6, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 6, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545", "row": 7, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "18", "row": 7, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Fyldningsgrad i spor/ udviddelsesfaktor", "row": 7, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 7, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 7, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 7, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 7, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "542;543;549", "row": 7, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;557", "row": 7, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 7, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 7, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "546", "row": 8, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "TO", "row": 8, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Lysinstallation - Opdeling af DALI inst.", "row": 8, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 8, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 8, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 8, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 8, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "556;559", "row": 8, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "9 16-03", "row": 8, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 8, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "547", "row": 9, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering af belysning", "row": 9, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 9, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 9, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 9, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 9, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "559", "row": 9, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 9, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 9, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "548", "row": 10, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50", "row": 10, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI", "row": 10, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 10, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 10, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 10, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 10, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "559", "row": 10, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 10, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 10, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "549", "row": 11, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "38", "row": 11, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Kraft - Placering af komponenter, belastning", "row": 11, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 11, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 11, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 11, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 11, "col": 6, "row_span": 1
 
-  [CHUNK 105 | type=table | 18701 chars]
- 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 11, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 11, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "550", "row": 12, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 12, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering og valg af ABA komponenter", "row": 12, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 12, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 12, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 12, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 12, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "554;555", "row": 12, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 12, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "551", "row": 13, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50", "row": 13, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Koordinering af AV-installationer med isolering p\u00e5 sk\u00f8rter. Placering af inst. Over loft samt under gulv", "row": 13, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 13, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 13, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 13, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 13, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "557;558;560", "row": 13, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 13, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "552", "row": 14, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Samlet el-belastning for BMS-KT og BMS-IBI tavOd", "row": 14, "col": 2, "row_span": 1, "col_span": 2, "kind": "content"}, {"content": "ti 20-10-26", "row": 14, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 14, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 14, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "897;913", "row": 14, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00b7 20-10", "row": 14, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "553", "row": 15, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "F\u00e6rdigg\u00f8re projektering", "row": 15, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "64d", "row": 15, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 15, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 05-05-26", "row": 15, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "26%", "row": 15, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 15, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1", "row": 15, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "562", "row": 16, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 6", "row": 16, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 16, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 16, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 16, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "98%", "row": 16, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1236", "row": 16, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "586", "row": 17, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 7", "row": 17, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 17, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 24-11-25", "row": 17, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 17, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 17, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1238", "row": 17, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "608", "row": 18, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 8", "row": 18, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 18, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 24-11-25", "row": 18, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 18, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "95%", "row": 18, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1240", "row": 18, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "631", "row": 19, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Globals", "row": 19, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 19, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 19, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 19, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "21%", "row": 19, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "632", "row": 20, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Afh\u00e6ngigheder", "row": 20, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 20, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 20, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 20, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "35%", "row": 20, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "633", "row": 21, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10kV Designkrav", "row": 21, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "25d", "row": 21, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 20-10-25", "row": 21, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 21-11-25", "row": 21, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "35%", "row": 21, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "646", "row": 21, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "634", "row": 22, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 22, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Omfang af d\u00e6kning", "row": 22, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 22, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 02-03-26", "row": 22, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 02-03-26", "row": 22, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 22, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "28", "row": 22, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "02-03", "row": 22, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "635", "row": 23, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "18", "row": 23, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Placering af synlige komponeneter", "row": 23, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 23, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 23, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 23, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 23, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00b7", "row": 23, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "23-02", "row": 23, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "636", "row": 24, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Anl\u00e6gs st\u00f8rrelse og udformning", "row": 24, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 24, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 24, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 24, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 24, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "645", "row": 24, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "638", "row": 25, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omfang - reetablering af solceller", "row": 25, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 25, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 25, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 25, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 25, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "784", "row": 25, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "12", "row": 25, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "639", "row": 26, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering skorsten + ind/afkast generator", "row": 26, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 26, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 01-01-50", "row": 26, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 26, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 26, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "640", "row": 27, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "HX-1 Designkrav", "row": 
+  [CHUNK 105 | type=table | 18705 chars]
+, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "545;556;557;558", "row": 11, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 11, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 11, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "550", "row": 12, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 12, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering og valg af ABA komponenter", "row": 12, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 12, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 12, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 12, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 12, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "554;555", "row": 12, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 12, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 12, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "551", "row": 13, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50", "row": 13, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Koordinering af AV-installationer med isolering p\u00e5 sk\u00f8rter. Placering af inst. Over loft samt under gulv", "row": 13, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 13, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 13, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 16-03-26", "row": 13, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 13, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "557;558;560", "row": 13, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0 16-03", "row": 13, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 13, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "552", "row": 14, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Samlet el-belastning for BMS-KT og BMS-IBI tavOd", "row": 14, "col": 2, "row_span": 1, "col_span": 2, "kind": "content"}, {"content": "ti 20-10-26", "row": 14, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 20-10-26", "row": 14, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 14, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "897;913", "row": 14, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00b7 20-10", "row": 14, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 14, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "553", "row": 15, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "F\u00e6rdigg\u00f8re projektering", "row": 15, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "64d", "row": 15, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 15, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 05-05-26", "row": 15, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "26%", "row": 15, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "I", "row": 15, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1", "row": 15, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 15, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "562", "row": 16, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 6", "row": 16, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 16, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 16, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 16, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "98%", "row": 16, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1236", "row": 16, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 16, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "586", "row": 17, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 7", "row": 17, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 17, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 24-11-25", "row": 17, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 17, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 17, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1238", "row": 17, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 17, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "608", "row": 18, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omr. 8", "row": 18, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 18, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 24-11-25", "row": 18, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 18, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "95%", "row": 18, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1240", "row": 18, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 18, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "631", "row": 19, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Globals", "row": 19, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 19, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 19, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 19, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "21%", "row": 19, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 19, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "632", "row": 20, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Afh\u00e6ngigheder", "row": 20, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 20, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 20, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 20, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "35%", "row": 20, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 20, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "633", "row": 21, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10kV Designkrav", "row": 21, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "25d", "row": 21, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 20-10-25", "row": 21, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 21-11-25", "row": 21, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "35%", "row": 21, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "646", "row": 21, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 21, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "634", "row": 22, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 22, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Omfang af d\u00e6kning", "row": 22, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 22, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 02-03-26", "row": 22, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 02-03-26", "row": 22, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 22, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "28", "row": 22, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "02-03", "row": 22, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 22, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "635", "row": 23, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Placering af synlige komponeneter", "row": 23, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 23, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 23, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 23-02-26", "row": 23, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 23, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "\u00b7", "row": 23, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "23-02", "row": 23, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 23, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "636", "row": 24, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "DAS/Sine - Anl\u00e6gs st\u00f8rrelse og udformning", "row": 24, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 24, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 24, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 24, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "90%", "row": 24, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "645", "row": 24, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 24, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "638", "row": 25, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Omfang - reetablering af solceller", "row": 25, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 25, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 25, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 25, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 25, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "784", "row": 25, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "12", "row": 25, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 25, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "639", "row": 26, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Placering skorsten + ind/afkast generator", "row": 26, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 26, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 01-01-50", "row": 26, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 26, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 26, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 26, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "640", "row": 27, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "HX-1 Designkrav", "row": 27, "col
 
-  [CHUNK 106 | type=table | 18654 chars]
-27, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 27, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 27, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 27, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "85%", "row": 27, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "650", "row": 27, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "641", "row": 28, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Designkrav jording", "row": 28, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 28, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 28, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 28, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 28, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "651", "row": 28, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "642", "row": 29, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Armaturtyper", "row": 29, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 29, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 29, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 29, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 29, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "643", "row": 30, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "F\u00e6rdigg\u00f8re projektering", "row": 30, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "125d", "row": 30, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 01-10-25", "row": 30, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 17-04-26", "row": 30, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "18%", "row": 30, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "644", "row": 31, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "38", "row": 31, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Udarbejde notat om DAS/SINE", "row": 31, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10d", "row": 31, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 02-12-25", "row": 31, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 15-12-25", "row": 31, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 31, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "28", "row": 31, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "645", "row": 32, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 32, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Projektering af DAS/Sine", "row": 32, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 32, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 18-11-25", "row": 32, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 02-12-25", "row": 32, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 32, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "636", "row": 32, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "646", "row": 33, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 33, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10kV", "row": 33, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "20d", "row": 33, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 01-12-25", "row": 33, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 09-01-26", "row": 33, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11%", "row": 33, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "633", "row": 33, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 33, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "647", "row": 34, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "da", "row": 34, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "UPS anl\u00e6g", "row": 34, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 34, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 03-12-25", "row": 34, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 17-12-25", "row": 34, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "80%", "row": 34, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "637", "row": 34, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "648", "row": 35, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Reetablering af solceller", "row": 35, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 35, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 35, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 15-01-26", "row": 35, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 35, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "784", "row": 35, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 35, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "649", "row": 36, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Generator anl\u00e6g", "row": 36, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 36, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 05-01-26", "row": 36, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 19-01-26", "row": 36, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 36, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 36, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "650", "row": 37, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 37, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "HX-1", "row": 37, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "6d", "row": 37, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 19-01-26", "row": 37, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 37, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 37, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "640", "row": 37, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 37, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "651", "row": 38, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Jording", "row": 38, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "6d", "row": 38, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 27-01-26", "row": 38, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 03-02-26", "row": 38, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 38, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "641", "row": 38, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 38, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "652", "row": 39, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 39, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Komponentkatalog for synlige komponenter til godkendelse", "row": 39, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10d", "row": 39, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 05-01-26", "row": 39, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 16-01-26", "row": 39, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "100%", "row": 39, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "33", "row": 39, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "653", "row": 40, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 40, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Lysarmaturer", "row": 40, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "45d", "row": 40, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 04-02-26", "row": 40, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 17-04-26", "row": 40, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "5%", "row": 40, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 40, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "654", "row": 41, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 41, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Ur-anl\u00e6g", "row": 41, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "60d", "row": 41, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 01-10-25", "row": 41, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 06-01-26", "row": 41, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "70%", "row": 41, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "655", "row": 42, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "E100.04 BMS", "row": 42, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 42, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 42, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 42, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11%", "row": 42, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 11, "row_span": 1, "col_span": 1, "kind":
+  [CHUNK 106 | type=table | 18661 chars]
+": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 27, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 27, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 27, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "85%", "row": 27, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "650", "row": 27, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 27, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "641", "row": 28, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Designkrav jording", "row": 28, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 28, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 28, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 28, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 28, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "651", "row": 28, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 28, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "642", "row": 29, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Armaturtyper", "row": 29, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 29, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 29, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 29, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 29, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 29, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "643", "row": 30, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "F\u00e6rdigg\u00f8re projektering", "row": 30, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "125d", "row": 30, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 01-10-25", "row": 30, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 17-04-26", "row": 30, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "18%", "row": 30, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 30, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "644", "row": 31, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "38", "row": 31, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Udarbejde notat om DAS/SINE", "row": 31, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10d", "row": 31, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 02-12-25", "row": 31, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 15-12-25", "row": 31, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 31, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "28", "row": 31, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 31, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "645", "row": 32, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 32, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Projektering af DAS/Sine", "row": 32, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 32, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 18-11-25", "row": 32, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 02-12-25", "row": 32, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 32, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "636", "row": 32, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 32, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "646", "row": 33, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 33, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10kV", "row": 33, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "20d", "row": 33, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 01-12-25", "row": 33, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 09-01-26", "row": 33, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11%", "row": 33, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "633", "row": 33, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 33, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 33, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "647", "row": 34, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "da", "row": 34, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "UPS anl\u00e6g", "row": 34, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 34, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 03-12-25", "row": 34, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 17-12-25", "row": 34, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "80%", "row": 34, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "637", "row": 34, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 34, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "648", "row": 35, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Reetablering af solceller", "row": 35, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 35, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 18-12-25", "row": 35, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "to 15-01-26", "row": 35, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 35, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "784", "row": 35, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 35, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 35, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "649", "row": 36, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Generator anl\u00e6g", "row": 36, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11d", "row": 36, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 05-01-26", "row": 36, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 19-01-26", "row": 36, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 36, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 36, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 36, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "650", "row": 37, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 37, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "HX-1", "row": 37, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "6d", "row": 37, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 19-01-26", "row": 37, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 26-01-26", "row": 37, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 37, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "640", "row": 37, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 37, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 37, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "651", "row": 38, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Jording", "row": 38, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "6d", "row": 38, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 27-01-26", "row": 38, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 03-02-26", "row": 38, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 38, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "641", "row": 38, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 38, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 38, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "652", "row": 39, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 39, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Komponentkatalog for synlige komponenter til godkendelse", "row": 39, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "10d", "row": 39, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 05-01-26", "row": 39, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 16-01-26", "row": 39, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "100%", "row": 39, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "33", "row": 39, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 39, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "653", "row": 40, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "SE", "row": 40, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Lysarmaturer", "row": 40, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "45d", "row": 40, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 04-02-26", "row": 40, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 17-04-26", "row": 40, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "5%", "row": 40, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "KL", "row": 40, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 40, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "654", "row": 41, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "8", "row": 41, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Ur-anl\u00e6g", "row": 41, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "60d", "row": 41, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "on 01-10-25", "row": 41, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ti 06-01-26", "row": 41, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "70%", "row": 41, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 41, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "655", "row": 42, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "E100.04 BMS", "row": 42, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d", "row": 42, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 08-09-25", "row": 42, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 42, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "11%", "row": 42, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 42, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"
 
-  [CHUNK 107 | type=table | 2484 chars]
- "content"}, {"content": "", "row": 42, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1071", "row": 43, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Ark", "row": 43, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d?", "row": 43, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 25-08-25", "row": 43, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 43, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 43, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1185", "row": 44, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "S", "row": 44, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "E100.05 ELEV", "row": 44, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "75d", "row": 44, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 03-11-25", "row": 44, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 06-03-26", "row": 44, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 44, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1225;1228;1230;1232;1234;1236;", "row": 44, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}], "pages": [3]}]
+  [CHUNK 107 | type=table | 2469 chars]
+content": "", "row": 42, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1071", "row": 43, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "Ark", "row": 43, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0d?", "row": 43, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 25-08-25", "row": 43, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "-", "row": 43, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "50%", "row": 43, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 43, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1185", "row": 44, "col": 0, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "S", "row": 44, "col": 1, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "E100.05 ELEV", "row": 44, "col": 2, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "75d", "row": 44, "col": 3, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "ma 03-11-25", "row": 44, "col": 4, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "fr 06-03-26", "row": 44, "col": 5, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "0%", "row": 44, "col": 6, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 7, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "1225;1228;1230;1232;1234;1236;", "row": 44, "col": 8, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 9, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 10, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 11, "row_span": 1, "col_span": 1, "kind": "content"}, {"content": "", "row": 44, "col": 12, "row_span": 1, "col_span": 1, "kind": "content"}], "pages": [3]}]
 
 
   [CHUNK 108 | type=table_row | 191 chars]
@@ -3000,8 +3000,8 @@ Id: 633 | Opg:  | Opgavenavn: 10kV Designkrav | Varighed: 25d | Startdato: ma 20
   [CHUNK 129 | type=table_row | 224 chars]
 Id: 634 | Opg: 8 | Opgavenavn: DAS/Sine - Omfang af dækning | Varighed: 0d | Startdato: ma 02-03-26 | Slutdato: ma 02-03-26 | % arbejde færdigt: 90% | Foregående opgaver: 28 | Efterfølgende opgaver:  | :  | :  | : 02-03 | : 
 
-  [CHUNK 130 | type=table_row | 240 chars]
-Id: 635 | Opg: 18 | Opgavenavn: DAS/Sine - Placering af synlige komponeneter | Varighed: 0d | Startdato: ma 23-02-26 | Slutdato: ma 23-02-26 | % arbejde færdigt: 90% | Foregående opgaver:  | Efterfølgende opgaver:  | :  | : · | : 23-02 | : 
+  [CHUNK 130 | type=table_row | 238 chars]
+Id: 635 | Opg:  | Opgavenavn: DAS/Sine - Placering af synlige komponeneter | Varighed: 0d | Startdato: ma 23-02-26 | Slutdato: ma 23-02-26 | % arbejde færdigt: 90% | Foregående opgaver:  | Efterfølgende opgaver:  | :  | : · | : 23-02 | : 
 
   [CHUNK 131 | type=table_row | 232 chars]
 Id: 636 | Opg:  | Opgavenavn: DAS/Sine - Anlægs størrelse og udformning | Varighed: 0d | Startdato: ma 08-09-25 | Slutdato: ma 08-09-25 | % arbejde færdigt: 90% | Foregående opgaver:  | Efterfølgende opgaver: 645 | :  | :  | :  | : 
@@ -3324,11 +3324,11 @@ Kritisk
   [CHUNK 187 | type=text | 995 chars]
 <td>ma 16-03-26</td> <td>ma 16-03-26</td> <td>0%</td> <td></td> <td>557;558;560</td> <td></td> <td></td> <td>0 16-03</td> <td></td> </tr> <tr> <td>552</td> <td></td> <td colspan="2">Samlet el-belastning for BMS-KT og BMS-IBI tavOd</td> <td>ti 20-10-26</td> <td>ti 20-10-26</td> <td>0%</td> <td>897;913</td> <td></td> <td></td> <td></td> <td>· 20-10</td> <td></td> </tr> <tr> <td>553</td> <td></td> <td>Færdiggøre projektering</td> <td>64d</td> <td>ma 26-01-26</td> <td>ti 05-05-26</td> <td>26%</td> <td></td> <td></td> <td></td> <td>I</td> <td>1</td> <td></td> </tr> <tr> <td>562</td> <td></td> <td>Omr. 6</td> <td>0d</td> <td>ma 23-02-26</td> <td>-</td> <td>98%</td> <td></td> <td>1236</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>586</td> <td></td> <td>Omr. 7</td> <td>0d</td> <td>ma 24-11-25</td> <td>-</td> <td>0%</td> <td></td> <td>1238</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>608</td> <td></td> <td>Omr. 8</td> <td>0d</td> <td>ma 24-11-25</td> <td>-</td>
 
-  [CHUNK 188 | type=text | 992 chars]
-<td>95%</td> <td></td> <td>1240</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>631</td> <td></td> <td>Globals</td> <td>0d</td> <td>ma 08-09-25</td> <td>-</td> <td>21%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>632</td> <td></td> <td>Afhængigheder</td> <td>0d</td> <td>ma 08-09-25</td> <td>-</td> <td>35%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>633</td> <td></td> <td>10kV Designkrav</td> <td>25d</td> <td>ma 20-10-25</td> <td>fr 21-11-25</td> <td>35%</td> <td></td> <td>646</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>634</td> <td>8</td> <td>DAS/Sine - Omfang af dækning</td> <td>0d</td> <td>ma 02-03-26</td> <td>ma 02-03-26</td> <td>90%</td> <td>28</td> <td></td> <td></td> <td></td> <td>02-03</td> <td></td> </tr> <tr> <td>635</td> <td>18</td> <td>DAS/Sine - Placering af synlige komponeneter</td> <td>0d</td> <td>ma 23-02-26</td> <td>ma 23-02-26</td> <td>90%</td> <td></td> <td></td>
+  [CHUNK 188 | type=text | 1000 chars]
+<td>95%</td> <td></td> <td>1240</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>631</td> <td></td> <td>Globals</td> <td>0d</td> <td>ma 08-09-25</td> <td>-</td> <td>21%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>632</td> <td></td> <td>Afhængigheder</td> <td>0d</td> <td>ma 08-09-25</td> <td>-</td> <td>35%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>633</td> <td></td> <td>10kV Designkrav</td> <td>25d</td> <td>ma 20-10-25</td> <td>fr 21-11-25</td> <td>35%</td> <td></td> <td>646</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>634</td> <td>8</td> <td>DAS/Sine - Omfang af dækning</td> <td>0d</td> <td>ma 02-03-26</td> <td>ma 02-03-26</td> <td>90%</td> <td>28</td> <td></td> <td></td> <td></td> <td>02-03</td> <td></td> </tr> <tr> <td>635</td> <td></td> <td>DAS/Sine - Placering af synlige komponeneter</td> <td>0d</td> <td>ma 23-02-26</td> <td>ma 23-02-26</td> <td>90%</td> <td></td> <td></td> <td></td>
 
-  [CHUNK 189 | type=text | 999 chars]
-<td></td> <td>·</td> <td>23-02</td> <td></td> </tr> <tr> <td>636</td> <td></td> <td>DAS/Sine - Anlægs størrelse og udformning</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>90%</td> <td></td> <td>645</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>638</td> <td></td> <td>Omfang - reetablering af solceller</td> <td>0d</td> <td>to 18-12-25</td> <td>to 18-12-25</td> <td>50%</td> <td></td> <td>784</td> <td>12</td> <td></td> <td></td> <td></td> </tr> <tr> <td>639</td> <td></td> <td>Placering skorsten + ind/afkast generator</td> <td>0d</td> <td>to 01-01-50</td> <td>-</td> <td>0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>640</td> <td></td> <td>HX-1 Designkrav</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>85%</td> <td></td> <td>650</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>641</td> <td></td> <td>Designkrav jording</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>50%</td> <td></td>
+  [CHUNK 189 | type=text | 989 chars]
+<td>·</td> <td>23-02</td> <td></td> </tr> <tr> <td>636</td> <td></td> <td>DAS/Sine - Anlægs størrelse og udformning</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>90%</td> <td></td> <td>645</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>638</td> <td></td> <td>Omfang - reetablering af solceller</td> <td>0d</td> <td>to 18-12-25</td> <td>to 18-12-25</td> <td>50%</td> <td></td> <td>784</td> <td>12</td> <td></td> <td></td> <td></td> </tr> <tr> <td>639</td> <td></td> <td>Placering skorsten + ind/afkast generator</td> <td>0d</td> <td>to 01-01-50</td> <td>-</td> <td>0%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>640</td> <td></td> <td>HX-1 Designkrav</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>85%</td> <td></td> <td>650</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>641</td> <td></td> <td>Designkrav jording</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>50%</td> <td></td>
 
   [CHUNK 190 | type=text | 996 chars]
 <td>651</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>642</td> <td></td> <td>Armaturtyper</td> <td>0d</td> <td>ma 08-09-25</td> <td>ma 08-09-25</td> <td>50%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>643</td> <td></td> <td>Færdiggøre projektering</td> <td>125d</td> <td>on 01-10-25</td> <td>fr 17-04-26</td> <td>18%</td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>644</td> <td>38</td> <td>Udarbejde notat om DAS/SINE</td> <td>10d</td> <td>ti 02-12-25</td> <td>ma 15-12-25</td> <td>0%</td> <td></td> <td>28</td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>645</td> <td>SE</td> <td>Projektering af DAS/Sine</td> <td>11d</td> <td>ti 18-11-25</td> <td>ti 02-12-25</td> <td>0%</td> <td>636</td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr> <td>646</td> <td>SE</td> <td>10kV</td> <td>20d</td> <td>ma 01-12-25</td> <td>fr 09-01-26</td> <td>11%</td> <td>633</td> <td></td> <td>KL</td> <td></td>
@@ -4494,27 +4494,19 @@ Return complete JSON matching the strict schema.
 ──────────────────────────────────────────────────────────────────────────────────────────
   Model:    gpt-5.2
   Status:   success
-  Tokens:   prompt=14754, completion=18373, reasoning=7885
-  Time:     224.0s total
+  Tokens:   prompt=14754, completion=19854, reasoning=9667
+  Time:     245.7s total
 
-  --- RAW JSON RESPONSE (38403 chars) ---
+  --- RAW JSON RESPONSE (37313 chars) ---
 
 {
-  "management_conclusion": "The delay picture is driven primarily by unresolved design/bygherre inputs that should have been closed in 2025–early 2026 and are now overdue with 0% progress. The most critical cascading risks are (1) Sikring (security/ADK) scope and component placement and (2) E100.12 solafskærmning/mørklægning requirements, both of which have multiple downstream successors and will continue to create rework and coordination clashes. A secondary but urgent blocker is the overdue bygherre approval for indbygning i “ovenlys” (task 36), which sits directly in front of an upcoming deadline chain. The single most important action now is to run a focused “design freeze / decision” session for Sikring + shading + DAS/SINE, assign named owners, and issue written decisions with dates to unlock all dependent packages.",
+  "management_conclusion": "The schedule shows 31 delayed activities (Startdato before 12-03-2026 with 0% progress), with the highest-risk cluster in security (ADK/sikringsprojekt and component placement) and a second critical risk in solafskærmning/mørklægning requirements. Several of these delayed items have large successor chains, meaning the delays are likely to cascade into multiple downstream disciplines if not resolved immediately. A further concern is data/logic integrity in Omr. 4: multiple 0% “input/coordination” milestones remain open even though successor installation activities show 100%, indicating missing close-out or incorrect dependencies. The single most important action now is to force a Bygherre-led decision/approval workshop to freeze security scope/layout and the shading/blackout requirements, then immediately re-issue coordinated design outputs and update the schedule logic/progress accordingly.",
   "schedule_overview": {
     "schedule_name": "2026-03-12 Samlet tidsplan",
     "reference_date": "12-03-2026",
     "total_activities": 109,
-    "delayed_count": 30,
+    "delayed_count": 31,
     "areas_covered": [
-      "E100.01 Ventilation",
-      "E100.02 VVS",
-      "E100.03 EL",
-      "E100.04 BMS",
-      "E100.05 ELEV",
-      "E100.12 Solafskærmning/Mørklægning",
-      "Sikring",
-      "IKT",
       "Omr. 1",
       "Omr. 2",
       "Omr. 3",
@@ -4523,25 +4515,17 @@ Return complete JSON matching the strict schema.
       "Omr. 6",
       "Omr. 7",
       "Omr. 8",
-      "Globals"
+      "Globals",
+      "E100.01 Ventilation",
+      "E100.02 VVS",
+      "E100.03 EL",
+      "E100.04 BMS",
+      "E100.05 ELEV",
+      "Ark"
     ],
     "format_detected": "MS Project Export"
   },
   "delayed_activities": [
-    {
-      "id": "1187",
-      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
-      "start_date": "08-09-2025",
-      "end_date": "-",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 185,
-      "task_type": "Milestone",
-      "priority": "CRITICAL_NOW",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "Globals/Projektering"
-    },
     {
       "id": "29",
       "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
@@ -4550,25 +4534,11 @@ Return complete JSON matching the strict schema.
       "duration": "15d",
       "progress": "0%",
       "days_overdue": 129,
-      "task_type": "Bygherre",
-      "priority": "CRITICAL_NOW",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "E100.12 Solafskærmning/Mørklægning"
-    },
-    {
-      "id": "40",
-      "task_name": "Placering/antal af sikringskomponenter, lofter",
-      "start_date": "03-11-2025",
-      "end_date": "15-04-2026",
-      "duration": "100d",
-      "progress": "0%",
-      "days_overdue": 129,
       "task_type": "Design",
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikring"
+      "area": "Ark"
     },
     {
       "id": "39",
@@ -4582,7 +4552,21 @@ Return complete JSON matching the strict schema.
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikring"
+      "area": "E100.03 EL"
+    },
+    {
+      "id": "40",
+      "task_name": "Placering/antal af sikringskomponenter, lofter",
+      "start_date": "03-11-2025",
+      "end_date": "15-04-2026",
+      "duration": "100d",
+      "progress": "0%",
+      "days_overdue": 129,
+      "task_type": "Design",
+      "priority": "CRITICAL_NOW",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "E100.03 EL"
     },
     {
       "id": "645",
@@ -4596,11 +4580,11 @@ Return complete JSON matching the strict schema.
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "E100.03 EL/Svagstrøm"
+      "area": "E100.03 EL"
     },
     {
       "id": "644",
-      "task_name": "Udarbedje notat om DAS/SINE",
+      "task_name": "Udarbejde notat om DAS/SINE",
       "start_date": "02-12-2025",
       "end_date": "15-12-2025",
       "duration": "10d",
@@ -4610,7 +4594,7 @@ Return complete JSON matching the strict schema.
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "E100.03 EL/Svagstrøm"
+      "area": "E100.03 EL"
     },
     {
       "id": "24",
@@ -4624,21 +4608,21 @@ Return complete JSON matching the strict schema.
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikring"
+      "area": "E100.03 EL"
     },
     {
-      "id": "36",
-      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
-      "start_date": "23-02-2026",
-      "end_date": "13-03-2026",
-      "duration": "15d",
+      "id": "1187",
+      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
+      "start_date": "08-09-2025",
+      "end_date": "-",
+      "duration": "0d",
       "progress": "0%",
-      "days_overdue": 17,
-      "task_type": "Bygherre",
-      "priority": "CRITICAL_NOW",
+      "days_overdue": 185,
+      "task_type": "Coordination",
+      "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Ark/Bygherre"
+      "area": "Globals"
     },
     {
       "id": "21",
@@ -4648,6 +4632,20 @@ Return complete JSON matching the strict schema.
       "duration": "10d",
       "progress": "0%",
       "days_overdue": 163,
+      "task_type": "Design",
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "E100.02 VVS"
+    },
+    {
+      "id": "20",
+      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
+      "start_date": "05-11-2025",
+      "end_date": "18-11-2025",
+      "duration": "10d",
+      "progress": "0%",
+      "days_overdue": 127,
       "task_type": "Design",
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
@@ -4666,7 +4664,21 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Solceller"
+      "area": "Globals"
+    },
+    {
+      "id": "23",
+      "task_name": "E100.01 - Fastlæg krav til kemidepot",
+      "start_date": "05-01-2026",
+      "end_date": "16-01-2026",
+      "duration": "10d",
+      "progress": "0%",
+      "days_overdue": 66,
+      "task_type": "Bygherre",
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "E100.01 Ventilation"
     },
     {
       "id": "26",
@@ -4694,21 +4706,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikring"
-    },
-    {
-      "id": "23",
-      "task_name": "E100.01 - Fastlæg krav til kemidepot",
-      "start_date": "05-01-2026",
-      "end_date": "16-01-2026",
-      "duration": "10d",
-      "progress": "0%",
-      "days_overdue": 66,
-      "task_type": "Design",
-      "priority": "IMPORTANT_NEXT",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "E100.01 Ventilation"
+      "area": "E100.03 EL"
     },
     {
       "id": "33",
@@ -4722,7 +4720,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "E100.03 EL/Svagstrøm"
+      "area": "E100.03 EL"
     },
     {
       "id": "42",
@@ -4736,7 +4734,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": false,
       "blocked_by_id": "24",
-      "area": "Sikring"
+      "area": "E100.03 EL"
     },
     {
       "id": "651",
@@ -4750,7 +4748,77 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL - Jording"
+      "area": "E100.03 EL"
+    },
+    {
+      "id": "36",
+      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
+      "start_date": "23-02-2026",
+      "end_date": "13-03-2026",
+      "duration": "15d",
+      "progress": "0%",
+      "days_overdue": 17,
+      "task_type": "Bygherre",
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Ark"
+    },
+    {
+      "id": "461",
+      "task_name": "Samlet el-belastning for BMS-KT og BMS-IBI tav1d",
+      "start_date": "23-02-2026",
+      "end_date": "24-02-2026",
+      "duration": "1d",
+      "progress": "0%",
+      "days_overdue": 17,
+      "task_type": "Design",
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "E100.04 BMS"
+    },
+    {
+      "id": "25",
+      "task_name": "Infovæg med glasfronter (ARK pkt. 3.7)",
+      "start_date": "05-01-2026",
+      "end_date": "06-01-2026",
+      "duration": "2d",
+      "progress": "0%",
+      "days_overdue": 66,
+      "task_type": "Bygherre",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Ark"
+    },
+    {
+      "id": "27",
+      "task_name": "E100 Pressemøder I Banksalen skal afklares",
+      "start_date": "05-01-2026",
+      "end_date": "09-01-2026",
+      "duration": "5d",
+      "progress": "0%",
+      "days_overdue": 66,
+      "task_type": "Coordination",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Globals"
+    },
+    {
+      "id": "30",
+      "task_name": "IKT",
+      "start_date": "05-01-2026",
+      "end_date": "09-01-2026",
+      "duration": "5d",
+      "progress": "0%",
+      "days_overdue": 66,
+      "task_type": "Coordination",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Globals"
     },
     {
       "id": "520",
@@ -4760,11 +4828,11 @@ Return complete JSON matching the strict schema.
       "duration": "0d",
       "progress": "0%",
       "days_overdue": 31,
-      "task_type": "Design",
+      "task_type": "Coordination",
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "521",
@@ -4774,11 +4842,11 @@ Return complete JSON matching the strict schema.
       "duration": "0d",
       "progress": "0%",
       "days_overdue": 31,
-      "task_type": "Design",
+      "task_type": "Coordination",
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "522",
@@ -4788,11 +4856,11 @@ Return complete JSON matching the strict schema.
       "duration": "0d",
       "progress": "0%",
       "days_overdue": 31,
-      "task_type": "Bygherre",
+      "task_type": "Coordination",
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "523",
@@ -4806,7 +4874,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": false,
       "blocked_by_id": "520",
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "524",
@@ -4820,7 +4888,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "525",
@@ -4834,7 +4902,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "526",
@@ -4848,7 +4916,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "527",
@@ -4862,7 +4930,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "528",
@@ -4876,7 +4944,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
+      "area": "Omr. 4"
     },
     {
       "id": "529",
@@ -4890,84 +4958,18 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4 (EL koordinering)"
-    },
-    {
-      "id": "20",
-      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
-      "start_date": "05-11-2025",
-      "end_date": "18-11-2025",
-      "duration": "10d",
-      "progress": "0%",
-      "days_overdue": 127,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "E100.02 VVS"
-    },
-    {
-      "id": "25",
-      "task_name": "Infovæg med glasfronter (ARK pkt. 3.7)",
-      "start_date": "05-01-2026",
-      "end_date": "06-01-2026",
-      "duration": "2d",
-      "progress": "0%",
-      "days_overdue": 66,
-      "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "Ark/Bygherre"
-    },
-    {
-      "id": "27",
-      "task_name": "E100 Pressemøder I Banksalen skal afklares",
-      "start_date": "05-01-2026",
-      "end_date": "09-01-2026",
-      "duration": "5d",
-      "progress": "0%",
-      "days_overdue": 66,
-      "task_type": "Coordination",
-      "priority": "MONITOR",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "E100 (Koordinering)"
-    },
-    {
-      "id": "30",
-      "task_name": "IKT",
-      "start_date": "05-01-2026",
-      "end_date": "09-01-2026",
-      "duration": "5d",
-      "progress": "0%",
-      "days_overdue": 66,
-      "task_type": "Coordination",
-      "priority": "MONITOR",
-      "is_root_cause": true,
-      "blocked_by_id": null,
-      "area": "IKT"
+      "area": "Omr. 4"
     }
   ],
   "root_cause_analysis": [
     {
-      "id": "1187",
-      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
-      "days_overdue": 185,
-      "problem_type": "Coordination blockage",
-      "why_it_matters": "Without an agreed baseline/overview for the post-price-validation design sequence, downstream design packages risk being issued late or inconsistently.",
-      "downstream_impact": "Cascading risk across all disciplines due to unclear gating and deliverable alignment.",
-      "consequence_if_unresolved": "Design and approvals will continue to slip without a clear decision log and frozen dates, increasing rework and site clashes.",
-      "affected_task_ids": []
-    },
-    {
       "id": "29",
       "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
       "days_overdue": 129,
-      "problem_type": "Bygherre decision pending",
-      "why_it_matters": "It releases multiple downstream activities tied to solafskærmning/mørklægning functional requirements.",
-      "downstream_impact": "Multiple downstream successors: 679, 1093, 1084, 743, 796, 937, 990.",
-      "consequence_if_unresolved": "Facade/interior coordination and procurement risk late changes and potential redesign.",
+      "problem_type": "Design input missing",
+      "why_it_matters": "Blocks multiple follow-on design and installation packages that require a frozen shading/blackout specification.",
+      "downstream_impact": "Cascading: affects several downstream packages via successors 679, 1093, 1084, 743, 796, 937, 990.",
+      "consequence_if_unresolved": "Interfaces (façade/ceiling/controls) will continue without a frozen requirement, increasing rework risk and late procurement.",
       "affected_task_ids": [
         "679",
         "1093",
@@ -4979,13 +4981,23 @@ Return complete JSON matching the strict schema.
       ]
     },
     {
+      "id": "39",
+      "task_name": "Sikringsprojekt",
+      "days_overdue": 129,
+      "problem_type": "Design input missing",
+      "why_it_matters": "Leaves the security design package unfrozen, preventing reliable coordination of components and penetrations.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Security scope and coordination will remain unstable, creating clashes and late change orders.",
+      "affected_task_ids": []
+    },
+    {
       "id": "40",
       "task_name": "Placering/antal af sikringskomponenter, lofter",
       "days_overdue": 129,
       "problem_type": "Design input missing",
-      "why_it_matters": "It defines security component layout in ceilings, which drives coordinated drawings and installation interfaces.",
-      "downstream_impact": "Multiple downstream successors: 1096, 1112, 1130, 1136, 1142, 1150.",
-      "consequence_if_unresolved": "Ceiling works and security rough-in will face clashes and late changes on site.",
+      "why_it_matters": "Blocks ceiling layouts, penetrations, and coordination for security components that must be located before closing ceilings.",
+      "downstream_impact": "Cascading: affects multiple downstream packages via successors 1096, 1112, 1130, 1136, 1142, 1150.",
+      "consequence_if_unresolved": "Ceilings/finishes risk proceeding without security interfaces, leading to rework and delayed commissioning.",
       "affected_task_ids": [
         "1096",
         "1112",
@@ -4996,33 +5008,23 @@ Return complete JSON matching the strict schema.
       ]
     },
     {
-      "id": "39",
-      "task_name": "Sikringsprojekt",
-      "days_overdue": 129,
-      "problem_type": "Design input missing",
-      "why_it_matters": "The overall security design package is a prerequisite for coordinated detailing and installation planning.",
-      "downstream_impact": "Cascading within the Sikring discipline (no explicit successors listed on this row).",
-      "consequence_if_unresolved": "Security scope will remain undefined, pushing ADK/ABA/AVA coordination into production phase.",
-      "affected_task_ids": []
-    },
-    {
       "id": "645",
       "task_name": "Projektering af DAS/Sine",
       "days_overdue": 114,
       "problem_type": "Design input missing",
-      "why_it_matters": "It is required to finalize DAS/SINE system design and subsequent approvals/coverage decisions.",
-      "downstream_impact": "Impacts DAS/SINE chain; the schedule shows related DAS/SINE activities (e.g., 28/634).",
-      "consequence_if_unresolved": "Authorities/coverage acceptance and installation routing may slip, creating late coordination with other EL/svagstrøm packages.",
+      "why_it_matters": "Prevents the DAS/SINE solution from being fully designed and coordinated for compliance and installation planning.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "DAS/SINE approvals and installation readiness will slip, risking late authority/interface issues.",
       "affected_task_ids": []
     },
     {
       "id": "644",
-      "task_name": "Udarbedje notat om DAS/SINE",
+      "task_name": "Udarbejde notat om DAS/SINE",
       "days_overdue": 100,
       "problem_type": "Design input missing",
-      "why_it_matters": "It feeds directly into the DAS/SINE clarification activity that follows (task 28).",
-      "downstream_impact": "Direct successor: 28.",
-      "consequence_if_unresolved": "DAS/SINE scope remains unclear, risking late changes and installation conflicts.",
+      "why_it_matters": "Feeds the DAS/SINE scope clarification activity (28), which relies on the note as a design basis.",
+      "downstream_impact": "Cascading: directly drives successor 28.",
+      "consequence_if_unresolved": "DAS/SINE scope and coverage assumptions may remain unvalidated, causing late redesign or under-coverage risk.",
       "affected_task_ids": [
         "28"
       ]
@@ -5032,9 +5034,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Sikringsprojekt, omfang af ADK",
       "days_overdue": 66,
       "problem_type": "Bygherre decision pending",
-      "why_it_matters": "ADK scope definition is needed before door-related security component decisions can be confirmed.",
-      "downstream_impact": "Direct successor includes delayed task 42 plus other successors: 1078, 1082.",
-      "consequence_if_unresolved": "Door schedules and security hardware coordination will drift into procurement/installation with high rework risk.",
+      "why_it_matters": "Defines ADK scope; without it, door-related component decisions cannot be finalized.",
+      "downstream_impact": "Cascading: blocks successor 42 and links to successors 1078 and 1082.",
+      "consequence_if_unresolved": "Door hardware, wiring, and access control interfaces will be designed/installed late or incorrectly, driving rework.",
       "affected_task_ids": [
         "1078",
         "1082",
@@ -5042,40 +5044,59 @@ Return complete JSON matching the strict schema.
       ]
     },
     {
-      "id": "36",
-      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
-      "days_overdue": 17,
-      "problem_type": "Bygherre decision pending",
-      "why_it_matters": "It is a formal approval gate before downstream submittal alignment and a deadline chain (task 38).",
-      "downstream_impact": "Successors: 126 and 38.",
-      "consequence_if_unresolved": "Late approval will compress the SLKS material alignment and increase risk of non-approved installations.",
-      "affected_task_ids": [
-        "126",
-        "38"
-      ]
+      "id": "1187",
+      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
+      "days_overdue": 185,
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Represents a missing governance/coordination baseline for design after price validation, reducing control of design deliverables.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Design delivery dates and responsibilities remain ambiguous, increasing the chance of late approvals and unmanaged scope changes.",
+      "affected_task_ids": []
     },
     {
       "id": "21",
       "task_name": "E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral",
       "days_overdue": 163,
       "problem_type": "Design input missing",
-      "why_it_matters": "Kitchen component data and layout decisions drive VVS sizing, routing, and coordinated shop drawings.",
-      "downstream_impact": "Direct successor: 84.",
-      "consequence_if_unresolved": "VVS installation interfaces in the kitchen area may be redesigned late, affecting procurement and site sequencing.",
+      "why_it_matters": "Locks component data and kitchen layout assumptions needed by downstream coordination and procurement.",
+      "downstream_impact": "Cascading: drives successor 84.",
+      "consequence_if_unresolved": "Downstream coordination/procurement will proceed on assumptions, increasing late changes and delivery risk.",
       "affected_task_ids": [
         "84"
       ]
+    },
+    {
+      "id": "20",
+      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
+      "days_overdue": 127,
+      "problem_type": "Design input missing",
+      "why_it_matters": "Without design definition, related interfaces (water supply/drainage and landscaping coordination) cannot be finalized.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Late scope definition may force rework in external works and delay final connections/commissioning.",
+      "affected_task_ids": []
     },
     {
       "id": "648",
       "task_name": "Reetablering af solceller",
       "days_overdue": 84,
       "problem_type": "Production delay",
-      "why_it_matters": "It is required before the solar cell reinstatement scope can be closed and handed over to the downstream milestone (784).",
-      "downstream_impact": "Successor: 784.",
-      "consequence_if_unresolved": "Roof/energy scope completion will drift, potentially affecting commissioning/acceptance sequencing.",
+      "why_it_matters": "Impacts the follow-on solar scope via successor 784.",
+      "downstream_impact": "Cascading: drives successor 784.",
+      "consequence_if_unresolved": "External rooftop works and any energy-related handover milestones may slip.",
       "affected_task_ids": [
         "784"
+      ]
+    },
+    {
+      "id": "23",
+      "task_name": "E100.01 - Fastlæg krav til kemidepot",
+      "days_overdue": 66,
+      "problem_type": "Bygherre decision pending",
+      "why_it_matters": "Defines functional/authority requirements for the chem storage space before detailed design and ventilation solutions are finalized.",
+      "downstream_impact": "Cascading: drives successor 103.",
+      "consequence_if_unresolved": "Late requirement changes can trigger redesign of ventilation/fire/room fit-out and delay approvals.",
+      "affected_task_ids": [
+        "103"
       ]
     },
     {
@@ -5083,9 +5104,9 @@ Return complete JSON matching the strict schema.
       "task_name": "E100.02 - Stillingtagen til kølevand i terræn - udskiftning/relining",
       "days_overdue": 66,
       "problem_type": "Bygherre decision pending",
-      "why_it_matters": "A decision is needed to lock method and scope, which influences design and potential procurement/contract scope in terrain.",
-      "downstream_impact": "Not explicitly linked by successors in this extract; likely coordination impact to later VVS/terrain works.",
-      "consequence_if_unresolved": "Late scope choice can trigger redesign or change orders once site works are underway.",
+      "why_it_matters": "A decision gate on whether to replace/reline affects design, method, and procurement planning for underground works.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Site works may proceed without a defined solution, increasing abortive work and late change risk.",
       "affected_task_ids": []
     },
     {
@@ -5093,53 +5114,86 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering/antal af sikringskomponenter, vægge",
       "days_overdue": 66,
       "problem_type": "Design input missing",
-      "why_it_matters": "Wall component locations drive coordinated drawings and openings/finishes interfaces.",
-      "downstream_impact": "Not explicitly linked by successors in this extract; practical impact is coordination with walls/finishes.",
-      "consequence_if_unresolved": "Security components may be placed ad-hoc, increasing rework and finish damage.",
+      "why_it_matters": "Wall component positioning affects coordination with partitions/finishes and wiring routes.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Late wall coordination can force rework in finishes and cable routing.",
       "affected_task_ids": []
-    },
-    {
-      "id": "23",
-      "task_name": "E100.01 - Fastlæg krav til kemidepot",
-      "days_overdue": 66,
-      "problem_type": "Design input missing",
-      "why_it_matters": "It releases follow-on ventilation/requirements activity shown as successor 103.",
-      "downstream_impact": "Direct successor: 103.",
-      "consequence_if_unresolved": "Ventilation and safety compliance for chemical storage may be designed late or incorrectly.",
-      "affected_task_ids": [
-        "103"
-      ]
     },
     {
       "id": "33",
       "task_name": "Gokendelse af synlige komponeter fra E100.03",
       "days_overdue": 52,
       "problem_type": "Bygherre decision pending",
-      "why_it_matters": "Approvals for visible components reduce late aesthetic/functional changes during installation.",
-      "downstream_impact": "Successor: 16.",
-      "consequence_if_unresolved": "Late rejection/changes can cause rework and procurement waste for visible EL components.",
+      "why_it_matters": "Visible component approvals are required to proceed without aesthetic/functional rework on EL deliverables.",
+      "downstream_impact": "Cascading: drives successor 16.",
+      "consequence_if_unresolved": "Work may be installed without approval, or held back, creating churn and late changes.",
       "affected_task_ids": [
         "16"
       ]
     },
     {
-      "id": "651",
-      "task_name": "Jording",
-      "days_overdue": 44,
-      "problem_type": "Production delay",
-      "why_it_matters": "Earthing is a prerequisite for safe energization and coordinated EL commissioning activities.",
-      "downstream_impact": "No explicit successors listed on this row; practical downstream is EL energization readiness.",
-      "consequence_if_unresolved": "Commissioning and testing activities will be constrained by incomplete earthing.",
+      "id": "36",
+      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
+      "days_overdue": 17,
+      "problem_type": "Bygherre decision pending",
+      "why_it_matters": "Approval is required before follow-on tasks and the linked deadline chain can be reliably met.",
+      "downstream_impact": "Cascading: drives successors 126 and 38.",
+      "consequence_if_unresolved": "Late approval will compress installation/coordination and may miss the downstream deadline milestone.",
+      "affected_task_ids": [
+        "126",
+        "38"
+      ]
+    },
+    {
+      "id": "461",
+      "task_name": "Samlet el-belastning for BMS-KT og BMS-IBI tav1d",
+      "days_overdue": 17,
+      "problem_type": "Design input missing",
+      "why_it_matters": "Electrical load confirmation is needed to validate board sizing and downstream BMS/electrical coordination.",
+      "downstream_impact": "Cascading: drives successor 691.",
+      "consequence_if_unresolved": "Board/load decisions may be taken late, creating redesign risk and late procurement adjustments.",
+      "affected_task_ids": [
+        "691"
+      ]
+    },
+    {
+      "id": "25",
+      "task_name": "Infovæg med glasfronter (ARK pkt. 3.7)",
+      "days_overdue": 66,
+      "problem_type": "Bygherre decision pending",
+      "why_it_matters": "Represents an architectural decision/definition needed to avoid late changes to fit-out interfaces.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Fit-out detailing may proceed on assumptions, increasing late change and rework risk.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "27",
+      "task_name": "E100 Pressemøder I Banksalen skal afklares",
+      "days_overdue": 66,
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Unresolved meeting/coordination items tend to block decisions and approvals across several packages.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Decision latency continues and pushes risk into later design and site phases.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "30",
+      "task_name": "IKT",
+      "days_overdue": 66,
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "IKT agreements impact document flows, model exchange, and coordination efficiency.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Information exchange issues can slow design close-out and reduce planning reliability.",
       "affected_task_ids": []
     },
     {
       "id": "520",
       "task_name": "Fancoils for dim af kabling",
       "days_overdue": 31,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Cabling dimensioning depends on confirmed fan coil data/loads.",
-      "downstream_impact": "Successors include 523, 534, 535, 536 (noting 534–536 show 100% in the schedule extract).",
-      "consequence_if_unresolved": "If this is truly unconfirmed, cabling may be undersized/oversized; otherwise the schedule needs status correction to avoid false constraints.",
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Defines prerequisites for cable dimensioning and coordination of downstream electrical works.",
+      "downstream_impact": "Cascading: drives successors 523, 534, 535, 536.",
+      "consequence_if_unresolved": "Cable sizing/board loading coordination remains unverified, increasing change risk and undermining schedule logic.",
       "affected_task_ids": [
         "523",
         "534",
@@ -5151,10 +5205,10 @@ Return complete JSON matching the strict schema.
       "id": "521",
       "task_name": "Øvrige installationer for dim af kabling",
       "days_overdue": 31,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Other installation data impacts cable sizing and containment coordination.",
-      "downstream_impact": "Successors: 523, 534, 535, 536.",
-      "consequence_if_unresolved": "Risk of cable/containment rework if inputs change after installation; otherwise update progress to reflect completion.",
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Provides input for cable dimensioning and coordination against other services.",
+      "downstream_impact": "Cascading: drives successors 523, 534, 535, 536.",
+      "consequence_if_unresolved": "Unverified inputs can force rework in routing and capacity checks later.",
       "affected_task_ids": [
         "523",
         "534",
@@ -5166,10 +5220,10 @@ Return complete JSON matching the strict schema.
       "id": "522",
       "task_name": "Arbejdsstationer placering",
       "days_overdue": 31,
-      "problem_type": "Bygherre decision pending",
-      "why_it_matters": "Workstation locations drive power/data outlet planning and containment layout.",
-      "downstream_impact": "Successors: 534, 535, 536, 538.",
-      "consequence_if_unresolved": "Late workstation changes can cause rework in outlets, containment, and finishes.",
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Workstation placement drives power/data outlet placement and affects several downstream electrical packages.",
+      "downstream_impact": "Cascading: drives successors 534, 535, 536, 538.",
+      "consequence_if_unresolved": "Late workstation decisions cause late outlet changes, rework, and commissioning issues.",
       "affected_task_ids": [
         "534",
         "535",
@@ -5182,9 +5236,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Lysinstallation - Opdeling af DALI inst.",
       "days_overdue": 31,
       "problem_type": "Design input missing",
-      "why_it_matters": "DALI zoning/segmentation must be defined before final lighting control wiring and programming can be confirmed.",
-      "downstream_impact": "Successors: 534 and 537.",
-      "consequence_if_unresolved": "Control zoning changes late typically drive rewiring and reprogramming.",
+      "why_it_matters": "DALI grouping is needed for controls strategy and coordinated installation/commissioning planning.",
+      "downstream_impact": "Cascading: drives successors 534 and 537.",
+      "consequence_if_unresolved": "Controls commissioning will be compressed and prone to late changes.",
       "affected_task_ids": [
         "534",
         "537"
@@ -5195,9 +5249,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering af belysning",
       "days_overdue": 31,
       "problem_type": "Design input missing",
-      "why_it_matters": "Lighting positions drive ceiling coordination and power/control routing.",
-      "downstream_impact": "Successor: 537.",
-      "consequence_if_unresolved": "Ceiling coordination and lighting rough-in will be exposed to late changes.",
+      "why_it_matters": "Light placement must be fixed to coordinate ceilings, routing, and control zones.",
+      "downstream_impact": "Cascading: drives successor 537.",
+      "consequence_if_unresolved": "Late lighting changes will create ceiling and electrical rework.",
       "affected_task_ids": [
         "537"
       ]
@@ -5207,9 +5261,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI",
       "days_overdue": 31,
       "problem_type": "Design input missing",
-      "why_it_matters": "Visible devices (buttons/PIR) require agreed locations for coordinated drawings and finishes.",
-      "downstream_impact": "Successor: 537.",
-      "consequence_if_unresolved": "Late changes will cause rework in walls/finishes and device cabling routes.",
+      "why_it_matters": "Sensor/switch locations are needed for final DALI/control zoning and user acceptance.",
+      "downstream_impact": "Cascading: drives successor 537.",
+      "consequence_if_unresolved": "Late changes to visible controls will drive rework and potential client dissatisfaction.",
       "affected_task_ids": [
         "537"
       ]
@@ -5219,9 +5273,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Kraft - Placering af komponenter, belastning",
       "days_overdue": 31,
       "problem_type": "Design input missing",
-      "why_it_matters": "Power component placement and load assumptions are needed before containment and cable sizing can be finalized.",
-      "downstream_impact": "Successors include 523, 534, 535, 536.",
-      "consequence_if_unresolved": "Load/placement changes late can invalidate cable sizing and containment routing.",
+      "why_it_matters": "Power component placement and load assumptions drive fill calculations and downstream board/routing works.",
+      "downstream_impact": "Cascading: drives successors 523, 534, 535, 536.",
+      "consequence_if_unresolved": "Power distribution and routing decisions remain unstable, increasing late changes.",
       "affected_task_ids": [
         "523",
         "534",
@@ -5234,9 +5288,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering og valg af ABA komponenter",
       "days_overdue": 31,
       "problem_type": "Design input missing",
-      "why_it_matters": "ABA device selection/locations are needed to proceed with detailed fire alarm design and installation.",
-      "downstream_impact": "Successors: 532 and 533.",
-      "consequence_if_unresolved": "Fire alarm coordination may slip, creating late ceiling/wall device changes.",
+      "why_it_matters": "ABA component selection/placement is required for coordinated fire alarm installation and interfaces.",
+      "downstream_impact": "Cascading: drives successors 532 and 533.",
+      "consequence_if_unresolved": "Fire alarm installation/coordination may slip or require rework when devices are finally selected.",
       "affected_task_ids": [
         "532",
         "533"
@@ -5247,9 +5301,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Koordinering af AV-installationer med isolering på skørter. Placering af inst. Over loft samt under gulv",
       "days_overdue": 31,
       "problem_type": "Coordination blockage",
-      "why_it_matters": "AV routing and placement must be coordinated with insulation/skirts to avoid clashes and rework.",
-      "downstream_impact": "Successors: 535, 536, 538.",
-      "consequence_if_unresolved": "AV containment and penetrations risk being installed in conflict with architectural build-ups.",
+      "why_it_matters": "AV coordination with skirting insulation and routing zones prevents clashes and rework.",
+      "downstream_impact": "Cascading: drives successors 535, 536, 538.",
+      "consequence_if_unresolved": "AV routes may conflict with finishes/insulation, creating rework and access problems.",
       "affected_task_ids": [
         "535",
         "536",
@@ -5257,43 +5311,13 @@ Return complete JSON matching the strict schema.
       ]
     },
     {
-      "id": "20",
-      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
-      "days_overdue": 127,
-      "problem_type": "Design input missing",
-      "why_it_matters": "The garden irrigation/water treatment concept needs to be defined before later landscape/utility coordination can be finalized.",
-      "downstream_impact": "Isolated (no successors shown in this extract).",
-      "consequence_if_unresolved": "Landscape/utility interfaces may be redesigned late once site works are underway.",
-      "affected_task_ids": []
-    },
-    {
-      "id": "25",
-      "task_name": "Infovæg med glasfronter (ARK pkt. 3.7)",
-      "days_overdue": 66,
+      "id": "651",
+      "task_name": "Jording",
+      "days_overdue": 44,
       "problem_type": "Production delay",
-      "why_it_matters": "Architectural feature elements often drive coordination with power/data and finishes.",
-      "downstream_impact": "Isolated (no successors shown in this extract).",
-      "consequence_if_unresolved": "May become a late fit-out item with procurement/installation compression.",
-      "affected_task_ids": []
-    },
-    {
-      "id": "27",
-      "task_name": "E100 Pressemøder I Banksalen skal afklares",
-      "days_overdue": 66,
-      "problem_type": "Coordination blockage",
-      "why_it_matters": "Press/meeting coordination is a prerequisite for aligned decisions and timely approvals.",
-      "downstream_impact": "Isolated (no successors shown in this extract).",
-      "consequence_if_unresolved": "Key decisions may remain unclarified, causing ongoing uncertainty in design/production planning.",
-      "affected_task_ids": []
-    },
-    {
-      "id": "30",
-      "task_name": "IKT",
-      "days_overdue": 66,
-      "problem_type": "Coordination blockage",
-      "why_it_matters": "IKT agreements define information exchange and deliverable standards that support coordinated production.",
-      "downstream_impact": "Isolated (no successors shown in this extract).",
-      "consequence_if_unresolved": "Deliverable quality and coordination efficiency will remain inconsistent, increasing planning friction.",
+      "why_it_matters": "Earthing is a prerequisite for safe electrical completion and testing/commissioning readiness.",
+      "downstream_impact": "Isolated (no successors listed).",
+      "consequence_if_unresolved": "Electrical testing and approvals can be delayed due to incomplete earthing.",
       "affected_task_ids": []
     }
   ],
@@ -5312,162 +5336,118 @@ Return complete JSON matching the strict schema.
   "priority_actions": [
     {
       "step": 1,
-      "action": "Run a 2-hour decision workshop for Sikring (tasks 39, 40, 24, 41, 42) to freeze ADK scope and component placement principles (lofts/vægge/døre), then issue a signed decision note and updated marked-up drawings within 48 hours.",
-      "action_type": "coordination"
-    },
-    {
-      "step": 2,
-      "action": "Freeze E100.12 solafskærmning/mørklægning functional requirements (task 29) with bygherre/ARK and publish a single requirement sheet for downstream tasks (679, 1093, 1084, 743, 796, 937, 990).",
+      "action": "Run a 2-hour decision workshop with Bygherre + EL/sikring + Ark to close scope and acceptance criteria for “Sikringsprojekt, omfang af ADK” (Id 24) and confirm the required security level per door/zone; issue a signed decision note the same day.",
       "action_type": "bygherre_decision"
     },
     {
+      "step": 2,
+      "action": "Immediately freeze and publish the coordinated security component layouts for ceilings/walls/doors (Ids 40, 41, 42) and update the model/drawings so downstream packages (1096/1112/1130/1136/1142/1150 and 1078/1082) can proceed without assumptions.",
+      "action_type": "release_work"
+    },
+    {
       "step": 3,
-      "action": "Close DAS/SINE design inputs by completing task 644 (note) and task 645 (projektering); appoint one owner and set a hard internal deadline date, then confirm readiness for task 28/634 chain.",
+      "action": "Close the solafskærmning/mørklægning requirement (Id 29) by issuing a single approved specification (function, control interface, blackout performance) and distribute to all impacted successors (679/1093/1084/743/796/937/990) with a formal change freeze date.",
       "action_type": "design_input"
     },
     {
       "step": 4,
-      "action": "Secure immediate bygherre approval for indbygning i \"ovenlys\" (task 36) by compiling the submittal pack and booking an approval meeting; protect the downstream deadline chain to task 38.",
+      "action": "Assign a named owner and deliver dates for DAS/SINE: complete “Udarbejde notat om DAS/SINE” (Id 644) and “Projektering af DAS/Sine” (Id 645), then confirm scope/capacity assumptions against the already-progressed activity 28 and correct any mismatches.",
       "action_type": "escalation"
     },
     {
       "step": 5,
-      "action": "Resolve VVS design inputs for the production kitchen (task 21) and the cooling water in terrain decision (task 26); issue a coordinated VVS design package/decision log to release downstream work (successor 84) and avoid late changes.",
-      "action_type": "design_input"
+      "action": "Clear remaining Bygherre approvals that are overdue and close to downstream deadlines: “Gokendelse af synlige komponeter fra E100.03” (Id 33) and “Godkendelse af indbygning i \"ovenlys\"” (Id 36), with fixed approval meeting slots and decision logs.",
+      "action_type": "bygherre_decision"
     },
     {
       "step": 6,
-      "action": "Validate whether Omr. 4 dependency milestones (tasks 520–529 and 523) are actually completed (since successors 534–538 show 100%); either update progress to factual status or immediately collect missing inputs and re-baseline logic to remove false constraints.",
+      "action": "For Omr. 4 (Ids 520–529), either (a) mark the 0d input/coordination tasks complete based on actual decisions already taken, or (b) re-sequence dependencies so completed installation tasks (e.g., 534–538) are not shown as depending on incomplete prerequisites; then re-run a logic check.",
       "action_type": "reassess"
     },
     {
       "step": 7,
-      "action": "Implement a rolling 3-week constraints log focusing on all Bygherre/Design gates (including tasks like 24, 29, 36, 644/645) and review it weekly with named owners and due dates.",
-      "action_type": "freeze_downstream"
+      "action": "Set recovery mini-plans for remaining overdue design/production items: VVS decisions (Ids 20/21/26) and “Reetablering af solceller” (Id 648), including responsible party, deliverables, and a 10-working-day close-out target.",
+      "action_type": "reassess"
     }
   ],
   "resource_assessment": [
     {
-      "id": "1187",
-      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
-      "resource_type": "management_attention",
-      "assessment": "Adding labour will not solve this; it needs management-led alignment on the baseline approach, decision gates, and how design deliverables are sequenced and accepted. Assign a single accountable planning owner and enforce decision deadlines."
-    },
-    {
       "id": "29",
       "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
       "resource_type": "bygherre_escalation",
-      "assessment": "This is a bygherre/architect decision gate; adding site manpower does not help until requirements are frozen. Escalate and time-box the decision to prevent cascading redesign/procurement impacts."
+      "assessment": "Adding labour will not resolve this until the requirement/spec is frozen and approved. Management must force a single decision path (performance + control strategy) to stop late changes across multiple successor packages."
+    },
+    {
+      "id": "39",
+      "task_name": "Sikringsprojekt",
+      "resource_type": "management_attention",
+      "assessment": "This is primarily a management-controlled design close-out issue: scope, ownership, and deliverables must be enforced. Additional site manpower will not help until the security design basis and component strategy are confirmed."
     },
     {
       "id": "40",
       "task_name": "Placering/antal af sikringskomponenter, lofter",
       "resource_type": "design_dependency",
-      "assessment": "The bottleneck is coordinated design input (security + ceilings + other MEP). Add labour only helps after decisions are frozen; prioritize a coordinated layout session and then release updated drawings."
-    },
-    {
-      "id": "39",
-      "task_name": "Sikringsprojekt",
-      "resource_type": "design_dependency",
-      "assessment": "This is a design package gap; manpower on site cannot compensate for missing security design. Assign a design lead and set a short, fixed deliverable list (scope, device schedule, principle drawings)."
+      "assessment": "The blocker is coordinated design/layout release (interfaces with ceilings/finishes), not field labour. Prioritize coordinated drawings/model extracts and a clash/coordination pass before allowing ceilings to close."
     },
     {
       "id": "645",
       "task_name": "Projektering af DAS/Sine",
       "resource_type": "design_dependency",
-      "assessment": "This requires specialist design coordination (coverage, equipment, interfaces). Additional drafting capacity can help only if the technical scope is confirmed; otherwise escalate to resolve scope/authority requirements first."
+      "assessment": "This requires specialist design input and coordination/approval routing, not more installers. Allocate dedicated engineering time and set a fixed review/approval window to prevent compliance-driven delays."
     },
     {
       "id": "644",
-      "task_name": "Udarbedje notat om DAS/SINE",
+      "task_name": "Udarbejde notat om DAS/SINE",
       "resource_type": "design_dependency",
-      "assessment": "This is a documentation/design input task; adding installers will not help. Assign one responsible engineer to complete the note and align it with the follow-on DAS/SINE chain."
+      "assessment": "This is an engineering deliverable; it must be produced and issued quickly to validate the already-progressed DAS/SINE scope work. Prioritize document production and stakeholder review over manpower increases."
     },
     {
       "id": "24",
       "task_name": "Sikringsprojekt, omfang af ADK",
       "resource_type": "bygherre_escalation",
-      "assessment": "This is an approval/scope decision; the fastest route is a structured decision meeting with clear options and consequences. Until ADK scope is frozen, downstream door hardware coordination remains at risk."
-    },
-    {
-      "id": "36",
-      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
-      "resource_type": "bygherre_escalation",
-      "assessment": "This is a formal approval gate and cannot be solved by adding labour. It needs a complete submittal package and a scheduled approval slot with the decision-makers to avoid compressing the downstream deadline chain."
+      "assessment": "This is a decision/approval gate; labour cannot compensate for missing scope. Escalate to Bygherre with a decision deadline and explicitly list the downstream impacts (door packages and security interfaces)."
     }
   ],
   "summary_by_area": [
     {
-      "area": "Sikring",
-      "delayed_count": 5,
-      "critical_count": 3,
-      "important_count": 2,
+      "area": "E100.03 EL",
+      "delayed_count": 9,
+      "critical_count": 5,
+      "important_count": 4,
       "monitor_count": 0,
-      "summary": "Security scope and component placement decisions are materially overdue and risk cascading rework across ceilings/walls/doors."
+      "summary": "Major cascading risk from overdue security/ADK and DAS/SINE design items; immediate Bygherre decisions and design release are required."
     },
     {
-      "area": "Omr. 4 (EL koordinering)",
+      "area": "Ark",
+      "delayed_count": 3,
+      "critical_count": 1,
+      "important_count": 1,
+      "monitor_count": 1,
+      "summary": "Shading/blackout requirements are critically overdue and will cascade into many successor packages; ovenlys approval is also overdue."
+    },
+    {
+      "area": "Omr. 4",
       "delayed_count": 10,
       "critical_count": 0,
       "important_count": 0,
       "monitor_count": 10,
-      "summary": "Multiple 0d coordination/design-input milestones are overdue at 0%, likely reflecting either missing updates or late dimensioning inputs."
+      "summary": "Multiple 0d coordination/input tasks are overdue; given successors show completion, this indicates schedule logic/progress close-out issues that must be cleaned up."
     },
     {
-      "area": "E100.03 EL/Svagstrøm",
-      "delayed_count": 3,
-      "critical_count": 2,
-      "important_count": 1,
-      "monitor_count": 0,
-      "summary": "DAS/SINE design deliverables are at 0% and overdue, creating ongoing uncertainty for EL/svagstrøm coordination and approvals."
-    },
-    {
-      "area": "E100.12 Solafskærmning/Mørklægning",
-      "delayed_count": 1,
-      "critical_count": 1,
-      "important_count": 0,
-      "monitor_count": 0,
-      "summary": "Unfrozen functional requirements are blocking multiple successors and should be escalated as a bygherre decision gate."
-    },
-    {
-      "area": "Ark/Bygherre",
-      "delayed_count": 2,
-      "critical_count": 1,
-      "important_count": 0,
-      "monitor_count": 1,
-      "summary": "A key approval gate (ovenlys) is overdue and must be closed to protect the downstream deadline chain."
+      "area": "Globals",
+      "delayed_count": 4,
+      "critical_count": 0,
+      "important_count": 2,
+      "monitor_count": 2,
+      "summary": "Governance/coordination items (including the design schedule overview) are overdue, and solar reinstatement is not started despite planned dates."
     },
     {
       "area": "E100.02 VVS",
       "delayed_count": 3,
       "critical_count": 0,
-      "important_count": 2,
-      "monitor_count": 1,
-      "summary": "VVS has overdue design decisions (kitchen data and cooling water scope) which can trigger late redesign if not resolved now."
-    },
-    {
-      "area": "Globals/Projektering",
-      "delayed_count": 1,
-      "critical_count": 1,
-      "important_count": 0,
+      "important_count": 3,
       "monitor_count": 0,
-      "summary": "A baseline/overview milestone is still 0% and overdue, indicating management-level alignment is missing."
-    },
-    {
-      "area": "Solceller",
-      "delayed_count": 1,
-      "critical_count": 0,
-      "important_count": 1,
-      "monitor_count": 0,
-      "summary": "Reetablering of solceller is overdue and risks pushing roof/energy scope closure and downstream milestone timing."
-    },
-    {
-      "area": "EL - Jording",
-      "delayed_count": 1,
-      "critical_count": 0,
-      "important_count": 1,
-      "monitor_count": 0,
-      "summary": "Earthing activity is overdue at 0% and can constrain safe energization/commissioning readiness."
+      "summary": "Key VVS design/decision items (kitchen component data, water treatment/irrigation, and cooling water solution) are significantly overdue and need owner-assigned close-out dates."
     },
     {
       "area": "E100.01 Ventilation",
@@ -5475,38 +5455,30 @@ Return complete JSON matching the strict schema.
       "critical_count": 0,
       "important_count": 1,
       "monitor_count": 0,
-      "summary": "Chemical depot requirement definition is overdue and may impact ventilation/safety compliance follow-on work."
+      "summary": "The chem depot requirement definition is overdue and should be closed to prevent late redesign/authority impacts."
     },
     {
-      "area": "IKT",
+      "area": "E100.04 BMS",
       "delayed_count": 1,
       "critical_count": 0,
-      "important_count": 0,
-      "monitor_count": 1,
-      "summary": "IKT coordination task is overdue but currently shows no explicit downstream links in this extract."
-    },
-    {
-      "area": "E100 (Koordinering)",
-      "delayed_count": 1,
-      "critical_count": 0,
-      "important_count": 0,
-      "monitor_count": 1,
-      "summary": "Press/meeting clarification is overdue; treat as a coordination hygiene item unless it is linked to pending decisions."
+      "important_count": 1,
+      "monitor_count": 0,
+      "summary": "Electrical load confirmation for BMS boards is overdue and should be issued to avoid downstream sizing/coordination changes."
     }
   ],
   "insight_data": {
     "total_activities": 109,
-    "delayed_count": 30,
-    "critical_count": 8,
-    "important_count": 8,
-    "monitor_count": 14,
-    "root_cause_count": 28,
+    "delayed_count": 31,
+    "critical_count": 6,
+    "important_count": 12,
+    "monitor_count": 13,
+    "root_cause_count": 29,
     "reference_date": "12-03-2026",
     "most_overdue_days": 185,
-    "areas_affected": 12,
+    "areas_affected": 7,
     "format_detected": "MS Project Export",
     "schedule_name": "2026-03-12 Samlet tidsplan",
-    "primary_risk": "Unresolved design/bygherre decision gates (Sikring + solafskærmning/mørklægning + DAS/SINE) are overdue at 0% and drive cascading downstream coordination risk."
+    "primary_risk": "Cascading design/Bygherre decision delays in security (ADK/sikringskomponenter) and solafskærmning/mørklægning requirements, compounded by schedule logic/progress inconsistencies in Omr. 4."
   }
 }
 
@@ -5514,30 +5486,35 @@ Return complete JSON matching the strict schema.
   STEP 6: RESULT SUMMARY
 ──────────────────────────────────────────────────────────────────────────────────────────
   Total Activities: 109
-  Delayed:          30
-  Areas:            E100.01 Ventilation, E100.02 VVS, E100.03 EL, E100.04 BMS, E100.05 ELEV, E100.12 Solafskærmning/Mørklægning, Sikring, IKT, Omr. 1, Omr. 2, Omr. 3, Omr. 4, Omr. 5, Omr. 6, Omr. 7, Omr. 8, Globals
+  Delayed:          31
+  Areas:            Omr. 1, Omr. 2, Omr. 3, Omr. 4, Omr. 5, Omr. 6, Omr. 7, Omr. 8, Globals, E100.01 Ventilation, E100.02 VVS, E100.03 EL, E100.04 BMS, E100.05 ELEV, Ark
   Format:           MS Project Export
 
-  Delayed Activity IDs: ['1187', '29', '40', '39', '645', '644', '24', '36', '21', '648', '26', '41', '23', '33', '42', '651', '520', '521', '522', '523', '524', '525', '526', '527', '528', '529', '20', '25', '27', '30']
+  Delayed Activity IDs: ['29', '39', '40', '645', '644', '24', '1187', '21', '20', '648', '23', '26', '41', '33', '42', '651', '36', '461', '25', '27', '30', '520', '521', '522', '523', '524', '525', '526', '527', '528', '529']
 
   ID       TASK NAME                                          START          DAYS   PRIORITY
   ──────── ────────────────────────────────────────────────── ────────────── ────── ───────────────
-  1187     Oversigt projekteringstidsplan - projekt til prisv 08-09-2025     185    CRITICAL_NOW
   29       E100.12 - SolafskærmningMørklægning,funktionskræ15 03-11-2025     129    CRITICAL_NOW
-  40       Placering/antal af sikringskomponenter, lofter     03-11-2025     129    CRITICAL_NOW
   39       Sikringsprojekt                                    03-11-2025     129    CRITICAL_NOW
+  40       Placering/antal af sikringskomponenter, lofter     03-11-2025     129    CRITICAL_NOW
   645      Projektering af DAS/Sine                           18-11-2025     114    CRITICAL_NOW
-  644      Udarbedje notat om DAS/SINE                        02-12-2025     100    CRITICAL_NOW
+  644      Udarbejde notat om DAS/SINE                        02-12-2025     100    CRITICAL_NOW
   24       Sikringsprojekt, omfang af ADK                     05-01-2026     66     CRITICAL_NOW
-  36       Godkendelse af indbygning i "ovenlys"              23-02-2026     17     CRITICAL_NOW
+  1187     Oversigt projekteringstidsplan - projekt til prisv 08-09-2025     185    IMPORTANT_NEXT
   21       E100.02 - Indretning af produktionskøkken, databla 30-09-2025     163    IMPORTANT_NEXT
+  20       E100.02 - Vandbehandling og vandingsanlæg til have 05-11-2025     127    IMPORTANT_NEXT
   648      Reetablering af solceller                          18-12-2025     84     IMPORTANT_NEXT
+  23       E100.01 - Fastlæg krav til kemidepot               05-01-2026     66     IMPORTANT_NEXT
   26       E100.02 - Stillingtagen til kølevand i terræn - ud 05-01-2026     66     IMPORTANT_NEXT
   41       Placering/antal af sikringskomponenter, vægge      05-01-2026     66     IMPORTANT_NEXT
-  23       E100.01 - Fastlæg krav til kemidepot               05-01-2026     66     IMPORTANT_NEXT
   33       Gokendelse af synlige komponeter fra E100.03       19-01-2026     52     IMPORTANT_NEXT
   42       Placering/antal af sikringskomponenter, døre       19-01-2026     52     IMPORTANT_NEXT
   651      Jording                                            27-01-2026     44     IMPORTANT_NEXT
+  36       Godkendelse af indbygning i "ovenlys"              23-02-2026     17     IMPORTANT_NEXT
+  461      Samlet el-belastning for BMS-KT og BMS-IBI tav1d   23-02-2026     17     IMPORTANT_NEXT
+  25       Infovæg med glasfronter (ARK pkt. 3.7)             05-01-2026     66     MONITOR
+  27       E100 Pressemøder I Banksalen skal afklares         05-01-2026     66     MONITOR
+  30       IKT                                                05-01-2026     66     MONITOR
   520      Fancoils for dim af kabling                        09-02-2026     31     MONITOR
   521      Øvrige installationer for dim af kabling           09-02-2026     31     MONITOR
   522      Arbejdsstationer placering                         09-02-2026     31     MONITOR
@@ -5548,10 +5525,6 @@ Return complete JSON matching the strict schema.
   527      Kraft - Placering af komponenter, belastning       09-02-2026     31     MONITOR
   528      Placering og valg af ABA komponenter               09-02-2026     31     MONITOR
   529      Koordinering af AV-installationer med isolering på 09-02-2026     31     MONITOR
-  20       E100.02 - Vandbehandling og vandingsanlæg til have 05-11-2025     127    MONITOR
-  25       Infovæg med glasfronter (ARK pkt. 3.7)             05-01-2026     66     MONITOR
-  27       E100 Pressemøder I Banksalen skal afklares         05-01-2026     66     MONITOR
-  30       IKT                                                05-01-2026     66     MONITOR
 
 ==========================================================================================
   END OF ANALYSIS ANATOMY
