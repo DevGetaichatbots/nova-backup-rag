@@ -479,7 +479,13 @@ def _render_forcing_assessment(data: Dict, lang: str) -> str:
         coord_cost = item.get("coordination_cost", "medium")
         parallel = item.get("parallelizability", "low")
         speedup = _e(item.get("max_speedup_factor", "1.0x"))
-        team_size = _e(item.get("optimal_team_size", "N/A"))
+        raw_team = item.get("optimal_team_size", "N/A")
+        is_na = not raw_team or raw_team.strip().upper() in ("N/A", "NA", "N/A.", "NOT APPLICABLE")
+        if is_na:
+            na_msg = "Ikke relevant" if lang == "da" else "Not applicable"
+            team_size = f'<span style="color:#94a3b8;font-weight:600;font-size:11px;">{na_msg}</span>'
+        else:
+            team_size = f'<span style="color:#1a202c;">{_e(raw_team)}</span>'
         ponr = _e(item.get("point_of_no_return", ""))
 
         coord_label = {"low": ("Lav" if lang == "da" else "Low"), "medium": ("Middel" if lang == "da" else "Medium"), "high": ("Høj" if lang == "da" else "High")}.get(coord_cost, coord_cost)
@@ -523,12 +529,12 @@ def _render_forcing_assessment(data: Dict, lang: str) -> str:
       </div>
       <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;text-align:center;">
         <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:3px;">{team_title}</div>
-        <div style="font-size:13px;font-weight:700;color:#1a202c;">{team_size}</div>
+        <div style="font-size:13px;font-weight:700;">{team_size}</div>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="padding:10px 14px;background:#f0fdfa;border-radius:8px;border:1px solid #99f6e4;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_svg("search", 12, "#0d9488")}<span style="font-size:10px;color:#0d9488;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{reason_label}</span></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_svg("scan-search", 12, "#0d9488")}<span style="font-size:10px;color:#0d9488;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{reason_label}</span></div>
         <div style="font-size:13px;color:#374151;line-height:1.7;">{_e(item.get("reason",""))}</div>
       </div>
       <div style="padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;">
