@@ -7,7 +7,6 @@ MODEL CONFIGURATION
 -------------------
 Model:              Azure OpenAI GPT-5.2 (gpt-5.2-2025-12-11)
 Deployment:         AZURE_OPENAI_PREDICTIVE_DEPLOYMENT
-API Version:        2024-12-01-preview
 Reasoning Effort:   medium
 Max Tokens:         65,536 completion tokens
 Response Format:    Strict JSON schema (deterministic structured output)
