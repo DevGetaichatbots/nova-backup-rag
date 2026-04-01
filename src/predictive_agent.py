@@ -466,7 +466,7 @@ Return complete JSON matching the strict schema."""
                 "temperature": 0,
                 "top_p": 0.1,
                 "seed": 42,
-                "max_tokens": 65536,
+                "max_tokens": 32768,
                 "response_format": {
                     "type": "json_schema",
                     "json_schema": NOVA_INSIGHT_SCHEMA
