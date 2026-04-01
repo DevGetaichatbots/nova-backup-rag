@@ -97,6 +97,22 @@ ACTION_TYPE_ICON_MAP = {
     "procurement": "package",
 }
 
+FORCEABLE_STYLES = {
+    "possible": {"color": "#059669", "bg": "#ecfdf5", "border": "#6ee7b7", "icon": "check-square", "label_en": "POSSIBLE", "label_da": "MULIG"},
+    "limited": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "icon": "alert-triangle", "label_en": "LIMITED", "label_da": "BEGRÆNSET"},
+    "not_recommended": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "icon": "alert-circle", "label_en": "NOT RECOMMENDED", "label_da": "FRARÅDES"},
+}
+
+CONSTRAINT_TYPE_CONFIG = {
+    "coordination_dependency": {"icon": "link", "color": "#7c3aed", "label_en": "Coordination", "label_da": "Koordinering"},
+    "design_input_required": {"icon": "pen-tool", "color": "#2563eb", "label_en": "Design Input", "label_da": "Designinput"},
+    "bygherre_decision_required": {"icon": "user", "color": "#c026d3", "label_en": "Client Decision", "label_da": "Bygherrebeslutning"},
+    "procurement_waiting": {"icon": "package", "color": "#d97706", "label_en": "Procurement", "label_da": "Indkøb"},
+    "execution_capacity": {"icon": "tool", "color": "#059669", "label_en": "Execution", "label_da": "Udførelse"},
+    "milestone_gate": {"icon": "flag", "color": "#64748b", "label_en": "Milestone", "label_da": "Milepæl"},
+    "cascading_dependencies": {"icon": "grid", "color": "#ea580c", "label_en": "Cascading", "label_da": "Kaskade"},
+}
+
 
 def _severity_color(days: int) -> dict:
     if days >= 120:
@@ -425,6 +441,110 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
 </div>'''
 
 
+def _render_forcing_assessment(data: Dict, lang: str) -> str:
+    items = data.get("forcing_assessment", [])
+    if not items:
+        return ""
+
+    ins = data.get("insight_data", {})
+    forceable_count = _safe_int(ins.get("forceable_count", 0))
+    not_forceable_count = _safe_int(ins.get("not_forceable_count", 0))
+
+    label = "Forceringsvurdering" if lang == "da" else "Forcing Assessment"
+    sub_text = "Kan forsinkelsen accelereres?" if lang == "da" else "Can the delay be accelerated?"
+    summary_label = f'{forceable_count} {"kan forceres" if lang == "da" else "forceable"} · {not_forceable_count} {"frarådes" if lang == "da" else "not recommended"}'
+
+    cards_html = ""
+    for item in items:
+        is_forceable = item.get("is_forceable", "not_recommended")
+        f_style = FORCEABLE_STYLES.get(is_forceable, FORCEABLE_STYLES["not_recommended"])
+        f_label = f_style[f"label_{lang}"] if f"label_{lang}" in f_style else f_style.get("label_en", is_forceable)
+
+        constraint = item.get("constraint_type", "execution_capacity")
+        c_config = CONSTRAINT_TYPE_CONFIG.get(constraint, CONSTRAINT_TYPE_CONFIG["execution_capacity"])
+        c_label = c_config[f"label_{lang}"] if f"label_{lang}" in c_config else c_config.get("label_en", constraint)
+
+        coord_cost = item.get("coordination_cost", "medium")
+        parallel = item.get("parallelizability", "low")
+        speedup = _e(item.get("max_speedup_factor", "1.0x"))
+        team_size = _e(item.get("optimal_team_size", "N/A"))
+        ponr = _e(item.get("point_of_no_return", ""))
+
+        coord_label = {"low": ("Lav" if lang == "da" else "Low"), "medium": ("Middel" if lang == "da" else "Medium"), "high": ("Høj" if lang == "da" else "High")}.get(coord_cost, coord_cost)
+        parallel_label = {"low": ("Lav" if lang == "da" else "Low"), "medium": ("Middel" if lang == "da" else "Medium"), "high": ("Høj" if lang == "da" else "High")}.get(parallel, parallel)
+
+        coord_color = {"low": "#059669", "medium": "#d97706", "high": "#dc2626"}.get(coord_cost, "#64748b")
+        parallel_color = {"low": "#dc2626", "medium": "#d97706", "high": "#059669"}.get(parallel, "#64748b")
+
+        reason_label = "Begrundelse" if lang == "da" else "Reason"
+        risk_label = "Risiko ved forcering" if lang == "da" else "Risk if Forced"
+        rec_label = "Anbefaling" if lang == "da" else "Recommendation"
+        ponr_label = "Point of No Return"
+        coord_title = "Koordineringsomkostning" if lang == "da" else "Coordination Cost"
+        parallel_title = "Paralleliserbarhed" if lang == "da" else "Parallelizability"
+        speedup_title = "Maks. speedup" if lang == "da" else "Max Speedup"
+        team_title = "Optimal holdstørrelse" if lang == "da" else "Optimal Team Size"
+
+        cards_html += f'''<div style="margin:12px 0;background:#fff;border-radius:12px;border:1px solid {f_style["border"]};border-left:4px solid {f_style["color"]};overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+  <div style="padding:14px 18px;background:{f_style["bg"]};border-bottom:1px solid {f_style["border"]};">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      {_svg(f_style["icon"], 14, f_style["color"])}
+      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#134e4a;background:#f0fdfa;border:1px solid #99f6e4;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(item.get("id",""))}</span>
+      <span style="font-size:13px;font-weight:700;color:#1a202c;flex:1;min-width:0;">{_e(item.get("task_name",""))}</span>
+      <span style="display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700;color:{f_style["color"]};background:#fff;border:1px solid {f_style["border"]};white-space:nowrap;">{f_label}</span>
+      <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;color:{c_config["color"]};background:#f8fafc;border:1px solid #e2e8f0;white-space:nowrap;">{_svg(c_config["icon"], 10, c_config["color"])} {c_label}</span>
+    </div>
+  </div>
+  <div style="padding:14px 18px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+      <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;text-align:center;">
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:3px;">{coord_title}</div>
+        <div style="font-size:13px;font-weight:700;color:{coord_color};">{coord_label}</div>
+      </div>
+      <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;text-align:center;">
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:3px;">{parallel_title}</div>
+        <div style="font-size:13px;font-weight:700;color:{parallel_color};">{parallel_label}</div>
+      </div>
+      <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;text-align:center;">
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:3px;">{speedup_title}</div>
+        <div style="font-size:13px;font-weight:700;color:#0d9488;">{speedup}</div>
+      </div>
+      <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;text-align:center;">
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:3px;">{team_title}</div>
+        <div style="font-size:13px;font-weight:700;color:#1a202c;">{team_size}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:10px 14px;background:#f0fdfa;border-radius:8px;border:1px solid #99f6e4;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_svg("search", 12, "#0d9488")}<span style="font-size:10px;color:#0d9488;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{reason_label}</span></div>
+        <div style="font-size:13px;color:#374151;line-height:1.7;">{_e(item.get("reason",""))}</div>
+      </div>
+      <div style="padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_svg("alert-triangle", 12, "#dc2626")}<span style="font-size:10px;color:#dc2626;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{risk_label}</span></div>
+        <div style="font-size:13px;color:#374151;line-height:1.7;">{_e(item.get("risk_if_forced",""))}</div>
+      </div>
+      <div style="padding:10px 14px;background:#ecfdf5;border-radius:8px;border:1px solid #6ee7b7;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">{_svg("check-square", 12, "#059669")}<span style="font-size:10px;color:#059669;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{rec_label}</span></div>
+        <div style="font-size:13px;color:#374151;line-height:1.7;font-weight:500;">{_e(item.get("recommendation",""))}</div>
+      </div>
+      <div style="padding:8px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+        <div style="display:flex;align-items:center;gap:6px;">{_svg("clock", 12, "#64748b")}<span style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:.6px;">{ponr_label}</span><span style="font-size:12px;color:#475569;font-weight:600;margin-left:6px;">{ponr}</span></div>
+      </div>
+    </div>
+  </div>
+</div>'''
+
+    return f'''
+<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#ea580c12;border:1px solid #ea580c22;">{_svg("zap", 18, "#ea580c")}</div>
+    <div style="flex:1;"><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub_text}</p></div>
+    <span style="font-size:11px;color:#64748b;font-weight:600;background:#f1f5f9;padding:4px 12px;border-radius:8px;">{summary_label}</span>
+  </div>
+  {cards_html}
+</div>'''
+
+
 def _render_summary_by_area(data: Dict, lang: str) -> str:
     areas = data.get("summary_by_area", [])
     if not areas:
@@ -511,6 +631,7 @@ def _build_html(data: Dict, lang: str) -> str:
 .nova-report .module-card:nth-child(6) {{ animation-delay:.30s; }}
 .nova-report .module-card:nth-child(7) {{ animation-delay:.36s; }}
 .nova-report .module-card:nth-child(8) {{ animation-delay:.42s; }}
+.nova-report .module-card:nth-child(9) {{ animation-delay:.48s; }}
 .nova-report .module-card:hover {{ border-color:#cbd5e1 !important;box-shadow:0 4px 16px rgba(0,0,0,.06) !important; }}
 .nova-report table tr:hover {{ background:#edf2f7 !important; }}
 .nova-report ::-webkit-scrollbar {{ height:6px; }}
@@ -532,6 +653,7 @@ def _build_html(data: Dict, lang: str) -> str:
     parts.append(_render_root_cause_analysis(data, lang))
     parts.append(_render_priority_actions(data, lang))
     parts.append(_render_resource_assessment(data, lang))
+    parts.append(_render_forcing_assessment(data, lang))
     parts.append(_render_summary_by_area(data, lang))
 
     parts.append(f'''
