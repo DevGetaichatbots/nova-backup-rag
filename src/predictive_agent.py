@@ -463,7 +463,9 @@ Return complete JSON matching the strict schema."""
             api_params = {
                 "model": self.deployment,
                 "messages": messages,
-                "temperature": 0.2,
+                "temperature": 0,
+                "top_p": 0.1,
+                "seed": 42,
                 "max_tokens": 65536,
                 "response_format": {
                     "type": "json_schema",

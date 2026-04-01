@@ -565,7 +565,9 @@ Keep your response concise and helpful."""
         response = self.client.chat.completions.create(
             model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
             messages=messages,
-            temperature=0.2,
+            temperature=0,
+            top_p=0.1,
+            seed=42,
             max_tokens=32768
         )
         
