@@ -1,6 +1,6 @@
 ==========================================================================================
   NOVA INSIGHT — COMPLETE ANALYSIS ANATOMY
-  Updated: 2026-04-01T12:22:07.156317
+  Updated: 2026-04-01T12:27:46.970265
 ==========================================================================================
 
 ──────────────────────────────────────────────────────────────────────────────────────────
@@ -11,7 +11,7 @@
   Reference Date: 12-03-2026
   Language:       en
   Format:         html
-  Analysis ID:    sa_60d2f8763a91a001
+  Analysis ID:    sa_81134251ff97980f
 
 ──────────────────────────────────────────────────────────────────────────────────────────
   STEP 2: OCR EXTRACTION (Azure Document Intelligence)
@@ -5163,25 +5163,30 @@ Return complete JSON matching the strict schema.
 ──────────────────────────────────────────────────────────────────────────────────────────
   Model:    gpt-4.1
   Status:   success
-  Tokens:   prompt=13672, completion=3614, reasoning=0
-  Time:     29.0s total
+  Tokens:   prompt=13672, completion=4496, reasoning=0
+  Time:     33.8s total
 
-  --- RAW JSON RESPONSE (13224 chars) ---
+  --- RAW JSON RESPONSE (16623 chars) ---
 
 {
-  "management_conclusion": "The primary risk driver in this schedule is a cluster of delayed coordination and production activities, particularly those related to the placement and selection of components, AV-installation coordination, and electrical/lighting installations. These delays are not isolated; they cascade across multiple disciplines and areas, blocking downstream tasks and threatening the timely completion of critical systems. The most critical areas are those with multiple overdue tasks in component placement and AV coordination, which are root causes for further delays. Immediate action should focus on resolving coordination bottlenecks and clarifying component placement to unblock subsequent work. Management attention is required to prioritize these issues and ensure cross-discipline alignment.",
+  "management_conclusion": "The primary risk driver in this schedule is a series of unresolved coordination and production tasks, particularly those related to component placement, AV-installation coordination, and electrical/lighting installation. Delays are cascading across multiple areas, with several root cause tasks blocking downstream activities, especially in AV, lighting, and electrical disciplines. The most critical areas are AV-installation coordination and component placement, which are preventing progress in related trades. Immediate action should focus on resolving the coordination bottlenecks and clarifying component placement to unlock downstream work and prevent further schedule slippage.",
   "schedule_overview": {
     "schedule_name": "2026-03-12 Samlet tidsplan_1side",
     "reference_date": "12-03-2026",
     "total_activities": 68,
     "delayed_count": 14,
     "areas_covered": [
-      "Component Placement",
-      "AV-installation Coordination",
-      "Electrical Installations",
-      "Lighting",
-      "IT and Weak Current",
-      "General Coordination"
+      "AV-installationer",
+      "Kraftinstallationer",
+      "Lysinstallationer",
+      "IT og Svagstrøm",
+      "Fyldningugrad i spor",
+      "Placering af belyuning",
+      "Placering synligt udstyr",
+      "ARA komponenter",
+      "Koordinering",
+      "Omr. d",
+      "Omr. G"
     ],
     "format_detected": "Structured Table"
   },
@@ -5198,7 +5203,7 @@ Return complete JSON matching the strict schema.
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Component Placement"
+      "area": "AV-installationer"
     },
     {
       "id": "2",
@@ -5206,13 +5211,13 @@ Return complete JSON matching the strict schema.
       "start_date": "26-01-2026",
       "end_date": "19-04-2026",
       "duration": "-",
-      "progress": "0%",
+      "progress": "0",
       "days_overdue": 46,
       "task_type": "Production",
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": false,
       "blocked_by_id": "1",
-      "area": "Component Placement"
+      "area": "AV-installationer"
     },
     {
       "id": "3",
@@ -5223,10 +5228,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Component Placement"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Kraftinstallationer"
     },
     {
       "id": "4",
@@ -5237,10 +5242,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Component Placement"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Kraftinstallationer"
     },
     {
       "id": "5",
@@ -5251,10 +5256,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Component Placement"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Kraftinstallationer"
     },
     {
       "id": "6",
@@ -5265,10 +5270,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Component Placement"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Kraftinstallationer"
     },
     {
       "id": "7",
@@ -5279,10 +5284,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Component Placement"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Kraftinstallationer"
     },
     {
       "id": "8",
@@ -5291,12 +5296,12 @@ Return complete JSON matching the strict schema.
       "end_date": "16-09-2026",
       "duration": "-",
       "progress": "0%",
-      "days_overdue": -125,
+      "days_overdue": -127,
       "task_type": "Production",
       "priority": "MONITOR",
       "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Lighting"
+      "blocked_by_id": "5",
+      "area": "Lysinstallationer"
     },
     {
       "id": "9",
@@ -5304,13 +5309,13 @@ Return complete JSON matching the strict schema.
       "start_date": "36-07-2026",
       "end_date": "16-07-2026",
       "duration": "-",
-      "progress": "0%",
+      "progress": "0",
       "days_overdue": 15,
       "task_type": "Production",
       "priority": "MONITOR",
       "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Lighting"
+      "blocked_by_id": "5",
+      "area": "Lysinstallationer"
     },
     {
       "id": "10",
@@ -5321,66 +5326,66 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 15,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "1",
-      "area": "Electrical Installations"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "ARA komponenter"
     },
     {
       "id": "11",
       "task_name": "Koordinering af AV-installationer med isolering på saarter. Placering af inat. Over want under gulw",
       "start_date": "09-02-2036",
       "end_date": "18-09-2026",
-      "duration": "-",
+      "duration": "loft",
       "progress": "0%",
-      "days_overdue": -3622,
+      "days_overdue": -3552,
       "task_type": "Coordination",
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "AV-installation Coordination"
+      "area": "Koordinering"
     },
     {
       "id": "12",
       "task_name": "Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer",
       "start_date": "09-02-2026",
       "end_date": "19-02-2026",
-      "duration": "-",
+      "duration": "Dd",
       "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Coordination",
-      "priority": "IMPORTANT_NEXT",
-      "is_root_cause": false,
-      "blocked_by_id": "11",
-      "area": "AV-installation Coordination"
+      "days_overdue": 31,
+      "task_type": "Production",
+      "priority": "CRITICAL_NOW",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "AV-installationer"
     },
     {
       "id": "13",
-      "task_name": "Kraftinstallationer",
-      "start_date": "22-00-2026",
-      "end_date": "18-09-2026",
+      "task_name": "IT og Svagstrøm",
+      "start_date": "29-01-2026",
+      "end_date": "09-02-2026",
       "duration": "-",
       "progress": "0%",
-      "days_overdue": -80,
+      "days_overdue": 43,
       "task_type": "Production",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "11",
-      "area": "Electrical Installations"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "IT og Svagstrøm"
     },
     {
       "id": "14",
-      "task_name": "Lysinstallationer",
-      "start_date": "23-02-2026",
+      "task_name": "Omr. d",
+      "start_date": "86-01-2026",
       "end_date": "18-09-2026",
-      "duration": "-",
+      "duration": "360,254",
       "progress": "0%",
-      "days_overdue": -18,
+      "days_overdue": -44,
       "task_type": "Production",
       "priority": "MONITOR",
       "is_root_cause": false,
       "blocked_by_id": "11",
-      "area": "Lighting"
+      "area": "Omr. d"
     }
   ],
   "root_cause_analysis": [
@@ -5389,34 +5394,100 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering'antal af akringukomponenter, vægge",
       "days_overdue": 66,
       "problem_type": "Production delay",
-      "why_it_matters": "Blocks the placement of doors, cabling, and subsequent installations.",
-      "downstream_impact": "Component Placement, Lighting, Electrical Installations",
-      "consequence_if_unresolved": "Multiple installation tasks will remain blocked, causing cascading delays.",
-      "affected_task_ids": [
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10"
-      ]
+      "why_it_matters": "Blocks installation of components in AV and related trades.",
+      "downstream_impact": "AV-installationer, electrical, lighting, and coordination tasks",
+      "consequence_if_unresolved": "Downstream installation work will remain blocked, causing cascading delays.",
+      "affected_task_ids": ["2"]
+    },
+    {
+      "id": "3",
+      "task_name": "Fancoil for dim af kabling",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Prevents completion of cabling and related installations.",
+      "downstream_impact": "Kraftinstallationer, lighting, AV, and IT disciplines",
+      "consequence_if_unresolved": "Electrical and AV installations will be delayed.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "4",
+      "task_name": "Øvrige installationer for dim af kabling",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Blocks progress on cabling and component installation.",
+      "downstream_impact": "Kraftinstallationer, AV, and IT disciplines",
+      "consequence_if_unresolved": "Multiple trades will be unable to proceed.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "5",
+      "task_name": "Arbejdutationer placering",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Prevents placement of workstations and related equipment.",
+      "downstream_impact": "Lighting and AV installations",
+      "consequence_if_unresolved": "Lighting and AV tasks will be delayed.",
+      "affected_task_ids": ["8", "9"]
+    },
+    {
+      "id": "6",
+      "task_name": "Fyldningugrad i spor/ udvidelsesfaktor",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Blocks installation of components in cable routes.",
+      "downstream_impact": "Kraftinstallationer, AV, and IT disciplines",
+      "consequence_if_unresolved": "Cable routing and installations will be delayed.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "7",
+      "task_name": "Againatallation - Opdeling af DALil inet.",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Prevents division of installations and completion of DALil network.",
+      "downstream_impact": "Kraftinstallationer, AV, and IT disciplines",
+      "consequence_if_unresolved": "Network installations will be delayed.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "10",
+      "task_name": "Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter",
+      "days_overdue": 15,
+      "problem_type": "Production delay",
+      "why_it_matters": "Blocks selection and placement of ARA components.",
+      "downstream_impact": "ARA komponenter, AV, and IT disciplines",
+      "consequence_if_unresolved": "ARA and related installations will be delayed.",
+      "affected_task_ids": []
     },
     {
       "id": "11",
       "task_name": "Koordinering af AV-installationer med isolering på saarter. Placering af inat. Over want under gulw",
-      "days_overdue": -3622,
+      "days_overdue": -3552,
       "problem_type": "Coordination blockage",
-      "why_it_matters": "Blocks AV-installation and related electrical and lighting tasks.",
-      "downstream_impact": "AV-installation Coordination, Electrical Installations, Lighting",
-      "consequence_if_unresolved": "AV and electrical installations will be delayed, impacting project handover.",
-      "affected_task_ids": [
-        "12",
-        "13",
-        "14"
-      ]
+      "why_it_matters": "Blocks AV installation coordination and related trades.",
+      "downstream_impact": "AV-installationer, Omr. d",
+      "consequence_if_unresolved": "AV installations and Omr. d will remain blocked.",
+      "affected_task_ids": ["14"]
+    },
+    {
+      "id": "12",
+      "task_name": "Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer",
+      "days_overdue": 31,
+      "problem_type": "Production delay",
+      "why_it_matters": "Blocks completion of AVA installations and electrical load calculations.",
+      "downstream_impact": "AV-installationer, electrical, and lighting disciplines",
+      "consequence_if_unresolved": "Electrical and AVA installations will be delayed.",
+      "affected_task_ids": []
+    },
+    {
+      "id": "13",
+      "task_name": "IT og Svagstrøm",
+      "days_overdue": 43,
+      "problem_type": "Production delay",
+      "why_it_matters": "Blocks IT and low voltage installations.",
+      "downstream_impact": "IT og Svagstrøm, AV, and lighting disciplines",
+      "consequence_if_unresolved": "IT and AV installations will be delayed.",
+      "affected_task_ids": []
     }
   ],
   "downstream_consequences": [
@@ -5426,96 +5497,56 @@ Return complete JSON matching the strict schema.
       "blocked_by_id": "1"
     },
     {
-      "id": "3",
-      "task_name": "Fancoil for dim af kabling",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "4",
-      "task_name": "Øvrige installationer for dim af kabling",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "5",
-      "task_name": "Arbejdutationer placering",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "6",
-      "task_name": "Fyldningugrad i spor/ udvidelsesfaktor",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "7",
-      "task_name": "Againatallation - Opdeling af DALil inet.",
-      "blocked_by_id": "1"
-    },
-    {
       "id": "8",
       "task_name": "Placering af bielyuning",
-      "blocked_by_id": "1"
+      "blocked_by_id": "5"
     },
     {
       "id": "9",
       "task_name": "Placering synligt udstyr fa tryk og pir, input vedr. DALI",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "10",
-      "task_name": "Kraft - Placering af komponenter, belastning Placering og valg af ARA komponenter",
-      "blocked_by_id": "1"
-    },
-    {
-      "id": "12",
-      "task_name": "Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer",
-      "blocked_by_id": "11"
-    },
-    {
-      "id": "13",
-      "task_name": "Kraftinstallationer",
-      "blocked_by_id": "11"
+      "blocked_by_id": "5"
     },
     {
       "id": "14",
-      "task_name": "Lysinstallationer",
+      "task_name": "Omr. d",
       "blocked_by_id": "11"
     }
   ],
   "priority_actions": [
     {
       "step": 1,
-      "action": "Immediately convene a coordination meeting to resolve placement of akringukomponenter in walls and clarify AV-installation interfaces.",
+      "action": "Immediately convene a coordination meeting for AV-installationer to resolve component placement and clarify responsibilities.",
       "action_type": "coordination"
     },
     {
       "step": 2,
-      "action": "Assign responsible parties to finalize component placement and update the schedule with realistic dates.",
+      "action": "Assign responsible parties to finalize placement of akringukomponenter in walls and doors to unlock downstream work.",
       "action_type": "release_work"
     },
     {
       "step": 3,
-      "action": "Freeze downstream tasks until root cause activities are resolved to prevent wasted effort and rework.",
-      "action_type": "freeze_downstream"
+      "action": "Review and update cabling and workstation placement tasks to ensure prerequisites are met and work can proceed.",
+      "action_type": "reassess"
     },
     {
       "step": 4,
-      "action": "Escalate unresolved coordination issues to project management for decision and resource allocation.",
+      "action": "Escalate unresolved coordination blockages to management for immediate attention if not resolved within 48 hours.",
       "action_type": "escalation"
     },
     {
       "step": 5,
-      "action": "Reassess manpower allocation for production tasks once coordination is resolved.",
-      "action_type": "reassess"
+      "action": "Freeze downstream activities dependent on unresolved root causes to prevent wasted effort and rework.",
+      "action_type": "freeze_downstream"
     },
     {
       "step": 6,
-      "action": "Release blocked tasks sequentially as soon as root causes are cleared.",
-      "action_type": "release_work"
+      "action": "Request updated input from design and procurement teams for ARA component selection and placement.",
+      "action_type": "design_input"
     },
     {
       "step": 7,
-      "action": "Monitor progress weekly and update stakeholders on status of critical delayed activities.",
-      "action_type": "coordination"
+      "action": "Release work packages for IT and low voltage installations once coordination and placement tasks are resolved.",
+      "action_type": "release_work"
     }
   ],
   "resource_assessment": [
@@ -5523,62 +5554,92 @@ Return complete JSON matching the strict schema.
       "id": "1",
       "task_name": "Placering'antal af akringukomponenter, vægge",
       "resource_type": "production_manpower",
-      "assessment": "Adding labour will not help until coordination and placement decisions are finalized. Management attention is needed to resolve prerequisites."
+      "assessment": "Adding labour will not help until coordination and placement decisions are finalized. Management attention may be needed to resolve prerequisites."
     },
     {
       "id": "11",
       "task_name": "Koordinering af AV-installationer med isolering på saarter. Placering af inat. Over want under gulw",
       "resource_type": "coordination_bottleneck",
-      "assessment": "This is a coordination bottleneck; additional manpower is ineffective. Cross-discipline alignment and management intervention are required."
+      "assessment": "This is a coordination bottleneck; additional manpower is not effective. Immediate management intervention is required to resolve cross-trade issues."
+    },
+    {
+      "id": "12",
+      "task_name": "Samiet ell-belastning for RMS-KT og RttS-lalita Færdiggare projektering AVA instalationer",
+      "resource_type": "production_manpower",
+      "assessment": "Progress depends on resolving upstream coordination and placement. Adding labour may help only after prerequisites are cleared."
     }
   ],
   "summary_by_area": [
     {
-      "area": "Component Placement",
-      "delayed_count": 10,
-      "critical_count": 1,
-      "important_count": 1,
-      "monitor_count": 8,
-      "summary": "Component placement delays are blocking multiple downstream installation tasks and require urgent coordination."
-    },
-    {
-      "area": "AV-installation Coordination",
+      "area": "AV-installationer",
       "delayed_count": 4,
-      "critical_count": 1,
+      "critical_count": 2,
       "important_count": 1,
-      "monitor_count": 2,
-      "summary": "AV-installation coordination is a root cause for delays in electrical and lighting installations."
+      "monitor_count": 1,
+      "summary": "AV-installationer are blocked by unresolved coordination and component placement, causing cascading delays."
     },
     {
-      "area": "Electrical Installations",
+      "area": "Kraftinstallationer",
+      "delayed_count": 5,
+      "critical_count": 0,
+      "important_count": 5,
+      "monitor_count": 0,
+      "summary": "Kraftinstallationer face multiple production delays in cabling and component placement, affecting several trades."
+    },
+    {
+      "area": "Lysinstallationer",
       "delayed_count": 2,
       "critical_count": 0,
       "important_count": 0,
       "monitor_count": 2,
-      "summary": "Electrical installation tasks are blocked by unresolved AV and component placement coordination."
+      "summary": "Lighting installations are delayed due to upstream placement and coordination issues."
     },
     {
-      "area": "Lighting",
-      "delayed_count": 3,
+      "area": "IT og Svagstrøm",
+      "delayed_count": 1,
+      "critical_count": 0,
+      "important_count": 1,
+      "monitor_count": 0,
+      "summary": "IT and low voltage installations are delayed pending resolution of upstream tasks."
+    },
+    {
+      "area": "ARA komponenter",
+      "delayed_count": 1,
+      "critical_count": 0,
+      "important_count": 1,
+      "monitor_count": 0,
+      "summary": "ARA component placement is delayed, affecting related installations."
+    },
+    {
+      "area": "Koordinering",
+      "delayed_count": 1,
+      "critical_count": 1,
+      "important_count": 0,
+      "monitor_count": 0,
+      "summary": "Coordination bottlenecks are blocking AV and Omr. d progress."
+    },
+    {
+      "area": "Omr. d",
+      "delayed_count": 1,
       "critical_count": 0,
       "important_count": 0,
-      "monitor_count": 3,
-      "summary": "Lighting installation delays are downstream consequences of component and AV coordination issues."
+      "monitor_count": 1,
+      "summary": "Omr. d is delayed due to unresolved AV coordination."
     }
   ],
   "insight_data": {
     "total_activities": 68,
     "delayed_count": 14,
-    "critical_count": 2,
-    "important_count": 2,
-    "monitor_count": 10,
-    "root_cause_count": 2,
+    "critical_count": 3,
+    "important_count": 8,
+    "monitor_count": 3,
+    "root_cause_count": 10,
     "reference_date": "12-03-2026",
     "most_overdue_days": 66,
-    "areas_affected": 4,
+    "areas_affected": 7,
     "format_detected": "Structured Table",
     "schedule_name": "2026-03-12 Samlet tidsplan_1side",
-    "primary_risk": "Coordination and component placement delays causing cascading blockages across disciplines."
+    "primary_risk": "Coordination and production delays in AV-installationer and component placement are causing cascading impacts across multiple trades."
   }
 }
 
@@ -5587,7 +5648,7 @@ Return complete JSON matching the strict schema.
 ──────────────────────────────────────────────────────────────────────────────────────────
   Total Activities: 68
   Delayed:          14
-  Areas:            Component Placement, AV-installation Coordination, Electrical Installations, Lighting, IT and Weak Current, General Coordination
+  Areas:            AV-installationer, Kraftinstallationer, Lysinstallationer, IT og Svagstrøm, Fyldningugrad i spor, Placering af belyuning, Placering synligt udstyr, ARA komponenter, Koordinering, Omr. d, Omr. G
   Format:           Structured Table
 
   Delayed Activity IDs: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
@@ -5596,18 +5657,18 @@ Return complete JSON matching the strict schema.
   ──────── ────────────────────────────────────────────────── ────────────── ────── ───────────────
   1        Placering'antal af akringukomponenter, vægge       06-01-2026     66     CRITICAL_NOW
   2        Placering'antal af akringukomponenter, døre        26-01-2026     46     IMPORTANT_NEXT
-  3        Fancoil for dim af kabling                         36-02-2026     15     MONITOR
-  4        Øvrige installationer for dim af kabling           36-07-2026     15     MONITOR
-  5        Arbejdutationer placering                          36-02-2026     15     MONITOR
-  6        Fyldningugrad i spor/ udvidelsesfaktor             36-07-2026     15     MONITOR
-  7        Againatallation - Opdeling af DALil inet.          36-02-2026     15     MONITOR
-  8        Placering af bielyuning                            16-07-2026     -125   MONITOR
+  3        Fancoil for dim af kabling                         36-02-2026     15     IMPORTANT_NEXT
+  4        Øvrige installationer for dim af kabling           36-07-2026     15     IMPORTANT_NEXT
+  5        Arbejdutationer placering                          36-02-2026     15     IMPORTANT_NEXT
+  6        Fyldningugrad i spor/ udvidelsesfaktor             36-07-2026     15     IMPORTANT_NEXT
+  7        Againatallation - Opdeling af DALil inet.          36-02-2026     15     IMPORTANT_NEXT
+  8        Placering af bielyuning                            16-07-2026     -127   MONITOR
   9        Placering synligt udstyr fa tryk og pir, input ved 36-07-2026     15     MONITOR
-  10       Kraft - Placering af komponenter, belastning Place 36-07-2026     15     MONITOR
-  11       Koordinering af AV-installationer med isolering på 09-02-2036     -3622  CRITICAL_NOW
-  12       Samiet ell-belastning for RMS-KT og RttS-lalita Fæ 09-02-2026     32     IMPORTANT_NEXT
-  13       Kraftinstallationer                                22-00-2026     -80    MONITOR
-  14       Lysinstallationer                                  23-02-2026     -18    MONITOR
+  10       Kraft - Placering af komponenter, belastning Place 36-07-2026     15     IMPORTANT_NEXT
+  11       Koordinering af AV-installationer med isolering på 09-02-2036     -3552  CRITICAL_NOW
+  12       Samiet ell-belastning for RMS-KT og RttS-lalita Fæ 09-02-2026     31     CRITICAL_NOW
+  13       IT og Svagstrøm                                    29-01-2026     43     IMPORTANT_NEXT
+  14       Omr. d                                             86-01-2026     -44    MONITOR
 
 ==========================================================================================
   END OF ANALYSIS ANATOMY
