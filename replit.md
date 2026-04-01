@@ -7,14 +7,14 @@ A Python-based RAG (Retrieval-Augmented Generation) Agent SaaS application that 
 - **Framework**: FastAPI
 - **Vector Store**: Supabase with pgvector extension
 - **Embeddings**: Azure OpenAI text-embedding-3-small
-- **LLM (Comparison)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
-- **LLM (Predictive)**: Azure OpenAI GPT-5.2 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
+- **LLM (Comparison)**: Azure OpenAI GPT-4.1 (`AZURE_OPENAI_CHAT_DEPLOYMENT`)
+- **LLM (Predictive)**: Azure OpenAI GPT-4.1 (`AZURE_OPENAI_PREDICTIVE_DEPLOYMENT`) — Nova Insight
 - **PDF Processing**: Azure Document Intelligence OCR + LangChain text splitters
 - **Separated Agents**: Comparison and Predictive agents are fully independent endpoints
 - **DB Connection Pooling**: ThreadedConnectionPool (2-8 connections), batch embedding conversion
 - **Session Metadata**: Original PDF filenames stored in `session_metadata` table, used in AI responses instead of generic labels
 - **Predictive Output**: Strict JSON schema via `response_format` → deterministic structured output → HTML mapping (no regex parsing)
-- **LLM Settings**: temperature=0.2 (near-deterministic), reasoning_effort=high (thorough row scanning), max_completion_tokens=65536
+- **LLM Settings**: temperature=0.2 (near-deterministic), max_tokens=65536 (predictive) / 32768 (comparison), no reasoning_effort (GPT-4.1 is not a reasoning model)
 - **Deployment**: Gunicorn with 1 worker (LLM-bound workload), 300s timeout
 
 ## Project Structure

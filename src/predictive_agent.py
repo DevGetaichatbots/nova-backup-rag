@@ -463,38 +463,15 @@ Return complete JSON matching the strict schema."""
             api_params = {
                 "model": self.deployment,
                 "messages": messages,
-                "max_completion_tokens": 65536,
+                "temperature": 0.2,
+                "max_tokens": 65536,
                 "response_format": {
                     "type": "json_schema",
                     "json_schema": NOVA_INSIGHT_SCHEMA
                 }
             }
 
-            try:
-                api_params["reasoning_effort"] = "high"
-                api_params["temperature"] = 0.2
-                response = self.client.chat.completions.create(**api_params)
-            except Exception as reasoning_err:
-                err_str = str(reasoning_err)
-                if "temperature" in err_str:
-                    logger.warning(f"  [PredictiveAgent] temperature not supported, retrying without it")
-                    del api_params["temperature"]
-                    try:
-                        response = self.client.chat.completions.create(**api_params)
-                    except Exception as inner_err:
-                        inner_str = str(inner_err)
-                        if "reasoning_effort" in inner_str or "Unrecognized" in inner_str:
-                            logger.warning(f"  [PredictiveAgent] reasoning_effort not supported either, retrying without both")
-                            del api_params["reasoning_effort"]
-                            response = self.client.chat.completions.create(**api_params)
-                        else:
-                            raise inner_err
-                elif "reasoning_effort" in err_str or "Unrecognized" in err_str:
-                    logger.warning(f"  [PredictiveAgent] reasoning_effort not supported, retrying without it")
-                    del api_params["reasoning_effort"]
-                    response = self.client.chat.completions.create(**api_params)
-                else:
-                    raise reasoning_err
+            response = self.client.chat.completions.create(**api_params)
 
             choice = response.choices[0]
             raw_content = choice.message.content or ""
