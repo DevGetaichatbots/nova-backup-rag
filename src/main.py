@@ -505,9 +505,9 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     _logger = _log.getLogger(__name__)
 
     if raw_md_chunks:
-        content = raw_md_chunks[0]["content"]
-        lines = content.split("\n")
-        _logger.info(f"  Raw markdown: {len(content)} chars, {len(lines)} lines")
+        all_content = "\n".join(c["content"] for c in raw_md_chunks)
+        lines = all_content.split("\n")
+        _logger.info(f"  Raw markdown: {len(raw_md_chunks)} chunks combined, {len(all_content)} chars, {len(lines)} lines")
         sample_start = [l[:100] for l in lines[:5]]
         sample_end = [l[:100] for l in lines[-3:]]
         _logger.info(f"  First lines: {sample_start}")
@@ -518,9 +518,9 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
         context_parts.append("It contains a table with columns: Id, Opgavetilstand, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver.")
         context_parts.append("Scan EVERY row for delayed activities. Count ALL rows, not just visible ones.")
         context_parts.append("")
-        context_parts.append(content)
+        context_parts.append(all_content)
         context_parts.append("")
-        _logger.info(f"  Context: raw Azure markdown, {len(content)} chars")
+        _logger.info(f"  Context: {len(raw_md_chunks)} raw Azure markdown chunks combined, {len(all_content)} chars")
         return "\n".join(context_parts)
 
     if text_chunks:
