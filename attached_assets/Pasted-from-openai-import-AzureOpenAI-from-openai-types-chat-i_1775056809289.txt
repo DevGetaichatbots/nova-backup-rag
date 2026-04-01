@@ -128,6 +128,12 @@ NOVA_INSIGHT_SCHEMA = {
                     }
                 }
             },
+            # ═══════════════════════════════════════════════════════════════
+            # NEW SECTION: FORCING ASSESSMENT (Client Requirement - April 2026)
+            # Based on: Jens Emil Hansen (Project Director) feedback
+            # References: Rapport Forcering - n^2 error rates, diminishing
+            # returns E(n)=1/(1+k(n-1)), Amdahl's law speedup ceiling
+            # ═══════════════════════════════════════════════════════════════
             "forcing_assessment": {
                 "type": "array",
                 "description": "One entry per CRITICAL_NOW and IMPORTANT_NEXT delayed activity. Evaluates whether the activity can be accelerated (forced) by adding resources, and what the consequences would be. This is the decision-support layer that tells project managers whether throwing people at a delay will help or make things worse.",
@@ -431,42 +437,6 @@ Numbered steps. What to do first, second, third. Turns report into action plan.
 
 ### STEP 7: Resource logic
 For each critical issue: manpower problem, coordination bottleneck, design dependency, or bygherre escalation.
-</task>
-
-<constraints>
-- Use ONLY data from the schedule — never fabricate tasks, IDs, or dates
-- NEVER create fake entries. Every item must correspond to a REAL activity with real values
-- If fewer activities exist, list only those — do NOT pad
-- Reference date: USE THE PROVIDED REFERENCE DATE. If none, use "Dato:" field or today's date
-- Parse Varighed: "50d"=50 days, "3u"=21 days, "0d"=milestone, "74.38d"/"74,38d"=decimal
-- Parse Startdato: "ma 05-01-26" (strip prefix, dd-mm-yy), "01-03-2022" (dd-mm-yyyy)
-- Slutdato="-" does NOT mean summary. Only skip if clearly GROUPING HEADER (Omr. X, E100.XX, Globals)
-- Summary rows: section headers with very high duration spanning sub-tasks AND no real work content
-- Both conditions simultaneously: Startdato < reference_date AND progress = 0%
-- Include 0d tasks (coordination milestones) if they meet both conditions
-- Dates in output: always dd-mm-yyyy format
-- management_conclusion must be written in the response language (Danish if da, English if en)
-- All text fields (task names, assessments, actions) must be in the response language
-- Keep original Danish task names — do not translate Opgavenavn
-- forcing_assessment entries must be present for ALL CRITICAL_NOW and IMPORTANT_NEXT tasks
-- forcing_assessment text fields (reason, risk_if_forced, recommendation) must be in the response language
-- forcing_assessment enum fields (is_forceable, constraint_type, coordination_cost, parallelizability) stay in English
-</constraints>
-
-## DETECTION MODULE A: Delayed Activities
-
-Logic: IF Startdato < reference_date AND progress = 0 THEN flag as DELAYED
-Include 0d tasks. Exclude only summary/parent GROUPING rows.
-
-## FORCING MODULE F: Acceleration Viability
-
-Logic: For each CRITICAL_NOW and IMPORTANT_NEXT delayed activity:
-1. Determine constraint_type from problem_type and task_type
-2. Apply forcing rules (Rules 1-5) to classify is_forceable
-3. Estimate coordination_cost and parallelizability from trade type
-4. Calculate max_speedup_factor and optimal_team_size
-5. Assess point_of_no_return based on days_overdue vs remaining duration
-6. Write clear reason, risk_if_forced, and recommendation
 
 ## PHASE 3: FORCING ASSESSMENT (Module F)
 
@@ -569,6 +539,42 @@ Use these as baseline estimates when classifying coordination_cost:
 3. No complex math in the output text — the math is internal logic, the output is plain language
 4. Each recommendation must be actionable — tell the PM what to DO, not just what the situation IS
 5. Always reference the specific constraint preventing or limiting acceleration
+</task>
+
+<constraints>
+- Use ONLY data from the schedule — never fabricate tasks, IDs, or dates
+- NEVER create fake entries. Every item must correspond to a REAL activity with real values
+- If fewer activities exist, list only those — do NOT pad
+- Reference date: USE THE PROVIDED REFERENCE DATE. If none, use "Dato:" field or today's date
+- Parse Varighed: "50d"=50 days, "3u"=21 days, "0d"=milestone, "74.38d"/"74,38d"=decimal
+- Parse Startdato: "ma 05-01-26" (strip prefix, dd-mm-yy), "01-03-2022" (dd-mm-yyyy)
+- Slutdato="-" does NOT mean summary. Only skip if clearly GROUPING HEADER (Omr. X, E100.XX, Globals)
+- Summary rows: section headers with very high duration spanning sub-tasks AND no real work content
+- Both conditions simultaneously: Startdato < reference_date AND progress = 0%
+- Include 0d tasks (coordination milestones) if they meet both conditions
+- Dates in output: always dd-mm-yyyy format
+- management_conclusion must be written in the response language (Danish if da, English if en)
+- All text fields (task names, assessments, actions) must be in the response language
+- Keep original Danish task names — do not translate Opgavenavn
+- forcing_assessment entries must be present for ALL CRITICAL_NOW and IMPORTANT_NEXT tasks
+- forcing_assessment text fields (reason, risk_if_forced, recommendation) must be in the response language
+- forcing_assessment enum fields (is_forceable, constraint_type, coordination_cost, parallelizability) stay in English
+</constraints>
+
+## DETECTION MODULE A: Delayed Activities
+
+Logic: IF Startdato < reference_date AND progress = 0 THEN flag as DELAYED
+Include 0d tasks. Exclude only summary/parent GROUPING rows.
+
+## FORCING MODULE F: Acceleration Viability
+
+Logic: For each CRITICAL_NOW and IMPORTANT_NEXT delayed activity:
+1. Determine constraint_type from problem_type and task_type
+2. Apply forcing rules (Rules 1-5) to classify is_forceable
+3. Estimate coordination_cost and parallelizability from trade type
+4. Calculate max_speedup_factor and optimal_team_size
+5. Assess point_of_no_return based on days_overdue vs remaining duration
+6. Write clear reason, risk_if_forced, and recommendation
 
 ## LANGUAGE HANDLING
 The management_conclusion, priority_actions, resource_assessment, forcing_assessment descriptive fields, summary_by_area, and all descriptive text fields must be in the requested language. Task names (task_name) stay in their original language from the PDF."""
@@ -685,176 +691,38 @@ Return complete JSON matching the strict schema."""
             {"role": "user", "content": user_message}
         ]
 
-        logger.info(f"  [PredictiveAgent] ╔══ LLM INPUT ══╗")
-        logger.info(f"  [PredictiveAgent] ║ System prompt: {len(system_prompt)} chars")
-        logger.info(f"  [PredictiveAgent] ║ User message: {len(user_message)} chars")
-        um_lines = user_message.split("\n")
-        logger.info(f"  [PredictiveAgent] ║ User msg first 20 lines:")
-        for li, line in enumerate(um_lines[:20]):
-            logger.info(f"  [PredictiveAgent] ║   {li}: {line[:200]}")
-        logger.info(f"  [PredictiveAgent] ║ User msg last 10 lines:")
-        for li, line in enumerate(um_lines[-10:]):
-            logger.info(f"  [PredictiveAgent] ║   {len(um_lines)-10+li}: {line[:200]}")
-        logger.info(f"  [PredictiveAgent] ╚══════════════════════════╝")
-
         try:
-            api_params = {
-                "model": self.deployment,
-                "messages": messages,
-                "temperature": 0,
-                "top_p": 0.1,
-                "seed": 42,
-                "max_tokens": 32768,
-                "response_format": {
+            response = self.client.chat.completions.create(
+                model=self.deployment,
+                messages=messages,
+                response_format={
                     "type": "json_schema",
                     "json_schema": NOVA_INSIGHT_SCHEMA
-                }
-            }
+                },
+                temperature=0.1,
+                max_tokens=16000
+            )
 
-            response = self.client.chat.completions.create(**api_params)
+            result = response.choices[0].message.content
+            logger.info(f"  [PredictiveAgent] Response received. Length: {len(result)} chars")
 
-            choice = response.choices[0]
-            raw_content = choice.message.content or ""
+            parsed = json.loads(result)
 
-            logger.info(f"  [PredictiveAgent] ╔══ RAW LLM RESPONSE ({len(raw_content)} chars) ══╗")
-            resp_lines = raw_content.split("\n")
-            for li, line in enumerate(resp_lines[:30]):
-                logger.info(f"  [PredictiveAgent] ║ {li}: {line[:300]}")
-            if len(resp_lines) > 30:
-                logger.info(f"  [PredictiveAgent] ║ ... ({len(resp_lines) - 30} more lines) ...")
-                for li, line in enumerate(resp_lines[-10:]):
-                    logger.info(f"  [PredictiveAgent] ║ {len(resp_lines)-10+li}: {line[:300]}")
-            logger.info(f"  [PredictiveAgent] ╚══════════════════════════╝")
+            delayed_count = len(parsed.get("delayed_activities", []))
+            root_causes = len(parsed.get("root_cause_analysis", []))
+            forcing_count = len(parsed.get("forcing_assessment", []))
+            forceable = sum(1 for f in parsed.get("forcing_assessment", []) if f.get("is_forceable") in ["possible", "limited"])
+            not_forceable = sum(1 for f in parsed.get("forcing_assessment", []) if f.get("is_forceable") == "not_recommended")
 
-            reasoning_content = getattr(choice.message, 'reasoning_content', None)
-            if not reasoning_content:
-                reasoning_content = getattr(choice.message, 'reasoning', None)
-            if not reasoning_content and hasattr(choice.message, 'model_extra') and choice.message.model_extra:
-                reasoning_content = choice.message.model_extra.get('reasoning_content') or choice.message.model_extra.get('reasoning')
-
-            if reasoning_content:
-                logger.info(f"  [PredictiveAgent] === LLM REASONING START ===")
-                reasoning_str = str(reasoning_content)
-                reasoning_lines = reasoning_str.split('\n')
-                for line in reasoning_lines:
-                    logger.info(f"  [PredictiveAgent] REASONING: {line}")
-                logger.info(f"  [PredictiveAgent] === LLM REASONING END ({len(reasoning_str)} chars) ===")
-            else:
-                logger.info(f"  [PredictiveAgent] No reasoning content returned by model")
-
-            model_used = getattr(response, 'model', self.deployment)
-            usage = getattr(response, 'usage', None)
-            usage_parts = []
-            if usage:
-                usage_parts.append(f"prompt={usage.prompt_tokens}")
-                usage_parts.append(f"completion={usage.completion_tokens}")
-                reasoning_tokens = getattr(usage, 'completion_tokens_details', None)
-                if reasoning_tokens:
-                    r_tokens = getattr(reasoning_tokens, 'reasoning_tokens', None)
-                    if r_tokens is None and hasattr(reasoning_tokens, 'model_extra'):
-                        r_tokens = reasoning_tokens.model_extra.get('reasoning_tokens')
-                    if r_tokens is not None:
-                        usage_parts.append(f"reasoning={r_tokens}")
-            usage_info = f", tokens: {', '.join(usage_parts)}" if usage_parts else ""
-
-            if not raw_content and hasattr(choice.message, 'refusal') and choice.message.refusal:
-                logger.warning(f"  [PredictiveAgent] Model refused: {choice.message.refusal}")
-                return {"predictive_insights": None, "model": self.deployment, "status": "error", "error": f"Model refused: {choice.message.refusal}"}
-
-            if not raw_content:
-                logger.warning(f"  [PredictiveAgent] Empty content. finish_reason={choice.finish_reason}")
-                return {"predictive_insights": None, "model": self.deployment, "status": "error", "error": "Empty response from model"}
-
-            try:
-                parsed_json = json.loads(raw_content)
-            except json.JSONDecodeError as je:
-                logger.error(f"  [PredictiveAgent] JSON parse error: {je}")
-                return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": f"Invalid JSON: {je}"}
-
-            required_keys = {"management_conclusion", "schedule_overview", "delayed_activities",
-                             "root_cause_analysis", "downstream_consequences", "priority_actions",
-                             "resource_assessment", "forcing_assessment", "summary_by_area", "insight_data"}
-            missing_keys = required_keys - set(parsed_json.keys())
-            if missing_keys:
-                logger.error(f"  [PredictiveAgent] Schema validation failed — missing keys: {missing_keys}")
-                return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": f"Schema validation failed: missing {missing_keys}"}
-
-            if not isinstance(parsed_json.get("delayed_activities"), list):
-                logger.error(f"  [PredictiveAgent] Schema validation failed — delayed_activities is not a list")
-                return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": "Schema validation failed: delayed_activities is not a list"}
-
-            original_count = len(parsed_json.get("delayed_activities", []))
-            valid_delayed = [a for a in parsed_json["delayed_activities"] if a.get("days_overdue", 0) > 0]
-            removed_count = original_count - len(valid_delayed)
-            if removed_count > 0:
-                removed_ids = [a.get("id", "?") for a in parsed_json["delayed_activities"] if a.get("days_overdue", 0) <= 0]
-                logger.warning(f"  [PredictiveAgent] Post-validation: removed {removed_count} false positives with days_overdue <= 0: {removed_ids}")
-                parsed_json["delayed_activities"] = valid_delayed
-                if "schedule_overview" in parsed_json:
-                    parsed_json["schedule_overview"]["delayed_count"] = len(valid_delayed)
-                if "insight_data" in parsed_json:
-                    parsed_json["insight_data"]["delayed_count"] = len(valid_delayed)
-                    parsed_json["insight_data"]["critical_count"] = sum(1 for a in valid_delayed if a.get("priority") == "CRITICAL_NOW")
-                    parsed_json["insight_data"]["important_count"] = sum(1 for a in valid_delayed if a.get("priority") == "IMPORTANT_NEXT")
-                    parsed_json["insight_data"]["monitor_count"] = sum(1 for a in valid_delayed if a.get("priority") == "MONITOR")
-
-                dc_list = parsed_json.get("downstream_consequences", [])
-                if dc_list:
-                    valid_dc = [dc for dc in dc_list if dc.get("blocked_by_id") not in set(removed_ids)]
-                    if len(valid_dc) < len(dc_list):
-                        logger.info(f"  [PredictiveAgent] Post-validation: removed {len(dc_list) - len(valid_dc)} downstream consequences linked to false positives")
-                        parsed_json["downstream_consequences"] = valid_dc
-
-                fa_list = parsed_json.get("forcing_assessment", [])
-                if fa_list:
-                    removed_id_set = set(removed_ids)
-                    valid_fa = [fa for fa in fa_list if fa.get("id") not in removed_id_set]
-                    if len(valid_fa) < len(fa_list):
-                        logger.info(f"  [PredictiveAgent] Post-validation: removed {len(fa_list) - len(valid_fa)} forcing assessments linked to false positives")
-                        parsed_json["forcing_assessment"] = valid_fa
-
-                if "insight_data" in parsed_json:
-                    fa_after = parsed_json.get("forcing_assessment", [])
-                    parsed_json["insight_data"]["forceable_count"] = sum(1 for f in fa_after if f.get("is_forceable") in ["possible", "limited"])
-                    parsed_json["insight_data"]["not_forceable_count"] = sum(1 for f in fa_after if f.get("is_forceable") == "not_recommended")
-
-            fa_final = parsed_json.get("forcing_assessment", [])
-            forceable = sum(1 for f in fa_final if f.get("is_forceable") in ["possible", "limited"])
-            not_forceable = sum(1 for f in fa_final if f.get("is_forceable") == "not_recommended")
-            if "insight_data" in parsed_json:
-                parsed_json["insight_data"]["forceable_count"] = forceable
-                parsed_json["insight_data"]["not_forceable_count"] = not_forceable
-
-            delayed_count = len(parsed_json.get("delayed_activities", []))
-            root_causes = sum(1 for a in parsed_json.get("delayed_activities", []) if a.get("is_root_cause"))
-            forcing_count = len(fa_final)
-            logger.info(f"  [PredictiveAgent] JSON response: {delayed_count} delayed activities, {root_causes} root causes, model: {model_used}{usage_info}")
+            logger.info(f"  [PredictiveAgent] Found {delayed_count} delayed activities, {root_causes} root causes")
             logger.info(f"  [PredictiveAgent] Forcing assessment: {forcing_count} evaluated — {forceable} forceable, {not_forceable} not recommended")
 
-            delayed_ids = [a.get("id", "?") for a in parsed_json.get("delayed_activities", [])]
-            logger.info(f"  [PredictiveAgent] Delayed activity IDs: {delayed_ids}")
+            return parsed
 
-            return {
-                "predictive_insights": raw_content,
-                "predictive_json": parsed_json,
-                "model": self.deployment,
-                "status": "success",
-                "raw_llm_response": raw_content,
-                "reasoning_content": str(reasoning_content) if reasoning_content else None,
-                "usage_info": ", ".join(usage_parts) if usage_parts else None,
-                "system_prompt": system_prompt,
-                "user_message": user_message
-            }
-
+        except json.JSONDecodeError as e:
+            logger.error(f"  [PredictiveAgent] JSON parse error: {e}")
+            logger.error(f"  [PredictiveAgent] Raw response: {result[:500]}")
+            raise
         except Exception as e:
             logger.error(f"  [PredictiveAgent] Error: {e}")
-            return {
-                "predictive_insights": None,
-                "predictive_json": None,
-                "model": self.deployment,
-                "status": "error",
-                "error": str(e)
-            }
-
-
-predictive_agent = PredictiveAgent()
+            raise
