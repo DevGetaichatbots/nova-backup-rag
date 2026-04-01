@@ -494,7 +494,130 @@ def _clean_gantt_noise(text: str) -> str:
     return "\n".join(clean_lines)
 
 
+SCHEDULE_DATA_HEADERS = {
+    "id", "opg", "opgavenavn", "varighed", "startdato", "slutdato",
+    "% arbejde færdigt", "% færdigt", "foregående opgaver",
+    "efterfølgende opgaver", "opgavetilstand", "entydigt id",
+    "etage", "omr.", "ansvarlig", "bemærkn.", "bemærkn",
+    "task name", "duration", "start", "finish", "start date",
+    "end date", "% complete", "predecessors", "successors",
+    "responsible", "area"
+}
+GANTT_HEADER_RE = re.compile(
+    r'^(kvt\d|kvt \d|\d{4}\s*kvt|uge\s*\d|jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|'
+    r'\d{4}\s+(jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|kvt))',
+    re.IGNORECASE
+)
+CORE_HEADERS = {"id", "opgavenavn", "startdato", "varighed"}
+
+
+def _parse_html_tables_to_rows(all_html: str) -> tuple[list[str], list[list[str]]]:
+    import re as _re
+    import logging as _log
+    _logger = _log.getLogger(__name__)
+
+    tables = _re.findall(r'<table>.*?</table>', all_html, _re.DOTALL)
+    _logger.info(f"  Table parser: found {len(tables)} tables in OCR HTML")
+
+    canonical_headers = []
+    canonical_indices = []
+    all_data_rows = []
+
+    for ti, table_html in enumerate(tables):
+        header_matches = list(_re.finditer(r'<tr>\s*((?:<th[^>]*>.*?</th>\s*)+)</tr>', table_html, _re.DOTALL))
+        if not header_matches:
+            continue
+
+        header_tr = header_matches[0].group(1)
+        raw_headers = [_re.sub(r'<[^>]+>', '', c).strip() for c in _re.findall(r'<th[^>]*>(.*?)</th>', header_tr, _re.DOTALL)]
+
+        lower_headers = {h.lower().strip() for h in raw_headers if h.strip()}
+        has_core = len(lower_headers & CORE_HEADERS) >= 2
+        if not has_core:
+            _logger.info(f"  Table {ti}: skipped (no schedule headers, got: {raw_headers[:5]})")
+            continue
+
+        data_indices = []
+        for i, h in enumerate(raw_headers):
+            h_lower = h.lower().strip()
+            if h_lower in SCHEDULE_DATA_HEADERS:
+                data_indices.append(i)
+            elif h_lower and not GANTT_HEADER_RE.match(h_lower):
+                data_indices.append(i)
+
+        if not data_indices:
+            data_indices = list(range(len(raw_headers)))
+
+        filtered_h = [raw_headers[i] for i in data_indices]
+
+        if not canonical_headers:
+            canonical_headers = filtered_h
+            canonical_indices = data_indices
+            _logger.info(f"  Table {ti}: canonical headers ({len(canonical_headers)}): {canonical_headers}")
+        else:
+            if filtered_h != canonical_headers:
+                col_map = {}
+                for ci, ch in enumerate(canonical_headers):
+                    ch_low = ch.lower().strip()
+                    for fi, fh in enumerate(filtered_h):
+                        if fh.lower().strip() == ch_low:
+                            col_map[ci] = data_indices[fi]
+                            break
+                if len(col_map) >= len(canonical_headers) - 1:
+                    data_indices = [col_map.get(ci, data_indices[ci] if ci < len(data_indices) else -1) for ci in range(len(canonical_headers))]
+                    _logger.info(f"  Table {ti}: remapped {len(col_map)}/{len(canonical_headers)} columns")
+                else:
+                    _logger.info(f"  Table {ti}: skipped (headers don't match canonical: {filtered_h[:5]})")
+                    continue
+
+        expected_data_cols = len(canonical_headers)
+        for row_match in _re.finditer(r'<tr>\s*((?:<td[^>]*>.*?</td>\s*)+)</tr>', table_html, _re.DOTALL):
+            raw_cells = _re.findall(r'<td[^>]*>(.*?)</td>', row_match.group(1), _re.DOTALL)
+            cells = [_re.sub(r'<[^>]+>', '', c).strip() for c in raw_cells]
+
+            max_idx = max(data_indices) if data_indices else 0
+            if len(cells) <= max_idx // 2:
+                continue
+
+            filtered = []
+            for idx in data_indices:
+                if idx < len(cells):
+                    filtered.append(cells[idx])
+                else:
+                    filtered.append("")
+
+            if any(v.strip() for v in filtered):
+                all_data_rows.append(filtered)
+
+        _logger.info(f"  Table {ti}: {len(all_data_rows)} total rows so far")
+
+    _logger.info(f"  Table parser result: {len(canonical_headers)} columns, {len(all_data_rows)} rows")
+    return canonical_headers, all_data_rows
+
+
+SKIP_HEADERS = {"opg", "opgavetilstand"}
+
+def _format_rows_as_labeled(headers: list[str], rows: list[list[str]]) -> str:
+    lines = []
+    for row in rows:
+        parts = []
+        for i, val in enumerate(row):
+            if i < len(headers):
+                h = headers[i]
+                if h.lower() in SKIP_HEADERS:
+                    continue
+                if not val.strip():
+                    continue
+                parts.append(f"{h}: {val}")
+            elif val and val.strip():
+                parts.append(val)
+        if parts:
+            lines.append(" | ".join(parts))
+    return "\n".join(lines)
+
+
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:
+    import re
     context_parts = []
     doc_label = f"Schedule ({filename})"
 
@@ -505,23 +628,41 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     _logger = _log.getLogger(__name__)
 
     if raw_md_chunks:
-        all_content = "\n".join(c["content"] for c in raw_md_chunks)
-        lines = all_content.split("\n")
-        _logger.info(f"  Raw markdown: {len(raw_md_chunks)} chunks combined, {len(all_content)} chars, {len(lines)} lines")
-        sample_start = [l[:100] for l in lines[:5]]
-        sample_end = [l[:100] for l in lines[-3:]]
-        _logger.info(f"  First lines: {sample_start}")
-        _logger.info(f"  Last lines: {sample_end}")
+        all_html = "\n".join(c["content"] for c in raw_md_chunks)
+        _logger.info(f"  Raw OCR: {len(raw_md_chunks)} chunks, {len(all_html)} chars (HTML)")
 
-        context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
-        context_parts.append("The data below is the COMPLETE schedule extracted from the PDF by OCR.")
-        context_parts.append("It contains a table with columns: Id, Opgavetilstand, Opgavenavn, Varighed, Startdato, Slutdato, % arbejde færdigt, Foregående opgaver, Efterfølgende opgaver.")
-        context_parts.append("Scan EVERY row for delayed activities. Count ALL rows, not just visible ones.")
-        context_parts.append("")
-        context_parts.append(all_content)
-        context_parts.append("")
-        _logger.info(f"  Context: {len(raw_md_chunks)} raw Azure markdown chunks combined, {len(all_content)} chars")
-        return "\n".join(context_parts)
+        headers, data_rows = _parse_html_tables_to_rows(all_html)
+
+        if headers and data_rows:
+            formatted = _format_rows_as_labeled(headers, data_rows)
+
+            non_table = re.sub(r'<table>.*?</table>', '', all_html, flags=re.DOTALL)
+            non_table = re.sub(r'<figure>\s*</figure>', '', non_table).strip()
+            non_table_clean = re.sub(r'<[^>]+>', '', non_table).strip()
+
+            display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
+            context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
+            context_parts.append(f"Columns: {' | '.join(display_headers)}")
+            context_parts.append(f"Total rows: {len(data_rows)}")
+            context_parts.append("Each row below is one activity. Scan EVERY row for delayed activities.")
+            context_parts.append("")
+            context_parts.append(formatted)
+            if non_table_clean:
+                context_parts.append("")
+                context_parts.append(non_table_clean)
+            context_parts.append("")
+
+            result = "\n".join(context_parts)
+            _logger.info(f"  Context: {len(result)} chars (was {len(all_html)} HTML → {len(result)} clean = {100 - len(result)*100//len(all_html)}% reduction)")
+            return result
+        else:
+            _logger.info(f"  No structured tables found, falling back to raw HTML")
+            context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
+            context_parts.append("Scan EVERY row for delayed activities. Count ALL rows.")
+            context_parts.append("")
+            context_parts.append(all_html)
+            context_parts.append("")
+            return "\n".join(context_parts)
 
     if text_chunks:
         context_parts.append(f"[{doc_label}] — TEXT DATA")
