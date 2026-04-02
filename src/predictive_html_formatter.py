@@ -648,32 +648,37 @@ def _render_executive_actions(data: Dict, lang: str) -> str:
             mp_border = "#fecaca"
             mp_label = "Mandskab hjælper IKKE" if lang == "da" else "Manpower will NOT help"
 
-        cards_html += f'''<div style="margin:10px 0;background:#fff;border-radius:12px;border:1px solid {rc["border"]};overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
-  <div style="padding:14px 18px;display:flex;align-items:flex-start;gap:14px;">
-    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:{rc["badge_bg"]};color:#fff;font-size:18px;font-weight:800;flex-shrink:0;box-shadow:0 2px 6px {rc["badge_bg"]}33;">{rank}</div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:14px;font-weight:700;color:#1a202c;line-height:1.5;margin-bottom:10px;">{_e(action.get("action", ""))}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;">
-          {_svg("user", 12, "#64748b")}
-          <span style="font-size:11px;color:#64748b;font-weight:600;">{who_label}:</span>
-          <span style="font-size:11px;color:#1a202c;font-weight:700;">{_e(action.get("responsible", ""))}</span>
-        </div>
-        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;">
-          {_svg("calendar", 12, "#d97706")}
-          <span style="font-size:11px;color:#92400e;font-weight:600;">{when_label}:</span>
-          <span style="font-size:11px;color:#92400e;font-weight:700;">{_e(action.get("deadline", ""))}</span>
-        </div>
+        deadline = _e(action.get("deadline", ""))
+        responsible = _e(action.get("responsible", ""))
+
+        meta_parts = []
+        if deadline:
+            meta_parts.append(f'{_svg("calendar", 13, "#d97706")} <span style="font-size:13px;font-weight:800;color:#92400e;">{deadline}</span>')
+        if deadline and responsible:
+            meta_parts.append('<span style="color:#cbd5e1;font-size:11px;">|</span>')
+        if responsible:
+            meta_parts.append(f'{_svg("user", 12, "#64748b")} <span style="font-size:12px;font-weight:600;color:#475569;">{responsible}</span>')
+        meta_html = f'<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">{"".join(meta_parts)}</div>' if meta_parts else ""
+
+        cards_html += f'''<div style="margin:10px 0;background:#fff;border-radius:12px;border:1px solid {rc["border"]};border-left:4px solid {rc["badge_bg"]};overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+  <div style="padding:16px 18px;">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+      <div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:{rc["badge_bg"]};color:#fff;font-size:16px;font-weight:800;flex-shrink:0;">{rank}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;color:#1a202c;line-height:1.6;">{_e(action.get("action", ""))}</div>
+        {meta_html}
       </div>
-      <div style="padding:8px 12px;background:{mp_bg};border-radius:8px;border:1px solid {mp_border};margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+    </div>
+    <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;padding:8px 12px;background:{mp_bg};border-radius:8px;border:1px solid {mp_border};">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
           {mp_icon}
-          <span style="font-size:10px;color:{mp_color};text-transform:uppercase;font-weight:800;letter-spacing:.6px;">{mp_label}</span>
+          <span style="font-size:10px;color:{mp_color};text-transform:uppercase;font-weight:800;letter-spacing:.5px;">{mp_label}</span>
         </div>
         <div style="font-size:12px;color:#374151;line-height:1.5;font-weight:500;">{manpower_note}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-        <span style="font-size:10px;color:#94a3b8;font-weight:600;">{tasks_label}:</span>
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:8px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+        <span style="font-size:10px;color:#94a3b8;font-weight:600;white-space:nowrap;">{tasks_label}:</span>
         {task_ids_html}
       </div>
     </div>

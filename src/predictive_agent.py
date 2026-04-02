@@ -2,7 +2,7 @@ from openai import AzureOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from src.config import settings
 from typing import List
-from datetime import datetime, date
+from datetime import datetime, date, timezone, timedelta
 import json
 import logging
 
@@ -653,7 +653,8 @@ class PredictiveAgent:
 
         schedule_label = schedule_filename if schedule_filename else "Schedule"
 
-        today = date.today()
+        cet = timezone(timedelta(hours=1))
+        today = datetime.now(cet).date()
         da_days = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
         en_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         da_months = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
