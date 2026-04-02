@@ -2,6 +2,7 @@ from openai import AzureOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from src.config import settings
 from typing import List
+from datetime import datetime, date
 import json
 import logging
 
@@ -38,7 +39,7 @@ NOVA_INSIGHT_SCHEMA = {
                         "rank": {"type": "integer", "description": "1, 2, or 3 — urgency rank"},
                         "action": {"type": "string", "description": "Clear, direct instruction in plain language. Not a description — a command. e.g. 'Indkald koordineringsmøde med EL og VVS for at løse grænsefladekonflikt i Omr. 2' or 'Call coordination meeting with EL + VVS to resolve interface conflict in Area 2'"},
                         "responsible": {"type": "string", "description": "WHO should execute this: 'Projektleder / Project Manager', 'Designleder / Design Lead', 'Bygherre / Client', 'Fagentreprenør EL / Trade Contractor EL', etc."},
-                        "deadline": {"type": "string", "description": "WHEN: 'I dag / Today', 'Denne uge / This week', 'Inden 3 dage / Within 3 days', 'Før [dato] / Before [date]'"},
+                        "deadline": {"type": "string", "description": "WHEN — use REAL day name and date based on today's date. Danish: 'Torsdag d. 3. april 2026'. English: 'Thursday, April 3, 2026'. Never use vague terms like 'this week' or 'within 3 days'."},
                         "related_task_ids": {"type": "array", "items": {"type": "string"}, "description": "Task IDs from delayed_activities that this action addresses"},
                         "manpower_helps": {"type": "boolean", "description": "true ONLY if adding more workers can actually accelerate this. false if it is a decision, coordination, design, procurement, or approval bottleneck"},
                         "manpower_note": {"type": "string", "description": "1 sentence. If manpower_helps=false: explain WHY adding people is useless (e.g. 'Ekstra mandskab hjælper ikke — afventer bygherrebeslutning' / 'Adding people will not help — waiting on client decision'). If manpower_helps=true: state how many and expected impact (e.g. '2-3 ekstra elektrikere kan accelerere med 2x' / '2-3 extra electricians can accelerate by 2x')"}
@@ -603,7 +604,7 @@ PREDICTIVE_LANGUAGE_INSTRUCTIONS = {
 IMPORTANT: All descriptive text must be in Danish (Dansk):
 - executive_actions[].action: written in Danish — direct instructions
 - executive_actions[].responsible: written in Danish (e.g. "Projektleder", "Designleder", "Bygherre")
-- executive_actions[].deadline: written in Danish (e.g. "I dag", "Denne uge", "Inden 3 dage")
+- executive_actions[].deadline: written in Danish with REAL day name and date (e.g. "Torsdag d. 3. april 2026", "Senest fredag d. 4. april")
 - executive_actions[].manpower_note: written in Danish
 - management_conclusion: written in Danish
 - priority_actions[].action: written in Danish
@@ -652,6 +653,17 @@ class PredictiveAgent:
 
         schedule_label = schedule_filename if schedule_filename else "Schedule"
 
+        today = date.today()
+        da_days = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
+        en_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        da_months = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+        en_months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        if language == "da":
+            today_str = f"{da_days[today.weekday()]} d. {today.day}. {da_months[today.month - 1]} {today.year}"
+        else:
+            today_str = f"{en_days[today.weekday()]}, {en_months[today.month - 1]} {today.day}, {today.year}"
+        today_iso = today.strftime("%d-%m-%Y")
+
         ref_date_instruction = ""
         if reference_date:
             ref_date_instruction = f"""
@@ -661,6 +673,9 @@ Do NOT use any other date. Do NOT use today's date. Use: {reference_date}
 """
 
         user_message = f"""Analyze the following construction schedule data.
+
+TODAY'S DATE: {today_str} ({today_iso})
+Today is {en_days[today.weekday()]}. Use this to set concrete deadlines in executive_actions (e.g. real day names and dates like "torsdag d. 3. april" or "Thursday, April 3").
 
 Schedule filename: "{schedule_label}"
 {ref_date_instruction}
@@ -715,7 +730,12 @@ Rules for executive_actions:
    GOOD: "Indkald møde med designteam for at afslutte loftplacering i Omr. 2"
    BAD: "Der er forsinkelser i designinput for Omr. 2"
 2. Each action must specify WHO is responsible (by role, not by name)
-3. Each action must specify WHEN — a concrete deadline relative to today
+3. Each action must specify WHEN — use REAL day names and dates based on TODAY'S DATE provided above.
+   GOOD (da): "Torsdag d. 3. april 2026", "Senest fredag d. 4. april", "Mandag d. 7. april"
+   GOOD (en): "Thursday, April 3, 2026", "By Friday, April 4", "Monday, April 7"
+   BAD: "This week", "Within 3 days", "ASAP" — these are too vague
+   Use the real calendar: if today is Wednesday, the next working day is Thursday.
+   Urgent actions = tomorrow or day after. Important actions = within the week. Lower = next Monday.
 4. Each action must clearly state whether adding manpower helps or is USELESS
 5. When manpower is useless, the manpower_note must be blunt:
    "Ekstra mandskab hjælper IKKE — dette er en beslutning, ikke en arbejdsopgave"
