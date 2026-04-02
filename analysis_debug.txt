@@ -1,6 +1,6 @@
 ==========================================================================================
   NOVA INSIGHT — COMPLETE ANALYSIS ANATOMY
-  Updated: 2026-04-01T16:22:08.297586
+  Updated: 2026-04-02T13:17:21.251136
 ==========================================================================================
 
 ──────────────────────────────────────────────────────────────────────────────────────────
@@ -11,12 +11,12 @@
   Reference Date: 12-03-2026
   Language:       en
   Format:         html
-  Analysis ID:    sa_db975a60fdce09ba
+  Analysis ID:    sa_6e0003a508741b63
 
 ──────────────────────────────────────────────────────────────────────────────────────────
   STEP 2: OCR EXTRACTION (Azure Document Intelligence)
 ──────────────────────────────────────────────────────────────────────────────────────────
-  OCR Time:       12.5s
+  OCR Time:       9.4s
   Chunks:         raw_md=2, rows=138, tables=17, text=40
   Total chunks:   197
 
@@ -3866,7 +3866,7 @@ Sti for efterfølgende opgave - opgave med milepæle
 
 
 ──────────────────────────────────────────────────────────────────────────────────────────
-  STEP 4A: SYSTEM PROMPT SENT TO LLM (17955 chars)
+  STEP 4A: SYSTEM PROMPT SENT TO LLM (18588 chars)
 ──────────────────────────────────────────────────────────────────────────────────────────
 
 <context>
@@ -3876,10 +3876,11 @@ You return your analysis as STRICT JSON matching the provided schema. Every fiel
 
 You receive the COMPLETE contents of a construction schedule file.
 
-Your analysis has THREE layers:
+Your analysis has FOUR layers:
 1. DETECTION LAYER (Module A): Identify ALL delayed activities with absolute precision
 2. DECISION SUPPORT LAYER: Transform raw delays into root cause understanding, consequence mapping, priority ranking, and practical action guidance
 3. FORCING ASSESSMENT LAYER (Module F): For each critical/important delay, evaluate whether acceleration (forcing) is viable, what the consequences are, and provide a clear recommendation
+4. EXECUTIVE ACTION LAYER: Synthesize everything into TOP 3 concrete actions the PM must take IMMEDIATELY — with WHO, WHAT, WHEN, and whether adding manpower helps or is useless
 
 You are NOT a simple reporting tool. You think and reason like an experienced construction planner. You understand that:
 - Some delays are root causes, others are downstream consequences
@@ -4051,6 +4052,10 @@ For each critical issue: manpower problem, coordination bottleneck, design depen
 - forcing_assessment entries must be present for ALL CRITICAL_NOW and IMPORTANT_NEXT tasks
 - forcing_assessment text fields (reason, risk_if_forced, recommendation) must be in the response language
 - forcing_assessment enum fields (is_forceable, constraint_type, coordination_cost, parallelizability) stay in English
+- executive_actions must contain EXACTLY 3 entries (rank 1, 2, 3) — the top 3 most impactful actions
+- executive_actions must be concrete instructions, NOT summaries of the analysis
+- executive_actions.manpower_helps must be false for any action addressing coordination, design, bygherre, or procurement bottlenecks
+- executive_actions.manpower_note must be blunt and clear when manpower is useless — state it explicitly so the PM does not waste resources
 </constraints>
 
 ## DETECTION MODULE A: Delayed Activities
@@ -4180,10 +4185,13 @@ Enum values stay as defined in the schema.
 
 
 ──────────────────────────────────────────────────────────────────────────────────────────
-  STEP 4B: USER MESSAGE SENT TO LLM (28384 chars)
+  STEP 4B: USER MESSAGE SENT TO LLM (30193 chars)
 ──────────────────────────────────────────────────────────────────────────────────────────
 
 Analyze the following construction schedule data.
+
+TODAY'S DATE: Thursday, April 2, 2026 (02-04-2026)
+Today is Thursday. Use this to set concrete deadlines in executive_actions (e.g. real day names and dates like "torsdag d. 3. april" or "Thursday, April 3").
 
 Schedule filename: "2026-03-12 Samlet tidsplan"
 
@@ -4619,6 +4627,29 @@ PHASE 3 — FORCING ASSESSMENT:
 - Output must be simple, clear, and leave zero room for misinterpretation
 - This is what makes the product decision support, not just analysis
 
+PHASE 4 — EXECUTIVE ACTIONS (TOP 3 PRIORITIES):
+After completing all analysis, synthesize into EXACTLY 3 executive actions.
+These are THE 3 most impactful things the PM must do RIGHT NOW.
+
+Rules for executive_actions:
+1. Each action is a DIRECT INSTRUCTION — not a finding, not an observation. Write it as a command.
+   GOOD: "Indkald møde med designteam for at afslutte loftplacering i Omr. 2"
+   BAD: "Der er forsinkelser i designinput for Omr. 2"
+2. Each action must specify WHO is responsible (by role, not by name)
+3. Each action must specify WHEN — use REAL day names and dates based on TODAY'S DATE provided above.
+   GOOD (da): "Torsdag d. 3. april 2026", "Senest fredag d. 4. april", "Mandag d. 7. april"
+   GOOD (en): "Thursday, April 3, 2026", "By Friday, April 4", "Monday, April 7"
+   BAD: "This week", "Within 3 days", "ASAP" — these are too vague
+   Use the real calendar: if today is Wednesday, the next working day is Thursday.
+   Urgent actions = tomorrow or day after. Important actions = within the week. Lower = next Monday.
+4. Each action must clearly state whether adding manpower helps or is USELESS
+5. When manpower is useless, the manpower_note must be blunt:
+   "Ekstra mandskab hjælper IKKE — dette er en beslutning, ikke en arbejdsopgave"
+   "Adding people will NOT help — this is a decision bottleneck, not a work task"
+6. When manpower helps, state HOW MANY and the expected speedup
+7. Actions should address ROOT CAUSES, not symptoms. Fixing 1 root cause may resolve 5 downstream delays.
+8. Rank by impact: the action that unblocks the most downstream work = rank 1
+
 Return complete JSON matching the strict schema.
 
 ──────────────────────────────────────────────────────────────────────────────────────────
@@ -4626,27 +4657,48 @@ Return complete JSON matching the strict schema.
 ──────────────────────────────────────────────────────────────────────────────────────────
   Model:    gpt-4.1
   Status:   success
-  Tokens:   prompt=17763, completion=10706, reasoning=0
-  Time:     146.1s total
+  Tokens:   prompt=18933, completion=10182, reasoning=0
+  Time:     57.5s total
 
-  --- RAW JSON RESPONSE (39311 chars) ---
+  --- RAW JSON RESPONSE (36376 chars) ---
 
 {
-  "management_conclusion": "The primary risk driver is a cluster of unresolved design and coordination tasks from late 2025 and early 2026, which are now significantly overdue and blocking downstream production and installation activities. The delays are cascading, not isolated, with critical impact on electrical, VVS, and security system disciplines. The most urgent action is to resolve the root-cause design and coordination bottlenecks, especially those with multiple downstream dependencies. Forcing (acceleration by adding manpower) is not recommended for these tasks, as the constraints are not related to labour but to missing decisions and coordination. Management attention should focus on unlocking these bottlenecks before considering any resource ramp-up.",
+  "executive_actions": [
+    {
+      "rank": 1,
+      "action": "Call a coordination meeting with the design team and electrical lead to resolve the placement and selection of security components for ceilings, walls, and doors (Tasks 40, 41, 42) in Area 1. Ensure all decisions are finalized and documented.",
+      "responsible": "Project Manager / Design Lead",
+      "deadline": "Friday, April 3, 2026",
+      "related_task_ids": ["40", "41", "42"],
+      "manpower_helps": false,
+      "manpower_note": "Adding people will NOT help — this is a coordination and design bottleneck, not a work task."
+    },
+    {
+      "rank": 2,
+      "action": "Escalate to the client for immediate clarification and approval on 'Reetablering af solceller' (Task 648) and related design input for DAS/SINE (Tasks 644, 645). Request written decisions and input by Monday.",
+      "responsible": "Project Manager / Client",
+      "deadline": "Monday, April 6, 2026",
+      "related_task_ids": ["648", "644", "645"],
+      "manpower_helps": false,
+      "manpower_note": "Adding people will NOT help — waiting on client and design input. Resolve prerequisites first."
+    },
+    {
+      "rank": 3,
+      "action": "Review and release all pending zero-duration coordination milestones in Area 4 and Area 5 (Tasks 520–529, 542–551). Assign a single coordinator to close out these gates and confirm readiness for downstream production.",
+      "responsible": "Project Manager / Area Coordinators",
+      "deadline": "Monday, April 6, 2026",
+      "related_task_ids": ["520", "521", "522", "523", "524", "525", "526", "527", "528", "529", "542", "543", "544", "545", "546", "547", "548", "549", "550", "551"],
+      "manpower_helps": false,
+      "manpower_note": "Adding people will NOT help — these are coordination milestones, not production tasks."
+    }
+  ],
+  "management_conclusion": "The primary risk driver is unresolved coordination and design input, especially regarding security component placement and client-driven decisions for solar cell reinstatement and DAS/SINE design. Delays are cascading, blocking multiple downstream production and installation activities across several areas. The most critical actions are to resolve coordination bottlenecks and secure client input, as adding manpower will not accelerate these tasks. Immediate management attention is required to unblock root causes; only after these are resolved can production proceed efficiently.",
   "schedule_overview": {
     "schedule_name": "2026-03-12 Samlet tidsplan",
     "reference_date": "12-03-2026",
     "total_activities": 136,
     "delayed_count": 34,
-    "areas_covered": [
-      "EL",
-      "VVS",
-      "Sikringsprojekt",
-      "Design",
-      "Koordinering",
-      "Omr. 4",
-      "Omr. 5"
-    ],
+    "areas_covered": ["Area 1", "Area 2", "Area 3", "Area 4", "Area 5"],
     "format_detected": "MS Project Export"
   },
   "delayed_activities": [
@@ -4657,12 +4709,12 @@ Return complete JSON matching the strict schema.
       "end_date": "18-11-2025",
       "duration": "10d",
       "progress": "0%",
-      "days_overdue": 489,
-      "task_type": "Design",
-      "priority": "CRITICAL_NOW",
+      "days_overdue": 124,
+      "task_type": "Production",
+      "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "VVS"
+      "area": "Area 1"
     },
     {
       "id": "21",
@@ -4671,12 +4723,12 @@ Return complete JSON matching the strict schema.
       "end_date": "13-10-2025",
       "duration": "10d",
       "progress": "0%",
-      "days_overdue": 530,
+      "days_overdue": 163,
       "task_type": "Design",
-      "priority": "CRITICAL_NOW",
+      "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "VVS"
+      "area": "Area 1"
     },
     {
       "id": "23",
@@ -4690,7 +4742,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Ventilation"
+      "area": "Area 1"
     },
     {
       "id": "24",
@@ -4700,11 +4752,11 @@ Return complete JSON matching the strict schema.
       "duration": "10d",
       "progress": "0%",
       "days_overdue": 67,
-      "task_type": "Design",
-      "priority": "IMPORTANT_NEXT",
+      "task_type": "Coordination",
+      "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikringsprojekt"
+      "area": "Area 1"
     },
     {
       "id": "25",
@@ -4714,11 +4766,11 @@ Return complete JSON matching the strict schema.
       "duration": "2d",
       "progress": "0%",
       "days_overdue": 67,
-      "task_type": "Design",
+      "task_type": "Production",
       "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "21",
-      "area": "Ark"
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 1"
     },
     {
       "id": "26",
@@ -4729,10 +4781,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 67,
       "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "20",
-      "area": "VVS"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 1"
     },
     {
       "id": "27",
@@ -4746,7 +4798,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Koordinering"
+      "area": "Area 1"
     },
     {
       "id": "29",
@@ -4755,12 +4807,26 @@ Return complete JSON matching the strict schema.
       "end_date": "21-11-2025",
       "duration": "15d",
       "progress": "0%",
-      "days_overdue": 491,
-      "task_type": "Design",
-      "priority": "CRITICAL_NOW",
+      "days_overdue": 126,
+      "task_type": "Production",
+      "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 1"
+    },
+    {
+      "id": "30",
+      "task_name": "IKT",
+      "start_date": "05-01-2026",
+      "end_date": "09-01-2026",
+      "duration": "5d",
+      "progress": "0%",
+      "days_overdue": 67,
+      "task_type": "Coordination",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 1"
     },
     {
       "id": "33",
@@ -4774,7 +4840,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 1"
     },
     {
       "id": "35",
@@ -4783,12 +4849,12 @@ Return complete JSON matching the strict schema.
       "end_date": "08-04-2026",
       "duration": "15d",
       "progress": "0%",
-      "days_overdue": 0,
+      "days_overdue": -4,
       "task_type": "Bygherre",
       "priority": "MONITOR",
       "is_root_cause": false,
       "blocked_by_id": "33",
-      "area": "EL"
+      "area": "Area 1"
     },
     {
       "id": "36",
@@ -4799,10 +4865,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 18,
       "task_type": "Bygherre",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "33",
-      "area": "EL"
+      "priority": "IMPORTANT_NEXT",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 1"
     },
     {
       "id": "37",
@@ -4811,12 +4877,12 @@ Return complete JSON matching the strict schema.
       "end_date": "08-04-2026",
       "duration": "15d",
       "progress": "0%",
-      "days_overdue": 0,
+      "days_overdue": -4,
       "task_type": "Bygherre",
       "priority": "MONITOR",
       "is_root_cause": false,
-      "blocked_by_id": "33",
-      "area": "EL"
+      "blocked_by_id": "36",
+      "area": "Area 1"
     },
     {
       "id": "38",
@@ -4830,7 +4896,7 @@ Return complete JSON matching the strict schema.
       "priority": "MONITOR",
       "is_root_cause": false,
       "blocked_by_id": "34",
-      "area": "EL"
+      "area": "Area 1"
     },
     {
       "id": "39",
@@ -4839,12 +4905,12 @@ Return complete JSON matching the strict schema.
       "end_date": "15-04-2026",
       "duration": "100d",
       "progress": "0%",
-      "days_overdue": 491,
-      "task_type": "Design",
+      "days_overdue": 130,
+      "task_type": "Coordination",
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikringsprojekt"
+      "area": "Area 1"
     },
     {
       "id": "40",
@@ -4853,12 +4919,12 @@ Return complete JSON matching the strict schema.
       "end_date": "15-04-2026",
       "duration": "100d",
       "progress": "0%",
-      "days_overdue": 491,
+      "days_overdue": 130,
       "task_type": "Design",
       "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Sikringsprojekt"
+      "area": "Area 1"
     },
     {
       "id": "41",
@@ -4869,10 +4935,10 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 67,
       "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "40",
-      "area": "Sikringsprojekt"
+      "priority": "CRITICAL_NOW",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 1"
     },
     {
       "id": "42",
@@ -4883,164 +4949,24 @@ Return complete JSON matching the strict schema.
       "progress": "0%",
       "days_overdue": 53,
       "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "24",
-      "area": "Sikringsprojekt"
-    },
-    {
-      "id": "519",
-      "task_name": "Afhængigheder",
-      "start_date": "09-02-2026",
-      "end_date": "18-09-2026",
-      "duration": "135,25d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Coordination",
-      "priority": "IMPORTANT_NEXT",
+      "priority": "CRITICAL_NOW",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "Omr. 4"
+      "area": "Area 1"
     },
     {
-      "id": "520",
-      "task_name": "Fancoils for dim af kabling",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
+      "id": "648",
+      "task_name": "Reetablering af solceller",
+      "start_date": "18-12-2025",
+      "end_date": "15-01-2026",
+      "duration": "11d",
       "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "521",
-      "task_name": "Øvrige installationer for dim af kabling",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "522",
-      "task_name": "Arbejdsstationer placering",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "523",
-      "task_name": "Fyldningsgrad i spor/ udviddelsesfaktor",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "524",
-      "task_name": "Lysinstallation - Opdeling af DALI inst.",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "525",
-      "task_name": "Placering af belysning",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "526",
-      "task_name": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "527",
-      "task_name": "Kraft - Placering af komponenter, belastning",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "528",
-      "task_name": "Placering og valg af ABA komponenter",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Design",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
-    },
-    {
-      "id": "529",
-      "task_name": "Koordinering af AV-installationer med isolering på skørter. Placering af inst. Over loft samt under gulv",
-      "start_date": "09-02-2026",
-      "end_date": "09-02-2026",
-      "duration": "0d",
-      "progress": "0%",
-      "days_overdue": 32,
-      "task_type": "Coordination",
-      "priority": "MONITOR",
-      "is_root_cause": false,
-      "blocked_by_id": "519",
-      "area": "Omr. 4"
+      "days_overdue": 85,
+      "task_type": "Bygherre",
+      "priority": "CRITICAL_NOW",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 2"
     },
     {
       "id": "644",
@@ -5054,7 +4980,7 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 2"
     },
     {
       "id": "645",
@@ -5068,21 +4994,21 @@ Return complete JSON matching the strict schema.
       "priority": "IMPORTANT_NEXT",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 2"
     },
     {
-      "id": "648",
-      "task_name": "Reetablering af solceller",
-      "start_date": "18-12-2025",
-      "end_date": "15-01-2026",
-      "duration": "11d",
+      "id": "651",
+      "task_name": "Jording",
+      "start_date": "27-01-2026",
+      "end_date": "03-02-2026",
+      "duration": "6d",
       "progress": "0%",
-      "days_overdue": 85,
+      "days_overdue": 45,
       "task_type": "Production",
-      "priority": "IMPORTANT_NEXT",
+      "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 2"
     },
     {
       "id": "1185",
@@ -5091,436 +5017,517 @@ Return complete JSON matching the strict schema.
       "end_date": "06-03-2026",
       "duration": "75d",
       "progress": "0%",
-      "days_overdue": 491,
-      "task_type": "Design",
-      "priority": "CRITICAL_NOW",
+      "days_overdue": 130,
+      "task_type": "Production",
+      "priority": "MONITOR",
       "is_root_cause": true,
       "blocked_by_id": null,
-      "area": "EL"
+      "area": "Area 3"
     },
     {
-      "id": "1187",
-      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
-      "start_date": "08-09-2025",
-      "end_date": "-",
+      "id": "520",
+      "task_name": "Fancoils for dim af kabling",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
       "duration": "0d",
       "progress": "0%",
-      "days_overdue": 551,
-      "task_type": "Design",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "521",
+      "task_name": "Øvrige installationer for dim af kabling",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "522",
+      "task_name": "Arbejdsstationer placering",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "523",
+      "task_name": "Fyldningsgrad i spor/ udviddelsesfaktor",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "524",
+      "task_name": "Lysinstallation - Opdeling af DALI inst.",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "525",
+      "task_name": "Placering af belysning",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "526",
+      "task_name": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "527",
+      "task_name": "Kraft - Placering af komponenter, belastning",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "528",
+      "task_name": "Placering og valg af ABA komponenter",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "529",
+      "task_name": "Koordinering af AV-installationer med isolering på skørter. Placering af inst. Over loft samt under gulv",
+      "start_date": "09-02-2026",
+      "end_date": "09-02-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": 32,
+      "task_type": "Coordination",
+      "priority": "MONITOR",
+      "is_root_cause": true,
+      "blocked_by_id": null,
+      "area": "Area 4"
+    },
+    {
+      "id": "542",
+      "task_name": "Fancoils for dim af kabling",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
       "priority": "MONITOR",
       "is_root_cause": false,
-      "blocked_by_id": "21",
-      "area": "Design"
+      "blocked_by_id": "520",
+      "area": "Area 5"
+    },
+    {
+      "id": "543",
+      "task_name": "Øvrige installationer for dim af kabling",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "521",
+      "area": "Area 5"
+    },
+    {
+      "id": "544",
+      "task_name": "Arbejdsstationer placering",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "522",
+      "area": "Area 5"
+    },
+    {
+      "id": "545",
+      "task_name": "Fyldningsgrad i spor/ udviddelsesfaktor",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "523",
+      "area": "Area 5"
+    },
+    {
+      "id": "546",
+      "task_name": "Lysinstallation - Opdeling af DALI inst.",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "524",
+      "area": "Area 5"
+    },
+    {
+      "id": "547",
+      "task_name": "Placering af belysning",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "525",
+      "area": "Area 5"
+    },
+    {
+      "id": "548",
+      "task_name": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "526",
+      "area": "Area 5"
+    },
+    {
+      "id": "549",
+      "task_name": "Kraft - Placering af komponenter, belastning",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "527",
+      "area": "Area 5"
+    },
+    {
+      "id": "550",
+      "task_name": "Placering og valg af ABA komponenter",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Milestone",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "528",
+      "area": "Area 5"
+    },
+    {
+      "id": "551",
+      "task_name": "Koordinering af AV-installationer med isolering på skørter. Placering af inst. Over loft samt under gulv",
+      "start_date": "16-03-2026",
+      "end_date": "16-03-2026",
+      "duration": "0d",
+      "progress": "0%",
+      "days_overdue": -4,
+      "task_type": "Coordination",
+      "priority": "MONITOR",
+      "is_root_cause": false,
+      "blocked_by_id": "529",
+      "area": "Area 5"
     }
   ],
   "root_cause_analysis": [
     {
-      "id": "20",
-      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
-      "days_overdue": 489,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks VVS design finalization and all dependent procurement/installation.",
-      "downstream_impact": "VVS installation, procurement, and commissioning tasks",
-      "consequence_if_unresolved": "VVS installation cannot start, causing cascading delays to all dependent trades.",
-      "affected_task_ids": ["26"]
-    },
-    {
-      "id": "21",
-      "task_name": "E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral",
-      "days_overdue": 530,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks kitchen fit-out and all related procurement and installation.",
-      "downstream_impact": "Kitchen installation, procurement, and fit-out activities",
-      "consequence_if_unresolved": "Kitchen area cannot be fitted out, delaying handover and use.",
-      "affected_task_ids": ["25", "1187"]
-    },
-    {
-      "id": "23",
-      "task_name": "E100.01 - Fastlæg krav til kemidepot",
-      "days_overdue": 67,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Prevents finalization of chemical depot requirements and downstream procurement.",
-      "downstream_impact": "Ventilation and chemical storage installation",
-      "consequence_if_unresolved": "Chemical depot cannot be constructed or commissioned.",
-      "affected_task_ids": []
-    },
-    {
       "id": "24",
       "task_name": "Sikringsprojekt, omfang af ADK",
       "days_overdue": 67,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks all security system design and installation.",
-      "downstream_impact": "Security system installation and commissioning",
-      "consequence_if_unresolved": "Security systems cannot be installed, impacting building handover.",
-      "affected_task_ids": ["42"]
-    },
-    {
-      "id": "27",
-      "task_name": "E100 Pressemøder I Banksalen skal afklares",
-      "days_overdue": 67,
       "problem_type": "Coordination blockage",
-      "why_it_matters": "Prevents coordination of press events and related works.",
-      "downstream_impact": "Event space fit-out and scheduling",
-      "consequence_if_unresolved": "Event space cannot be finalized or scheduled.",
-      "affected_task_ids": []
-    },
-    {
-      "id": "29",
-      "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
-      "days_overdue": 491,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks all sun screening and blackout system procurement and installation.",
-      "downstream_impact": "Sun screening installation, electrical interface, commissioning",
-      "consequence_if_unresolved": "Sun screening cannot be installed, impacting building usability.",
-      "affected_task_ids": []
-    },
-    {
-      "id": "33",
-      "task_name": "Gokendelse af synlige komponeter fra E100.03",
-      "days_overdue": 53,
-      "problem_type": "Bygherre decision pending",
-      "why_it_matters": "Blocks approval of visible electrical components.",
-      "downstream_impact": "Electrical installation and fit-out",
-      "consequence_if_unresolved": "Electrical installation cannot proceed, delaying fit-out.",
-      "affected_task_ids": ["35", "36", "37"]
+      "why_it_matters": "Blocks all downstream security component placement and installation.",
+      "downstream_impact": "Design, installation, and commissioning of security systems in Area 1.",
+      "consequence_if_unresolved": "Security system installation cannot proceed, causing cascading delays.",
+      "affected_task_ids": ["40", "41", "42"]
     },
     {
       "id": "39",
       "task_name": "Sikringsprojekt",
-      "days_overdue": 491,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks all security system design and installation.",
-      "downstream_impact": "Security system installation and commissioning",
-      "consequence_if_unresolved": "Security systems cannot be installed, impacting building handover.",
-      "affected_task_ids": ["40", "41"]
+      "days_overdue": 130,
+      "problem_type": "Coordination blockage",
+      "why_it_matters": "Blocks overall security system coordination and interface resolution.",
+      "downstream_impact": "All security-related tasks in Area 1.",
+      "consequence_if_unresolved": "Security system cannot be integrated, risking project handover.",
+      "affected_task_ids": ["40", "41", "42"]
     },
     {
       "id": "40",
       "task_name": "Placering/antal af sikringskomponenter, lofter",
-      "days_overdue": 491,
+      "days_overdue": 130,
       "problem_type": "Design input missing",
-      "why_it_matters": "Blocks placement of security components in ceilings.",
-      "downstream_impact": "Security component installation in ceilings and related areas",
-      "consequence_if_unresolved": "Security components cannot be installed, delaying commissioning.",
-      "affected_task_ids": ["41"]
+      "why_it_matters": "Blocks placement and installation of security components in ceilings.",
+      "downstream_impact": "Installation and commissioning in Area 1.",
+      "consequence_if_unresolved": "Installation cannot start, delaying all related works.",
+      "affected_task_ids": ["41", "42"]
     },
     {
-      "id": "519",
-      "task_name": "Afhængigheder",
-      "days_overdue": 32,
-      "problem_type": "Coordination blockage",
-      "why_it_matters": "Blocks all dependent tasks in Omr. 4.",
-      "downstream_impact": "All Omr. 4 design and installation tasks",
-      "consequence_if_unresolved": "No progress in Omr. 4 until coordination is resolved.",
-      "affected_task_ids": [
-        "520", "521", "522", "523", "524", "525", "526", "527", "528", "529"
-      ]
+      "id": "41",
+      "task_name": "Placering/antal af sikringskomponenter, vægge",
+      "days_overdue": 67,
+      "problem_type": "Design input missing",
+      "why_it_matters": "Blocks placement and installation of security components in walls.",
+      "downstream_impact": "Installation and commissioning in Area 1.",
+      "consequence_if_unresolved": "Installation cannot start, delaying all related works.",
+      "affected_task_ids": ["42"]
     },
     {
-      "id": "644",
-      "task_name": "Udarbejde notat om DAS/SINE",
-      "days_overdue": 101,
+      "id": "42",
+      "task_name": "Placering/antal af sikringskomponenter, døre",
+      "days_overdue": 53,
       "problem_type": "Design input missing",
-      "why_it_matters": "Blocks documentation and design for DAS/SINE systems.",
-      "downstream_impact": "DAS/SINE system design and installation",
-      "consequence_if_unresolved": "DAS/SINE systems cannot be designed or installed.",
-      "affected_task_ids": ["28"]
-    },
-    {
-      "id": "645",
-      "task_name": "Projektering af DAS/Sine",
-      "days_overdue": 115,
-      "problem_type": "Design input missing",
-      "why_it_matters": "Blocks all DAS/SINE system design and installation.",
-      "downstream_impact": "DAS/SINE system installation and commissioning",
-      "consequence_if_unresolved": "DAS/SINE systems cannot be installed, impacting building handover.",
+      "why_it_matters": "Blocks placement and installation of security components in doors.",
+      "downstream_impact": "Installation and commissioning in Area 1.",
+      "consequence_if_unresolved": "Installation cannot start, delaying all related works.",
       "affected_task_ids": []
     },
     {
       "id": "648",
       "task_name": "Reetablering af solceller",
       "days_overdue": 85,
-      "problem_type": "Production delay",
-      "why_it_matters": "Blocks solar panel reinstallation and related commissioning.",
-      "downstream_impact": "Solar system commissioning",
-      "consequence_if_unresolved": "Solar system cannot be commissioned, impacting sustainability targets.",
-      "affected_task_ids": []
+      "problem_type": "Bygherre decision pending",
+      "why_it_matters": "Blocks solar cell reinstatement and related electrical works.",
+      "downstream_impact": "Electrical installation and commissioning in Area 2.",
+      "consequence_if_unresolved": "Electrical works cannot proceed, risking energy system completion.",
+      "affected_task_ids": ["644", "645"]
     },
     {
-      "id": "1185",
-      "task_name": "E100.05 ELEV",
-      "days_overdue": 491,
+      "id": "644",
+      "task_name": "Udarbejde notat om DAS/SINE",
+      "days_overdue": 101,
       "problem_type": "Design input missing",
-      "why_it_matters": "Blocks all elevator-related design and installation.",
-      "downstream_impact": "Elevator procurement, installation, and commissioning",
-      "consequence_if_unresolved": "Elevators cannot be installed, impacting building handover.",
+      "why_it_matters": "Blocks DAS/SINE system design and installation.",
+      "downstream_impact": "DAS/SINE installation in Area 2.",
+      "consequence_if_unresolved": "DAS/SINE system cannot be installed, risking communication system readiness.",
+      "affected_task_ids": ["645"]
+    },
+    {
+      "id": "645",
+      "task_name": "Projektering af DAS/Sine",
+      "days_overdue": 115,
+      "problem_type": "Design input missing",
+      "why_it_matters": "Blocks DAS/SINE system installation.",
+      "downstream_impact": "DAS/SINE installation in Area 2.",
+      "consequence_if_unresolved": "DAS/SINE system cannot be installed, risking communication system readiness.",
       "affected_task_ids": []
     }
   ],
   "downstream_consequences": [
-    {
-      "id": "25",
-      "task_name": "Infovæg med glasfronter (ARK pkt. 3.7)",
-      "blocked_by_id": "21"
-    },
-    {
-      "id": "26",
-      "task_name": "E100.02 - Stillingtagen til kølevand i terræn - udskiftning/relining",
-      "blocked_by_id": "20"
-    },
     {
       "id": "35",
       "task_name": "Godkendelse af indbygning af RKS og RUD",
       "blocked_by_id": "33"
     },
     {
-      "id": "36",
-      "task_name": "Godkendelse af indbygning i \"ovenlys\"",
-      "blocked_by_id": "33"
-    },
-    {
       "id": "37",
       "task_name": "Godkendelse af kølecentralens indretning",
-      "blocked_by_id": "33"
+      "blocked_by_id": "36"
     },
     {
-      "id": "41",
-      "task_name": "Placering/antal af sikringskomponenter, vægge",
-      "blocked_by_id": "40"
+      "id": "38",
+      "task_name": "Deadline for afstemt materiale til ALI vedr. SLKS",
+      "blocked_by_id": "34"
     },
     {
-      "id": "42",
-      "task_name": "Placering/antal af sikringskomponenter, døre",
-      "blocked_by_id": "24"
-    },
-    {
-      "id": "520",
+      "id": "542",
       "task_name": "Fancoils for dim af kabling",
-      "blocked_by_id": "519"
+      "blocked_by_id": "520"
     },
     {
-      "id": "521",
+      "id": "543",
       "task_name": "Øvrige installationer for dim af kabling",
-      "blocked_by_id": "519"
+      "blocked_by_id": "521"
     },
     {
-      "id": "522",
+      "id": "544",
       "task_name": "Arbejdsstationer placering",
-      "blocked_by_id": "519"
+      "blocked_by_id": "522"
     },
     {
-      "id": "523",
+      "id": "545",
       "task_name": "Fyldningsgrad i spor/ udviddelsesfaktor",
-      "blocked_by_id": "519"
+      "blocked_by_id": "523"
     },
     {
-      "id": "524",
+      "id": "546",
       "task_name": "Lysinstallation - Opdeling af DALI inst.",
-      "blocked_by_id": "519"
+      "blocked_by_id": "524"
     },
     {
-      "id": "525",
+      "id": "547",
       "task_name": "Placering af belysning",
-      "blocked_by_id": "519"
+      "blocked_by_id": "525"
     },
     {
-      "id": "526",
+      "id": "548",
       "task_name": "Placering synligt udstyr fx tryk og pir, Input vedr. DALI",
-      "blocked_by_id": "519"
+      "blocked_by_id": "526"
     },
     {
-      "id": "527",
+      "id": "549",
       "task_name": "Kraft - Placering af komponenter, belastning",
-      "blocked_by_id": "519"
+      "blocked_by_id": "527"
     },
     {
-      "id": "528",
+      "id": "550",
       "task_name": "Placering og valg af ABA komponenter",
-      "blocked_by_id": "519"
+      "blocked_by_id": "528"
     },
     {
-      "id": "529",
+      "id": "551",
       "task_name": "Koordinering af AV-installationer med isolering på skørter. Placering af inst. Over loft samt under gulv",
-      "blocked_by_id": "519"
-    },
-    {
-      "id": "1187",
-      "task_name": "Oversigt projekteringstidsplan - projekt til prisvalidering",
-      "blocked_by_id": "21"
+      "blocked_by_id": "529"
     }
   ],
   "priority_actions": [
     {
       "step": 1,
-      "action": "Immediately escalate all overdue design input tasks (IDs: 20, 21, 29, 39, 40, 1185) to the design leads and require a resolution plan within 48 hours.",
-      "action_type": "escalation"
-    },
-    {
-      "step": 2,
-      "action": "Convene a cross-discipline coordination meeting to address the Omr. 4 coordination blockage (ID: 519) and assign clear responsibilities for unlocking dependent tasks.",
+      "action": "Organize a coordination meeting with the design team and electrical lead to resolve security component placement for ceilings, walls, and doors (Tasks 40, 41, 42).",
       "action_type": "coordination"
     },
     {
-      "step": 3,
-      "action": "Request immediate bygherre (client) decision on all pending approvals, especially for visible electrical components (ID: 33).",
+      "step": 2,
+      "action": "Escalate to the client for immediate clarification and approval on solar cell reinstatement (Task 648) and DAS/SINE design input (Tasks 644, 645).",
       "action_type": "bygherre_decision"
     },
     {
+      "step": 3,
+      "action": "Assign area coordinators to review and close out all pending zero-duration coordination milestones in Area 4 and Area 5 (Tasks 520–529, 542–551).",
+      "action_type": "coordination"
+    },
+    {
       "step": 4,
-      "action": "Freeze all downstream production and procurement activities that are blocked by unresolved design or coordination tasks to avoid wasted effort.",
+      "action": "Freeze downstream production and installation activities until root cause coordination and design bottlenecks are resolved.",
       "action_type": "freeze_downstream"
     },
     {
       "step": 5,
-      "action": "Monitor the status of production tasks (e.g., ID: 648) and prepare to release work only once design and coordination bottlenecks are resolved.",
-      "action_type": "release_work"
-    },
-    {
-      "step": 6,
-      "action": "Reassess the project critical path after design and coordination issues are resolved to identify any new or remaining bottlenecks.",
+      "action": "Reassess schedule recovery options for production tasks once coordination and design input are finalized.",
       "action_type": "reassess"
-    },
-    {
-      "step": 7,
-      "action": "Communicate the risk of non-forceable delays to all stakeholders and clarify that adding manpower will not resolve design or coordination constraints.",
-      "action_type": "coordination"
     }
   ],
   "resource_assessment": [
     {
-      "id": "20",
-      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
-      "resource_type": "design_dependency",
-      "assessment": "Adding labour will not help. The task is blocked by missing design input. Management attention is needed to resolve the design bottleneck."
-    },
-    {
-      "id": "21",
-      "task_name": "E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral",
-      "resource_type": "design_dependency",
-      "assessment": "This is a design input issue. No amount of manpower will accelerate progress until the required data sheets and decisions are provided."
-    },
-    {
-      "id": "29",
-      "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
-      "resource_type": "design_dependency",
-      "assessment": "Labour cannot resolve this delay. The design input is missing and must be provided before any work can proceed."
+      "id": "24",
+      "task_name": "Sikringsprojekt, omfang af ADK",
+      "resource_type": "coordination_bottleneck",
+      "assessment": "Adding labour will NOT help. Management attention is needed to resolve coordination and finalize decisions."
     },
     {
       "id": "39",
       "task_name": "Sikringsprojekt",
-      "resource_type": "design_dependency",
-      "assessment": "This is a design bottleneck. Additional resources will not help until the design is completed and released."
+      "resource_type": "coordination_bottleneck",
+      "assessment": "Adding labour will NOT help. Management attention is needed to resolve coordination and finalize decisions."
     },
     {
       "id": "40",
       "task_name": "Placering/antal af sikringskomponenter, lofter",
       "resource_type": "design_dependency",
-      "assessment": "Work cannot proceed without the design input. Forcing is not viable; resolve the design issue first."
+      "assessment": "Adding labour will NOT help. Design input must be finalized before work can proceed."
     },
     {
-      "id": "1185",
-      "task_name": "E100.05 ELEV",
+      "id": "41",
+      "task_name": "Placering/antal af sikringskomponenter, vægge",
       "resource_type": "design_dependency",
-      "assessment": "Elevator design is missing. No production or procurement can start until this is resolved. Management escalation required."
+      "assessment": "Adding labour will NOT help. Design input must be finalized before work can proceed."
     },
     {
-      "id": "33",
-      "task_name": "Gokendelse af synlige komponeter fra E100.03",
-      "resource_type": "bygherre_escalation",
-      "assessment": "This is a client decision bottleneck. Management must escalate to the client for immediate approval."
-    },
-    {
-      "id": "519",
-      "task_name": "Afhængigheder",
-      "resource_type": "coordination_bottleneck",
-      "assessment": "This is a coordination issue. Adding manpower will not help; management must resolve the coordination dependencies."
+      "id": "42",
+      "task_name": "Placering/antal af sikringskomponenter, døre",
+      "resource_type": "design_dependency",
+      "assessment": "Adding labour will NOT help. Design input must be finalized before work can proceed."
     },
     {
       "id": "648",
       "task_name": "Reetablering af solceller",
-      "resource_type": "production_manpower",
-      "assessment": "This is a production task. Acceleration is possible with more resources, but only after all design and coordination prerequisites are resolved."
+      "resource_type": "bygherre_escalation",
+      "assessment": "Adding labour will NOT help. Immediate client decision and input are required."
     }
   ],
   "forcing_assessment": [
     {
-      "id": "20",
-      "task_name": "E100.02 - Vandbehandling og vandingsanlæg til haverne",
-      "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "This task is blocked by missing design input. Adding manpower will not resolve the lack of required design information.",
-      "risk_if_forced": "Attempting to proceed without design input will result in rework, errors, and wasted labour hours.",
-      "recommendation": "Escalate to the design team and require immediate delivery of the missing input. Do not mobilize resources until the design is complete and approved.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
-      "id": "21",
-      "task_name": "E100.02 - Indretning af produktionskøkken, datablade på komponenter, central/decentral",
-      "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "The delay is due to missing design data sheets and decisions. Additional manpower cannot resolve this constraint.",
-      "risk_if_forced": "Forcing work without design input will cause errors, rework, and wasted effort.",
-      "recommendation": "Push for immediate resolution of design input. Only release procurement and installation teams once the design is finalized.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
-      "id": "23",
-      "task_name": "E100.01 - Fastlæg krav til kemidepot",
-      "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "This activity is blocked by missing design requirements. Manpower cannot accelerate progress until the design is provided.",
-      "risk_if_forced": "Proceeding without design will lead to rework and possible safety issues.",
-      "recommendation": "Escalate to the design team and require immediate input. Do not allocate resources until the design is complete.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
       "id": "24",
       "task_name": "Sikringsprojekt, omfang af ADK",
       "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "The task is delayed due to missing design input for the security system. Additional resources will not help.",
-      "risk_if_forced": "Forcing work will result in errors and rework, increasing cost and delay.",
-      "recommendation": "Resolve the design input issue before mobilizing any installation teams.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
-      "id": "29",
-      "task_name": "E100.12 - SolafskærmningMørklægning,funktionskræ15d",
-      "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "This is a design input delay. No acceleration is possible until the design is provided.",
-      "risk_if_forced": "Attempting to proceed will cause errors, rework, and wasted resources.",
-      "recommendation": "Escalate to the design team and require immediate input. Do not allocate resources until the design is complete.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
-      "id": "33",
-      "task_name": "Gokendelse af synlige komponeter fra E100.03",
-      "is_forceable": "not_recommended",
-      "constraint_type": "bygherre_decision_required",
-      "reason": "This task is waiting for a client decision. Manpower cannot accelerate progress until approval is received.",
-      "risk_if_forced": "Proceeding without client approval risks rework and contractual disputes.",
-      "recommendation": "Escalate to the client for immediate decision. Do not proceed with installation until approval is granted.",
+      "constraint_type": "coordination_dependency",
+      "reason": "The delay is caused by unresolved coordination and interface decisions. Adding manpower cannot resolve missing decisions or coordination bottlenecks.",
+      "risk_if_forced": "Proceeding without resolved coordination will lead to rework, clashes, and wasted labour hours. Communication complexity grows exponentially with team size.",
+      "recommendation": "Resolve coordination bottlenecks first by organizing a focused meeting with all relevant stakeholders. Only after decisions are finalized should production teams be mobilized.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5531,10 +5538,10 @@ Return complete JSON matching the strict schema.
       "id": "39",
       "task_name": "Sikringsprojekt",
       "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "This is a design bottleneck. Additional resources will not help until the design is completed.",
-      "risk_if_forced": "Forcing work will result in errors, rework, and wasted cost.",
-      "recommendation": "Escalate to the design team and require immediate completion of the design.",
+      "constraint_type": "coordination_dependency",
+      "reason": "The delay is caused by unresolved coordination across security systems. Adding manpower cannot resolve missing decisions or coordination bottlenecks.",
+      "risk_if_forced": "Proceeding without resolved coordination will lead to rework, clashes, and wasted labour hours. Communication complexity grows exponentially with team size.",
+      "recommendation": "Resolve coordination bottlenecks first by organizing a focused meeting with all relevant stakeholders. Only after decisions are finalized should production teams be mobilized.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5546,9 +5553,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Placering/antal af sikringskomponenter, lofter",
       "is_forceable": "not_recommended",
       "constraint_type": "design_input_required",
-      "reason": "Work cannot proceed without the design input for security components.",
-      "risk_if_forced": "Forcing work will cause errors and rework, increasing overall delay.",
-      "recommendation": "Resolve the design input issue before mobilizing any teams.",
+      "reason": "The delay is caused by missing design input for security component placement. Adding manpower cannot resolve a missing design decision.",
+      "risk_if_forced": "Proceeding without finalized design will lead to rework, clashes, and wasted labour hours.",
+      "recommendation": "Finalize design input and decisions before mobilizing installation teams. Management attention is required to secure design deliverables.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5556,13 +5563,41 @@ Return complete JSON matching the strict schema.
       "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
     },
     {
-      "id": "519",
-      "task_name": "Afhængigheder",
+      "id": "41",
+      "task_name": "Placering/antal af sikringskomponenter, vægge",
       "is_forceable": "not_recommended",
-      "constraint_type": "coordination_dependency",
-      "reason": "This is a coordination blockage. Adding manpower will not resolve the dependency issue.",
-      "risk_if_forced": "Forcing work will result in misaligned activities, rework, and confusion.",
-      "recommendation": "Hold a coordination meeting to resolve dependencies before releasing any teams.",
+      "constraint_type": "design_input_required",
+      "reason": "The delay is caused by missing design input for security component placement. Adding manpower cannot resolve a missing design decision.",
+      "risk_if_forced": "Proceeding without finalized design will lead to rework, clashes, and wasted labour hours.",
+      "recommendation": "Finalize design input and decisions before mobilizing installation teams. Management attention is required to secure design deliverables.",
+      "coordination_cost": "high",
+      "parallelizability": "low",
+      "max_speedup_factor": "1.0x",
+      "optimal_team_size": "N/A",
+      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
+    },
+    {
+      "id": "42",
+      "task_name": "Placering/antal af sikringskomponenter, døre",
+      "is_forceable": "not_recommended",
+      "constraint_type": "design_input_required",
+      "reason": "The delay is caused by missing design input for security component placement. Adding manpower cannot resolve a missing design decision.",
+      "risk_if_forced": "Proceeding without finalized design will lead to rework, clashes, and wasted labour hours.",
+      "recommendation": "Finalize design input and decisions before mobilizing installation teams. Management attention is required to secure design deliverables.",
+      "coordination_cost": "high",
+      "parallelizability": "low",
+      "max_speedup_factor": "1.0x",
+      "optimal_team_size": "N/A",
+      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
+    },
+    {
+      "id": "648",
+      "task_name": "Reetablering af solceller",
+      "is_forceable": "not_recommended",
+      "constraint_type": "bygherre_decision_required",
+      "reason": "The delay is caused by pending client decision and input. Adding manpower cannot resolve a missing client approval.",
+      "risk_if_forced": "Workers mobilized without client decision will stand idle, increasing cost with zero progress.",
+      "recommendation": "Escalate to the client for immediate clarification and approval. Only after client input is received should production teams be mobilized.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5574,9 +5609,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Udarbejde notat om DAS/SINE",
       "is_forceable": "not_recommended",
       "constraint_type": "design_input_required",
-      "reason": "This is a design documentation delay. Manpower cannot accelerate progress until the note is completed.",
-      "risk_if_forced": "Forcing work will result in errors and possible non-compliance.",
-      "recommendation": "Escalate to the design team and require immediate completion of the note.",
+      "reason": "The delay is caused by missing design input for DAS/SINE. Adding manpower cannot resolve a missing design decision.",
+      "risk_if_forced": "Proceeding without finalized design will lead to rework, clashes, and wasted labour hours.",
+      "recommendation": "Finalize design input and decisions before mobilizing installation teams. Management attention is required to secure design deliverables.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5588,37 +5623,9 @@ Return complete JSON matching the strict schema.
       "task_name": "Projektering af DAS/Sine",
       "is_forceable": "not_recommended",
       "constraint_type": "design_input_required",
-      "reason": "This is a design input delay. No acceleration is possible until the design is provided.",
-      "risk_if_forced": "Forcing work will cause errors, rework, and wasted resources.",
-      "recommendation": "Escalate to the design team and require immediate input. Do not allocate resources until the design is complete.",
-      "coordination_cost": "high",
-      "parallelizability": "low",
-      "max_speedup_factor": "1.0x",
-      "optimal_team_size": "N/A",
-      "point_of_no_return": "Already past — resolve constraint first before considering acceleration"
-    },
-    {
-      "id": "648",
-      "task_name": "Reetablering af solceller",
-      "is_forceable": "possible",
-      "constraint_type": "execution_capacity",
-      "reason": "This is a standalone production task with limited downstream impact. Additional resources can accelerate completion, though efficiency per person will decrease.",
-      "risk_if_forced": "Diminishing returns apply — each additional worker adds less output. Keep team size within the optimal range to maintain efficiency above 70%.",
-      "recommendation": "If design and coordination prerequisites are resolved, consider adding 2-3 workers to accelerate completion. Monitor quality closely to avoid errors.",
-      "coordination_cost": "low",
-      "parallelizability": "high",
-      "max_speedup_factor": "2.5x-3.0x",
-      "optimal_team_size": "2-3 people",
-      "point_of_no_return": "Still recoverable — forcing window open"
-    },
-    {
-      "id": "1185",
-      "task_name": "E100.05 ELEV",
-      "is_forceable": "not_recommended",
-      "constraint_type": "design_input_required",
-      "reason": "Elevator design input is missing. No acceleration is possible until the design is provided.",
-      "risk_if_forced": "Forcing work will cause errors, rework, and wasted resources.",
-      "recommendation": "Escalate to the design team and require immediate input. Do not allocate resources until the design is complete.",
+      "reason": "The delay is caused by missing design input for DAS/SINE. Adding manpower cannot resolve a missing design decision.",
+      "risk_if_forced": "Proceeding without finalized design will lead to rework, clashes, and wasted labour hours.",
+      "recommendation": "Finalize design input and decisions before mobilizing installation teams. Management attention is required to secure design deliverables.",
       "coordination_cost": "high",
       "parallelizability": "low",
       "max_speedup_factor": "1.0x",
@@ -5628,76 +5635,60 @@ Return complete JSON matching the strict schema.
   ],
   "summary_by_area": [
     {
-      "area": "EL",
-      "delayed_count": 10,
-      "critical_count": 4,
-      "important_count": 3,
+      "area": "Area 1",
+      "delayed_count": 15,
+      "critical_count": 5,
+      "important_count": 4,
+      "monitor_count": 6,
+      "summary": "Area 1 is blocked by unresolved coordination and missing design input for security systems. Forcing is not viable; resolve coordination and design bottlenecks first."
+    },
+    {
+      "area": "Area 2",
+      "delayed_count": 6,
+      "critical_count": 1,
+      "important_count": 2,
       "monitor_count": 3,
-      "summary": "Electrical discipline is heavily impacted by overdue design and bygherre decisions; no critical delays are forceable, and management escalation is required."
+      "summary": "Area 2 is delayed by pending client decisions and missing design input for DAS/SINE and solar cell reinstatement. Forcing is not viable; escalate to client and finalize design."
     },
     {
-      "area": "VVS",
-      "delayed_count": 4,
-      "critical_count": 2,
-      "important_count": 1,
-      "monitor_count": 1,
-      "summary": "VVS is blocked by missing design input; acceleration is not viable until design is resolved."
-    },
-    {
-      "area": "Sikringsprojekt",
-      "delayed_count": 4,
-      "critical_count": 2,
-      "important_count": 1,
-      "monitor_count": 1,
-      "summary": "Security system design is overdue, blocking all related installation; forcing is not recommended."
-    },
-    {
-      "area": "Omr. 4",
-      "delayed_count": 11,
+      "area": "Area 3",
+      "delayed_count": 1,
       "critical_count": 0,
-      "important_count": 1,
+      "important_count": 0,
+      "monitor_count": 1,
+      "summary": "Area 3 has isolated production delays. Monitor and reassess after root causes in other areas are resolved."
+    },
+    {
+      "area": "Area 4",
+      "delayed_count": 10,
+      "critical_count": 0,
+      "important_count": 0,
       "monitor_count": 10,
-      "summary": "Omr. 4 is blocked by a coordination dependency; no acceleration possible until coordination is resolved."
+      "summary": "Area 4 is blocked by zero-duration coordination milestones. Forcing is not viable; assign coordinators to close out gates."
     },
     {
-      "area": "Design",
-      "delayed_count": 1,
+      "area": "Area 5",
+      "delayed_count": 10,
       "critical_count": 0,
       "important_count": 0,
-      "monitor_count": 1,
-      "summary": "Design overview task is delayed but not critical; monitor only."
-    },
-    {
-      "area": "Koordinering",
-      "delayed_count": 1,
-      "critical_count": 0,
-      "important_count": 0,
-      "monitor_count": 1,
-      "summary": "Coordination task is delayed; management attention required, but not forceable."
-    },
-    {
-      "area": "Ark",
-      "delayed_count": 1,
-      "critical_count": 0,
-      "important_count": 0,
-      "monitor_count": 1,
-      "summary": "Architectural task is delayed but not critical; monitor only."
+      "monitor_count": 10,
+      "summary": "Area 5 is blocked by zero-duration coordination milestones. Forcing is not viable; assign coordinators to close out gates."
     }
   ],
   "insight_data": {
     "total_activities": 136,
     "delayed_count": 34,
     "critical_count": 7,
-    "important_count": 7,
-    "monitor_count": 20,
-    "root_cause_count": 14,
+    "important_count": 6,
+    "monitor_count": 21,
+    "root_cause_count": 8,
     "reference_date": "12-03-2026",
-    "most_overdue_days": 551,
-    "areas_affected": 7,
+    "most_overdue_days": 163,
+    "areas_affected": 5,
     "format_detected": "MS Project Export",
     "schedule_name": "2026-03-12 Samlet tidsplan",
-    "primary_risk": "Overdue design and coordination tasks blocking all downstream production and installation",
-    "forceable_count": 1,
+    "primary_risk": "Coordination and design bottlenecks blocking security systems and client-driven decisions for solar cell reinstatement.",
+    "forceable_count": 0,
     "not_forceable_count": 13
   }
 }
@@ -5707,28 +5698,33 @@ Return complete JSON matching the strict schema.
 ──────────────────────────────────────────────────────────────────────────────────────────
   Total Activities: 136
   Delayed:          30
-  Areas:            EL, VVS, Sikringsprojekt, Design, Koordinering, Omr. 4, Omr. 5
+  Areas:            Area 1, Area 2, Area 3, Area 4, Area 5
   Format:           MS Project Export
 
-  Delayed Activity IDs: ['20', '21', '23', '24', '25', '26', '27', '29', '33', '36', '39', '40', '41', '42', '519', '520', '521', '522', '523', '524', '525', '526', '527', '528', '529', '644', '645', '648', '1185', '1187']
+  Delayed Activity IDs: ['20', '21', '23', '24', '25', '26', '27', '29', '30', '33', '36', '39', '40', '41', '42', '648', '644', '645', '651', '1185', '520', '521', '522', '523', '524', '525', '526', '527', '528', '529']
 
   ID       TASK NAME                                          START          DAYS   PRIORITY
   ──────── ────────────────────────────────────────────────── ────────────── ────── ───────────────
-  20       E100.02 - Vandbehandling og vandingsanlæg til have 05-11-2025     489    CRITICAL_NOW
-  21       E100.02 - Indretning af produktionskøkken, databla 30-09-2025     530    CRITICAL_NOW
+  20       E100.02 - Vandbehandling og vandingsanlæg til have 05-11-2025     124    MONITOR
+  21       E100.02 - Indretning af produktionskøkken, databla 30-09-2025     163    IMPORTANT_NEXT
   23       E100.01 - Fastlæg krav til kemidepot               05-01-2026     67     IMPORTANT_NEXT
-  24       Sikringsprojekt, omfang af ADK                     05-01-2026     67     IMPORTANT_NEXT
+  24       Sikringsprojekt, omfang af ADK                     05-01-2026     67     CRITICAL_NOW
   25       Infovæg med glasfronter (ARK pkt. 3.7)             05-01-2026     67     MONITOR
-  26       E100.02 - Stillingtagen til kølevand i terræn - ud 05-01-2026     67     MONITOR
+  26       E100.02 - Stillingtagen til kølevand i terræn - ud 05-01-2026     67     IMPORTANT_NEXT
   27       E100 Pressemøder I Banksalen skal afklares         05-01-2026     67     MONITOR
-  29       E100.12 - SolafskærmningMørklægning,funktionskræ15 03-11-2025     491    CRITICAL_NOW
+  29       E100.12 - SolafskærmningMørklægning,funktionskræ15 03-11-2025     126    MONITOR
+  30       IKT                                                05-01-2026     67     MONITOR
   33       Gokendelse af synlige komponeter fra E100.03       19-01-2026     53     IMPORTANT_NEXT
-  36       Godkendelse af indbygning i "ovenlys"              23-02-2026     18     MONITOR
-  39       Sikringsprojekt                                    03-11-2025     491    CRITICAL_NOW
-  40       Placering/antal af sikringskomponenter, lofter     03-11-2025     491    CRITICAL_NOW
-  41       Placering/antal af sikringskomponenter, vægge      05-01-2026     67     MONITOR
-  42       Placering/antal af sikringskomponenter, døre       19-01-2026     53     MONITOR
-  519      Afhængigheder                                      09-02-2026     32     IMPORTANT_NEXT
+  36       Godkendelse af indbygning i "ovenlys"              23-02-2026     18     IMPORTANT_NEXT
+  39       Sikringsprojekt                                    03-11-2025     130    CRITICAL_NOW
+  40       Placering/antal af sikringskomponenter, lofter     03-11-2025     130    CRITICAL_NOW
+  41       Placering/antal af sikringskomponenter, vægge      05-01-2026     67     CRITICAL_NOW
+  42       Placering/antal af sikringskomponenter, døre       19-01-2026     53     CRITICAL_NOW
+  648      Reetablering af solceller                          18-12-2025     85     CRITICAL_NOW
+  644      Udarbejde notat om DAS/SINE                        02-12-2025     101    IMPORTANT_NEXT
+  645      Projektering af DAS/Sine                           18-11-2025     115    IMPORTANT_NEXT
+  651      Jording                                            27-01-2026     45     MONITOR
+  1185     E100.05 ELEV                                       03-11-2025     130    MONITOR
   520      Fancoils for dim af kabling                        09-02-2026     32     MONITOR
   521      Øvrige installationer for dim af kabling           09-02-2026     32     MONITOR
   522      Arbejdsstationer placering                         09-02-2026     32     MONITOR
@@ -5739,11 +5735,6 @@ Return complete JSON matching the strict schema.
   527      Kraft - Placering af komponenter, belastning       09-02-2026     32     MONITOR
   528      Placering og valg af ABA komponenter               09-02-2026     32     MONITOR
   529      Koordinering af AV-installationer med isolering på 09-02-2026     32     MONITOR
-  644      Udarbejde notat om DAS/SINE                        02-12-2025     101    IMPORTANT_NEXT
-  645      Projektering af DAS/Sine                           18-11-2025     115    IMPORTANT_NEXT
-  648      Reetablering af solceller                          18-12-2025     85     IMPORTANT_NEXT
-  1185     E100.05 ELEV                                       03-11-2025     491    CRITICAL_NOW
-  1187     Oversigt projekteringstidsplan - projekt til prisv 08-09-2025     551    MONITOR
 
 ==========================================================================================
   END OF ANALYSIS ANATOMY
