@@ -30,7 +30,8 @@ The system features two independent agents: a Comparison Agent and a Predictive 
 - **Predictive Agent (Nova Insight):** Analyzes a single PDF schedule to identify delayed activities, perform root cause analysis, prioritize actions, assess resources, and evaluate forcing options.
 - **PDF Processing:** Utilizes Azure Document Intelligence OCR to preserve tables and structure. Text is chunked, embedded, and stored in Supabase pgvector.
 - **Reference Date Extraction:** Automatically extracts reference dates from PDF filenames using various formats.
-- **Predictive Output Structure:** Generates a comprehensive report with sections like `MANAGEMENT_CONCLUSION`, `SCHEDULE_OVERVIEW`, `DELAYED_ACTIVITIES`, `ROOT_CAUSE_ANALYSIS`, `PRIORITY_ACTIONS`, `RESOURCE_ASSESSMENT`, `FORCING_ASSESSMENT`, and `SUMMARY_BY_AREA`.
+- **Predictive Output Structure:** Generates a comprehensive report with sections: `EXECUTIVE_ACTIONS` (Top 3 priorities), `MANAGEMENT_CONCLUSION`, `SCHEDULE_OVERVIEW`, `DELAYED_ACTIVITIES`, `ROOT_CAUSE_ANALYSIS`, `PRIORITY_ACTIONS`, `RESOURCE_ASSESSMENT`, `FORCING_ASSESSMENT`, and `SUMMARY_BY_AREA`.
+- **Executive Actions (Top 3):** Synthesizes all analysis into exactly 3 concrete action items with WHO (responsible party), WHAT (direct instruction), WHEN (deadline), related task IDs, and a prominent manpower indicator showing whether adding people will help or is useless (with explanation).
 - **Module A Detection Criteria:** Identifies delayed activities based on start date, completion percentage, and reference date.
 - **Task Type Classification:** Classifies tasks into categories such as "Coordination," "Design," "Bygherre," "Production," "Procurement," and "Milestone."
 - **Priority Levels:** Assigns "CRITICAL NOW," "IMPORTANT NEXT," or "MONITOR" priorities based on impact and urgency.

@@ -606,6 +606,93 @@ def _render_summary_by_area(data: Dict, lang: str) -> str:
 </div>'''
 
 
+def _render_executive_actions(data: Dict, lang: str) -> str:
+    actions = data.get("executive_actions", [])
+    if not actions:
+        return ""
+
+    title = "Top 3 prioriteter — Handl nu" if lang == "da" else "Top 3 Priorities — Act Now"
+    sub = "De vigtigste handlinger baseret på analysen" if lang == "da" else "The most critical actions based on the analysis"
+    who_label = "Ansvarlig" if lang == "da" else "Responsible"
+    when_label = "Deadline" if lang == "da" else "Deadline"
+    tasks_label = "Relaterede opgaver" if lang == "da" else "Related tasks"
+
+    rank_colors = {
+        1: {"bg": "#fef2f2", "border": "#fecaca", "accent": "#dc2626", "badge_bg": "#dc2626"},
+        2: {"bg": "#fffbeb", "border": "#fde68a", "accent": "#d97706", "badge_bg": "#d97706"},
+        3: {"bg": "#f0fdfa", "border": "#99f6e4", "accent": "#0d9488", "badge_bg": "#0d9488"},
+    }
+
+    cards_html = ""
+    for action in sorted(actions, key=lambda a: a.get("rank", 99)):
+        rank = action.get("rank", 1)
+        rc = rank_colors.get(rank, rank_colors[3])
+        manpower_helps = action.get("manpower_helps", False)
+        manpower_note = _e(action.get("manpower_note", ""))
+        task_ids = action.get("related_task_ids", [])
+        task_ids_html = " ".join(
+            f'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;color:#134e4a;background:#f0fdfa;border:1px solid #99f6e4;font-family:\'SF Mono\',\'Cascadia Code\',monospace;">{_e(tid)}</span>'
+            for tid in task_ids
+        )
+
+        if manpower_helps:
+            mp_icon = _svg("users", 14, "#059669")
+            mp_color = "#059669"
+            mp_bg = "#f0fdf4"
+            mp_border = "#bbf7d0"
+            mp_label = "Mandskab hjælper" if lang == "da" else "Manpower helps"
+        else:
+            mp_icon = _svg("alert-circle", 14, "#dc2626")
+            mp_color = "#dc2626"
+            mp_bg = "#fef2f2"
+            mp_border = "#fecaca"
+            mp_label = "Mandskab hjælper IKKE" if lang == "da" else "Manpower will NOT help"
+
+        cards_html += f'''<div style="margin:10px 0;background:#fff;border-radius:12px;border:1px solid {rc["border"]};overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+  <div style="padding:14px 18px;display:flex;align-items:flex-start;gap:14px;">
+    <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:{rc["badge_bg"]};color:#fff;font-size:18px;font-weight:800;flex-shrink:0;box-shadow:0 2px 6px {rc["badge_bg"]}33;">{rank}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:14px;font-weight:700;color:#1a202c;line-height:1.5;margin-bottom:10px;">{_e(action.get("action", ""))}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;">
+          {_svg("user", 12, "#64748b")}
+          <span style="font-size:11px;color:#64748b;font-weight:600;">{who_label}:</span>
+          <span style="font-size:11px;color:#1a202c;font-weight:700;">{_e(action.get("responsible", ""))}</span>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;">
+          {_svg("clock", 12, "#64748b")}
+          <span style="font-size:11px;color:#64748b;font-weight:600;">{when_label}:</span>
+          <span style="font-size:11px;color:#1a202c;font-weight:700;">{_e(action.get("deadline", ""))}</span>
+        </div>
+      </div>
+      <div style="padding:8px 12px;background:{mp_bg};border-radius:8px;border:1px solid {mp_border};margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          {mp_icon}
+          <span style="font-size:10px;color:{mp_color};text-transform:uppercase;font-weight:800;letter-spacing:.6px;">{mp_label}</span>
+        </div>
+        <div style="font-size:12px;color:#374151;line-height:1.5;font-weight:500;">{manpower_note}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="font-size:10px;color:#94a3b8;font-weight:600;">{tasks_label}:</span>
+        {task_ids_html}
+      </div>
+    </div>
+  </div>
+</div>'''
+
+    return f'''
+<div class="module-card" style="margin:0 0 20px;padding:22px 24px;background:linear-gradient(135deg,#fff 0%,#f0fdfa 100%);border-radius:14px;border:2px solid #0d9488;transition:all .2s;box-shadow:0 4px 16px rgba(13,148,136,.1);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #99f6e4;">
+    <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 3px 10px rgba(13,148,136,.3);">{_svg("target", 20, "#fff")}</div>
+    <div>
+      <h3 style="font-size:17px;font-weight:800;color:#0d9488;margin:0;letter-spacing:-.3px;">{title}</h3>
+      <p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p>
+    </div>
+  </div>
+  {cards_html}
+</div>'''
+
+
 def format_predictive_as_html(raw_input, language: str = "en") -> str:
     if not raw_input:
         return ""
@@ -650,6 +737,7 @@ def _build_html(data: Dict, lang: str) -> str:
 .nova-report .module-card:nth-child(7) {{ animation-delay:.36s; }}
 .nova-report .module-card:nth-child(8) {{ animation-delay:.42s; }}
 .nova-report .module-card:nth-child(9) {{ animation-delay:.48s; }}
+.nova-report .module-card:nth-child(10) {{ animation-delay:.54s; }}
 .nova-report .module-card:hover {{ border-color:#cbd5e1 !important;box-shadow:0 4px 16px rgba(0,0,0,.06) !important; }}
 .nova-report table tr:hover {{ background:#edf2f7 !important; }}
 .nova-report ::-webkit-scrollbar {{ height:6px; }}
@@ -665,6 +753,7 @@ def _build_html(data: Dict, lang: str) -> str:
   </div>''']
 
     parts.append(_render_hero(data, lang))
+    parts.append(_render_executive_actions(data, lang))
     parts.append(_render_management_conclusion(data, lang))
     parts.append(_render_schedule_overview(data, lang))
     parts.append(_render_delayed_table(data, lang))

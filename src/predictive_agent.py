@@ -13,6 +13,7 @@ NOVA_INSIGHT_SCHEMA = {
     "schema": {
         "type": "object",
         "required": [
+            "executive_actions",
             "management_conclusion",
             "schedule_overview",
             "delayed_activities",
@@ -26,6 +27,24 @@ NOVA_INSIGHT_SCHEMA = {
         ],
         "additionalProperties": False,
         "properties": {
+            "executive_actions": {
+                "type": "array",
+                "description": "TOP 3 most critical actions the project manager must take IMMEDIATELY. Not analysis — direct, concrete instructions. Each action answers: WHAT to do, WHO does it, WHEN it must happen. Sorted by urgency (most urgent first). These come from synthesizing delayed_activities, root_cause_analysis, forcing_assessment, and priority_actions into the 3 most impactful moves.",
+                "items": {
+                    "type": "object",
+                    "required": ["rank", "action", "responsible", "deadline", "related_task_ids", "manpower_helps", "manpower_note"],
+                    "additionalProperties": False,
+                    "properties": {
+                        "rank": {"type": "integer", "description": "1, 2, or 3 — urgency rank"},
+                        "action": {"type": "string", "description": "Clear, direct instruction in plain language. Not a description — a command. e.g. 'Indkald koordineringsmøde med EL og VVS for at løse grænsefladekonflikt i Omr. 2' or 'Call coordination meeting with EL + VVS to resolve interface conflict in Area 2'"},
+                        "responsible": {"type": "string", "description": "WHO should execute this: 'Projektleder / Project Manager', 'Designleder / Design Lead', 'Bygherre / Client', 'Fagentreprenør EL / Trade Contractor EL', etc."},
+                        "deadline": {"type": "string", "description": "WHEN: 'I dag / Today', 'Denne uge / This week', 'Inden 3 dage / Within 3 days', 'Før [dato] / Before [date]'"},
+                        "related_task_ids": {"type": "array", "items": {"type": "string"}, "description": "Task IDs from delayed_activities that this action addresses"},
+                        "manpower_helps": {"type": "boolean", "description": "true ONLY if adding more workers can actually accelerate this. false if it is a decision, coordination, design, procurement, or approval bottleneck"},
+                        "manpower_note": {"type": "string", "description": "1 sentence. If manpower_helps=false: explain WHY adding people is useless (e.g. 'Ekstra mandskab hjælper ikke — afventer bygherrebeslutning' / 'Adding people will not help — waiting on client decision'). If manpower_helps=true: state how many and expected impact (e.g. '2-3 ekstra elektrikere kan accelerere med 2x' / '2-3 extra electricians can accelerate by 2x')"}
+                    }
+                }
+            },
             "management_conclusion": {
                 "type": "string",
                 "description": "3-5 sentences as a senior construction planner would brief a project director. State the primary risk driver, whether delays are isolated or cascading, the most critical areas, and the single most important action right now. Include a brief note on whether any critical delays are candidates for acceleration (forcing) or not."
@@ -276,10 +295,11 @@ You return your analysis as STRICT JSON matching the provided schema. Every fiel
 
 You receive the COMPLETE contents of a construction schedule file.
 
-Your analysis has THREE layers:
+Your analysis has FOUR layers:
 1. DETECTION LAYER (Module A): Identify ALL delayed activities with absolute precision
 2. DECISION SUPPORT LAYER: Transform raw delays into root cause understanding, consequence mapping, priority ranking, and practical action guidance
 3. FORCING ASSESSMENT LAYER (Module F): For each critical/important delay, evaluate whether acceleration (forcing) is viable, what the consequences are, and provide a clear recommendation
+4. EXECUTIVE ACTION LAYER: Synthesize everything into TOP 3 concrete actions the PM must take IMMEDIATELY — with WHO, WHAT, WHEN, and whether adding manpower helps or is useless
 
 You are NOT a simple reporting tool. You think and reason like an experienced construction planner. You understand that:
 - Some delays are root causes, others are downstream consequences
@@ -451,6 +471,10 @@ For each critical issue: manpower problem, coordination bottleneck, design depen
 - forcing_assessment entries must be present for ALL CRITICAL_NOW and IMPORTANT_NEXT tasks
 - forcing_assessment text fields (reason, risk_if_forced, recommendation) must be in the response language
 - forcing_assessment enum fields (is_forceable, constraint_type, coordination_cost, parallelizability) stay in English
+- executive_actions must contain EXACTLY 3 entries (rank 1, 2, 3) — the top 3 most impactful actions
+- executive_actions must be concrete instructions, NOT summaries of the analysis
+- executive_actions.manpower_helps must be false for any action addressing coordination, design, bygherre, or procurement bottlenecks
+- executive_actions.manpower_note must be blunt and clear when manpower is useless — state it explicitly so the PM does not waste resources
 </constraints>
 
 ## DETECTION MODULE A: Delayed Activities
@@ -577,6 +601,10 @@ The management_conclusion, priority_actions, resource_assessment, forcing_assess
 PREDICTIVE_LANGUAGE_INSTRUCTIONS = {
     "da": """
 IMPORTANT: All descriptive text must be in Danish (Dansk):
+- executive_actions[].action: written in Danish — direct instructions
+- executive_actions[].responsible: written in Danish (e.g. "Projektleder", "Designleder", "Bygherre")
+- executive_actions[].deadline: written in Danish (e.g. "I dag", "Denne uge", "Inden 3 dage")
+- executive_actions[].manpower_note: written in Danish
 - management_conclusion: written in Danish
 - priority_actions[].action: written in Danish
 - resource_assessment[].assessment: written in Danish
@@ -678,6 +706,24 @@ PHASE 3 — FORCING ASSESSMENT:
 - Output must be simple, clear, and leave zero room for misinterpretation
 - This is what makes the product decision support, not just analysis
 
+PHASE 4 — EXECUTIVE ACTIONS (TOP 3 PRIORITIES):
+After completing all analysis, synthesize into EXACTLY 3 executive actions.
+These are THE 3 most impactful things the PM must do RIGHT NOW.
+
+Rules for executive_actions:
+1. Each action is a DIRECT INSTRUCTION — not a finding, not an observation. Write it as a command.
+   GOOD: "Indkald møde med designteam for at afslutte loftplacering i Omr. 2"
+   BAD: "Der er forsinkelser i designinput for Omr. 2"
+2. Each action must specify WHO is responsible (by role, not by name)
+3. Each action must specify WHEN — a concrete deadline relative to today
+4. Each action must clearly state whether adding manpower helps or is USELESS
+5. When manpower is useless, the manpower_note must be blunt:
+   "Ekstra mandskab hjælper IKKE — dette er en beslutning, ikke en arbejdsopgave"
+   "Adding people will NOT help — this is a decision bottleneck, not a work task"
+6. When manpower helps, state HOW MANY and the expected speedup
+7. Actions should address ROOT CAUSES, not symptoms. Fixing 1 root cause may resolve 5 downstream delays.
+8. Rank by impact: the action that unblocks the most downstream work = rank 1
+
 Return complete JSON matching the strict schema."""
 
         messages: List[ChatCompletionMessageParam] = [
@@ -771,7 +817,7 @@ Return complete JSON matching the strict schema."""
                 logger.error(f"  [PredictiveAgent] JSON parse error: {je}")
                 return {"predictive_insights": raw_content, "predictive_json": None, "model": self.deployment, "status": "error", "error": f"Invalid JSON: {je}"}
 
-            required_keys = {"management_conclusion", "schedule_overview", "delayed_activities",
+            required_keys = {"executive_actions", "management_conclusion", "schedule_overview", "delayed_activities",
                              "root_cause_analysis", "downstream_consequences", "priority_actions",
                              "resource_assessment", "forcing_assessment", "summary_by_area", "insight_data"}
             missing_keys = required_keys - set(parsed_json.keys())
@@ -812,6 +858,16 @@ Return complete JSON matching the strict schema."""
                     if len(valid_fa) < len(fa_list):
                         logger.info(f"  [PredictiveAgent] Post-validation: removed {len(fa_list) - len(valid_fa)} forcing assessments linked to false positives")
                         parsed_json["forcing_assessment"] = valid_fa
+
+                ea_list = parsed_json.get("executive_actions", [])
+                if ea_list:
+                    removed_id_set = set(removed_ids)
+                    for ea in ea_list:
+                        orig_ids = ea.get("related_task_ids", [])
+                        cleaned = [tid for tid in orig_ids if tid not in removed_id_set]
+                        if len(cleaned) < len(orig_ids):
+                            ea["related_task_ids"] = cleaned
+                    logger.info(f"  [PredictiveAgent] Post-validation: cleaned executive_actions task ID references")
 
                 if "insight_data" in parsed_json:
                     fa_after = parsed_json.get("forcing_assessment", [])
