@@ -636,13 +636,13 @@ def _render_executive_actions(data: Dict, lang: str) -> str:
         )
 
         if manpower_helps:
-            mp_icon = _svg("users", 14, "#059669")
+            mp_icon = _svg("circle-check", 14, "#059669")
             mp_color = "#059669"
             mp_bg = "#f0fdf4"
             mp_border = "#bbf7d0"
             mp_label = "Mandskab hjælper" if lang == "da" else "Manpower helps"
         else:
-            mp_icon = _svg("alert-circle", 14, "#dc2626")
+            mp_icon = _svg("alert-triangle", 14, "#dc2626")
             mp_color = "#dc2626"
             mp_bg = "#fef2f2"
             mp_border = "#fecaca"
@@ -753,7 +753,6 @@ def _build_html(data: Dict, lang: str) -> str:
   </div>''']
 
     parts.append(_render_hero(data, lang))
-    parts.append(_render_executive_actions(data, lang))
     parts.append(_render_management_conclusion(data, lang))
     parts.append(_render_schedule_overview(data, lang))
     parts.append(_render_delayed_table(data, lang))
@@ -761,6 +760,7 @@ def _build_html(data: Dict, lang: str) -> str:
     parts.append(_render_priority_actions(data, lang))
     parts.append(_render_resource_assessment(data, lang))
     parts.append(_render_forcing_assessment(data, lang))
+    parts.append(_render_executive_actions(data, lang))
     parts.append(_render_summary_by_area(data, lang))
 
     parts.append(f'''
