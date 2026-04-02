@@ -729,24 +729,6 @@ async def predictive_analysis(
         logger.info(f"  ╔══ OCR COMPLETE ({ocr_elapsed:.1f}s) ══╗")
         logger.info(f"  ║ Total chunks: {len(chunks)} (raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count})")
 
-        for c in chunks:
-            ctype = c.get("metadata", {}).get("type", "?")
-            clen = len(c.get("content", ""))
-            if ctype == "raw_markdown":
-                content = c["content"]
-                lines = content.split("\n")
-                logger.info(f"  ║ [raw_markdown] {clen} chars, {len(lines)} lines")
-                logger.info(f"  ║ FIRST 10 LINES:")
-                for li, line in enumerate(lines[:10]):
-                    logger.info(f"  ║   L{li}: {line[:200]}")
-                logger.info(f"  ║ LAST 5 LINES:")
-                for li, line in enumerate(lines[-5:]):
-                    logger.info(f"  ║   L{len(lines)-5+li}: {line[:200]}")
-            elif ctype == "table":
-                logger.info(f"  ║ [table chunk] {clen} chars")
-            elif ctype == "text":
-                logger.info(f"  ║ [text chunk] {clen} chars: {c['content'][:80]}...")
-
         logger.info(f"  ╚══════════════════════════╝")
 
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
