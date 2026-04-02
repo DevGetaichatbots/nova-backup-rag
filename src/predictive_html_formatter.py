@@ -659,10 +659,10 @@ def _render_executive_actions(data: Dict, lang: str) -> str:
           <span style="font-size:11px;color:#64748b;font-weight:600;">{who_label}:</span>
           <span style="font-size:11px;color:#1a202c;font-weight:700;">{_e(action.get("responsible", ""))}</span>
         </div>
-        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;">
-          {_svg("clock", 12, "#64748b")}
-          <span style="font-size:11px;color:#64748b;font-weight:600;">{when_label}:</span>
-          <span style="font-size:11px;color:#1a202c;font-weight:700;">{_e(action.get("deadline", ""))}</span>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;">
+          {_svg("calendar", 12, "#d97706")}
+          <span style="font-size:11px;color:#92400e;font-weight:600;">{when_label}:</span>
+          <span style="font-size:11px;color:#92400e;font-weight:700;">{_e(action.get("deadline", ""))}</span>
         </div>
       </div>
       <div style="padding:8px 12px;background:{mp_bg};border-radius:8px;border:1px solid {mp_border};margin-bottom:8px;">
