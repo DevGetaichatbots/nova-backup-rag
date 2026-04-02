@@ -883,7 +883,7 @@ Return complete JSON matching the strict schema."""
                 "model": self.deployment,
                 "status": "success",
                 "raw_llm_response": raw_content,
-                "reasoning_content": str(reasoning_content) if reasoning_content else None,
+                "reasoning_content": None,
                 "usage_info": ", ".join(usage_parts) if usage_parts else None,
                 "system_prompt": system_prompt,
                 "user_message": user_message

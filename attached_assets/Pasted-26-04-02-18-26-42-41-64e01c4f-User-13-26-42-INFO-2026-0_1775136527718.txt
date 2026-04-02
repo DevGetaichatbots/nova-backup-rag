@@ -1,0 +1,104 @@
+26-04-02 18:26:42.41
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 0: Azure marked 13 columnHeader cells in rows {0} (sample: ['Id', 'Opg', 'Opgavenavn', 'Varighed', 'Startdato']) — ignored, using fallback header detection
+2026-04-02 18:26:42.41
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 2: Azure marked 16 columnHeader cells in rows {0, 1} (sample: ['Id', 'Opg', 'Opgavenavn', 'Varighed', 'Startdato']) — ignored, using fallback header detection
+2026-04-02 18:26:42.41
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 3: Azure marked 14 columnHeader cells in rows {0, 1} (sample: ['Id', 'Opg', 'Opgavenavn', 'Varighed', 'Startdato']) — ignored, using fallback header detection
+2026-04-02 18:26:42.41
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 4: Azure marked 11 columnHeader cells in rows {0} (sample: ['Id', 'i', 'Opg', 'Opgavenavn', 'Varighed']) — ignored, using fallback header detection
+2026-04-02 18:26:42.41
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Extracted 5 structured tables
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Extracted 34149 chars, 5 tables, 4 pages
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 0 first data row: Id: Id | Opg: Opg | Opgavenavn: Opgavenavn | Varighed: Varighed | Startdato: Startdato | Slutdato: Slutdato | % arbejde færdigt: % arbejde færdigt | Foregående opgaver: Foregående opgaver | Efterfølgende opgaver: Efterfølgende opgaver | 2026 Kvt1: 2026 Kvt1 | : | Kvt2: Kvt2 | Kvt3 Kvt4: Kvt3 Kvt4 | 2027 Kvt1: 2027 Kvt1
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 0 headers (score=8): ['Id', 'Opg', 'Opgavenavn', 'Varighed', 'Startdato', 'Slutdato', '% arbejde færdigt', 'Foregående opgaver', 'Efterfølgende opgaver', '2026 Kvt1', '', 'Kvt2', 'Kvt3 Kvt4', '2027 Kvt1']
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Raw markdown chunk: 34149 chars
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 1: Skipping non-data rows at indices {0, 1, 2, 3, 4}
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 1: Using fallback headers: ['Id', 'Opgavetilstand', 'Opgavenavn', 'Varighed']
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 1 headers (score=1): ['Id', 'Opgavetilstand', 'Opgavenavn', 'Varighed']
+2026-04-02 18:26:42.42
+64e01c4f
+User
+13:26:42 | WARNING | [2026-03-12 Samlet tidsplan.pdf] Table 1: Header detection FAILED (best_score=1 < 3). Using MS Project fallback for 4 columns...
+2026-04-02 18:26:42.43
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 2 first data row: Id: Id | Opg: Opg | Opgavenavn: Opgavenavn | Varighed: Varighed | Startdato: Startdato | Slutdato: Slutdato | % arbejde færdigt: % arbejde færdigt | Foregående opgaver: Foregående opgaver | Efterfølgende opgaver: Efterfølgende opgaver | : | : | : | : | :
+2026-04-02 18:26:42.43
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 2 headers (score=8): ['Id', 'Opg', 'Opgavenavn', 'Varighed', 'Startdato', 'Slutdato', '% arbejde færdigt', 'Foregående opgaver', 'Efterfølgende opgaver', '', '', '', '', '']
+2026-04-02 18:26:42.43
+64e01c4f
+User
+13:26:42 | INFO | [2026-03-12 Samlet tidsplan.pdf] Table 1 first data row: Id: Inaktiv opgave | Opgavetilstand: | Opgavenavn: | Varighed:
+2026-04-02 18:26:42.56
+64e01c4f
+User
+13:26:42 | INFO | Split oversized chunk (15501 tokens) into 2 parts
+2026-04-02 18:27:27.58
+64e01c4f
+User
+13:27:27 | INFO | HTTP Request: POST https://novanewagentgpt.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | INFO | [PredictiveAgent] LLM response received (32508 chars)
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | INFO | [PredictiveAgent] Forcing assessment: 9 evaluated — 3 forceable, 6 not recommended
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | ERROR | [PredictiveAgent] Error: name 'reasoning_content' is not defined
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | INFO | [PredictiveAgent] JSON response: 26 delayed activities, 23 root causes, model: gpt-4.1-2025-04-14, tokens: prompt=18933, completion=8719, reasoning=0
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | INFO | [PredictiveAgent] Post-validation: cleaned executive_actions task ID references
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | WARNING | [PredictiveAgent] Post-validation: removed 3 false positives with days_overdue <= 0: ['35', '38', '550']
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | INFO | [PredictiveAgent] Delayed activity IDs: ['20', '21', '23', '24', '25', '26', '27', '29', '30', '33', '36', '39', '40', '41', '42', '484', '648', '520', '521', '522', '523', '524', '525', '526', '527', '528']
+2026-04-02 18:27:27.62
+64e01c4f
+User
+13:27:27 | ERROR | Predictive analysis failed: object of type 'NoneType' has no len()
