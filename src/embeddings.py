@@ -66,27 +66,47 @@ def split_oversized_text(text: str, max_tokens: int = MAX_TOKENS) -> list[str]:
 
 
 def generate_embeddings(texts: list[str], progress_callback=None) -> list[list[float]]:
+    import time as _time
+
     client = get_azure_openai_client()
-    
+
     safe_texts = [truncate_text(t) for t in texts]
-    
+
     embeddings = []
-    batch_size = 100
+    batch_size = 16
     total_batches = (len(safe_texts) + batch_size - 1) // batch_size
-    
+
     for batch_num, i in enumerate(range(0, len(safe_texts), batch_size), 1):
         batch = safe_texts[i:i + batch_size]
-        response = client.embeddings.create(
-            model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-            input=batch
-        )
-        
-        for item in response.data:
-            embeddings.append(item.embedding)
-        
+
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = client.embeddings.create(
+                    model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+                    input=batch
+                )
+                for item in response.data:
+                    embeddings.append(item.embedding)
+                break
+            except Exception as e:
+                err_str = str(e)
+                if "429" in err_str or "Too Many Requests" in err_str:
+                    wait = 10 * (attempt + 1)
+                    logger.warning(f"  Rate limited on batch {batch_num}/{total_batches}, retrying in {wait}s...")
+                    _time.sleep(wait)
+                elif attempt < max_retries - 1:
+                    logger.warning(f"  Embedding error on batch {batch_num}, retrying: {e}")
+                    _time.sleep(2)
+                else:
+                    raise
+
         if progress_callback:
             progress_callback(batch_num, total_batches)
-    
+
+        if batch_num < total_batches:
+            _time.sleep(0.5)
+
     return embeddings
 
 

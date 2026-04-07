@@ -634,7 +634,7 @@ def _is_allowed_file(filename: str) -> bool:
 def _is_csv(filename: str) -> bool:
     return filename.lower().endswith(".csv")
 
-MAX_CHUNK_ROWS = 50
+MAX_CHUNK_ROWS = 20
 
 def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     try:
