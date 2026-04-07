@@ -634,6 +634,8 @@ def _is_allowed_file(filename: str) -> bool:
 def _is_csv(filename: str) -> bool:
     return filename.lower().endswith(".csv")
 
+MAX_CHUNK_ROWS = 50
+
 def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     try:
         text = file_bytes.decode("utf-8-sig")
@@ -657,30 +659,34 @@ def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     logger.info(f"  [CSV] {filename}: {len(headers)} columns, {len(data_rows)} data rows")
     logger.info(f"  [CSV] Headers: {headers}")
 
-    labeled_lines = []
-    for row in data_rows:
-        parts = []
-        for i, val in enumerate(row):
-            val = val.strip()
-            if i < len(headers) and val:
-                parts.append(f"{headers[i]}: {val}")
-        if parts:
-            labeled_lines.append(" | ".join(parts))
+    chunks = []
+    for batch_start in range(0, len(data_rows), MAX_CHUNK_ROWS):
+        batch = data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
+        labeled_lines = []
+        for row in batch:
+            parts = []
+            for i, val in enumerate(row):
+                val = val.strip()
+                if i < len(headers) and val:
+                    parts.append(f"{headers[i]}: {val}")
+            if parts:
+                labeled_lines.append(" | ".join(parts))
 
-    content = "\n".join(labeled_lines)
+        if labeled_lines:
+            header_line = "Columns: " + " | ".join(headers)
+            content = header_line + "\n" + "\n".join(labeled_lines)
+            part_num = batch_start // MAX_CHUNK_ROWS + 1
+            chunks.append({
+                "content": content,
+                "metadata": {
+                    "type": "table",
+                    "source": filename,
+                    "part": part_num,
+                    "row_count": len(labeled_lines)
+                }
+            })
 
-    chunks = [
-        {
-            "content": content,
-            "metadata": {
-                "type": "raw_markdown",
-                "source": filename,
-                "headers": headers,
-                "row_count": len(data_rows)
-            }
-        }
-    ]
-
+    logger.info(f"  [CSV] Created {len(chunks)} table chunks from {len(data_rows)} rows")
     return chunks
 
 
