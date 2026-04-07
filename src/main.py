@@ -743,19 +743,35 @@ def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
             vals.append(v)
         compact_lines.append(_serialize_compact_row(vals))
 
-    context_parts = [
+    MAX_PREDICTIVE_CONTEXT_BYTES = 900_000
+
+    preamble = "\n".join([
         f"[{doc_label}] — COMPLETE SCHEDULE DATA",
         f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).",
         f"Total rows: {len(data_rows)}",
         "Scan EVERY row for delayed activities.",
         "",
         header_line,
-        "\n".join(compact_lines),
         ""
-    ]
+    ])
 
-    result = "\n".join(context_parts)
-    logger.info(f"  [CSV] Context built: {len(result)} chars — {len(compact_lines)}/{len(data_rows)} rows (0 dropped)")
+    budget = MAX_PREDICTIVE_CONTEXT_BYTES - len(preamble.encode("utf-8"))
+    included_lines = []
+    current_bytes = 0
+    for line in compact_lines:
+        line_bytes = len(line.encode("utf-8")) + 1
+        if current_bytes + line_bytes > budget:
+            break
+        included_lines.append(line)
+        current_bytes += line_bytes
+
+    skipped = len(compact_lines) - len(included_lines)
+    result = preamble + "\n".join(included_lines) + "\n"
+
+    if skipped:
+        logger.warning(f"  [CSV] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows included, {skipped} rows omitted (token limit)")
+    else:
+        logger.info(f"  [CSV] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows (0 dropped)")
     return result
 
 
