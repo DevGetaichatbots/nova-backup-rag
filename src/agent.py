@@ -368,7 +368,7 @@ class RAGAgent:
         
         return True
     
-    MAX_CONTEXT_BYTES = 900_000
+    MAX_CONTEXT_BYTES = 2_200_000
 
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
