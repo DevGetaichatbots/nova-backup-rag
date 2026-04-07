@@ -368,10 +368,10 @@ class RAGAgent:
         
         return True
     
-    MAX_CONTEXT_BYTES = 2_400_000
+    MAX_CONTEXT_BYTES = 2_100_000
     MAX_MODEL_TOKENS = 1_047_576
-    TOKENS_PER_BYTE = 0.45
-    RESERVED_TOKENS = 40_000
+    TOKENS_PER_BYTE = 0.50
+    RESERVED_TOKENS = 50_000
 
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
@@ -624,14 +624,63 @@ Keep your response concise and helpful."""
         messages.append({"role": "user", "content": user_message})
         
         logger.info(f"  Calling Azure OpenAI ({settings.AZURE_OPENAI_CHAT_DEPLOYMENT})...")
-        response = self.client.chat.completions.create(
-            model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
-            messages=messages,
-            temperature=0,
-            top_p=0.1,
-            seed=42,
-            max_tokens=32768
-        )
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
+                messages=messages,
+                temperature=0,
+                top_p=0.1,
+                seed=42,
+                max_tokens=32768
+            )
+        except Exception as e:
+            error_str = str(e)
+            if "context_length_exceeded" in error_str:
+                logger.warning(f"  Token limit exceeded, retrying with reduced context...")
+                reduced_context = self._retrieve_context(
+                    user_query, table_names, top_k,
+                    old_filename=old_filename, new_filename=new_filename
+                )
+                reduced_bytes = int(len(reduced_context.encode("utf-8")) * 0.85)
+                per_store = reduced_bytes // max(len(table_names), 1)
+
+                trimmed_parts = []
+                for table_name in table_names:
+                    results = vector_store_manager.fetch_all_from_stores([table_name], chunk_type="table").get(table_name, [])
+                    if isinstance(results, dict):
+                        continue
+                    store_bytes = 0
+                    for i, result in enumerate(results, 1):
+                        chunk_text = f"--- Table {i} ---\n{result['content']}\n"
+                        cb = len(chunk_text.encode("utf-8"))
+                        if store_bytes + cb > per_store:
+                            break
+                        trimmed_parts.append(chunk_text)
+                        store_bytes += cb
+
+                reduced_ctx = "\n".join(trimmed_parts)
+                logger.info(f"  Reduced context to {len(reduced_ctx):,} bytes (was {len(reduced_context):,})")
+
+                if is_comparison:
+                    user_message = user_message.replace(context, reduced_ctx)
+                messages[-1] = {"role": "user", "content": user_message}
+
+                history_msgs = [m for m in messages if m["role"] in ("user", "assistant") and m != messages[-1] and m != messages[0]]
+                for hm in history_msgs:
+                    messages.remove(hm)
+                logger.info(f"  Removed chat history for retry")
+
+                response = self.client.chat.completions.create(
+                    model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,
+                    messages=messages,
+                    temperature=0,
+                    top_p=0.1,
+                    seed=42,
+                    max_tokens=32768
+                )
+            else:
+                raise
         
         assistant_response = response.choices[0].message.content or ""
         logger.info(f"  AI response received: {len(assistant_response)} chars")
