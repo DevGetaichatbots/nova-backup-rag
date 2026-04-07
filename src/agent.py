@@ -373,16 +373,11 @@ class RAGAgent:
     TOKENS_PER_BYTE = 0.45
     RESERVED_TOKENS = 40_000
 
-    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None, used_tokens_estimate: int = 0) -> str:
+    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
         all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
 
-        available_tokens = self.MAX_MODEL_TOKENS - self.RESERVED_TOKENS - used_tokens_estimate
-        token_based_budget = int(available_tokens / self.TOKENS_PER_BYTE)
-        effective_budget = min(self.MAX_CONTEXT_BYTES, token_based_budget)
-        if used_tokens_estimate > 0:
-            logger.info(f"  Context budget: {effective_budget:,} bytes (history uses ~{used_tokens_estimate:,} tokens, {available_tokens:,} tokens available for data)")
-        per_store_budget = effective_budget // max(len(table_names), 1)
+        per_store_budget = self.MAX_CONTEXT_BYTES // max(len(table_names), 1)
 
         context_parts = []
         total_chunks = 0
@@ -480,43 +475,57 @@ class RAGAgent:
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
-        logger.info(f"  Loading chat history for session: {session_id}")
-        chat_history = get_chat_history(session_id, limit=4)
-        logger.info(f"  Found {len(chat_history)} previous messages")
-
-        history_tokens = 0
-        for msg in chat_history:
-            content = str(msg["content"])
-            if msg["role"] == "assistant" and len(content) > 500:
-                content = content[:500]
-            history_tokens += len(content) // 3
-
         if is_comparison:
             if preloaded_context is not None:
                 context = preloaded_context
                 logger.info(f"  Using preloaded context ({len(context)} chars)")
             else:
                 logger.info(f"  Retrieving context from {len(table_names)} vector stores (top_k={top_k} per query pass)...")
-                context = self._retrieve_context(user_query, table_names, top_k, old_filename=old_filename, new_filename=new_filename, used_tokens_estimate=history_tokens)
+                context = self._retrieve_context(user_query, table_names, top_k, old_filename=old_filename, new_filename=new_filename)
         else:
             context = ""
             logger.info(f"  Skipping vector store retrieval for non-comparison query")
         
         lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
         system_prompt = f"{SYSTEM_PROMPT_BASE}\n\n{lang_instruction}"
-        
+
+        data_tokens = int(len(context.encode("utf-8")) * self.TOKENS_PER_BYTE)
+        system_tokens = len(system_prompt) // 3
+        remaining_for_history = self.MAX_MODEL_TOKENS - self.RESERVED_TOKENS - data_tokens - system_tokens
+
+        logger.info(f"  Loading chat history for session: {session_id}")
+        chat_history = get_chat_history(session_id, limit=10)
+        logger.info(f"  Found {len(chat_history)} previous messages")
+
         messages: List[ChatCompletionMessageParam] = [
             {"role": "system", "content": system_prompt}
         ]
+
+        history_used = 0
+        history_included = 0
+        for msg in reversed(chat_history):
+            role = msg["role"]
+            content = str(msg["content"])
+            if role == "assistant" and len(content) > 500:
+                content = content[:500] + "\n\n[... previous response truncated ...]"
+            msg_tokens = len(content) // 3
+            if history_used + msg_tokens > remaining_for_history:
+                break
+            history_used += msg_tokens
+            history_included += 1
+
+        fitted_history = chat_history[-history_included:] if history_included > 0 else []
+        if history_included < len(chat_history):
+            logger.info(f"  Chat history: {history_included}/{len(chat_history)} messages fit (data priority, ~{remaining_for_history:,} tokens available for history)")
         
-        for msg in chat_history:
+        for msg in fitted_history:
             role = msg["role"]
             content = str(msg["content"])
             if role == "user":
                 messages.append({"role": "user", "content": content})
             elif role == "assistant":
                 if len(content) > 500:
-                    content = content[:500] + "\n\n[... previous response truncated for context ...]"
+                    content = content[:500] + "\n\n[... previous response truncated ...]"
                 messages.append({"role": "assistant", "content": content})
         
         
