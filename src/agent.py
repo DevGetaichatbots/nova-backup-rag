@@ -368,13 +368,13 @@ class RAGAgent:
         
         return True
     
-    MAX_CONTEXT_CHARS = 9_000_000
+    MAX_CONTEXT_BYTES = 9_000_000
 
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
         all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
 
-        per_store_budget = self.MAX_CONTEXT_CHARS // max(len(table_names), 1)
+        per_store_budget = self.MAX_CONTEXT_BYTES // max(len(table_names), 1)
 
         context_parts = []
         total_chunks = 0
@@ -395,16 +395,17 @@ class RAGAgent:
             else:
                 has_table_chunks = True
                 store_parts = []
-                store_chars = 0
+                store_bytes = 0
                 included = 0
                 skipped = 0
                 for i, result in enumerate(results, 1):
                     chunk_text = f"--- Table {i} ---\n{result['content']}\n"
-                    if store_chars + len(chunk_text) > per_store_budget:
+                    chunk_bytes = len(chunk_text.encode("utf-8"))
+                    if store_bytes + chunk_bytes > per_store_budget:
                         skipped += 1
                         continue
                     store_parts.append(chunk_text)
-                    store_chars += len(chunk_text)
+                    store_bytes += chunk_bytes
                     included += 1
 
                 total_chunks += included
@@ -431,16 +432,17 @@ class RAGAgent:
                     context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {results['error']}\n")
                 elif results:
                     store_parts = []
-                    store_chars = 0
+                    store_bytes = 0
                     included = 0
                     skipped = 0
                     for i, result in enumerate(results, 1):
                         chunk_text = f"--- Chunk {i} ---\n{result['content']}\n"
-                        if store_chars + len(chunk_text) > per_store_budget:
+                        chunk_bytes = len(chunk_text.encode("utf-8"))
+                        if store_bytes + chunk_bytes > per_store_budget:
                             skipped += 1
                             continue
                         store_parts.append(chunk_text)
-                        store_chars += len(chunk_text)
+                        store_bytes += chunk_bytes
                         included += 1
                     total_chunks += included
                     total_skipped += skipped
@@ -451,7 +453,7 @@ class RAGAgent:
                     context_parts.extend(store_parts)
 
         if total_skipped:
-            logger.warning(f"  Context truncated: {total_chunks} chunks sent, {total_skipped} omitted (API limit: {self.MAX_CONTEXT_CHARS:,} chars)")
+            logger.warning(f"  Context truncated: {total_chunks} chunks sent, {total_skipped} omitted (API limit: {self.MAX_CONTEXT_BYTES:,} bytes)")
         else:
             logger.info(f"  Chunks sent to LLM: {total_chunks}")
         return "\n".join(context_parts)

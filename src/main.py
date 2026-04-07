@@ -634,7 +634,21 @@ def _is_allowed_file(filename: str) -> bool:
 def _is_csv(filename: str) -> bool:
     return filename.lower().endswith(".csv")
 
-MAX_CHUNK_ROWS = 100
+CSV_SEPARATOR = ";"
+MAX_CHUNK_ROWS = 250
+
+def _detect_delimiter(sample: str) -> str:
+    counts = {}
+    for d in [";", ",", "\t", "|"]:
+        counts[d] = sample.count(d)
+    best = max(counts, key=counts.get)
+    return best if counts[best] > 0 else ","
+
+def _serialize_compact_row(vals: list[str], sep: str = CSV_SEPARATOR) -> str:
+    buf = io.StringIO()
+    writer = csv.writer(buf, delimiter=sep, quoting=csv.QUOTE_MINIMAL, lineterminator="")
+    writer.writerow(vals)
+    return buf.getvalue()
 
 def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     try:
@@ -647,46 +661,46 @@ def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
         dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
         reader = csv.reader(io.StringIO(text), dialect)
     except csv.Error:
-        reader = csv.reader(io.StringIO(text))
+        detected = _detect_delimiter(sample)
+        reader = csv.reader(io.StringIO(text), delimiter=detected)
 
     rows = list(reader)
     if not rows:
         return []
 
     headers = [h.strip() for h in rows[0]]
+    display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
+    keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
     data_rows = rows[1:]
 
-    logger.info(f"  [CSV] {filename}: {len(headers)} columns, {len(data_rows)} data rows")
-    logger.info(f"  [CSV] Headers: {headers}")
+    logger.info(f"  [CSV] {filename}: {len(headers)} columns ({len(display_headers)} kept), {len(data_rows)} data rows")
+    logger.info(f"  [CSV] Headers: {display_headers}")
 
-    if len(data_rows) > 10000:
-        logger.warning(f"  [CSV] Large file: {len(data_rows)} rows. LLM context window is ~1M tokens. Files >10,000 rows may exceed limits for comparison.")
+    header_line = _serialize_compact_row(display_headers)
 
     total_stored = 0
     chunks = []
     for batch_start in range(0, len(data_rows), MAX_CHUNK_ROWS):
         batch = data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
-        labeled_lines = []
+        compact_lines = []
         for row in batch:
-            parts = []
-            for i, val in enumerate(row):
-                v = val.strip() if i < len(row) else ""
-                h = headers[i] if i < len(headers) else f"Col{i}"
-                parts.append(f"{h}: {v}")
-            labeled_lines.append(" | ".join(parts))
+            vals = []
+            for idx in keep_indices:
+                v = row[idx].strip() if idx < len(row) else ""
+                vals.append(v)
+            compact_lines.append(_serialize_compact_row(vals))
 
-        if labeled_lines:
-            header_line = "Columns: " + " | ".join(headers)
-            content = header_line + "\n" + "\n".join(labeled_lines)
+        if compact_lines:
+            content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\n{header_line}\n" + "\n".join(compact_lines)
             part_num = batch_start // MAX_CHUNK_ROWS + 1
-            total_stored += len(labeled_lines)
+            total_stored += len(compact_lines)
             chunks.append({
                 "content": content,
                 "metadata": {
                     "type": "table",
                     "source": filename,
                     "part": part_num,
-                    "row_count": len(labeled_lines)
+                    "row_count": len(compact_lines)
                 }
             })
 
@@ -705,7 +719,8 @@ def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
         dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
         reader = csv.reader(io.StringIO(text), dialect)
     except csv.Error:
-        reader = csv.reader(io.StringIO(text))
+        detected = _detect_delimiter(sample)
+        reader = csv.reader(io.StringIO(text), delimiter=detected)
 
     rows = list(reader)
     if not rows:
@@ -716,30 +731,31 @@ def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
 
     doc_label = f"Schedule ({filename.replace('.csv', '').replace('.CSV', '')})"
     display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
+    keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
 
-    labeled_lines = []
+    header_line = _serialize_compact_row(display_headers)
+
+    compact_lines = []
     for row in data_rows:
-        parts = []
-        for i, val in enumerate(row):
-            v = val.strip() if i < len(row) else ""
-            if i < len(headers):
-                if headers[i].lower() in SKIP_HEADERS:
-                    continue
-                parts.append(f"{headers[i]}: {v}")
-        labeled_lines.append(" | ".join(parts))
+        vals = []
+        for idx in keep_indices:
+            v = row[idx].strip() if idx < len(row) else ""
+            vals.append(v)
+        compact_lines.append(_serialize_compact_row(vals))
 
     context_parts = [
         f"[{doc_label}] — COMPLETE SCHEDULE DATA",
-        f"Columns: {' | '.join(display_headers)}",
+        f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).",
         f"Total rows: {len(data_rows)}",
-        "Each row below is one activity. Scan EVERY row for delayed activities.",
+        "Scan EVERY row for delayed activities.",
         "",
-        "\n".join(labeled_lines),
+        header_line,
+        "\n".join(compact_lines),
         ""
     ]
 
     result = "\n".join(context_parts)
-    logger.info(f"  [CSV] Context built: {len(result)} chars — {len(labeled_lines)}/{len(data_rows)} rows (0 dropped)")
+    logger.info(f"  [CSV] Context built: {len(result)} chars — {len(compact_lines)}/{len(data_rows)} rows (0 dropped)")
     return result
 
 
