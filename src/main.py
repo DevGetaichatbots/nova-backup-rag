@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
+import csv
+import io
 import logging
 import os
 import time
@@ -202,9 +204,9 @@ async def upload_schedules(
     old_filename = old_schedule.filename or "old_schedule.pdf"
     new_filename = new_schedule.filename or "new_schedule.pdf"
     
-    if not old_filename.lower().endswith('.pdf') or not new_filename.lower().endswith('.pdf'):
-        logger.error("Invalid file type - only PDF accepted")
-        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+    if not _is_allowed_file(old_filename) or not _is_allowed_file(new_filename):
+        logger.error("Invalid file type - only PDF and CSV accepted")
+        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
     
     try:
         old_pdf_bytes = await old_schedule.read()
@@ -236,12 +238,20 @@ async def upload_schedules(
                     new_p = _upload_progress[upload_id]["new_schedule"]["progress"]
                     _upload_progress[upload_id]["overall_progress"] = (old_p + new_p) // 2
 
-                def process_file(file_key, filename, pdf_bytes, table_id):
+                def process_file(file_key, filename, file_bytes, table_id):
                     progress_cb(file_key, "ocr", f"Extracting content from {filename}...", 10)
-                    result = vector_store_manager.create_store_from_pdf(
-                        session_id, filename, pdf_bytes, table_id,
-                        progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
-                    )
+                    if _is_csv(filename):
+                        logger.info(f"  Processing CSV file: {filename}")
+                        chunks = _parse_csv_to_chunks(file_bytes, filename)
+                        result = vector_store_manager.create_store_from_chunks(
+                            session_id, filename, chunks, table_id,
+                            progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
+                        )
+                    else:
+                        result = vector_store_manager.create_store_from_pdf(
+                            session_id, filename, file_bytes, table_id,
+                            progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
+                        )
                     progress_cb(file_key, "complete", f"{filename} processed", 100)
                     return result
                 
@@ -616,6 +626,115 @@ def _format_rows_as_labeled(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join(lines)
 
 
+ALLOWED_EXTENSIONS = {".pdf", ".csv"}
+
+def _is_allowed_file(filename: str) -> bool:
+    return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
+
+def _is_csv(filename: str) -> bool:
+    return filename.lower().endswith(".csv")
+
+def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
+    try:
+        text = file_bytes.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = file_bytes.decode("latin-1")
+
+    sample = text[:2048]
+    try:
+        dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
+        reader = csv.reader(io.StringIO(text), dialect)
+    except csv.Error:
+        reader = csv.reader(io.StringIO(text))
+
+    rows = list(reader)
+    if not rows:
+        return []
+
+    headers = [h.strip() for h in rows[0]]
+    data_rows = rows[1:]
+
+    logger.info(f"  [CSV] {filename}: {len(headers)} columns, {len(data_rows)} data rows")
+    logger.info(f"  [CSV] Headers: {headers}")
+
+    labeled_lines = []
+    for row in data_rows:
+        parts = []
+        for i, val in enumerate(row):
+            val = val.strip()
+            if i < len(headers) and val:
+                parts.append(f"{headers[i]}: {val}")
+        if parts:
+            labeled_lines.append(" | ".join(parts))
+
+    content = "\n".join(labeled_lines)
+
+    chunks = [
+        {
+            "content": content,
+            "metadata": {
+                "type": "raw_markdown",
+                "source": filename,
+                "headers": headers,
+                "row_count": len(data_rows)
+            }
+        }
+    ]
+
+    return chunks
+
+
+def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
+    try:
+        text = file_bytes.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = file_bytes.decode("latin-1")
+
+    sample = text[:2048]
+    try:
+        dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
+        reader = csv.reader(io.StringIO(text), dialect)
+    except csv.Error:
+        reader = csv.reader(io.StringIO(text))
+
+    rows = list(reader)
+    if not rows:
+        return ""
+
+    headers = [h.strip() for h in rows[0]]
+    data_rows = rows[1:]
+
+    doc_label = f"Schedule ({filename.replace('.csv', '').replace('.CSV', '')})"
+    display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
+
+    labeled_lines = []
+    for row in data_rows:
+        parts = []
+        for i, val in enumerate(row):
+            val = val.strip()
+            if i < len(headers):
+                if headers[i].lower() in SKIP_HEADERS:
+                    continue
+                if val:
+                    parts.append(f"{headers[i]}: {val}")
+        if parts:
+            labeled_lines.append(" | ".join(parts))
+
+    context_parts = [
+        f"[{doc_label}] — COMPLETE SCHEDULE DATA",
+        f"Columns: {' | '.join(display_headers)}",
+        f"Total rows: {len(data_rows)}",
+        "Each row below is one activity. Scan EVERY row for delayed activities.",
+        "",
+        "\n".join(labeled_lines),
+        ""
+    ]
+
+    result = "\n".join(context_parts)
+    logger.info(f"  [CSV] Context built: {len(result)} chars from {len(data_rows)} rows")
+    return result
+
+
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     import re
     context_parts = []
@@ -693,7 +812,7 @@ async def predictive_analysis(
         analysis_id = str(uuid.uuid4())[:12]
 
     filename = schedule.filename or "schedule.pdf"
-    filename_clean = filename.replace(".pdf", "").replace(".PDF", "")
+    filename_clean = filename.replace(".pdf", "").replace(".PDF", "").replace(".csv", "").replace(".CSV", "")
 
     reference_date = _extract_reference_date(filename)
 
@@ -702,38 +821,46 @@ async def predictive_analysis(
     logger.info(f"=== PREDICTIVE REQUEST [{analysis_id}] ===")
     logger.info(f"Schedule: {filename} | Language: {language} | Reference date: {reference_date or 'not found in filename'}")
 
-    if not filename.lower().endswith('.pdf'):
+    if not _is_allowed_file(filename):
         _update_progress(analysis_id, "error", language)
         _schedule_progress_cleanup(analysis_id, delay=60)
-        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
 
     try:
-        pdf_bytes = await schedule.read()
-        logger.info(f"  File read: {len(pdf_bytes)} bytes")
+        file_bytes = await schedule.read()
+        logger.info(f"  File read: {len(file_bytes)} bytes")
 
-        _update_progress(analysis_id, "reading", language, f"{len(pdf_bytes) // 1024} KB")
+        _update_progress(analysis_id, "reading", language, f"{len(file_bytes) // 1024} KB")
 
         loop = asyncio.get_event_loop()
 
-        logger.info(f"  Running OCR on PDF...")
-        chunks = await loop.run_in_executor(
-            _query_executor,
-            lambda: process_pdf_binary(pdf_bytes, filename)
-        )
+        is_csv_file = _is_csv(filename)
 
-        raw_md_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown")
-        row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
-        table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
-        text_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "text")
-        ocr_elapsed = time.time() - start_time
-        logger.info(f"  ╔══ OCR COMPLETE ({ocr_elapsed:.1f}s) ══╗")
-        logger.info(f"  ║ Total chunks: {len(chunks)} (raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count})")
+        if is_csv_file:
+            logger.info(f"  Parsing CSV directly (no OCR needed)...")
+            context = _build_predictive_context_from_csv(file_bytes, filename_clean)
+            row_count = context.count("\n")
+            parse_elapsed = time.time() - start_time
+            logger.info(f"  CSV parsed in {parse_elapsed:.1f}s")
+        else:
+            logger.info(f"  Running OCR on PDF...")
+            chunks = await loop.run_in_executor(
+                _query_executor,
+                lambda: process_pdf_binary(file_bytes, filename)
+            )
 
-        logger.info(f"  ╚══════════════════════════╝")
+            raw_md_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown")
+            row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
+            table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
+            text_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "text")
+            ocr_elapsed = time.time() - start_time
+            logger.info(f"  ╔══ OCR COMPLETE ({ocr_elapsed:.1f}s) ══╗")
+            logger.info(f"  ║ Total chunks: {len(chunks)} (raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count})")
+            logger.info(f"  ╚══════════════════════════╝")
+
+            context = _build_predictive_context(chunks, filename_clean)
 
         _update_progress(analysis_id, "extracting", language, f"{row_count} activities")
-
-        context = _build_predictive_context(chunks, filename_clean)
         logger.info(f"  Context built: {len(context)} chars")
 
         _update_progress(analysis_id, "analyzing", language, f"{row_count} activities")
@@ -779,7 +906,7 @@ async def predictive_analysis(
                 _f.write(f"  STEP 1: REQUEST RECEIVED\n")
                 _f.write(f"{'─'*90}\n")
                 _f.write(f"  File:           {filename}\n")
-                _f.write(f"  Size:           {len(pdf_bytes)} bytes ({len(pdf_bytes)//1024} KB)\n")
+                _f.write(f"  Size:           {len(file_bytes)} bytes ({len(file_bytes)//1024} KB)\n")
                 _f.write(f"  Reference Date: {reference_date}\n")
                 _f.write(f"  Language:       {language}\n")
                 _f.write(f"  Format:         {format}\n")
