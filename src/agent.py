@@ -369,12 +369,20 @@ class RAGAgent:
         return True
     
     MAX_CONTEXT_BYTES = 2_400_000
+    MAX_MODEL_TOKENS = 1_047_576
+    TOKENS_PER_BYTE = 0.45
+    RESERVED_TOKENS = 40_000
 
-    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
+    def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None, used_tokens_estimate: int = 0) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
         all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
 
-        per_store_budget = self.MAX_CONTEXT_BYTES // max(len(table_names), 1)
+        available_tokens = self.MAX_MODEL_TOKENS - self.RESERVED_TOKENS - used_tokens_estimate
+        token_based_budget = int(available_tokens / self.TOKENS_PER_BYTE)
+        effective_budget = min(self.MAX_CONTEXT_BYTES, token_based_budget)
+        if used_tokens_estimate > 0:
+            logger.info(f"  Context budget: {effective_budget:,} bytes (history uses ~{used_tokens_estimate:,} tokens, {available_tokens:,} tokens available for data)")
+        per_store_budget = effective_budget // max(len(table_names), 1)
 
         context_parts = []
         total_chunks = 0
@@ -472,20 +480,27 @@ class RAGAgent:
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
+        logger.info(f"  Loading chat history for session: {session_id}")
+        chat_history = get_chat_history(session_id, limit=4)
+        logger.info(f"  Found {len(chat_history)} previous messages")
+
+        history_tokens = 0
+        for msg in chat_history:
+            content = str(msg["content"])
+            if msg["role"] == "assistant" and len(content) > 500:
+                content = content[:500]
+            history_tokens += len(content) // 3
+
         if is_comparison:
             if preloaded_context is not None:
                 context = preloaded_context
                 logger.info(f"  Using preloaded context ({len(context)} chars)")
             else:
                 logger.info(f"  Retrieving context from {len(table_names)} vector stores (top_k={top_k} per query pass)...")
-                context = self._retrieve_context(user_query, table_names, top_k)
+                context = self._retrieve_context(user_query, table_names, top_k, old_filename=old_filename, new_filename=new_filename, used_tokens_estimate=history_tokens)
         else:
             context = ""
             logger.info(f"  Skipping vector store retrieval for non-comparison query")
-        
-        logger.info(f"  Loading chat history for session: {session_id}")
-        chat_history = get_chat_history(session_id, limit=4)
-        logger.info(f"  Found {len(chat_history)} previous messages")
         
         lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
         system_prompt = f"{SYSTEM_PROMPT_BASE}\n\n{lang_instruction}"
