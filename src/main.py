@@ -634,7 +634,7 @@ def _is_allowed_file(filename: str) -> bool:
 def _is_csv(filename: str) -> bool:
     return filename.lower().endswith(".csv")
 
-MAX_CHUNK_ROWS = 20
+MAX_CHUNK_ROWS = 100
 
 def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     try:
@@ -658,6 +658,9 @@ def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
 
     logger.info(f"  [CSV] {filename}: {len(headers)} columns, {len(data_rows)} data rows")
     logger.info(f"  [CSV] Headers: {headers}")
+
+    if len(data_rows) > 10000:
+        logger.warning(f"  [CSV] Large file: {len(data_rows)} rows. LLM context window is ~1M tokens. Files >10,000 rows may exceed limits for comparison.")
 
     total_stored = 0
     chunks = []

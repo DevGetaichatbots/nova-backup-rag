@@ -89,24 +89,20 @@ class VectorStoreManager:
             return {"status": "error", "message": "No content found", "table_name": safe_table_name}
 
         _progress("chunking", f"Parsed {len(chunks)} chunks from {file_name}", 40)
-        logger.info(f"  Parsed {len(chunks)} chunks, generating embeddings...")
-        texts = [chunk["content"] for chunk in chunks]
+        logger.info(f"  CSV direct store: {len(chunks)} chunks (skipping embeddings — fetch-all retrieval)")
 
-        _progress("embedding", f"Generating embeddings for {len(chunks)} chunks...", 50)
-        embeddings = generate_embeddings(texts, progress_callback=lambda done, total: _progress(
-            "embedding", f"Embedding batch {done}/{total}...", 50 + int((done / max(total, 1)) * 35)
-        ))
+        zero_embedding = [0.0] * self.dimension
 
         documents = []
-        for i, chunk in enumerate(chunks):
+        for chunk in chunks:
             documents.append({
                 "content": chunk["content"],
-                "embedding": embeddings[i],
+                "embedding": zero_embedding,
                 "metadata": json.dumps(chunk["metadata"])
             })
 
-        _progress("storing", f"Storing {len(documents)} embeddings in database...", 90)
-        logger.info(f"  Storing {len(documents)} embeddings in database...")
+        _progress("storing", f"Storing {len(documents)} chunks in database...", 70)
+        logger.info(f"  Storing {len(documents)} chunks in database...")
         insert_embeddings(safe_table_name, documents)
 
         _progress("complete", f"Done — {len(chunks)} chunks stored", 100)
