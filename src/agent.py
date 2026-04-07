@@ -368,39 +368,59 @@ class RAGAgent:
         
         return True
     
+    MAX_CONTEXT_CHARS = 9_000_000
+
     def _retrieve_context(self, query: str, table_names: list[str], top_k: int = 20, old_filename: str = None, new_filename: str = None) -> str:
         logger.info(f"  Fetching table chunks from {len(table_names)} stores...")
         all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
-        
+
+        per_store_budget = self.MAX_CONTEXT_CHARS // max(len(table_names), 1)
+
         context_parts = []
         total_chunks = 0
+        total_skipped = 0
         has_table_chunks = False
-        
+
         for table_name in table_names:
             if "old" in table_name.lower():
                 doc_label = f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
             else:
                 doc_label = f"NEW Schedule ({new_filename})" if new_filename else "NEW Schedule"
             results = all_results.get(table_name, {})
-            
+
             if isinstance(results, dict) and "error" in results:
                 context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {results['error']}\n")
             elif not results:
                 context_parts.append(f"\n[{doc_label}: {table_name}]\nNo table chunks found.\n")
             else:
                 has_table_chunks = True
-                total_chunks += len(results)
-                context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} table chunks (structured data)")
+                store_parts = []
+                store_chars = 0
+                included = 0
+                skipped = 0
                 for i, result in enumerate(results, 1):
-                    context_parts.append(f"--- Table {i} ---")
-                    context_parts.append(result["content"])
-                    context_parts.append("")
-        
+                    chunk_text = f"--- Table {i} ---\n{result['content']}\n"
+                    if store_chars + len(chunk_text) > per_store_budget:
+                        skipped += 1
+                        continue
+                    store_parts.append(chunk_text)
+                    store_chars += len(chunk_text)
+                    included += 1
+
+                total_chunks += included
+                total_skipped += skipped
+                label = f"\n[{doc_label}: {table_name}] — {included} table chunks (structured data)"
+                if skipped:
+                    label += f" [WARNING: {skipped} chunks omitted — exceeds API size limit]"
+                context_parts.append(label)
+                context_parts.extend(store_parts)
+
         if not has_table_chunks:
             logger.info(f"  No table chunks found, falling back to text chunks...")
             all_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="text")
             context_parts = []
             total_chunks = 0
+            total_skipped = 0
             for table_name in table_names:
                 if "old" in table_name.lower():
                     doc_label = f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
@@ -410,14 +430,30 @@ class RAGAgent:
                 if isinstance(results, dict) and "error" in results:
                     context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {results['error']}\n")
                 elif results:
-                    total_chunks += len(results)
-                    context_parts.append(f"\n[{doc_label}: {table_name}] — {len(results)} text chunks")
+                    store_parts = []
+                    store_chars = 0
+                    included = 0
+                    skipped = 0
                     for i, result in enumerate(results, 1):
-                        context_parts.append(f"--- Chunk {i} ---")
-                        context_parts.append(result["content"])
-                        context_parts.append("")
-        
-        logger.info(f"  Chunks sent to LLM: {total_chunks}")
+                        chunk_text = f"--- Chunk {i} ---\n{result['content']}\n"
+                        if store_chars + len(chunk_text) > per_store_budget:
+                            skipped += 1
+                            continue
+                        store_parts.append(chunk_text)
+                        store_chars += len(chunk_text)
+                        included += 1
+                    total_chunks += included
+                    total_skipped += skipped
+                    label = f"\n[{doc_label}: {table_name}] — {included} text chunks"
+                    if skipped:
+                        label += f" [WARNING: {skipped} chunks omitted — exceeds API size limit]"
+                    context_parts.append(label)
+                    context_parts.extend(store_parts)
+
+        if total_skipped:
+            logger.warning(f"  Context truncated: {total_chunks} chunks sent, {total_skipped} omitted (API limit: {self.MAX_CONTEXT_CHARS:,} chars)")
+        else:
+            logger.info(f"  Chunks sent to LLM: {total_chunks}")
         return "\n".join(context_parts)
     
     def query(
