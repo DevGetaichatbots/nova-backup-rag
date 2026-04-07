@@ -184,7 +184,7 @@ def insert_embeddings(table_name: str, documents: list):
                     page_size=BATCH_SIZE
                 )
                 batch_num = i // BATCH_SIZE + 1
-                logger.info(f"  Inserted batch {batch_num} ({len(batch_docs)} rows)")
+                logger.info(f"  Inserted batch {batch_num} ({len(batch_docs)} chunks)")
             
             conn.commit()
 
