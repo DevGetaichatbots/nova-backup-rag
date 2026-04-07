@@ -743,7 +743,7 @@ def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
             vals.append(v)
         compact_lines.append(_serialize_compact_row(vals))
 
-    MAX_PREDICTIVE_CONTEXT_BYTES = 2_400_000
+    MAX_PREDICTIVE_CONTEXT_BYTES = 2_100_000
 
     preamble = "\n".join([
         f"[{doc_label}] — COMPLETE SCHEDULE DATA",
