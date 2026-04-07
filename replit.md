@@ -26,9 +26,9 @@ The system features two independent agents: a Comparison Agent and a Predictive 
 - Severity-colored overdue indicators are used within tables.
 
 **Technical Implementations & Feature Specifications:**
-- **Comparison Agent:** Processes two PDF schedules, creates separate vector store tables for each, and uses dual vector store querying to provide comparison analysis.
-- **Predictive Agent (Nova Insight):** Analyzes a single PDF schedule to identify delayed activities, perform root cause analysis, prioritize actions, assess resources, and evaluate forcing options.
-- **PDF Processing:** Utilizes Azure Document Intelligence OCR to preserve tables and structure. Text is chunked, embedded, and stored in Supabase pgvector.
+- **Comparison Agent:** Processes two PDF or CSV schedules, creates separate vector store tables for each, and uses dual vector store querying to provide comparison analysis.
+- **Predictive Agent (Nova Insight):** Analyzes a single PDF or CSV schedule to identify delayed activities, perform root cause analysis, prioritize actions, assess resources, and evaluate forcing options.
+- **File Processing:** Supports both PDF and CSV inputs. PDFs are processed via Azure Document Intelligence OCR to preserve tables and structure. CSVs are parsed directly (no OCR needed) with automatic delimiter detection (comma, semicolon, tab). Text is chunked, embedded, and stored in Supabase pgvector.
 - **Reference Date Extraction:** Automatically extracts reference dates from PDF filenames using various formats.
 - **Predictive Output Structure:** Generates a comprehensive report with sections: `EXECUTIVE_ACTIONS` (Top 3 priorities), `MANAGEMENT_CONCLUSION`, `SCHEDULE_OVERVIEW`, `DELAYED_ACTIVITIES`, `ROOT_CAUSE_ANALYSIS`, `PRIORITY_ACTIONS`, `RESOURCE_ASSESSMENT`, `FORCING_ASSESSMENT`, and `SUMMARY_BY_AREA`.
 - **Executive Actions (Top 3):** Synthesizes all analysis into exactly 3 concrete action items with WHO (responsible party), WHAT (direct instruction), WHEN (real calendar date with day name, e.g. "Torsdag d. 3. april 2026" — based on today's injected date), related task IDs, and a prominent manpower indicator showing whether adding people will help or is useless (with explanation). Deadlines are shown inline with the action text, not as a separate field.
