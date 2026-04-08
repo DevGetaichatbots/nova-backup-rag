@@ -135,7 +135,7 @@ from src.predictive_agent import predictive_agent
 from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
 from src.html_formatter import format_response_as_html
 from src.predictive_html_formatter import format_predictive_as_html
-from src.pdf_processor import process_pdf_binary
+from src.pdf_processor import process_pdf_binary, rows_to_compact_csv_chunks
 
 app = FastAPI(
     title="RAG Agent SaaS",
@@ -632,21 +632,12 @@ def _is_allowed_file(filename: str) -> bool:
 def _is_csv(filename: str) -> bool:
     return filename.lower().endswith(".csv")
 
-CSV_SEPARATOR = ";"
-MAX_CHUNK_ROWS = 250
-
 def _detect_delimiter(sample: str) -> str:
     counts = {}
     for d in [";", ",", "\t", "|"]:
         counts[d] = sample.count(d)
     best = max(counts, key=counts.get)
     return best if counts[best] > 0 else ","
-
-def _serialize_compact_row(vals: list[str], sep: str = CSV_SEPARATOR) -> str:
-    buf = io.StringIO()
-    writer = csv.writer(buf, delimiter=sep, quoting=csv.QUOTE_MINIMAL, lineterminator="")
-    writer.writerow(vals)
-    return buf.getvalue()
 
 def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
     try:
@@ -667,110 +658,17 @@ def _parse_csv_to_chunks(file_bytes: bytes, filename: str) -> list[dict]:
         return []
 
     headers = [h.strip() for h in rows[0]]
-    display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
-    keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
     data_rows = rows[1:]
 
-    logger.info(f"  [CSV] {filename}: {len(headers)} columns ({len(display_headers)} kept), {len(data_rows)} data rows")
-    logger.info(f"  [CSV] Headers: {display_headers}")
+    logger.info(f"  [CSV] {filename}: {len(headers)} columns, {len(data_rows)} data rows")
 
-    header_line = _serialize_compact_row(display_headers)
-
-    total_stored = 0
-    chunks = []
-    for batch_start in range(0, len(data_rows), MAX_CHUNK_ROWS):
-        batch = data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
-        compact_lines = []
-        for row in batch:
-            vals = []
-            for idx in keep_indices:
-                v = row[idx].strip() if idx < len(row) else ""
-                vals.append(v)
-            compact_lines.append(_serialize_compact_row(vals))
-
-        if compact_lines:
-            content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\n{header_line}\n" + "\n".join(compact_lines)
-            part_num = batch_start // MAX_CHUNK_ROWS + 1
-            total_stored += len(compact_lines)
-            chunks.append({
-                "content": content,
-                "metadata": {
-                    "type": "table",
-                    "source": filename,
-                    "part": part_num,
-                    "row_count": len(compact_lines)
-                }
-            })
-
-    logger.info(f"  [CSV] Created {len(chunks)} table chunks — {total_stored}/{len(data_rows)} rows stored (0 dropped)")
-    return chunks
+    return rows_to_compact_csv_chunks(headers, data_rows, filename)
 
 
 def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
-    try:
-        text = file_bytes.decode("utf-8-sig")
-    except UnicodeDecodeError:
-        text = file_bytes.decode("latin-1")
-
-    sample = text[:2048]
-    try:
-        dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
-        reader = csv.reader(io.StringIO(text), dialect)
-    except csv.Error:
-        detected = _detect_delimiter(sample)
-        reader = csv.reader(io.StringIO(text), delimiter=detected)
-
-    rows = list(reader)
-    if not rows:
-        return ""
-
-    headers = [h.strip() for h in rows[0]]
-    data_rows = rows[1:]
-
-    doc_label = f"Schedule ({filename.replace('.csv', '').replace('.CSV', '')})"
-    display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
-    keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
-
-    header_line = _serialize_compact_row(display_headers)
-
-    compact_lines = []
-    for row in data_rows:
-        vals = []
-        for idx in keep_indices:
-            v = row[idx].strip() if idx < len(row) else ""
-            vals.append(v)
-        compact_lines.append(_serialize_compact_row(vals))
-
-    MAX_PREDICTIVE_CONTEXT_BYTES = 1_900_000
-
-    preamble = "\n".join([
-        f"[{doc_label}] — COMPLETE SCHEDULE DATA",
-        f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).",
-        f"Total rows: {len(data_rows)}",
-        "Scan EVERY row for delayed activities.",
-        "",
-        header_line,
-        ""
-    ])
-
-    budget = MAX_PREDICTIVE_CONTEXT_BYTES - len(preamble.encode("utf-8"))
-    included_lines = []
-    current_bytes = 0
-    for line in compact_lines:
-        line_bytes = len(line.encode("utf-8")) + 1
-        if current_bytes + line_bytes > budget:
-            break
-        included_lines.append(line)
-        current_bytes += line_bytes
-
-    skipped = len(compact_lines) - len(included_lines)
-    result = preamble + "\n".join(included_lines) + "\n"
-
-    if skipped:
-        logger.warning(f"  [CSV] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows included, {skipped} rows omitted (token limit)")
-    else:
-        logger.info(f"  [CSV] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows (0 dropped)")
-    return result
+    chunks = _parse_csv_to_chunks(file_bytes, filename)
+    filename_clean = filename.replace('.csv', '').replace('.CSV', '')
+    return _build_predictive_context(chunks, filename_clean)
 
 
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:

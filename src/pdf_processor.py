@@ -134,6 +134,42 @@ def _detect_header_row(rows, col_count):
         return fallback, data_rows
 
 
+def rows_to_compact_csv_chunks(headers: list[str], data_rows: list[list[str]], source: str) -> list[dict]:
+    if not headers or not data_rows:
+        return []
+
+    display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
+    keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
+
+    header_line = _serialize_compact_row(display_headers)
+
+    chunks = []
+    total_stored = 0
+    for batch_start in range(0, len(data_rows), MAX_CHUNK_ROWS):
+        batch = data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
+        compact_lines = []
+        for row in batch:
+            vals = [row[idx].strip() if idx < len(row) else "" for idx in keep_indices]
+            compact_lines.append(_serialize_compact_row(vals))
+
+        if compact_lines:
+            content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\n{header_line}\n" + "\n".join(compact_lines)
+            part_num = batch_start // MAX_CHUNK_ROWS + 1
+            total_stored += len(compact_lines)
+            chunks.append({
+                "content": content,
+                "metadata": {
+                    "type": "table",
+                    "source": source,
+                    "part": part_num,
+                    "row_count": len(compact_lines)
+                }
+            })
+
+    logger.info(f"  [{source}] Compact CSV: {len(chunks)} chunks, {total_stored}/{len(data_rows)} rows, {len(display_headers)} columns")
+    return chunks
+
+
 def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list[dict]:
     all_headers = []
     all_data_rows = []
@@ -194,36 +230,7 @@ def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list
         logger.warning(f"[{filename}] No structured table data found in OCR output")
         return []
 
-    display_headers = [h for h in all_headers if h.lower() not in SKIP_HEADERS]
-    keep_indices = [i for i, h in enumerate(all_headers) if h.lower() not in SKIP_HEADERS]
-
-    header_line = _serialize_compact_row(display_headers)
-
-    chunks = []
-    total_stored = 0
-    for batch_start in range(0, len(all_data_rows), MAX_CHUNK_ROWS):
-        batch = all_data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
-        compact_lines = []
-        for row in batch:
-            vals = [row[idx].strip() if idx < len(row) else "" for idx in keep_indices]
-            compact_lines.append(_serialize_compact_row(vals))
-
-        if compact_lines:
-            content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\n{header_line}\n" + "\n".join(compact_lines)
-            part_num = batch_start // MAX_CHUNK_ROWS + 1
-            total_stored += len(compact_lines)
-            chunks.append({
-                "content": content,
-                "metadata": {
-                    "type": "table",
-                    "source": filename,
-                    "part": part_num,
-                    "row_count": len(compact_lines)
-                }
-            })
-
-    logger.info(f"[{filename}] OCR → compact CSV: {len(chunks)} chunks, {total_stored}/{len(all_data_rows)} rows stored, {len(display_headers)} columns")
-    return chunks
+    return rows_to_compact_csv_chunks(all_headers, all_data_rows, filename)
 
 
 def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
@@ -254,23 +261,7 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list
     chunks = _ocr_tables_to_compact_csv_chunks(tables, filename)
 
     if not chunks:
-        raw_markdown = extraction.get("raw_markdown", "")
-        if raw_markdown and raw_markdown.strip():
-            logger.warning(f"[{filename}] No structured tables found in OCR output — attempting raw markdown conversion")
-            lines = raw_markdown.strip().split("\n")
-            data_lines = [l.strip() for l in lines if l.strip() and not l.strip().startswith("#")]
-            if data_lines:
-                content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\nRawData\n" + "\n".join(data_lines[:MAX_CHUNK_ROWS])
-                chunks.append({
-                    "content": content,
-                    "metadata": {
-                        "type": "table",
-                        "source": filename,
-                        "part": 1,
-                        "row_count": len(data_lines[:MAX_CHUNK_ROWS]),
-                        "fallback": "raw_markdown"
-                    }
-                })
+        logger.warning(f"[{filename}] No structured tables found in OCR output — no data to store")
 
     logger.info(f"[{filename}] Final: {len(chunks)} compact CSV chunks")
     return chunks
