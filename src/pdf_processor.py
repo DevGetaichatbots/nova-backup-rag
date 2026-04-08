@@ -285,23 +285,54 @@ def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list
     return rows_to_compact_csv_chunks(canonical_headers, all_data_rows, filename)
 
 
+def _extract_tables_from_markdown(raw_markdown: str) -> list[list[list[str]]]:
+    tables = []
+
+    html_tables = re.findall(r'<table>.*?</table>', raw_markdown, re.DOTALL)
+    for ht in html_tables:
+        rows = []
+        for tr_match in re.finditer(r'<tr>(.*?)</tr>', ht, re.DOTALL):
+            cells_th = re.findall(r'<th[^>]*>(.*?)</th>', tr_match.group(1), re.DOTALL)
+            cells_td = re.findall(r'<td[^>]*>(.*?)</td>', tr_match.group(1), re.DOTALL)
+            raw = cells_th if cells_th else cells_td
+            row = [re.sub(r'<[^>]+>', '', c).strip() for c in raw]
+            if row:
+                rows.append(row)
+        if rows:
+            tables.append(rows)
+
+    pipe_blocks = re.findall(r'((?:^\|.+\|$\n?)+)', raw_markdown, re.MULTILINE)
+    for block in pipe_blocks:
+        lines = [l.strip() for l in block.strip().split("\n") if l.strip()]
+        rows = []
+        for li in lines:
+            if re.match(r'^\|[\s\-:|]+\|$', li):
+                continue
+            cells = [c.strip() for c in li.strip('|').split('|')]
+            if cells:
+                rows.append(cells)
+        if len(rows) >= 2:
+            tables.append(rows)
+
+    return tables
+
+
 def _parse_raw_markdown_tables(raw_markdown: str, filename: str) -> tuple[list[str], list[list[str]]]:
-    tables_html = re.findall(r'<table>.*?</table>', raw_markdown, re.DOTALL)
-    if not tables_html:
+    extracted = _extract_tables_from_markdown(raw_markdown)
+    if not extracted:
         return [], []
 
-    logger.info(f"[{filename}] Raw markdown: found {len(tables_html)} HTML tables")
+    logger.info(f"[{filename}] Raw markdown: found {len(extracted)} tables")
 
     canonical_headers = []
     all_data_rows = []
 
-    for ti, table_html in enumerate(tables_html):
-        header_matches = list(re.finditer(r'<tr>\s*((?:<th[^>]*>.*?</th>\s*)+)</tr>', table_html, re.DOTALL))
-        if not header_matches:
+    for ti, table_rows in enumerate(extracted):
+        if len(table_rows) < 2:
             continue
 
-        header_tr = header_matches[0].group(1)
-        raw_headers = [re.sub(r'<[^>]+>', '', c).strip() for c in re.findall(r'<th[^>]*>(.*?)</th>', header_tr, re.DOTALL)]
+        raw_headers = table_rows[0]
+        data = table_rows[1:]
 
         sched_indices = [i for i, h in enumerate(raw_headers) if _is_schedule_column(h)]
         if not sched_indices:
@@ -314,42 +345,69 @@ def _parse_raw_markdown_tables(raw_markdown: str, filename: str) -> tuple[list[s
 
         if not canonical_headers:
             canonical_headers = filtered_h
-            col_indices_map = list(range(len(sched_indices)))
+            active_indices = list(sched_indices)
             logger.info(f"[{filename}] Raw MD table {ti}: canonical headers ({len(canonical_headers)}): {canonical_headers}")
         else:
             canon_low = [h.lower().strip() for h in canonical_headers]
             table_low = [h.lower().strip() for h in filtered_h]
-            col_indices_map = []
-            matched = 0
+            col_map = {}
             for ci, ch in enumerate(canon_low):
-                found = -1
                 for fi, fh in enumerate(table_low):
                     if fh == ch:
-                        found = fi
-                        matched += 1
+                        col_map[ci] = sched_indices[fi]
                         break
-                col_indices_map.append(found)
             min_required = max(1, int(0.6 * len(canonical_headers)))
-            if matched < min_required:
+            if len(col_map) < min_required:
                 continue
+            active_indices = [col_map.get(ci, -1) for ci in range(len(canonical_headers))]
 
-        for row_match in re.finditer(r'<tr>\s*((?:<td[^>]*>.*?</td>\s*)+)</tr>', table_html, re.DOTALL):
-            raw_cells = re.findall(r'<td[^>]*>(.*?)</td>', row_match.group(1), re.DOTALL)
-            cells = [re.sub(r'<[^>]+>', '', c).strip() for c in raw_cells]
-
+        for row in data:
             row_vals = []
-            for mi, ci in enumerate(col_indices_map):
-                if ci < 0 or ci >= len(sched_indices):
-                    row_vals.append("")
+            for idx in active_indices:
+                if 0 <= idx < len(row):
+                    row_vals.append(row[idx].strip())
                 else:
-                    src_idx = sched_indices[ci]
-                    row_vals.append(cells[src_idx] if 0 <= src_idx < len(cells) else "")
-
-            if any(v.strip() for v in row_vals):
+                    row_vals.append("")
+            if any(v for v in row_vals):
                 all_data_rows.append(row_vals)
 
     logger.info(f"[{filename}] Raw markdown parsed: {len(canonical_headers)} columns, {len(all_data_rows)} rows")
     return canonical_headers, all_data_rows
+
+
+_DATE_RE = re.compile(r'^[a-zæøåA-ZÆØÅ]{0,3}\s*\d{1,2}[-/\.]\d{1,2}[-/\.]\d{2,4}$')
+_DUR_RE = re.compile(r'^\d+\s*[dDhHwWmM]?$')
+
+
+def _data_quality_score(headers: list[str], data_rows: list[list[str]]) -> float:
+    date_cols = [i for i, h in enumerate(headers)
+                 if h.lower().strip() in ('startdato', 'slutdato', 'start', 'finish', 'start date', 'end date')]
+    dur_cols = [i for i, h in enumerate(headers)
+                if h.lower().strip() in ('varighed', 'duration')]
+
+    if not date_cols and not dur_cols:
+        return 1.0
+
+    valid = 0
+    total = 0
+    sample = data_rows[:30]
+    for row in sample:
+        for ci in date_cols:
+            if ci < len(row) and row[ci].strip():
+                total += 1
+                if _DATE_RE.match(row[ci].strip()):
+                    valid += 1
+        for ci in dur_cols:
+            if ci < len(row) and row[ci].strip():
+                total += 1
+                if _DUR_RE.match(row[ci].strip()):
+                    valid += 1
+
+    return valid / total if total > 0 else 1.0
+
+
+def _count_data_rows_in_chunks(chunks: list[dict]) -> int:
+    return sum(c.get("metadata", {}).get("row_count", 0) for c in chunks)
 
 
 def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
@@ -358,8 +416,7 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list
 
     OCR extracts tables, then converts to semicolon-separated CSV chunks
     with 250 rows each, type="table", ready for zero-vector storage.
-    Uses structured tables first; falls back to raw_markdown HTML parsing
-    if structured tables yield no data.
+    Tries both structured tables and raw_markdown HTML, picks better quality.
 
     Args:
         pdf_bytes: Raw PDF file bytes
@@ -377,19 +434,53 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list
         raise ValueError(f"PDF extraction failed: {extraction['error']}")
 
     tables = extraction.get("tables", [])
-    logger.info(f"[{filename}] OCR extracted {len(tables)} tables")
+    raw_markdown = extraction.get("raw_markdown", "")
+    logger.info(f"[{filename}] OCR extracted {len(tables)} tables, {len(raw_markdown)} chars raw markdown")
 
-    chunks = _ocr_tables_to_compact_csv_chunks(tables, filename)
+    struct_chunks = _ocr_tables_to_compact_csv_chunks(tables, filename)
+    struct_rows = _count_data_rows_in_chunks(struct_chunks)
 
-    if not chunks:
-        raw_markdown = extraction.get("raw_markdown", "")
-        if raw_markdown:
-            logger.info(f"[{filename}] Structured tables failed — trying raw markdown HTML parsing")
-            headers, data_rows = _parse_raw_markdown_tables(raw_markdown, filename)
-            if headers and data_rows:
-                chunks = rows_to_compact_csv_chunks(headers, data_rows, filename)
+    struct_quality = 0.0
+    if struct_chunks:
+        first_content = struct_chunks[0].get("content", "")
+        lines = first_content.split("\n")
+        if len(lines) >= 3:
+            hdr_line = lines[1]
+            sample_headers = [h.strip() for h in hdr_line.split(CSV_SEPARATOR)]
+            sample_data = []
+            for dl in lines[2:min(32, len(lines))]:
+                vals = [v.strip() for v in dl.split(CSV_SEPARATOR)]
+                sample_data.append(vals)
+            struct_quality = _data_quality_score(sample_headers, sample_data)
+        logger.info(f"[{filename}] Structured tables: {struct_rows} rows, quality={struct_quality:.2f}")
 
-    if not chunks:
+    md_chunks = []
+    md_quality = 0.0
+    if raw_markdown:
+        md_headers, md_data = _parse_raw_markdown_tables(raw_markdown, filename)
+        if md_headers and md_data:
+            md_quality = _data_quality_score(md_headers, md_data)
+            md_chunks = rows_to_compact_csv_chunks(md_headers, md_data, filename)
+            md_rows = _count_data_rows_in_chunks(md_chunks)
+            logger.info(f"[{filename}] Raw markdown tables: {md_rows} rows, quality={md_quality:.2f}")
+
+    if struct_chunks and md_chunks:
+        if struct_quality >= 0.6:
+            chunks = struct_chunks
+            logger.info(f"[{filename}] Using structured tables (quality={struct_quality:.2f})")
+        elif md_quality > struct_quality:
+            chunks = md_chunks
+            logger.info(f"[{filename}] Using raw markdown — better quality ({md_quality:.2f} vs {struct_quality:.2f})")
+        else:
+            chunks = struct_chunks
+            logger.info(f"[{filename}] Using structured tables (both low quality)")
+    elif struct_chunks:
+        chunks = struct_chunks
+    elif md_chunks:
+        chunks = md_chunks
+        logger.info(f"[{filename}] Using raw markdown fallback (no structured tables)")
+    else:
+        chunks = []
         logger.warning(f"[{filename}] No schedule data could be extracted from OCR output")
 
     logger.info(f"[{filename}] Final: {len(chunks)} compact CSV chunks")
