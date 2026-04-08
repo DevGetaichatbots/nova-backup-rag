@@ -3,12 +3,12 @@ PDF Processor - Azure Document Intelligence OCR
 ================================================
 Extracts text and tables from PDFs, optimized for construction schedules.
 Uses Azure's AI-powered document analysis for accurate OCR.
-Preserves table structure using Azure's structured table output.
+Converts OCR table output to compact CSV format (identical to CSV upload path).
 """
-import json
+import csv
+import io
 import logging
 from src.azure_ocr import AzureDocumentIntelligence
-from src.embeddings import count_tokens, MAX_TOKENS
 
 logger = logging.getLogger(__name__)
 
@@ -56,374 +56,221 @@ def extract_from_pdf(pdf_bytes: bytes, filename: str = "document.pdf") -> dict:
         raise
 
 
-def table_to_markdown(table: dict) -> str:
-    """Convert structured table to markdown format."""
-    rows = table.get("rows", [])
+
+CSV_SEPARATOR = ";"
+MAX_CHUNK_ROWS = 250
+SKIP_HEADERS = {"opg", "opgavetilstand"}
+
+KNOWN_HEADERS = {
+    "id", "entydigt id", "etage", "omr.", "ansvarlig", "opgavenavn",
+    "opgavetilstand", "varighed", "startdato", "slutdato",
+    "% arbejde færdigt", "% færdigt", "foregående opgaver",
+    "efterfølgende opgaver", "bemærkn.", "bemærkn",
+    "opg.navn", "opgavenavn/aktivitet"
+}
+
+MS_PROJECT_HEADERS = {
+    9: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver"],
+    10: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10"],
+    11: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10", "Col11"],
+}
+
+
+def _serialize_compact_row(vals: list[str], sep: str = CSV_SEPARATOR) -> str:
+    buf = io.StringIO()
+    writer = csv.writer(buf, delimiter=sep, quoting=csv.QUOTE_MINIMAL, lineterminator="")
+    writer.writerow(vals)
+    return buf.getvalue()
+
+
+def _header_score(row_vals):
+    if not row_vals:
+        return 0
+    cleaned = [str(v).strip().lower() for v in row_vals if str(v).strip()]
+    return sum(1 for v in cleaned if v in KNOWN_HEADERS or any(kh in v for kh in KNOWN_HEADERS))
+
+
+def _detect_header_row(rows, col_count):
     if not rows:
-        return ""
-    
-    lines = []
-    for i, row in enumerate(rows):
-        line = "| " + " | ".join(str(cell) for cell in row) + " |"
-        lines.append(line)
-        if i == 0:
-            separator = "| " + " | ".join("---" for _ in row) + " |"
-            lines.append(separator)
-    
-    return "\n".join(lines)
+        return [], rows
 
+    raw_header = rows[0]
+    header_row = raw_header
+    best_score = _header_score(raw_header)
+    best_header_idx = 0
 
-def chunk_text_content(content: str, chunk_size: int = 1000) -> list[str]:
-    """Split text into chunks by paragraphs."""
-    if not content or not content.strip():
-        return []
-    
-    paragraphs = content.split("\n\n")
-    chunks = []
-    current_chunk = ""
-    
-    for para in paragraphs:
-        para = para.strip()
-        if not para:
-            continue
-        
-        if len(current_chunk) + len(para) + 2 <= chunk_size:
-            current_chunk += ("\n\n" if current_chunk else "") + para
-        else:
-            if current_chunk:
-                chunks.append(current_chunk)
-            
-            if len(para) <= chunk_size:
-                current_chunk = para
+    for check_idx in range(1, min(5, len(rows))):
+        score = _header_score(rows[check_idx])
+        if score > best_score:
+            best_score = score
+            header_row = rows[check_idx]
+            best_header_idx = check_idx
+
+    MIN_HEADER_SCORE = 3
+
+    if best_header_idx > 0 and best_score >= MIN_HEADER_SCORE:
+        data_rows = [r for i, r in enumerate(rows) if i != best_header_idx and i != 0]
+        return header_row, data_rows
+    elif best_score >= MIN_HEADER_SCORE:
+        return header_row, rows[1:]
+    else:
+        fallback = MS_PROJECT_HEADERS.get(col_count)
+        if not fallback:
+            closest = min(MS_PROJECT_HEADERS.keys(), key=lambda k: abs(k - col_count))
+            fb = MS_PROJECT_HEADERS[closest]
+            if col_count > closest:
+                fallback = fb + [f"Col{i+1}" for i in range(closest, col_count)]
             else:
-                words = para.split()
-                current_chunk = ""
-                for word in words:
-                    if len(current_chunk) + len(word) + 1 <= chunk_size:
-                        current_chunk += (" " if current_chunk else "") + word
-                    else:
-                        if current_chunk:
-                            chunks.append(current_chunk)
-                        current_chunk = word
-    
-    if current_chunk:
-        chunks.append(current_chunk)
-    
+                fallback = fb[:col_count]
+
+        skip_rows = set()
+        for ri in range(min(5, len(rows))):
+            row_vals = [str(v).strip().lower() for v in rows[ri] if str(v).strip()]
+            is_data = any(v.isdigit() for v in row_vals)
+            if not is_data and row_vals:
+                skip_rows.add(ri)
+
+        data_rows = [r for i, r in enumerate(rows) if i not in skip_rows]
+        return fallback, data_rows
+
+
+def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list[dict]:
+    all_headers = []
+    all_data_rows = []
+
+    for table in tables:
+        table_id = table.get("table_id", 0)
+        col_count = table.get("column_count", 0)
+        rows = table.get("rows", [])
+
+        if not rows:
+            continue
+
+        header_row, data_rows = _detect_header_row(rows, col_count)
+
+        header_clean = [str(h).strip() for h in header_row]
+        logger.info(f"[{filename}] Table {table_id}: {len(data_rows)} data rows, headers (score={_header_score(header_row)}): {header_clean}")
+
+        if data_rows:
+            sample = data_rows[0]
+            sample_mapped = " | ".join(
+                f"{header_clean[i] if i < len(header_clean) else f'Col{i}'}: {str(sample[i]).strip()[:30]}"
+                for i in range(min(len(sample), len(header_clean)))
+            )
+            logger.info(f"[{filename}] Table {table_id} first data row: {sample_mapped}")
+
+        if not all_headers:
+            all_headers = header_clean
+        else:
+            if header_clean != all_headers:
+                col_map = {}
+                for ci, ch in enumerate(all_headers):
+                    ch_low = ch.lower().strip()
+                    for fi, fh in enumerate(header_clean):
+                        if fh.lower().strip() == ch_low:
+                            col_map[ci] = fi
+                            break
+                if len(col_map) < len(all_headers) - 1:
+                    logger.info(f"[{filename}] Table {table_id}: headers don't match canonical, skipping")
+                    continue
+                remapped_rows = []
+                for row in data_rows:
+                    new_row = []
+                    for ci in range(len(all_headers)):
+                        src_idx = col_map.get(ci, -1)
+                        new_row.append(row[src_idx] if 0 <= src_idx < len(row) else "")
+                    remapped_rows.append(new_row)
+                data_rows = remapped_rows
+                logger.info(f"[{filename}] Table {table_id}: remapped {len(col_map)}/{len(all_headers)} columns")
+
+        for row in data_rows:
+            cleaned = [str(v).strip() if v else "" for v in row]
+            if any(v for v in cleaned):
+                while len(cleaned) < len(all_headers):
+                    cleaned.append("")
+                all_data_rows.append(cleaned[:len(all_headers)])
+
+    if not all_headers or not all_data_rows:
+        logger.warning(f"[{filename}] No structured table data found in OCR output")
+        return []
+
+    display_headers = [h for h in all_headers if h.lower() not in SKIP_HEADERS]
+    keep_indices = [i for i, h in enumerate(all_headers) if h.lower() not in SKIP_HEADERS]
+
+    header_line = _serialize_compact_row(display_headers)
+
+    chunks = []
+    total_stored = 0
+    for batch_start in range(0, len(all_data_rows), MAX_CHUNK_ROWS):
+        batch = all_data_rows[batch_start:batch_start + MAX_CHUNK_ROWS]
+        compact_lines = []
+        for row in batch:
+            vals = [row[idx].strip() if idx < len(row) else "" for idx in keep_indices]
+            compact_lines.append(_serialize_compact_row(vals))
+
+        if compact_lines:
+            content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\n{header_line}\n" + "\n".join(compact_lines)
+            part_num = batch_start // MAX_CHUNK_ROWS + 1
+            total_stored += len(compact_lines)
+            chunks.append({
+                "content": content,
+                "metadata": {
+                    "type": "table",
+                    "source": filename,
+                    "part": part_num,
+                    "row_count": len(compact_lines)
+                }
+            })
+
+    logger.info(f"[{filename}] OCR → compact CSV: {len(chunks)} chunks, {total_stored}/{len(all_data_rows)} rows stored, {len(display_headers)} columns")
     return chunks
 
 
-def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf",
-                       chunk_size: int = 1000, chunk_overlap: int = 100) -> list[dict]:
+def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
     """
-    Process PDF binary to chunks ready for embedding.
-    
-    Tables are chunked separately to preserve structure.
-    Each table row becomes a searchable chunk with full table context.
-    
+    Process PDF binary to compact CSV chunks (same format as CSV upload path).
+
+    OCR extracts tables, then converts to semicolon-separated CSV chunks
+    with 250 rows each, type="table", ready for zero-vector storage.
+
     Args:
         pdf_bytes: Raw PDF file bytes
         filename: Name of the file
-        chunk_size: Max chars per text chunk (tables handled separately)
-        chunk_overlap: Overlap for text chunks
-    
+
     Returns:
-        List of chunk dicts with 'content' and 'metadata'
-    
+        List of chunk dicts with 'content' and 'metadata' (type="table")
+
     Raises:
         ValueError: If Azure OCR not configured or extraction fails
     """
     extraction = extract_from_pdf(pdf_bytes, filename)
-    
+
     if not extraction["success"]:
         raise ValueError(f"PDF extraction failed: {extraction['error']}")
-    
-    chunks = []
-    chunk_index = 0
 
-    raw_markdown = extraction.get("raw_markdown", "")
-    if raw_markdown and raw_markdown.strip():
-        chunks.append({
-            "content": raw_markdown.strip(),
-            "metadata": {
-                "chunk_index": chunk_index,
-                "filename": filename,
-                "type": "raw_markdown",
-                "source": "azure_ocr"
-            }
-        })
-        chunk_index += 1
-        logger.info(f"[{filename}] Raw markdown chunk: {len(raw_markdown)} chars")
-    
     tables = extraction.get("tables", [])
-    for table in tables:
-        table_id = table.get("table_id", 0)
-        row_count = table.get("row_count", 0)
-        col_count = table.get("column_count", 0)
-        page_numbers = table.get("page_numbers", [1])
-        rows = table.get("rows", [])
-        cells = table.get("cells", [])
-        has_merged_cells = table.get("has_merged_cells", False)
-        
-        if not rows:
-            continue
-        
-        raw_header = rows[0] if rows else []
-        
-        KNOWN_HEADERS = {
-            "id", "entydigt id", "etage", "omr.", "ansvarlig", "opgavenavn",
-            "opgavetilstand", "varighed", "startdato", "slutdato",
-            "% arbejde færdigt", "% færdigt", "foregående opgaver",
-            "efterfølgende opgaver", "bemærkn.", "bemærkn",
-            "opg.navn", "opgavenavn/aktivitet"
-        }
+    logger.info(f"[{filename}] OCR extracted {len(tables)} tables")
 
-        MS_PROJECT_HEADERS = {
-            9: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver"],
-            10: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10"],
-            11: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10", "Col11"],
-        }
-        
-        def _header_score(row_vals):
-            if not row_vals:
-                return 0
-            cleaned = [str(v).strip().lower() for v in row_vals if str(v).strip()]
-            return sum(1 for v in cleaned if v in KNOWN_HEADERS or any(kh in v for kh in KNOWN_HEADERS))
-        
-        header_row = raw_header
-        best_score = _header_score(raw_header)
-        best_header_idx = 0
-        
-        for check_idx in range(1, min(5, len(rows))):
-            score = _header_score(rows[check_idx])
-            if score > best_score:
-                best_score = score
-                header_row = rows[check_idx]
-                best_header_idx = check_idx
-        
-        MIN_HEADER_SCORE = 3
+    chunks = _ocr_tables_to_compact_csv_chunks(tables, filename)
 
-        if best_header_idx > 0 and best_score >= MIN_HEADER_SCORE:
-            logger.info(f"[{filename}] Table {table_id}: Header found at row {best_header_idx} (score={best_score}), not row 0")
-            rows = [header_row] + [r for i, r in enumerate(rows) if i != best_header_idx and i != 0]
-        elif best_score < MIN_HEADER_SCORE:
-            logger.warning(f"[{filename}] Table {table_id}: Header detection FAILED (best_score={best_score} < {MIN_HEADER_SCORE}). Using MS Project fallback for {col_count} columns...")
-
-            fallback = MS_PROJECT_HEADERS.get(col_count)
-            if not fallback:
-                closest = min(MS_PROJECT_HEADERS.keys(), key=lambda k: abs(k - col_count))
-                fb = MS_PROJECT_HEADERS[closest]
-                if col_count > closest:
-                    fallback = fb + [f"Col{i+1}" for i in range(closest, col_count)]
-                else:
-                    fallback = fb[:col_count]
-
-            header_row = fallback
-            logger.info(f"[{filename}] Table {table_id}: Using fallback headers: {header_row}")
-
-            skip_rows = set()
-            for ri in range(min(5, len(rows))):
-                row_vals = [str(v).strip().lower() for v in rows[ri] if str(v).strip()]
-                is_data = False
-                for v in row_vals:
-                    if v.isdigit():
-                        is_data = True
-                        break
-                if not is_data and row_vals:
-                    skip_rows.add(ri)
-            if skip_rows:
-                logger.info(f"[{filename}] Table {table_id}: Skipping non-data rows at indices {skip_rows}")
-
-            rows = [r for i, r in enumerate(rows) if i not in skip_rows]
-        
-        logger.info(f"[{filename}] Table {table_id} headers (score={best_score}): {[str(h).strip() for h in header_row]}")
-        if rows:
-            sample_row = rows[0]
-            sample_mapped = " | ".join(f"{header_row[i] if i < len(header_row) else f'Col{i}'}: {str(sample_row[i]).strip()[:30]}" for i in range(min(len(sample_row), len(header_row))))
-            logger.info(f"[{filename}] Table {table_id} first data row: {sample_mapped}")
-        
-        MAX_TABLE_CHUNK_CHARS = 120000
-
-        corrected_rows = [header_row] + rows
-        corrected_table = {**table, "rows": corrected_rows}
-        table_md = table_to_markdown(corrected_table)
-        structured_json = json.dumps({"table_id": table_id, "rows": rows, "cells": cells, "pages": page_numbers})
-        
-        full_table_content = f"TABLE {table_id} (Pages {page_numbers})\n{table_md}\n[STRUCTURED: {structured_json}]"
-        
-        if len(full_table_content) <= MAX_TABLE_CHUNK_CHARS:
-            chunks.append({
-                "content": full_table_content,
-                "metadata": {
-                    "chunk_index": chunk_index,
-                    "filename": filename,
-                    "type": "table",
-                    "table_id": table_id,
-                    "row_count": row_count,
-                    "column_count": col_count,
-                    "page_numbers": page_numbers,
-                    "has_merged_cells": has_merged_cells,
-                    "source": "azure_ocr"
-                }
-            })
-            chunk_index += 1
-        else:
-            table_content_no_json = f"TABLE {table_id} (Pages {page_numbers})\n{table_md}"
-            
-            if len(table_content_no_json) <= MAX_TABLE_CHUNK_CHARS:
+    if not chunks:
+        raw_markdown = extraction.get("raw_markdown", "")
+        if raw_markdown and raw_markdown.strip():
+            logger.warning(f"[{filename}] No structured tables found in OCR output — attempting raw markdown conversion")
+            lines = raw_markdown.strip().split("\n")
+            data_lines = [l.strip() for l in lines if l.strip() and not l.strip().startswith("#")]
+            if data_lines:
+                content = f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).\nRawData\n" + "\n".join(data_lines[:MAX_CHUNK_ROWS])
                 chunks.append({
-                    "content": table_content_no_json,
+                    "content": content,
                     "metadata": {
-                        "chunk_index": chunk_index,
-                        "filename": filename,
                         "type": "table",
-                        "table_id": table_id,
-                        "row_count": row_count,
-                        "column_count": col_count,
-                        "page_numbers": page_numbers,
-                        "has_merged_cells": has_merged_cells,
-                        "source": "azure_ocr"
+                        "source": filename,
+                        "part": 1,
+                        "row_count": len(data_lines[:MAX_CHUNK_ROWS]),
+                        "fallback": "raw_markdown"
                     }
                 })
-                chunk_index += 1
-            else:
-                md_lines = table_md.split("\n")
-                current_part = f"TABLE {table_id} (Pages {page_numbers})\n"
-                part_num = 1
-                
-                for line in md_lines:
-                    if len(current_part) + len(line) + 1 > MAX_TABLE_CHUNK_CHARS:
-                        if current_part.strip():
-                            chunks.append({
-                                "content": current_part,
-                                "metadata": {
-                                    "chunk_index": chunk_index,
-                                    "filename": filename,
-                                    "type": "table",
-                                    "table_id": table_id,
-                                    "part": part_num,
-                                    "row_count": row_count,
-                                    "column_count": col_count,
-                                    "page_numbers": page_numbers,
-                                    "source": "azure_ocr"
-                                }
-                            })
-                            chunk_index += 1
-                            part_num += 1
-                        current_part = f"TABLE {table_id} Part {part_num} (Pages {page_numbers})\n"
-                    current_part += line + "\n"
-                
-                if current_part.strip():
-                    chunks.append({
-                        "content": current_part,
-                        "metadata": {
-                            "chunk_index": chunk_index,
-                            "filename": filename,
-                            "type": "table",
-                            "table_id": table_id,
-                            "part": part_num,
-                            "row_count": row_count,
-                            "column_count": col_count,
-                            "page_numbers": page_numbers,
-                            "source": "azure_ocr"
-                        }
-                    })
-                    chunk_index += 1
-            
-            logger.info(f"[{filename}] Large table {table_id} split into {part_num if 'part_num' in dir() else 1} chunks (was {len(full_table_content)} chars)")
-        
-        for row_idx, row in enumerate(rows[1:], start=1):
-            row_cells = [c for c in cells if c.get("row") == row_idx]
-            
-            row_page = page_numbers[0] if page_numbers else 1
-            for cell in row_cells:
-                if "bounding_regions" in cell:
-                    for br in cell.get("bounding_regions", []):
-                        row_page = br.get("pageNumber", row_page)
-                        break
-            
-            row_content_parts = []
-            has_any_value = False
-            for i, cell_val in enumerate(row):
-                header = header_row[i] if i < len(header_row) else f"Col{i+1}"
-                val = str(cell_val).strip() if cell_val else ""
-                row_content_parts.append(f"{header}: {val}")
-                if val:
-                    has_any_value = True
-            
-            if has_any_value:
-                row_content = " | ".join(row_content_parts)
-                chunks.append({
-                    "content": row_content,
-                    "metadata": {
-                        "chunk_index": chunk_index,
-                        "filename": filename,
-                        "type": "table_row",
-                        "table_id": table_id,
-                        "row_index": row_idx,
-                        "page_number": row_page,
-                        "cells_data": json.dumps(row_cells) if row_cells else None,
-                        "source": "azure_ocr"
-                    }
-                })
-                chunk_index += 1
-    
-    pages = extraction.get("pages", [])
-    for page in pages:
-        page_content = page.get("content", "")
-        page_number = page.get("page_number", 1)
-        total_pages = page.get("total_pages", 1)
-        
-        text_chunks = chunk_text_content(page_content, chunk_size)
-        
-        for i, text in enumerate(text_chunks):
-            chunks.append({
-                "content": text,
-                "metadata": {
-                    "chunk_index": chunk_index,
-                    "filename": filename,
-                    "type": "text",
-                    "page_number": page_number,
-                    "total_pages": total_pages,
-                    "page_chunk_index": i,
-                    "source": "azure_ocr"
-                }
-            })
-            chunk_index += 1
-    
-    if not chunks and extraction["raw_markdown"]:
-        text_chunks = chunk_text_content(extraction["raw_markdown"], chunk_size)
-        for i, text in enumerate(text_chunks):
-            chunks.append({
-                "content": text,
-                "metadata": {
-                    "chunk_index": i,
-                    "filename": filename,
-                    "type": "text",
-                    "source": "azure_ocr"
-                }
-            })
-    
-    safe_token_limit = MAX_TOKENS - 100
-    final_chunks = []
-    split_count = 0
-    for chunk in chunks:
-        token_count = count_tokens(chunk["content"])
-        if token_count <= safe_token_limit:
-            final_chunks.append(chunk)
-        else:
-            from src.embeddings import split_oversized_text
-            parts = split_oversized_text(chunk["content"], safe_token_limit)
-            split_count += 1
-            for part_idx, part_text in enumerate(parts):
-                new_chunk = {
-                    "content": part_text,
-                    "metadata": {**chunk["metadata"], "chunk_index": len(final_chunks), "split_part": part_idx + 1, "split_total": len(parts)}
-                }
-                final_chunks.append(new_chunk)
 
-    if split_count > 0:
-        logger.info(f"[{filename}] Token safety: split {split_count} oversized chunks → {len(final_chunks)} total (was {len(chunks)})")
-    
-    logger.info(f"[{filename}] Created {len(final_chunks)} chunks ({len(tables)} tables, {len(pages)} pages)")
-    
-    return final_chunks
+    logger.info(f"[{filename}] Final: {len(chunks)} compact CSV chunks")
+    return chunks

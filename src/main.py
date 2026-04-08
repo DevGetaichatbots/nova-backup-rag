@@ -243,15 +243,13 @@ async def upload_schedules(
                     if _is_csv(filename):
                         logger.info(f"  Processing CSV file: {filename}")
                         chunks = _parse_csv_to_chunks(file_bytes, filename)
-                        result = vector_store_manager.create_store_from_chunks(
-                            session_id, filename, chunks, table_id,
-                            progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
-                        )
                     else:
-                        result = vector_store_manager.create_store_from_pdf(
-                            session_id, filename, file_bytes, table_id,
-                            progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
-                        )
+                        logger.info(f"  Processing PDF file: {filename}")
+                        chunks = process_pdf_binary(file_bytes, filename)
+                    result = vector_store_manager.create_store_from_chunks(
+                        session_id, filename, chunks, table_id,
+                        progress_callback=lambda step, detail, pct: progress_cb(file_key, step, detail, pct)
+                    )
                     progress_cb(file_key, "complete", f"{filename} processed", 100)
                     return result
                 
@@ -776,100 +774,35 @@ def _build_predictive_context_from_csv(file_bytes: bytes, filename: str) -> str:
 
 
 def _build_predictive_context(chunks: list[dict], filename: str) -> str:
-    import re
-    context_parts = []
     doc_label = f"Schedule ({filename})"
-
     MAX_PREDICTIVE_CONTEXT_BYTES = 1_900_000
 
-    raw_md_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown"]
-    text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
+    table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
 
-    import logging as _log
-    _logger = _log.getLogger(__name__)
+    if not table_chunks:
+        return f"[{doc_label}]\nNo schedule data could be extracted.\n"
 
-    if raw_md_chunks:
-        all_html = "\n".join(c["content"] for c in raw_md_chunks)
-        _logger.info(f"  Raw OCR: {len(raw_md_chunks)} chunks, {len(all_html)} chars (HTML)")
+    preamble = "\n".join([
+        f"[{doc_label}] — COMPLETE SCHEDULE DATA",
+        "Scan EVERY row for delayed activities.",
+        ""
+    ])
 
-        headers, data_rows = _parse_html_tables_to_rows(all_html)
+    budget = MAX_PREDICTIVE_CONTEXT_BYTES - len(preamble.encode("utf-8"))
+    included_parts = []
+    current_bytes = 0
+    for chunk in table_chunks:
+        chunk_bytes = len(chunk["content"].encode("utf-8")) + 1
+        if current_bytes + chunk_bytes > budget:
+            logger.warning(f"  [PDF] Context trimmed at {current_bytes} bytes (limit: {MAX_PREDICTIVE_CONTEXT_BYTES})")
+            break
+        included_parts.append(chunk["content"])
+        current_bytes += chunk_bytes
 
-        if headers and data_rows:
-            display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
-            keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
-
-            header_line = _serialize_compact_row(display_headers)
-
-            compact_lines = []
-            for row in data_rows:
-                vals = []
-                for idx in keep_indices:
-                    v = row[idx].strip() if idx < len(row) else ""
-                    vals.append(v)
-                compact_lines.append(_serialize_compact_row(vals))
-
-            preamble = "\n".join([
-                f"[{doc_label}] — COMPLETE SCHEDULE DATA",
-                f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).",
-                f"Total rows: {len(data_rows)}",
-                "Scan EVERY row for delayed activities.",
-                "",
-                header_line,
-                ""
-            ])
-
-            budget = MAX_PREDICTIVE_CONTEXT_BYTES - len(preamble.encode("utf-8"))
-            included_lines = []
-            current_bytes = 0
-            for line in compact_lines:
-                line_bytes = len(line.encode("utf-8")) + 1
-                if current_bytes + line_bytes > budget:
-                    break
-                included_lines.append(line)
-                current_bytes += line_bytes
-
-            skipped = len(compact_lines) - len(included_lines)
-            result = preamble + "\n".join(included_lines) + "\n"
-
-            if skipped:
-                _logger.warning(f"  [PDF] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows included, {skipped} rows omitted (token limit)")
-            else:
-                _logger.info(f"  [PDF] Context: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows (was {len(all_html)} HTML → {len(result)} compact)")
-            return result
-        else:
-            _logger.info(f"  No structured tables found, falling back to raw HTML")
-            context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
-            context_parts.append("Scan EVERY row for delayed activities. Count ALL rows.")
-            context_parts.append("")
-            raw_bytes = len(all_html.encode("utf-8"))
-            if raw_bytes > MAX_PREDICTIVE_CONTEXT_BYTES:
-                trim_point = MAX_PREDICTIVE_CONTEXT_BYTES
-                all_html = all_html.encode("utf-8")[:trim_point].decode("utf-8", errors="ignore")
-                _logger.warning(f"  Raw HTML trimmed from {raw_bytes} to {trim_point} bytes")
-            context_parts.append(all_html)
-            context_parts.append("")
-            return "\n".join(context_parts)
-
-    if text_chunks:
-        context_parts.append(f"[{doc_label}] — TEXT DATA")
-        context_parts.append("")
-        current_bytes = 0
-        for chunk in text_chunks:
-            content = chunk["content"]
-            if content.strip():
-                chunk_bytes = len(content.encode("utf-8"))
-                if current_bytes + chunk_bytes > MAX_PREDICTIVE_CONTEXT_BYTES:
-                    _logger.warning(f"  Text context trimmed at {current_bytes} bytes (limit: {MAX_PREDICTIVE_CONTEXT_BYTES})")
-                    break
-                context_parts.append(content)
-                context_parts.append("")
-                current_bytes += chunk_bytes
-        if len(context_parts) <= 2:
-            context_parts.append("No schedule data could be extracted.\n")
-        return "\n".join(context_parts)
-
-    context_parts.append(f"[{doc_label}]\nNo content extracted.\n")
-    return "\n".join(context_parts)
+    result = preamble + "\n".join(included_parts) + "\n"
+    total_rows = sum(c.get("metadata", {}).get("row_count", 0) for c in table_chunks)
+    logger.info(f"  [PDF] Context: {len(result)} bytes — {len(included_parts)}/{len(table_chunks)} chunks, ~{total_rows} rows")
+    return result
 
 
 @app.post("/predictive")
@@ -922,14 +855,10 @@ async def predictive_analysis(
                 lambda: process_pdf_binary(file_bytes, filename)
             )
 
-            raw_md_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown")
-            row_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table_row")
-            table_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "table")
-            text_count = sum(1 for c in chunks if c.get("metadata", {}).get("type") == "text")
+            table_count = len(chunks)
+            row_count = sum(c.get("metadata", {}).get("row_count", 0) for c in chunks)
             ocr_elapsed = time.time() - start_time
-            logger.info(f"  ╔══ OCR COMPLETE ({ocr_elapsed:.1f}s) ══╗")
-            logger.info(f"  ║ Total chunks: {len(chunks)} (raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count})")
-            logger.info(f"  ╚══════════════════════════╝")
+            logger.info(f"  OCR complete ({ocr_elapsed:.1f}s): {table_count} compact CSV chunks, ~{row_count} rows")
 
             context = _build_predictive_context(chunks, filename_clean)
 
@@ -986,19 +915,24 @@ async def predictive_analysis(
                 _f.write(f"  Analysis ID:    {analysis_id}\n\n")
 
                 _f.write(f"{'─'*90}\n")
-                _f.write(f"  STEP 2: OCR EXTRACTION (Azure Document Intelligence)\n")
+                _f.write(f"  STEP 2: DATA EXTRACTION\n")
                 _f.write(f"{'─'*90}\n")
-                _f.write(f"  OCR Time:       {ocr_elapsed:.1f}s\n")
-                _f.write(f"  Chunks:         raw_md={raw_md_count}, rows={row_count}, tables={table_count}, text={text_count}\n")
-                _f.write(f"  Total chunks:   {len(chunks)}\n\n")
+                if not is_csv_file:
+                    _f.write(f"  OCR Time:       {ocr_elapsed:.1f}s\n")
+                    _f.write(f"  Table chunks:   {table_count}\n")
+                    _f.write(f"  Total rows:     ~{row_count}\n")
+                    _f.write(f"  Total chunks:   {len(chunks)}\n\n")
+                else:
+                    _f.write(f"  CSV rows:       ~{row_count}\n\n")
 
-                _f.write(f"  --- COMPLETE OCR OUTPUT (all chunks) ---\n\n")
-                for ci, c in enumerate(chunks):
-                    ctype = c.get("metadata", {}).get("type", "unknown")
-                    ccontent = c.get("content", "")
-                    _f.write(f"  [CHUNK {ci} | type={ctype} | {len(ccontent)} chars]\n")
-                    _f.write(ccontent)
-                    _f.write(f"\n\n")
+                if not is_csv_file:
+                    _f.write(f"  --- COMPLETE OCR OUTPUT (all chunks) ---\n\n")
+                    for ci, c in enumerate(chunks):
+                        ctype = c.get("metadata", {}).get("type", "unknown")
+                        ccontent = c.get("content", "")
+                        _f.write(f"  [CHUNK {ci} | type={ctype} | {len(ccontent)} chars]\n")
+                        _f.write(ccontent)
+                        _f.write(f"\n\n")
 
                 _f.write(f"{'─'*90}\n")
                 _f.write(f"  STEP 3: CONTEXT PASSED TO LLM ({len(context)} chars)\n")

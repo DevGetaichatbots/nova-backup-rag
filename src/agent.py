@@ -477,8 +477,6 @@ class RAGAgent:
     TOKENS_PER_BYTE = 0.50
     RESERVED_TOKENS = 50_000
 
-    MIN_TABLE_CHUNKS = 3
-
     def _get_doc_label(self, table_name: str, old_filename: str = None, new_filename: str = None) -> str:
         if "old" in table_name.lower():
             return f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
@@ -489,23 +487,6 @@ class RAGAgent:
         all_table_results = vector_store_manager.fetch_all_from_stores(table_names, chunk_type="table")
 
         per_store_budget = self.MAX_CONTEXT_BYTES // max(len(table_names), 1)
-
-        stores_needing_fallback = []
-        for table_name in table_names:
-            results = all_table_results.get(table_name, {})
-            if isinstance(results, dict) and "error" in results:
-                continue
-            table_count = len(results) if results else 0
-            if table_count < self.MIN_TABLE_CHUNKS:
-                stores_needing_fallback.append(table_name)
-                doc_label = self._get_doc_label(table_name, old_filename, new_filename)
-                logger.warning(f"  Store {table_name} has only {table_count} table chunks (min={self.MIN_TABLE_CHUNKS}), will supplement with raw_markdown/text")
-
-        all_raw_md = {}
-        all_text = {}
-        if stores_needing_fallback:
-            all_raw_md = vector_store_manager.fetch_all_from_stores(stores_needing_fallback, chunk_type="raw_markdown")
-            all_text = vector_store_manager.fetch_all_from_stores(stores_needing_fallback, chunk_type="text")
 
         context_parts = []
         total_chunks = 0
@@ -519,30 +500,9 @@ class RAGAgent:
                 context_parts.append(f"\n[{doc_label}: {table_name}]\nError: {table_results['error']}\n")
                 continue
 
-            combined_results = []
-            source_desc = ""
+            results = list(table_results) if table_results else []
 
-            if table_name in stores_needing_fallback:
-                raw_md_results = all_raw_md.get(table_name, [])
-                text_results = all_text.get(table_name, [])
-
-                if raw_md_results and not isinstance(raw_md_results, dict):
-                    combined_results = list(raw_md_results)
-                    source_desc = f"raw_markdown ({len(raw_md_results)} chunks)"
-                    logger.info(f"  {doc_label}: Using raw_markdown ({len(raw_md_results)} chunks) as primary data source")
-                elif text_results and not isinstance(text_results, dict):
-                    combined_results = list(text_results)
-                    source_desc = f"text ({len(text_results)} chunks)"
-                    logger.info(f"  {doc_label}: Using text chunks ({len(text_results)} chunks) as fallback")
-
-                if table_results and not isinstance(table_results, dict):
-                    combined_results.extend(table_results)
-                    source_desc += f" + table ({len(table_results)} chunks)"
-            else:
-                combined_results = list(table_results) if table_results else []
-                source_desc = f"table ({len(combined_results)} chunks)"
-
-            if not combined_results:
+            if not results:
                 context_parts.append(f"\n[{doc_label}: {table_name}]\nNo data chunks found.\n")
                 continue
 
@@ -550,7 +510,7 @@ class RAGAgent:
             store_bytes = 0
             included = 0
             skipped = 0
-            for i, result in enumerate(combined_results, 1):
+            for i, result in enumerate(results, 1):
                 chunk_text = f"--- Data {i} ---\n{result['content']}\n"
                 chunk_bytes = len(chunk_text.encode("utf-8"))
                 if store_bytes + chunk_bytes > per_store_budget:
@@ -562,7 +522,7 @@ class RAGAgent:
 
             total_chunks += included
             total_skipped += skipped
-            label = f"\n[{doc_label}: {table_name}] — {included} chunks ({source_desc})"
+            label = f"\n[{doc_label}: {table_name}] — {included} chunks (table)"
             if skipped:
                 label += f" [WARNING: {skipped} chunks omitted — exceeds API size limit]"
             context_parts.append(label)
