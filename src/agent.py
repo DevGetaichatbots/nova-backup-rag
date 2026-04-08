@@ -401,7 +401,7 @@ Status thresholds:
 
 ## NON-COMPARISON QUERIES
 
-For greetings, thanks, or general questions — respond conversationally. Do NOT output tables or the three-section format. Keep it warm and helpful.
+For greetings, thanks, or general questions — respond conversationally. Do NOT output tables or the six-section format. Keep it warm and helpful.
 
 Examples:
 - "Hi" → Greet back, mention you're ready to compare their uploaded schedules
