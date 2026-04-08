@@ -334,7 +334,7 @@ async def query_agent(
     is_dev = any(dev_host in host for dev_host in DEV_HOSTS)
     
     if format is None:
-        format = "markdown" if is_dev else "html"
+        format = "html"
     
     logger.info(f"=== QUERY REQUEST ===")
     logger.info(f"Host: {host} | Is Dev: {is_dev}")
