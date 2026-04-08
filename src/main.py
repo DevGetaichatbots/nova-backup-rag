@@ -502,128 +502,6 @@ def _clean_gantt_noise(text: str) -> str:
     return "\n".join(clean_lines)
 
 
-SCHEDULE_DATA_HEADERS = {
-    "id", "opg", "opgavenavn", "varighed", "startdato", "slutdato",
-    "% arbejde færdigt", "% færdigt", "foregående opgaver",
-    "efterfølgende opgaver", "opgavetilstand", "entydigt id",
-    "etage", "omr.", "ansvarlig", "bemærkn.", "bemærkn",
-    "task name", "duration", "start", "finish", "start date",
-    "end date", "% complete", "predecessors", "successors",
-    "responsible", "area"
-}
-GANTT_HEADER_RE = re.compile(
-    r'^(kvt\d|kvt \d|\d{4}\s*kvt|uge\s*\d|jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|'
-    r'\d{4}\s+(jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|kvt))',
-    re.IGNORECASE
-)
-CORE_HEADERS = {"id", "opgavenavn", "startdato", "varighed"}
-
-
-def _parse_html_tables_to_rows(all_html: str) -> tuple[list[str], list[list[str]]]:
-    import re as _re
-    import logging as _log
-    _logger = _log.getLogger(__name__)
-
-    tables = _re.findall(r'<table>.*?</table>', all_html, _re.DOTALL)
-    _logger.info(f"  Table parser: found {len(tables)} tables in OCR HTML")
-
-    canonical_headers = []
-    canonical_indices = []
-    all_data_rows = []
-
-    for ti, table_html in enumerate(tables):
-        header_matches = list(_re.finditer(r'<tr>\s*((?:<th[^>]*>.*?</th>\s*)+)</tr>', table_html, _re.DOTALL))
-        if not header_matches:
-            continue
-
-        header_tr = header_matches[0].group(1)
-        raw_headers = [_re.sub(r'<[^>]+>', '', c).strip() for c in _re.findall(r'<th[^>]*>(.*?)</th>', header_tr, _re.DOTALL)]
-
-        lower_headers = {h.lower().strip() for h in raw_headers if h.strip()}
-        has_core = len(lower_headers & CORE_HEADERS) >= 2
-        if not has_core:
-            _logger.info(f"  Table {ti}: skipped (no schedule headers, got: {raw_headers[:5]})")
-            continue
-
-        data_indices = []
-        for i, h in enumerate(raw_headers):
-            h_lower = h.lower().strip()
-            if h_lower in SCHEDULE_DATA_HEADERS:
-                data_indices.append(i)
-            elif h_lower and not GANTT_HEADER_RE.match(h_lower):
-                data_indices.append(i)
-
-        if not data_indices:
-            data_indices = list(range(len(raw_headers)))
-
-        filtered_h = [raw_headers[i] for i in data_indices]
-
-        if not canonical_headers:
-            canonical_headers = filtered_h
-            canonical_indices = data_indices
-            _logger.info(f"  Table {ti}: canonical headers ({len(canonical_headers)}): {canonical_headers}")
-        else:
-            if filtered_h != canonical_headers:
-                col_map = {}
-                for ci, ch in enumerate(canonical_headers):
-                    ch_low = ch.lower().strip()
-                    for fi, fh in enumerate(filtered_h):
-                        if fh.lower().strip() == ch_low:
-                            col_map[ci] = data_indices[fi]
-                            break
-                if len(col_map) >= len(canonical_headers) - 1:
-                    data_indices = [col_map.get(ci, data_indices[ci] if ci < len(data_indices) else -1) for ci in range(len(canonical_headers))]
-                    _logger.info(f"  Table {ti}: remapped {len(col_map)}/{len(canonical_headers)} columns")
-                else:
-                    _logger.info(f"  Table {ti}: skipped (headers don't match canonical: {filtered_h[:5]})")
-                    continue
-
-        expected_data_cols = len(canonical_headers)
-        for row_match in _re.finditer(r'<tr>\s*((?:<td[^>]*>.*?</td>\s*)+)</tr>', table_html, _re.DOTALL):
-            raw_cells = _re.findall(r'<td[^>]*>(.*?)</td>', row_match.group(1), _re.DOTALL)
-            cells = [_re.sub(r'<[^>]+>', '', c).strip() for c in raw_cells]
-
-            max_idx = max(data_indices) if data_indices else 0
-            if len(cells) <= max_idx // 2:
-                continue
-
-            filtered = []
-            for idx in data_indices:
-                if idx < len(cells):
-                    filtered.append(cells[idx])
-                else:
-                    filtered.append("")
-
-            if any(v.strip() for v in filtered):
-                all_data_rows.append(filtered)
-
-        _logger.info(f"  Table {ti}: {len(all_data_rows)} total rows so far")
-
-    _logger.info(f"  Table parser result: {len(canonical_headers)} columns, {len(all_data_rows)} rows")
-    return canonical_headers, all_data_rows
-
-
-SKIP_HEADERS = {"opg", "opgavetilstand"}
-
-def _format_rows_as_labeled(headers: list[str], rows: list[list[str]]) -> str:
-    lines = []
-    for row in rows:
-        parts = []
-        for i, val in enumerate(row):
-            if i < len(headers):
-                h = headers[i]
-                if h.lower() in SKIP_HEADERS:
-                    continue
-                if not val.strip():
-                    continue
-                parts.append(f"{h}: {val}")
-            elif val and val.strip():
-                parts.append(val)
-        if parts:
-            lines.append(" | ".join(parts))
-    return "\n".join(lines)
-
-
 ALLOWED_EXTENSIONS = {".pdf", ".csv"}
 
 def _is_allowed_file(filename: str) -> bool:
@@ -692,14 +570,14 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     for chunk in table_chunks:
         chunk_bytes = len(chunk["content"].encode("utf-8")) + 1
         if current_bytes + chunk_bytes > budget:
-            logger.warning(f"  [PDF] Context trimmed at {current_bytes} bytes (limit: {MAX_PREDICTIVE_CONTEXT_BYTES})")
+            logger.warning(f"  [Predictive] Context trimmed at {current_bytes} bytes (limit: {MAX_PREDICTIVE_CONTEXT_BYTES})")
             break
         included_parts.append(chunk["content"])
         current_bytes += chunk_bytes
 
     result = preamble + "\n".join(included_parts) + "\n"
     total_rows = sum(c.get("metadata", {}).get("row_count", 0) for c in table_chunks)
-    logger.info(f"  [PDF] Context: {len(result)} bytes — {len(included_parts)}/{len(table_chunks)} chunks, ~{total_rows} rows")
+    logger.info(f"  [Predictive] Context: {len(result)} bytes — {len(included_parts)}/{len(table_chunks)} chunks, ~{total_rows} rows")
     return result
 
 
