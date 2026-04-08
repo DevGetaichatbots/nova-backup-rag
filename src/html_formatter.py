@@ -45,11 +45,11 @@ CATEGORY_ORDER = ["removed", "added", "delayed", "accelerated", "moved", "critic
 
 
 SECTION_PATTERNS = {
-    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*HANDLINGSPLAN"],
-    "root_cause": [r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*ÅRSAGSANALYSE"],
-    "impact": [r"^##\s*IMPACT_ASSESSMENT", r"^##\s*KONSEKVENSVURDERING"],
-    "summary": [r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*OPSUMMERING_AF_ÆNDRINGER", r"^##\s*Summary\s+of\s+Changes", r"^##\s*Opsummering\s+af\s+Ændringer"],
-    "health": [r"^##\s*PROJECT_HEALTH", r"^##\s*PROJEKTSUNDHED", r"^##\s*Project\s+Health", r"^##\s*Projektsundhed"],
+    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*Executive\s+Actions", r"^##\s*HANDLINGSPLAN", r"^##\s*Handlingsplan"],
+    "root_cause": [r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*Root\s+Cause\s+Analysis", r"^##\s*ÅRSAGSANALYSE", r"^##\s*Årsagsanalyse"],
+    "impact": [r"^##\s*IMPACT_ASSESSMENT", r"^##\s*Impact\s+Assessment", r"^##\s*KONSEKVENSVURDERING", r"^##\s*Konsekvensvurdering"],
+    "summary": [r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*Summary\s+of\s+Changes", r"^##\s*OPSUMMERING_AF_ÆNDRINGER", r"^##\s*Opsummering\s+af\s+Ændringer"],
+    "health": [r"^##\s*PROJECT_HEALTH", r"^##\s*Project\s+Health", r"^##\s*PROJEKTSUNDHED", r"^##\s*Projektsundhed"],
 }
 
 SECTION_ORDER = ["executive", "root_cause", "impact", "summary", "health"]
@@ -445,13 +445,258 @@ def generate_table_html(tables_section: str, language: str = "en") -> str:
     return "".join(parts)
 
 
-def _render_markdown_section(content: str, section_key: str, title_en: str, title_da: str,
-                             icon_key: str, color: str, bg: str, border: str, language: str) -> str:
+def _inline_markdown(text: str) -> str:
+    parts = re.split(r'(\*\*[^*]+\*\*|\*[^*]+\*)', text)
+    result = []
+    for part in parts:
+        bold = re.match(r'^\*\*([^*]+)\*\*$', part)
+        italic = re.match(r'^\*([^*]+)\*$', part)
+        if bold:
+            result.append(f'<strong style="color:#1e293b;font-weight:700;">{escape_html(bold.group(1))}</strong>')
+        elif italic:
+            result.append(f'<em>{escape_html(italic.group(1))}</em>')
+        else:
+            result.append(escape_html(part))
+    text = "".join(result)
+    text = text.replace('🔴', '<span style="color:#ef4444;font-size:10px;">●</span>')
+    text = text.replace('🟠', '<span style="color:#f59e0b;font-size:10px;">●</span>')
+    text = text.replace('🟢', '<span style="color:#10b981;font-size:10px;">●</span>')
+    return text
+
+
+def _render_section_header(title: str, icon: str, color: str) -> str:
+    return f'''<div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid {color}18;">
+      <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}dd);box-shadow:0 4px 14px {color}30;">
+        <span style="color:white;">{icon}</span>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;letter-spacing:-0.3px;">{title}</h2>
+    </div>'''
+
+
+def generate_executive_html(content: str, language: str = "en") -> str:
     if not content or not content.strip():
         return ""
 
-    title = title_da if language == "da" else title_en
-    icon = SVG_ICONS.get(icon_key, SVG_ICONS["default"])
+    title = "Handlingsplan" if language == "da" else "Executive Actions"
+    icon = SVG_ICONS.get("executive", SVG_ICONS["default"])
+    color = "#0d9488"
+
+    lines = content.split("\n")
+    action_cards = []
+    current_card = None
+
+    def flush_card():
+        nonlocal current_card
+        if current_card:
+            meta_html = ""
+            if current_card["meta"]:
+                meta_html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">' + "".join(current_card["meta"]) + '</div>'
+            dot_color = current_card["color"]
+            num = current_card["num"]
+            action_cards.append(f'''
+    <div style="margin:0 0 16px 0;padding:20px 24px;background:white;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:{dot_color};border-radius:4px 0 0 4px;"></div>
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,{dot_color},{dot_color}cc);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;box-shadow:0 2px 8px {dot_color}40;">{num}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:700;color:#0f172a;line-height:1.5;margin-bottom:4px;">{current_card["title"]}</div>
+          {"".join(current_card["body"])}
+          {meta_html}
+        </div>
+      </div>
+    </div>''')
+            current_card = None
+
+    for line in lines:
+        line = line.strip()
+        if not line or line in ["---", "***"]:
+            continue
+
+        if re.match(r"^##\s", line):
+            continue
+
+        priority_match = re.match(r'^(?:🔴|🟠|🟢)?\s*\*\*(\d+)\.\s*(.+?)\*\*\s*$', line)
+        if priority_match:
+            flush_card()
+            num = priority_match.group(1)
+            text = escape_html(priority_match.group(2))
+            dot = ""
+            if "🔴" in line:
+                dot = "🔴"
+            elif "🟠" in line:
+                dot = "🟠"
+            elif "🟢" in line:
+                dot = "🟢"
+            dot_color = {"🔴": "#ef4444", "🟠": "#f59e0b", "🟢": "#10b981"}.get(dot, color)
+            current_card = {"num": num, "title": text, "color": dot_color, "body": [], "meta": []}
+            continue
+
+        if current_card:
+            who_match = re.match(r'^(?:\*\*)?WHO(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if who_match:
+                value = escape_html(who_match.group(1).strip())
+                current_card["meta"].append(f'''<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#6366f108,#6366f104);border:1px solid #6366f120;border-radius:8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#6366f1" stroke-width="2.5"/><circle cx="12" cy="7" r="4" stroke="#6366f1" stroke-width="2.5"/></svg>
+                  <span style="font-size:12px;font-weight:600;color:#6366f1;">{value}</span>
+                </div>''')
+                continue
+
+            related_match = re.match(r'^(?:\*\*)?RELATED(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if related_match:
+                raw_ids = related_match.group(1).strip()
+                id_list = [x.strip() for x in re.split(r'[,;]\s*', raw_ids) if x.strip()]
+                if len(id_list) > 8:
+                    visible = escape_html(", ".join(id_list[:8]))
+                    rest_count = len(id_list) - 8
+                    ids_display = f'{visible} <span style="color:#8b5cf6;font-weight:600;">+{rest_count} more</span>'
+                else:
+                    ids_display = escape_html(", ".join(id_list))
+                current_card["meta"].append(f'''<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#8b5cf608,#8b5cf604);border:1px solid #8b5cf620;border-radius:8px;max-width:100%;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  <span style="font-size:11px;font-weight:500;color:#64748b;line-height:1.4;overflow-wrap:break-word;word-break:break-all;">{ids_display}</span>
+                </div>''')
+                continue
+
+            impact_match = re.match(r'^(?:↳\s*)?(?:\*\*)?IMPACT(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if impact_match:
+                value = escape_html(impact_match.group(1).strip())
+                current_card["meta"].append(f'''<div style="display:flex;align-items:flex-start;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#ef444408,#ef444404);border:1px solid #ef444420;border-radius:8px;width:100%;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:2px;"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span style="font-size:12px;font-weight:500;color:#64748b;line-height:1.5;">{value}</span>
+                </div>''')
+                continue
+
+            text = _inline_markdown(line)
+            current_card["body"].append(f'<p style="margin:4px 0;color:#475569;font-size:13px;line-height:1.6;">{text}</p>')
+            continue
+
+        text = _inline_markdown(line)
+        action_cards.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
+
+    flush_card()
+
+    return f'''
+<div class="executive-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#f0fdfa,#f8fffe,#ffffff);border-radius:16px;border:1px solid rgba(13,148,136,0.15);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+  {_render_section_header(title, icon, color)}
+  {"".join(action_cards)}
+</div>'''
+
+
+def generate_root_cause_html(content: str, language: str = "en") -> str:
+    if not content or not content.strip():
+        return ""
+
+    title = "Årsagsanalyse" if language == "da" else "Root Cause Analysis"
+    icon = SVG_ICONS.get("rootcause", SVG_ICONS["default"])
+    color = "#6366f1"
+
+    lines = content.split("\n")
+    processed = []
+    current_cause_items = []
+    in_cause_block = False
+
+    def flush_cause_items():
+        nonlocal current_cause_items
+        if current_cause_items:
+            processed.append('<div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">')
+            for item in current_cause_items:
+                processed.append(item)
+            processed.append('</div>')
+            current_cause_items = []
+
+    for line in lines:
+        line = line.strip()
+        if not line or line in ["---", "***"]:
+            continue
+
+        if re.match(r"^##\s", line):
+            continue
+
+        sub_header = re.match(r'^###\s*(.+)$', line)
+        if sub_header:
+            flush_cause_items()
+            header_text = escape_html(sub_header.group(1).strip())
+            in_cause_block = True
+            processed.append(f'''
+    <div style="margin:16px 0 12px 0;padding:14px 18px;background:linear-gradient(135deg,#6366f108,#6366f103);border-radius:10px;border-left:3px solid #6366f1;">
+      <h3 style="font-size:15px;font-weight:700;color:#312e81;margin:0;line-height:1.4;">{header_text}</h3>
+    </div>''')
+            continue
+
+        label_value = re.match(r'^\*\*([^*]+?):\*\*\s*(.+)$', line)
+        if label_value:
+            label = escape_html(label_value.group(1).strip())
+            value = _inline_markdown(label_value.group(2).strip())
+
+            label_lower = label.lower()
+            if any(k in label_lower for k in ["manpower", "mandskab", "adding"]):
+                will_help = any(k in value.lower() for k in ["will not", "useless", "hjælper ikke", "no ", "ikke"])
+                badge_color = "#ef4444" if will_help else "#10b981"
+                badge_icon = "✕" if will_help else "✓"
+                current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+                  <div style="width:24px;height:24px;border-radius:6px;background:{badge_color}12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                    <span style="color:{badge_color};font-size:12px;font-weight:800;">{badge_icon}</span>
+                  </div>
+                  <div><span style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+                </div>''')
+            elif any(k in label_lower for k in ["affected", "berørt", "task", "opgave"]):
+                current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+                  <div style="width:24px;height:24px;border-radius:6px;background:#8b5cf612;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="#8b5cf6" stroke-width="2.5"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="#8b5cf6" stroke-width="2"/></svg>
+                  </div>
+                  <div><span style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+                </div>''')
+            elif any(k in label_lower for k in ["required", "action", "handling", "key", "nøgle", "insight"]):
+                current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+                  <div style="width:24px;height:24px;border-radius:6px;background:#0d948812;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div><span style="font-size:11px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+                </div>''')
+            else:
+                current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+                  <div style="width:24px;height:24px;border-radius:6px;background:#64748b12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                    <span style="color:#64748b;font-size:11px;font-weight:800;">i</span>
+                  </div>
+                  <div><span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+                </div>''')
+            continue
+
+        bold_only = re.match(r"^\*\*([^*]+)\*\*\s*$", line)
+        if bold_only:
+            flush_cause_items()
+            header_text = escape_html(bold_only.group(1).rstrip(":"))
+            processed.append(f'<h4 style="font-size:13px;font-weight:700;color:#6366f1;margin:18px 0 8px 0;text-transform:uppercase;letter-spacing:0.5px;">{header_text}</h4>')
+            continue
+
+        if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
+            item_text = _inline_markdown(line[2:])
+            current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
+              <span style="color:#6366f1;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
+            </div>''')
+            continue
+
+        flush_cause_items()
+        text = _inline_markdown(line)
+        processed.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
+
+    flush_cause_items()
+
+    return f'''
+<div class="root-cause-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#eef2ff,#f5f3ff,#ffffff);border-radius:16px;border:1px solid rgba(99,102,241,0.12);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+  {_render_section_header(title, icon, color)}
+  {"".join(processed)}
+</div>'''
+
+
+def generate_impact_html(content: str, language: str = "en") -> str:
+    if not content or not content.strip():
+        return ""
+
+    title = "Konsekvensvurdering" if language == "da" else "Impact Assessment"
+    icon = SVG_ICONS.get("impact", SVG_ICONS["default"])
+    color = "#d97706"
 
     lines = content.split("\n")
     processed = []
@@ -460,10 +705,10 @@ def _render_markdown_section(content: str, section_key: str, title_en: str, titl
     def flush_list():
         nonlocal list_items
         if list_items:
-            processed.append('<ul style="margin:12px 0;padding-left:0;list-style:none;">')
+            processed.append('<div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">')
             for item in list_items:
-                processed.append(f'<li style="margin:10px 0;line-height:1.7;padding-left:24px;position:relative;font-size:14px;color:#334155;"><span style="position:absolute;left:0;color:{color};font-size:18px;">•</span>{item}</li>')
-            processed.append('</ul>')
+                processed.append(item)
+            processed.append('</div>')
             list_items = []
 
     for line in lines:
@@ -473,108 +718,66 @@ def _render_markdown_section(content: str, section_key: str, title_en: str, titl
             continue
 
         if re.match(r"^##\s", line):
-            flush_list()
             continue
 
-        bold_heading = re.match(r"^\*\*([^*]+):\*\*$", line) or re.match(r"^\*\*([^*]+)\*\*\s*$", line)
-        if bold_heading and "|" not in line:
+        sub_header = re.match(r'^###\s*(.+)$', line)
+        if sub_header:
             flush_list()
-            header_text = bold_heading.group(1).rstrip(":")
-            processed.append(f'<h3 style="font-size:14px;font-weight:700;color:{color};margin:20px 0 10px 0;padding-bottom:8px;border-bottom:2px solid {color}18;text-transform:uppercase;letter-spacing:0.5px;">{escape_html(header_text)}</h3>')
-            continue
-
-        priority_match = re.match(r'^(🔴|🟠|🟢)\s*\*\*(\d+)\.\s*(.+?)\*\*\s*$', line)
-        if priority_match:
-            flush_list()
-            dot = priority_match.group(1)
-            num = priority_match.group(2)
-            text = priority_match.group(3)
-            dot_color = {"🔴": "#ef4444", "🟠": "#f59e0b", "🟢": "#10b981"}.get(dot, color)
+            header_text = escape_html(sub_header.group(1).strip())
             processed.append(f'''
-<div style="display:flex;align-items:flex-start;gap:12px;margin:16px 0;padding:16px 20px;background:linear-gradient(135deg,{dot_color}08,{dot_color}03);border-radius:12px;border-left:4px solid {dot_color};">
-  <div style="width:32px;height:32px;border-radius:50%;background:{dot_color};color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">{num}</div>
-  <div style="flex:1;"><strong style="color:#0f172a;font-size:15px;line-height:1.5;">{escape_html(text)}</strong></div>
-</div>''')
+    <div style="margin:16px 0 12px 0;padding:14px 18px;background:linear-gradient(135deg,#f59e0b08,#f59e0b03);border-radius:10px;border-left:3px solid #d97706;">
+      <h3 style="font-size:15px;font-weight:700;color:#92400e;margin:0;line-height:1.4;">{header_text}</h3>
+    </div>''')
             continue
 
-        if line.startswith("WHO:") or line.startswith("RELATED:") or line.startswith("↳"):
-            label_match = re.match(r'^(WHO|RELATED|↳\s*IMPACT):\s*(.+)$', line)
-            if label_match:
-                label = label_match.group(1).replace("↳ ", "")
-                value = label_match.group(2)
-                label_color = {"WHO": "#6366f1", "RELATED": "#8b5cf6", "IMPACT": "#ef4444"}.get(label, "#64748b")
-                processed.append(f'<div style="margin:4px 0 4px 44px;font-size:13px;color:#475569;line-height:1.5;"><span style="font-weight:700;color:{label_color};text-transform:uppercase;font-size:11px;letter-spacing:0.5px;">{escape_html(label)}: </span>{escape_html(value)}</div>')
-                continue
-            elif line.startswith("↳"):
-                text = line[1:].strip()
-                text = re.sub(r"\*\*([^*]+)\*\*", r'<strong>\1</strong>', text)
-                processed.append(f'<div style="margin:4px 0 4px 44px;font-size:13px;color:#475569;line-height:1.5;">{text}</div>')
-                continue
+        label_value = re.match(r'^\*\*([^*]+?):\*\*\s*(.+)$', line)
+        if label_value:
+            flush_list()
+            label = escape_html(label_value.group(1).strip())
+            value = _inline_markdown(label_value.group(2).strip())
+            processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+              <div style="width:24px;height:24px;border-radius:6px;background:#d9770612;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                <span style="color:#d97706;font-size:11px;font-weight:800;">!</span>
+              </div>
+              <div><span style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+            </div>''')
+            continue
+
+        bold_only = re.match(r"^\*\*([^*]+)\*\*\s*$", line)
+        if bold_only:
+            flush_list()
+            header_text = escape_html(bold_only.group(1).rstrip(":"))
+            processed.append(f'<h4 style="font-size:13px;font-weight:700;color:#d97706;margin:18px 0 8px 0;text-transform:uppercase;letter-spacing:0.5px;">{header_text}</h4>')
+            continue
 
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
-            item_text = line[2:]
-            item_text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', item_text)
-            item_text = re.sub(r'🔴', '<span style="color:#ef4444;">●</span>', item_text)
-            item_text = re.sub(r'🟠', '<span style="color:#f59e0b;">●</span>', item_text)
-            item_text = re.sub(r'🟢', '<span style="color:#10b981;">●</span>', item_text)
-            list_items.append(item_text)
+            item_text = _inline_markdown(line[2:])
+            list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
+              <span style="color:#d97706;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
+            </div>''')
             continue
 
         flush_list()
-        text = line
-        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', text)
-        text = re.sub(r'🔴', '<span style="color:#ef4444;">●</span>', text)
-        text = re.sub(r'🟠', '<span style="color:#f59e0b;">●</span>', text)
-        text = re.sub(r'🟢', '<span style="color:#10b981;">●</span>', text)
-        processed.append(f'<p style="margin:10px 0;color:#334155;line-height:1.7;font-size:14px;">{text}</p>')
+        text = _inline_markdown(line)
+        processed.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
 
     flush_list()
 
     return f'''
-<div class="{section_key}-section" style="margin:0 0 24px 0;padding:24px;background:linear-gradient(135deg,{bg},rgba(255,255,255,0.95));border-radius:16px;border:1px solid {border};">
-  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-    <div style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}cc);box-shadow:0 6px 20px {color}30;">
-      <span style="color:white;">{icon}</span>
-    </div>
-    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">{title}</h2>
-  </div>
+<div class="impact-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#fffbeb,#fefce8,#ffffff);border-radius:16px;border:1px solid rgba(217,119,6,0.12);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+  {_render_section_header(title, icon, color)}
   {"".join(processed)}
 </div>'''
-
-
-def generate_executive_html(content: str, language: str = "en") -> str:
-    return _render_markdown_section(
-        content, "executive",
-        "Executive Actions", "Handlingsplan",
-        "executive", "#0d9488",
-        "rgba(13,148,136,0.04)", "rgba(13,148,136,0.12)",
-        language
-    )
-
-
-def generate_root_cause_html(content: str, language: str = "en") -> str:
-    return _render_markdown_section(
-        content, "root-cause",
-        "Root Cause Analysis", "Årsagsanalyse",
-        "rootcause", "#6366f1",
-        "rgba(99,102,241,0.04)", "rgba(99,102,241,0.12)",
-        language
-    )
-
-
-def generate_impact_html(content: str, language: str = "en") -> str:
-    return _render_markdown_section(
-        content, "impact",
-        "Impact Assessment", "Konsekvensvurdering",
-        "impact", "#f59e0b",
-        "rgba(245,158,11,0.04)", "rgba(245,158,11,0.12)",
-        language
-    )
 
 
 def generate_summary_html(summary_content: str, language: str = "en") -> str:
     if not summary_content or not summary_content.strip():
         return ""
+
+    title = "Opsummering af Ændringer" if language == "da" else "Summary of Changes"
+    icon = SVG_ICONS["summary"]
+    color = "#8b5cf6"
 
     lines = summary_content.split("\n")
     processed = []
@@ -583,10 +786,10 @@ def generate_summary_html(summary_content: str, language: str = "en") -> str:
     def flush_list():
         nonlocal list_items
         if list_items:
-            processed.append('<ul style="margin:12px 0;padding-left:0;list-style:none;">')
+            processed.append('<div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">')
             for item in list_items:
-                processed.append(f'<li style="margin:10px 0;line-height:1.6;padding-left:24px;position:relative;"><span style="position:absolute;left:0;color:#8b5cf6;font-size:18px;">•</span>{item}</li>')
-            processed.append('</ul>')
+                processed.append(item)
+            processed.append('</div>')
             list_items = []
 
     for line in lines:
@@ -595,40 +798,56 @@ def generate_summary_html(summary_content: str, language: str = "en") -> str:
             flush_list()
             continue
 
-        if re.match(r"^##\s*(SUMMARY_OF_CHANGES|OPSUMMERING_AF_ÆNDRINGER)", line, re.IGNORECASE):
+        if re.match(r"^##\s*(SUMMARY_OF_CHANGES|OPSUMMERING_AF_ÆNDRINGER|Summary\s+of\s+Changes)", line, re.IGNORECASE):
+            continue
+
+        sub_header = re.match(r'^###\s*(.+)$', line)
+        if sub_header:
             flush_list()
-            header_text = "Opsummering af Ændringer" if language == "da" else "Summary of Changes"
+            header_text = escape_html(sub_header.group(1).strip())
             processed.append(f'''
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-          <div style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#8b5cf6,#7c3aed);box-shadow:0 6px 20px rgba(139,92,246,0.25);">
-            <span style="color:white;">{SVG_ICONS["summary"]}</span>
-          </div>
-          <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">{header_text}</h2>
-        </div>''')
+    <div style="margin:16px 0 12px 0;padding:14px 18px;background:linear-gradient(135deg,#8b5cf608,#8b5cf603);border-radius:10px;border-left:3px solid #8b5cf6;">
+      <h3 style="font-size:15px;font-weight:700;color:#5b21b6;margin:0;line-height:1.4;">{header_text}</h3>
+    </div>''')
             continue
 
         bold_match = re.match(r"^\*\*([^*]+):\*\*$", line) or re.match(r"^\*\*([^*]+)\*\*$", line)
         if bold_match:
             flush_list()
-            header_text = bold_match.group(1).rstrip(":")
-            processed.append(f'<h3 style="font-size:14px;font-weight:700;color:#7c3aed;margin:20px 0 10px 0;padding-bottom:8px;border-bottom:2px solid rgba(139,92,246,0.12);text-transform:uppercase;letter-spacing:0.5px;">{escape_html(header_text)}</h3>')
+            header_text = escape_html(bold_match.group(1).rstrip(":"))
+            processed.append(f'<h4 style="font-size:13px;font-weight:700;color:#7c3aed;margin:18px 0 8px 0;text-transform:uppercase;letter-spacing:0.5px;">{header_text}</h4>')
+            continue
+
+        label_value = re.match(r'^\*\*([^*]+?):\*\*\s*(.+)$', line)
+        if label_value:
+            flush_list()
+            label = escape_html(label_value.group(1).strip())
+            value = _inline_markdown(label_value.group(2).strip())
+            processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+              <div style="width:24px;height:24px;border-radius:6px;background:#8b5cf612;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                <span style="color:#8b5cf6;font-size:11px;font-weight:800;">i</span>
+              </div>
+              <div><span style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+            </div>''')
             continue
 
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
-            item_text = line[2:]
-            item_text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#6d28d9;font-weight:600;">\1</strong>', item_text)
-            list_items.append(item_text)
+            item_text = _inline_markdown(line[2:])
+            list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
+              <span style="color:#8b5cf6;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
+            </div>''')
             continue
 
         flush_list()
-        text = escape_html(line)
-        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#6d28d9;font-weight:600;">\1</strong>', text)
-        processed.append(f'<p style="margin:10px 0;color:#334155;line-height:1.7;font-size:14px;">{text}</p>')
+        text = _inline_markdown(line)
+        processed.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
 
     flush_list()
 
     return f'''
-<div class="summary-section" style="margin:24px 0;padding:24px;background:linear-gradient(135deg,rgba(139,92,246,0.04),rgba(124,58,237,0.02));border-radius:16px;border:1px solid rgba(139,92,246,0.1);">
+<div class="summary-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#f5f3ff,#faf5ff,#ffffff);border-radius:16px;border:1px solid rgba(139,92,246,0.12);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+  {_render_section_header(title, icon, color)}
   {"".join(processed)}
 </div>'''
 
@@ -646,16 +865,19 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         status = "attention"
 
     status_config = {
-        "stable": {"color": "#10b981", "bg": "rgba(16,185,129,0.06)", "border": "rgba(16,185,129,0.15)", "label_en": "Stable", "label_da": "Stabil"},
-        "attention": {"color": "#f59e0b", "bg": "rgba(245,158,11,0.06)", "border": "rgba(245,158,11,0.15)", "label_en": "Attention Needed", "label_da": "Kræver Opmærksomhed"},
-        "high_risk": {"color": "#ef4444", "bg": "rgba(239,68,68,0.06)", "border": "rgba(239,68,68,0.15)", "label_en": "High Risk", "label_da": "Høj Risiko"}
+        "stable": {"color": "#10b981", "grad_from": "#ecfdf5", "grad_mid": "#f0fdf4", "label_en": "Stable", "label_da": "Stabil"},
+        "attention": {"color": "#f59e0b", "grad_from": "#fffbeb", "grad_mid": "#fefce8", "label_en": "Attention Needed", "label_da": "Kræver Opmærksomhed"},
+        "high_risk": {"color": "#ef4444", "grad_from": "#fef2f2", "grad_mid": "#fff1f2", "label_en": "High Risk", "label_da": "Høj Risiko"}
     }
 
     config = status_config.get(status, status_config["stable"])
     color = config["color"]
-    bg = config["bg"]
-    border = config["border"]
+    grad_from = config["grad_from"]
+    grad_mid = config["grad_mid"]
     status_label = config["label_da"] if language == "da" else config["label_en"]
+
+    header_text = "Projektsundhed" if language == "da" else "Project Health"
+    icon = SVG_ICONS["pulse"]
 
     lines = health_content.split("\n")
     processed = []
@@ -664,10 +886,10 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
     def flush_list():
         nonlocal list_items
         if list_items:
-            processed.append('<ul style="margin:12px 0;padding-left:0;list-style:none;">')
+            processed.append('<div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">')
             for item in list_items:
-                processed.append(f'<li style="margin:8px 0;line-height:1.6;padding-left:24px;position:relative;"><span style="position:absolute;left:0;color:{color};font-size:18px;">•</span>{item}</li>')
-            processed.append('</ul>')
+                processed.append(item)
+            processed.append('</div>')
             list_items = []
 
     for line in lines:
@@ -677,43 +899,52 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
             continue
 
         if re.match(r"^##\s*(PROJECT_HEALTH|PROJEKTSUNDHED)", line, re.IGNORECASE):
-            flush_list()
-            header_text = "Projektsundhed" if language == "da" else "Project Health"
-            processed.append(f'''
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px;">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}cc);box-shadow:0 6px 20px {color}30;">
-              <span style="color:white;">{SVG_ICONS["pulse"]}</span>
-            </div>
-            <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">{header_text}</h2>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-radius:50px;background:{bg};border:2px solid {border};">
-            <div style="width:10px;height:10px;border-radius:50%;background:{color};box-shadow:0 0 8px {color}80;"></div>
-            <span style="font-size:14px;font-weight:700;color:{color};">{status_label}</span>
-          </div>
-        </div>''')
             continue
 
         if re.match(r"^\*\*Status:\*\*", line, re.IGNORECASE):
             continue
 
-        bold_match = re.match(r"^\*\*([^*]+):\*\*$", line) or re.match(r"^\*\*([^*]+)\*\*$", line)
+        sub_header = re.match(r'^###\s*(.+)$', line)
+        if sub_header:
+            flush_list()
+            h_text = escape_html(sub_header.group(1).strip())
+            processed.append(f'''
+    <div style="margin:16px 0 12px 0;padding:14px 18px;background:linear-gradient(135deg,{color}08,{color}03);border-radius:10px;border-left:3px solid {color};">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin:0;line-height:1.4;">{h_text}</h3>
+    </div>''')
+            continue
+
+        label_value = re.match(r'^\*\*([^*]+?):\*\*\s*(.+)$', line)
+        if label_value:
+            flush_list()
+            label = escape_html(label_value.group(1).strip())
+            value = _inline_markdown(label_value.group(2).strip())
+            processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
+              <div style="width:24px;height:24px;border-radius:6px;background:{color}12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                <span style="color:{color};font-size:11px;font-weight:800;">i</span>
+              </div>
+              <div><span style="font-size:11px;font-weight:700;color:{color};text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
+            </div>''')
+            continue
+
+        bold_match = re.match(r"^\*\*([^*]+)\*\*$", line)
         if bold_match:
             flush_list()
-            header_text = bold_match.group(1).rstrip(":")
-            processed.append(f'<h3 style="font-size:14px;font-weight:700;color:{color};margin:20px 0 10px 0;padding-bottom:8px;border-bottom:2px solid {color}15;text-transform:uppercase;letter-spacing:0.5px;">{escape_html(header_text)}</h3>')
+            h_text = escape_html(bold_match.group(1).rstrip(":"))
+            processed.append(f'<h4 style="font-size:13px;font-weight:700;color:{color};margin:18px 0 8px 0;text-transform:uppercase;letter-spacing:0.5px;">{h_text}</h4>')
             continue
 
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
-            item_text = line[2:]
-            item_text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="font-weight:600;">\1</strong>', item_text)
-            list_items.append(item_text)
+            item_text = _inline_markdown(line[2:])
+            list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
+              <span style="color:{color};font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
+            </div>''')
             continue
 
         flush_list()
-        text = escape_html(line)
-        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="font-weight:600;">\1</strong>', text)
-        processed.append(f'<p style="margin:10px 0;color:#334155;line-height:1.7;font-size:14px;">{text}</p>')
+        text = _inline_markdown(line)
+        processed.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
 
     flush_list()
 
@@ -729,13 +960,27 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         for key, m_color, m_label in metric_items:
             val = health_data.get(key)
             if val is not None:
-                metrics.append(f'<div style="text-align:center;padding:14px 10px;background:linear-gradient(135deg,{m_color}0a,{m_color}04);border-radius:12px;border:1px solid {m_color}15;"><div style="font-size:24px;font-weight:800;color:{m_color};">{val}</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px;font-weight:600;">{m_label}</div></div>')
+                metrics.append(f'<div style="text-align:center;padding:14px 10px;background:white;border-radius:10px;border:1px solid {m_color}20;"><div style="font-size:24px;font-weight:800;color:{m_color};">{val}</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px;font-weight:600;">{m_label}</div></div>')
 
         if metrics:
-            metrics_html = f'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:20px;padding-top:20px;border-top:2px solid {color}10;">{"".join(metrics)}</div>'
+            metrics_html = f'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid {color}15;">{"".join(metrics)}</div>'
+
+    status_badge = f'''<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:50px;background:white;border:1px solid {color}25;">
+        <div style="width:8px;height:8px;border-radius:50%;background:{color};box-shadow:0 0 6px {color}60;"></div>
+        <span style="font-size:13px;font-weight:700;color:{color};">{status_label}</span>
+      </div>'''
 
     return f'''
-<div class="health-section" style="margin:24px 0;padding:24px;background:linear-gradient(135deg,{bg},rgba(255,255,255,0.95));border-radius:16px;border:1px solid {border};">
+<div class="health-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,{grad_from},{grad_mid},#ffffff);border-radius:16px;border:1px solid {color}18;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid {color}18;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}dd);box-shadow:0 4px 14px {color}30;">
+        <span style="color:white;">{icon}</span>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;letter-spacing:-0.3px;">{header_text}</h2>
+    </div>
+    {status_badge}
+  </div>
   {"".join(processed)}
   {metrics_html}
 </div>'''
