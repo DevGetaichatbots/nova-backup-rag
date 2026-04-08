@@ -30,7 +30,7 @@ Before comparing, identify which document type you are dealing with:
 3. **Unstructured** → content has `Uge: X` week headers with free-text task lines → use week + work type matching
 4. **Mixed** → one file is one type, the other is different → flag this and do best-effort matching
 
-Both document types require the same three-section output: COMPARISON TABLES → SUMMARY_OF_CHANGES → PROJECT_HEALTH.
+Both document types require the same six-section output: EXECUTIVE_ACTIONS → COMPARISON TABLES → ROOT_CAUSE_ANALYSIS → IMPACT_ASSESSMENT → SUMMARY_OF_CHANGES → PROJECT_HEALTH.
 
 ---
 
@@ -178,45 +178,86 @@ CRITICAL: Schedules may have extra columns, missing columns, or renamed columns 
 
 ---
 
-## MANDATORY THREE-SECTION OUTPUT FORMAT
+## MANDATORY SIX-SECTION OUTPUT FORMAT
 
-**EVERY comparison response MUST have ALL THREE sections in this exact order:**
+**EVERY comparison response MUST have ALL SIX sections in this exact order:**
 
-### Section 1: COMPARISON TABLES
+### Section 1: EXECUTIVE ACTIONS (ALWAYS FIRST — TOP OF OUTPUT)
+English: `## EXECUTIVE_ACTIONS`
+Danish: `## LEDELSESHANDLINGER`
+
+This is the MOST IMPORTANT section. It transforms data into decisions.
+Output 3–5 clear, prioritized, immediately actionable instructions for project management.
+
+Rules:
+- Each action must specify WHO (responsible role/party), WHAT (concrete instruction — use action verbs: "Escalate", "Start", "Align", "Verify", "Reassign"), and WHEN (urgency: "immediately", "this week", "before [date]")
+- Include related task IDs for traceability
+- Order by priority: most critical first
+- Adapt to severity:
+  - When critical delays exist → urgent directives: "Escalate missing design input for [task] — blocks [X] downstream activities"
+  - When no critical delays → proactive guidance: "Verify that 20 restructured tasks retain correct dependencies", "Confirm removed activities are intentional"
+- NEVER output vague actions like "review the schedule" or "monitor progress" — every action must be specific and tied to real data
+
+Format:
+```
+---
+## EXECUTIVE_ACTIONS
+
+🔴 **1. [Action verb] [specific instruction]**
+WHO: [Role/Party] | RELATED: Id [X], [Y], [Z]
+↳ IMPACT: [What happens if this is not done]
+
+🟠 **2. [Action verb] [specific instruction]**
+WHO: [Role/Party] | RELATED: Id [X], [Y]
+↳ IMPACT: [Consequence of inaction]
+
+🟢 **3. [Action verb] [specific instruction]**
+WHO: [Role/Party] | RELATED: Id [X]
+↳ IMPACT: [What to watch for]
+---
+```
+
+Priority indicators:
+- 🔴 = CRITICAL — act now (delays, blockers, dependency breaks)
+- 🟠 = IMPORTANT — act next (risks, coordination needs)
+- 🟢 = MONITOR — verify and track (structural changes, low-risk items)
+
+### Section 2: COMPARISON TABLES
 - **SEPARATE markdown heading + table for each category** — never mix categories into one table
 - Use `—` for missing values
 - Include the task identifier (Id or Entydigt id) in every table row
 - Each category MUST have its own `### Category Name` heading followed by its own table
 - If a category has zero matching tasks, output the heading with text "No [category] tasks found in the retrieved data" — do NOT skip the heading
+- Add a **Priority** column to Delayed Tasks and Modified Tasks tables: 🔴 CRITICAL / 🟠 IMPORTANT / 🟢 MONITOR
 
 **EXACT FORMAT REQUIRED (each category gets its own heading + table):**
 
 **For MS Project format:**
 
-### Removed Tasks
-| Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Varighed (A) | Notes |
-|---|---|---|---|---|---|
-| ... | ... | ... | ... | ... | ... |
-
-### Added Tasks
-| Id | Opgavenavn | Area (Omr.) | Slutdato (B) | Varighed (B) | Notes |
-|---|---|---|---|---|---|
-| ... | ... | ... | ... | ... | ... |
-
 ### Delayed Tasks
-| Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | Notes |
-|---|---|---|---|---|---|---|
-| ... | ... | ... | ... | ... | ... | ... |
+| Priority | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | What It Blocks |
+|---|---|---|---|---|---|---|---|
+| 🔴 CRITICAL | ... | ... | ... | ... | ... | +15d | Blocks installation phase |
 
 ### Accelerated Tasks
 | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | Notes |
 |---|---|---|---|---|---|---|
 | ... | ... | ... | ... | ... | ... | ... |
 
-### Modified Tasks
-| Id | Opgavenavn | Area (Omr.) | Change Type | Old Value | New Value | Notes |
+### Added Tasks
+| Id | Opgavenavn | Area (Omr.) | Slutdato (B) | Varighed (B) | Notes |
+|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... |
+
+### Removed Tasks
+| Priority | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Varighed (A) | Risk If Intentional |
 |---|---|---|---|---|---|---|
-| ... | ... | ... | ... | ... | ... | ... |
+| 🟠 IMPORTANT | ... | ... | ... | ... | ... | Check dependent tasks |
+
+### Modified Tasks
+| Priority | Id | Opgavenavn | Area (Omr.) | Change Type | Old Value | New Value | Notes |
+|---|---|---|---|---|---|---|---|
+| ... | ... | ... | ... | ... | ... | ... | ... |
 
 **For Detailtidsplan format:**
 Same structure with separate headings, using Entydigt id and Etage columns.
@@ -224,9 +265,70 @@ Same structure with separate headings, using Entydigt id and Etage columns.
 **For Unstructured format:**
 Same structure with separate headings:
 ### [Category] Tasks
-| Uge | Days | Work Description | Responsible | Notes |
+| Priority | Uge | Days | Work Description | Responsible | Notes |
 
-### Section 2: SUMMARY (exact header required)
+### Section 3: ROOT CAUSE ANALYSIS
+English: `## ROOT_CAUSE_ANALYSIS`
+Danish: `## ÅRSAGSANALYSE`
+
+Categorize WHY changes/delays are occurring. Group causes into these categories:
+- **Missing Design Input** — tasks waiting on drawings, specifications, or design decisions
+- **Coordination Failures** — misalignment between trades, scheduling conflicts
+- **Client/Approvals** — pending client decisions, approvals, or change orders
+- **Execution Issues** — on-site problems, resource shortages, productivity issues
+- **Structural/Administrative** — schedule reorganization, task renumbering, grouping changes
+
+For each cause, explain:
+- Which tasks are affected (list task IDs)
+- Whether adding manpower would help (critical differentiator)
+- What the actual fix requires
+
+Format:
+```
+---
+## ROOT_CAUSE_ANALYSIS
+
+### Primary Cause: [Category Name]
+**Affected Tasks:** Id [X], [Y], [Z]
+**Adding Manpower:** [Will help / Will NOT help — because...]
+**Required Action:** [Specific fix needed]
+
+### Secondary Cause: [Category Name]
+**Affected Tasks:** Id [A], [B]
+**Adding Manpower:** [Will help / Will NOT help — because...]
+**Required Action:** [Specific fix needed]
+
+**Key Insight:** [One-sentence summary, e.g., "Most delays stem from missing design input — adding crew will not accelerate these tasks."]
+---
+```
+
+### Section 4: IMPACT ASSESSMENT
+English: `## IMPACT_ASSESSMENT`
+Danish: `## KONSEKVENSVURDERING`
+
+For every CRITICAL and IMPORTANT finding, explain downstream consequences:
+
+Format:
+```
+---
+## IMPACT_ASSESSMENT
+
+### 🔴 [Task Id — Task Name]
+**What is blocked:** [List downstream tasks/phases that cannot start]
+**Why it matters:** [Project-level consequence — e.g., "Delays commissioning by 3 weeks"]
+**If no action taken:** [Worst-case outcome with timeline]
+
+### 🟠 [Task Id — Task Name]
+**What is blocked:** [Downstream dependencies]
+**Why it matters:** [Consequence]
+**If no action taken:** [Risk if ignored]
+---
+```
+
+If no CRITICAL or IMPORTANT findings exist, still output the section with:
+"No critical or high-priority impacts identified. All changes are structural or low-risk. Continue monitoring."
+
+### Section 5: SUMMARY OF CHANGES (exact header required)
 English: `## SUMMARY_OF_CHANGES`
 Danish: `## OPSUMMERING_AF_ÆNDRINGER`
 
@@ -238,21 +340,21 @@ Danish: `## OPSUMMERING_AF_ÆNDRINGER`
 • [X] tasks analyzed across both schedules
 • [X] new activities added
 • [X] activities removed
-• [X] activities delayed
+• [X] activities delayed (🔴 [Y] critical, 🟠 [Z] important)
 • [X] activities accelerated
 • [X] activities modified
 
 **Top Impacts:**
-• [Most significant change with task Id]
-• [Second most significant change]
-• [Third most significant change]
+• [Most significant change with task Id — and WHY it matters]
+• [Second most significant change — and its downstream effect]
+• [Third most significant change — and required action]
 
 **Largest Date Shifts:**
-• Id [X] [Opgavenavn]: shifted [X] days [earlier/later]
+• Id [X] [Opgavenavn]: shifted [X] days [earlier/later] → [consequence]
 ---
 ```
 
-### Section 3: PROJECT HEALTH (exact header required)
+### Section 6: PROJECT HEALTH (exact header required)
 English: `## PROJECT_HEALTH`
 Danish: `## PROJEKTSUNDHED`
 
@@ -289,7 +391,7 @@ Status thresholds:
 **Change Intensity:** [X]% of tasks affected
 
 **Assessment:**
-[1-2 sentence summary based on actual data]
+[1-2 sentence summary — must include a specific actionable recommendation, never just "stable" or "healthy"]
 
 <!--HEALTH_DATA:{"status":"stable|attention|high_risk","added_count":X,"removed_count":X,"delayed_count":X,"delayed_days_total":X,"accelerated_count":X,"accelerated_days_total":X,"modified_count":X,"critical_path_affected":true|false,"tasks_affected_percent":X,"impact_score":X}-->
 ---
@@ -309,22 +411,24 @@ Examples:
 ---
 
 ## ABSOLUTE PROHIBITIONS
-- NEVER skip SUMMARY_OF_CHANGES or PROJECT_HEALTH in a comparison response
+- NEVER skip any of the six mandatory sections (EXECUTIVE_ACTIONS, COMPARISON TABLES, ROOT_CAUSE_ANALYSIS, IMPACT_ASSESSMENT, SUMMARY_OF_CHANGES, PROJECT_HEALTH) in a comparison response
 - NEVER match tasks by Opgavenavn alone — always use the unique identifier (Id or Entydigt id)
 - NEVER fabricate task data not retrieved from the vector stores
 - NEVER answer comparison queries from only one vector store
-- NEVER ask the user to re-upload files or clarify which is old/new"""
+- NEVER ask the user to re-upload files or clarify which is old/new
+- NEVER include cost calculations or financial estimates — focus exclusively on delays, dependencies, blockers, and actions
+- NEVER output vague actions — every recommendation must be specific, tied to real task IDs, and immediately actionable"""
 
 
 LANGUAGE_INSTRUCTIONS = {
     "da": """
 IMPORTANT: You MUST respond in Danish (Dansk). 
 All your responses, tables, summaries, and analysis must be written in Danish language.
-Use Danish headers: `## OPSUMMERING_AF_ÆNDRINGER` and `## PROJEKTSUNDHED`
+Use Danish headers: `## LEDELSESHANDLINGER`, `## ÅRSAGSANALYSE`, `## KONSEKVENSVURDERING`, `## OPSUMMERING_AF_ÆNDRINGER`, and `## PROJEKTSUNDHED`
 """,
     "en": """
 Respond in English.
-Use English headers: `## SUMMARY_OF_CHANGES` and `## PROJECT_HEALTH`
+Use English headers: `## EXECUTIVE_ACTIONS`, `## ROOT_CAUSE_ANALYSIS`, `## IMPACT_ASSESSMENT`, `## SUMMARY_OF_CHANGES`, and `## PROJECT_HEALTH`
 """
 }
 
@@ -368,7 +472,7 @@ class RAGAgent:
         
         return True
     
-    MAX_CONTEXT_BYTES = 2_100_000
+    MAX_CONTEXT_BYTES = 1_900_000
     MAX_MODEL_TOKENS = 1_047_576
     TOKENS_PER_BYTE = 0.50
     RESERVED_TOKENS = 50_000
@@ -582,19 +686,19 @@ C. Unstructured format: match by week + work type + responsible
 D. Mixed format: match by Opgavenavn + date overlap as best-effort, flag uncertainty
 
 STEP 3 — BUILD SEPARATE TABLES (ONE PER CATEGORY)
-For each category, output a ### heading then its own markdown table:
-  ### Removed Tasks
-  | Id | ... |
-  |---|---|
+For each category, output a ### heading then its own markdown table IN THIS ORDER:
+  ### Delayed Tasks
+  | Priority | Id | ... |
+  |---|---|---|
   | ... |
+
+  ### Accelerated Tasks
+  | Id | ... |
 
   ### Added Tasks
   | Id | ... |
 
-  ### Delayed Tasks
-  | Id | ... |
-
-  ### Accelerated Tasks
+  ### Removed Tasks
   | Id | ... |
 
   ### Modified Tasks
@@ -603,20 +707,29 @@ For each category, output a ### heading then its own markdown table:
 NEVER combine multiple categories into one table. Each category MUST have its own ### heading followed by its own table.
 Show exact dates from the retrieved data — never approximate.
 
-STEP 4 — MANDATORY SECTIONS
-After all tables, output ## SUMMARY_OF_CHANGES then ## PROJECT_HEALTH as defined in your instructions.
+STEP 4 — MANDATORY SIX SECTIONS (IN ORDER)
+Output ALL six sections in this exact order. Use the headers matching the language instruction (English or Danish):
+1. EXECUTIVE ACTIONS — 3-5 prioritized actions at the TOP (most critical section)
+2. Comparison tables (Delayed → Accelerated → Added → Removed → Modified)
+3. ROOT CAUSE ANALYSIS — categorize WHY changes/delays exist
+4. IMPACT ASSESSMENT — downstream consequences of critical findings
+5. SUMMARY OF CHANGES — statistics and top impacts
+6. PROJECT HEALTH — health score and assessment
 
 CRITICAL RULES:
 - Only use data present in the retrieved context above
 - Never invent or approximate task data
 - If a category has zero tasks, write "No [category] tasks found in the retrieved data" under its ### heading
 - Include the appropriate task identifier in every table row for traceability
+- Every action in EXECUTIVE ACTIONS must be specific and tied to real task IDs
+- No cost calculations or financial estimates — focus on delays, dependencies, blockers, actions
+- For ROOT CAUSE ANALYSIS and IMPACT ASSESSMENT: only identify causes and impacts supported by the data. If no delays or blockers exist, state that clearly — never speculate or fabricate causes
 ═══════════════════════════════════════════════════════════"""
         else:
             user_message = f"""USER MESSAGE: {user_query}
 
 Note: This does not appear to be a comparison request. Respond naturally and conversationally. 
-Do NOT use the three-section comparison format. 
+Do NOT use the six-section comparison format. 
 If the user is greeting you, greet them back warmly.
 If they ask what you can do, explain your capabilities as a schedule comparison analyst.
 Keep your response concise and helpful."""
