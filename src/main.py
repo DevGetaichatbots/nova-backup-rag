@@ -780,6 +780,8 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     context_parts = []
     doc_label = f"Schedule ({filename})"
 
+    MAX_PREDICTIVE_CONTEXT_BYTES = 1_900_000
+
     raw_md_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "raw_markdown"]
     text_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "text"]
 
@@ -793,32 +795,57 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
         headers, data_rows = _parse_html_tables_to_rows(all_html)
 
         if headers and data_rows:
-            formatted = _format_rows_as_labeled(headers, data_rows)
-
-            non_table = re.sub(r'<table>.*?</table>', '', all_html, flags=re.DOTALL)
-            non_table = re.sub(r'<figure>\s*</figure>', '', non_table).strip()
-            non_table_clean = re.sub(r'<[^>]+>', '', non_table).strip()
-
             display_headers = [h for h in headers if h.lower() not in SKIP_HEADERS]
-            context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
-            context_parts.append(f"Columns: {' | '.join(display_headers)}")
-            context_parts.append(f"Total rows: {len(data_rows)}")
-            context_parts.append("Each row below is one activity. Scan EVERY row for delayed activities.")
-            context_parts.append("")
-            context_parts.append(formatted)
-            if non_table_clean:
-                context_parts.append("")
-                context_parts.append(non_table_clean)
-            context_parts.append("")
+            keep_indices = [i for i, h in enumerate(headers) if h.lower() not in SKIP_HEADERS]
 
-            result = "\n".join(context_parts)
-            _logger.info(f"  Context: {len(result)} chars (was {len(all_html)} HTML → {len(result)} clean = {100 - len(result)*100//len(all_html)}% reduction)")
+            header_line = _serialize_compact_row(display_headers)
+
+            compact_lines = []
+            for row in data_rows:
+                vals = []
+                for idx in keep_indices:
+                    v = row[idx].strip() if idx < len(row) else ""
+                    vals.append(v)
+                compact_lines.append(_serialize_compact_row(vals))
+
+            preamble = "\n".join([
+                f"[{doc_label}] — COMPLETE SCHEDULE DATA",
+                f"FORMAT: CSV — each row = one activity. Columns separated by semicolon (values with semicolons are quoted).",
+                f"Total rows: {len(data_rows)}",
+                "Scan EVERY row for delayed activities.",
+                "",
+                header_line,
+                ""
+            ])
+
+            budget = MAX_PREDICTIVE_CONTEXT_BYTES - len(preamble.encode("utf-8"))
+            included_lines = []
+            current_bytes = 0
+            for line in compact_lines:
+                line_bytes = len(line.encode("utf-8")) + 1
+                if current_bytes + line_bytes > budget:
+                    break
+                included_lines.append(line)
+                current_bytes += line_bytes
+
+            skipped = len(compact_lines) - len(included_lines)
+            result = preamble + "\n".join(included_lines) + "\n"
+
+            if skipped:
+                _logger.warning(f"  [PDF] Context built: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows included, {skipped} rows omitted (token limit)")
+            else:
+                _logger.info(f"  [PDF] Context: {len(result)} bytes — {len(included_lines)}/{len(data_rows)} rows (was {len(all_html)} HTML → {len(result)} compact)")
             return result
         else:
             _logger.info(f"  No structured tables found, falling back to raw HTML")
             context_parts.append(f"[{doc_label}] — COMPLETE SCHEDULE DATA")
             context_parts.append("Scan EVERY row for delayed activities. Count ALL rows.")
             context_parts.append("")
+            raw_bytes = len(all_html.encode("utf-8"))
+            if raw_bytes > MAX_PREDICTIVE_CONTEXT_BYTES:
+                trim_point = MAX_PREDICTIVE_CONTEXT_BYTES
+                all_html = all_html.encode("utf-8")[:trim_point].decode("utf-8", errors="ignore")
+                _logger.warning(f"  Raw HTML trimmed from {raw_bytes} to {trim_point} bytes")
             context_parts.append(all_html)
             context_parts.append("")
             return "\n".join(context_parts)
@@ -826,11 +853,17 @@ def _build_predictive_context(chunks: list[dict], filename: str) -> str:
     if text_chunks:
         context_parts.append(f"[{doc_label}] — TEXT DATA")
         context_parts.append("")
+        current_bytes = 0
         for chunk in text_chunks:
             content = chunk["content"]
             if content.strip():
+                chunk_bytes = len(content.encode("utf-8"))
+                if current_bytes + chunk_bytes > MAX_PREDICTIVE_CONTEXT_BYTES:
+                    _logger.warning(f"  Text context trimmed at {current_bytes} bytes (limit: {MAX_PREDICTIVE_CONTEXT_BYTES})")
+                    break
                 context_parts.append(content)
                 context_parts.append("")
+                current_bytes += chunk_bytes
         if len(context_parts) <= 2:
             context_parts.append("No schedule data could be extracted.\n")
         return "\n".join(context_parts)
