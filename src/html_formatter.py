@@ -1,7 +1,8 @@
 """
 Premium Structured HTML Converter — SaaS Section-Grouped Layout
 Each task category gets its own card with header + table.
-Parses: TABLES → SUMMARY_OF_CHANGES → PROJECT_HEALTH
+Parses all 6 sections: EXECUTIVE_ACTIONS → COMPARISON TABLES →
+ROOT_CAUSE_ANALYSIS → IMPACT_ASSESSMENT → SUMMARY_OF_CHANGES → PROJECT_HEALTH
 """
 import re
 import json
@@ -16,6 +17,9 @@ SVG_ICONS = {
     "summary": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" opacity="0.15"/><path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     "pulse": '<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     "download": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    "executive": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    "rootcause": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    "impact": '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/></svg>',
     "added": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#10b981" opacity="0.15"/><path d="M12 8v8M8 12h8" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/></svg>',
     "removed": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#ef4444" opacity="0.15"/><path d="M8 12h8" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/></svg>',
     "moved": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f59e0b" opacity="0.15"/><path d="M8 12h8M12 8l4 4-4 4" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -40,76 +44,106 @@ CATEGORY_CONFIG = {
 CATEGORY_ORDER = ["removed", "added", "delayed", "accelerated", "moved", "critical", "risks", "default"]
 
 
+SECTION_PATTERNS = {
+    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*HANDLINGSPLAN"],
+    "root_cause": [r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*ÅRSAGSANALYSE"],
+    "impact": [r"^##\s*IMPACT_ASSESSMENT", r"^##\s*KONSEKVENSVURDERING"],
+    "summary": [r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*OPSUMMERING_AF_ÆNDRINGER", r"^##\s*Summary\s+of\s+Changes", r"^##\s*Opsummering\s+af\s+Ændringer"],
+    "health": [r"^##\s*PROJECT_HEALTH", r"^##\s*PROJEKTSUNDHED", r"^##\s*Project\s+Health", r"^##\s*Projektsundhed"],
+}
+
+SECTION_ORDER = ["executive", "root_cause", "impact", "summary", "health"]
+
+
 def parse_structured_response(markdown: str) -> Dict:
+    empty = {
+        "executive_section": "",
+        "tables_section": "",
+        "root_cause_section": "",
+        "impact_section": "",
+        "summary_section": "",
+        "health_section": "",
+        "health_data": None
+    }
     if not markdown:
-        return {"tables_section": "", "summary_section": "", "health_section": "", "health_data": None}
+        return empty
 
-    summary_patterns = [
-        r"^##\s*SUMMARY_OF_CHANGES\s*$",
-        r"^##\s*OPSUMMERING_AF_ÆNDRINGER\s*$",
-        r"^##\s*Summary\s+of\s+Changes",
-        r"^##\s*Opsummering\s+af\s+Ændringer"
-    ]
+    found = {}
+    for key, patterns in SECTION_PATTERNS.items():
+        for p in patterns:
+            m = re.search(p, markdown, re.MULTILINE | re.IGNORECASE)
+            if m:
+                found[key] = m.start()
+                break
 
-    health_patterns = [
-        r"^##\s*PROJECT_HEALTH\s*$",
-        r"^##\s*PROJEKTSUNDHED\s*$",
-        r"^##\s*Project\s+Health",
-        r"^##\s*Projektsundhed"
-    ]
+    boundaries = sorted(found.items(), key=lambda x: x[1])
 
-    summary_start = -1
-    health_start = -1
+    sections = {}
+    for i, (key, start) in enumerate(boundaries):
+        end = boundaries[i + 1][1] if i + 1 < len(boundaries) else len(markdown)
+        sections[key] = markdown[start:end].strip()
 
-    for pattern in summary_patterns:
-        match = re.search(pattern, markdown, re.MULTILINE | re.IGNORECASE)
-        if match:
-            summary_start = match.start()
-            break
+    first_section_start = boundaries[0][1] if boundaries else len(markdown)
+    pre_content = markdown[:first_section_start].strip()
 
-    for pattern in health_patterns:
-        match = re.search(pattern, markdown, re.MULTILINE | re.IGNORECASE)
-        if match:
-            health_start = match.start()
-            break
+    if "executive" in sections:
+        exec_end = found["executive"]
+        next_after_exec = None
+        for key, pos in boundaries:
+            if key != "executive" and pos > exec_end:
+                next_after_exec = pos
+                break
+        if next_after_exec is None:
+            next_after_exec = len(markdown)
+        exec_section = sections["executive"]
 
-    tables_section = ""
-    summary_section = ""
-    health_section = ""
+        table_start_in_exec = -1
+        for table_pattern in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Forsink|Fremskynd|Tilføj|Fjern|Ændr)",
+                              r"^\|.*\|.*\|"]:
+            tm = re.search(table_pattern, exec_section, re.MULTILINE | re.IGNORECASE)
+            if tm:
+                if table_start_in_exec == -1 or tm.start() < table_start_in_exec:
+                    table_start_in_exec = tm.start()
 
-    if summary_start == -1 and health_start == -1:
-        tables_section = markdown
-    elif summary_start != -1 and health_start != -1:
-        if summary_start < health_start:
-            tables_section = markdown[:summary_start].strip()
-            summary_section = markdown[summary_start:health_start].strip()
-            health_section = markdown[health_start:].strip()
+        if table_start_in_exec > 0:
+            sections["executive"] = exec_section[:table_start_in_exec].strip()
+            tables_part = exec_section[table_start_in_exec:].strip()
         else:
-            tables_section = markdown[:health_start].strip()
-            health_section = markdown[health_start:summary_start].strip()
-            summary_section = markdown[summary_start:].strip()
-    elif summary_start != -1:
-        tables_section = markdown[:summary_start].strip()
-        summary_section = markdown[summary_start:].strip()
+            tables_part = ""
     else:
-        tables_section = markdown[:health_start].strip()
-        health_section = markdown[health_start:].strip()
+        tables_part = pre_content
 
-    health_data = None
-    health_match = re.search(r"<!--HEALTH_DATA:(.*?)-->", health_section, re.DOTALL)
+    if "root_cause" in sections and not tables_part:
+        rc_start = found.get("root_cause", len(markdown))
+        tables_between = markdown[first_section_start:rc_start].strip() if first_section_start < rc_start else ""
+        if "executive" in sections:
+            exec_end_pos = found["executive"]
+            for key, pos in boundaries:
+                if key != "executive" and pos > exec_end_pos:
+                    tables_between = markdown[exec_end_pos:pos].strip()
+                    exec_section_text = sections["executive"]
+                    tables_between = tables_between[len(exec_section_text):].strip() if tables_between.startswith(exec_section_text[:20]) else tables_between
+                    break
+
+    result = {
+        "executive_section": sections.get("executive", ""),
+        "tables_section": tables_part if tables_part else pre_content,
+        "root_cause_section": sections.get("root_cause", ""),
+        "impact_section": sections.get("impact", ""),
+        "summary_section": sections.get("summary", ""),
+        "health_section": sections.get("health", ""),
+        "health_data": None
+    }
+
+    health_match = re.search(r"<!--HEALTH_DATA:(.*?)-->", result["health_section"], re.DOTALL)
     if health_match:
         try:
-            health_data = json.loads(health_match.group(1))
-            health_section = re.sub(r"<!--HEALTH_DATA:.*?-->", "", health_section, flags=re.DOTALL).strip()
+            result["health_data"] = json.loads(health_match.group(1))
+            result["health_section"] = re.sub(r"<!--HEALTH_DATA:.*?-->", "", result["health_section"], flags=re.DOTALL).strip()
         except:
             pass
 
-    return {
-        "tables_section": tables_section,
-        "summary_section": summary_section,
-        "health_section": health_section,
-        "health_data": health_data
-    }
+    return result
 
 
 def detect_category(text: str) -> str:
@@ -411,6 +445,133 @@ def generate_table_html(tables_section: str, language: str = "en") -> str:
     return "".join(parts)
 
 
+def _render_markdown_section(content: str, section_key: str, title_en: str, title_da: str,
+                             icon_key: str, color: str, bg: str, border: str, language: str) -> str:
+    if not content or not content.strip():
+        return ""
+
+    title = title_da if language == "da" else title_en
+    icon = SVG_ICONS.get(icon_key, SVG_ICONS["default"])
+
+    lines = content.split("\n")
+    processed = []
+    list_items = []
+
+    def flush_list():
+        nonlocal list_items
+        if list_items:
+            processed.append('<ul style="margin:12px 0;padding-left:0;list-style:none;">')
+            for item in list_items:
+                processed.append(f'<li style="margin:10px 0;line-height:1.7;padding-left:24px;position:relative;font-size:14px;color:#334155;"><span style="position:absolute;left:0;color:{color};font-size:18px;">•</span>{item}</li>')
+            processed.append('</ul>')
+            list_items = []
+
+    for line in lines:
+        line = line.strip()
+        if not line or line in ["---", "***"]:
+            flush_list()
+            continue
+
+        if re.match(r"^##\s", line):
+            flush_list()
+            continue
+
+        bold_heading = re.match(r"^\*\*([^*]+):\*\*$", line) or re.match(r"^\*\*([^*]+)\*\*\s*$", line)
+        if bold_heading and "|" not in line:
+            flush_list()
+            header_text = bold_heading.group(1).rstrip(":")
+            processed.append(f'<h3 style="font-size:14px;font-weight:700;color:{color};margin:20px 0 10px 0;padding-bottom:8px;border-bottom:2px solid {color}18;text-transform:uppercase;letter-spacing:0.5px;">{escape_html(header_text)}</h3>')
+            continue
+
+        priority_match = re.match(r'^(🔴|🟠|🟢)\s*\*\*(\d+)\.\s*(.+?)\*\*\s*$', line)
+        if priority_match:
+            flush_list()
+            dot = priority_match.group(1)
+            num = priority_match.group(2)
+            text = priority_match.group(3)
+            dot_color = {"🔴": "#ef4444", "🟠": "#f59e0b", "🟢": "#10b981"}.get(dot, color)
+            processed.append(f'''
+<div style="display:flex;align-items:flex-start;gap:12px;margin:16px 0;padding:16px 20px;background:linear-gradient(135deg,{dot_color}08,{dot_color}03);border-radius:12px;border-left:4px solid {dot_color};">
+  <div style="width:32px;height:32px;border-radius:50%;background:{dot_color};color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">{num}</div>
+  <div style="flex:1;"><strong style="color:#0f172a;font-size:15px;line-height:1.5;">{escape_html(text)}</strong></div>
+</div>''')
+            continue
+
+        if line.startswith("WHO:") or line.startswith("RELATED:") or line.startswith("↳"):
+            label_match = re.match(r'^(WHO|RELATED|↳\s*IMPACT):\s*(.+)$', line)
+            if label_match:
+                label = label_match.group(1).replace("↳ ", "")
+                value = label_match.group(2)
+                label_color = {"WHO": "#6366f1", "RELATED": "#8b5cf6", "IMPACT": "#ef4444"}.get(label, "#64748b")
+                processed.append(f'<div style="margin:4px 0 4px 44px;font-size:13px;color:#475569;line-height:1.5;"><span style="font-weight:700;color:{label_color};text-transform:uppercase;font-size:11px;letter-spacing:0.5px;">{escape_html(label)}: </span>{escape_html(value)}</div>')
+                continue
+            elif line.startswith("↳"):
+                text = line[1:].strip()
+                text = re.sub(r"\*\*([^*]+)\*\*", r'<strong>\1</strong>', text)
+                processed.append(f'<div style="margin:4px 0 4px 44px;font-size:13px;color:#475569;line-height:1.5;">{text}</div>')
+                continue
+
+        if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
+            item_text = line[2:]
+            item_text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', item_text)
+            item_text = re.sub(r'🔴', '<span style="color:#ef4444;">●</span>', item_text)
+            item_text = re.sub(r'🟠', '<span style="color:#f59e0b;">●</span>', item_text)
+            item_text = re.sub(r'🟢', '<span style="color:#10b981;">●</span>', item_text)
+            list_items.append(item_text)
+            continue
+
+        flush_list()
+        text = line
+        text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="color:#1e293b;font-weight:600;">\1</strong>', text)
+        text = re.sub(r'🔴', '<span style="color:#ef4444;">●</span>', text)
+        text = re.sub(r'🟠', '<span style="color:#f59e0b;">●</span>', text)
+        text = re.sub(r'🟢', '<span style="color:#10b981;">●</span>', text)
+        processed.append(f'<p style="margin:10px 0;color:#334155;line-height:1.7;font-size:14px;">{text}</p>')
+
+    flush_list()
+
+    return f'''
+<div class="{section_key}-section" style="margin:0 0 24px 0;padding:24px;background:linear-gradient(135deg,{bg},rgba(255,255,255,0.95));border-radius:16px;border:1px solid {border};">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+    <div style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{color},{color}cc);box-shadow:0 6px 20px {color}30;">
+      <span style="color:white;">{icon}</span>
+    </div>
+    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">{title}</h2>
+  </div>
+  {"".join(processed)}
+</div>'''
+
+
+def generate_executive_html(content: str, language: str = "en") -> str:
+    return _render_markdown_section(
+        content, "executive",
+        "Executive Actions", "Handlingsplan",
+        "executive", "#0d9488",
+        "rgba(13,148,136,0.04)", "rgba(13,148,136,0.12)",
+        language
+    )
+
+
+def generate_root_cause_html(content: str, language: str = "en") -> str:
+    return _render_markdown_section(
+        content, "root-cause",
+        "Root Cause Analysis", "Årsagsanalyse",
+        "rootcause", "#6366f1",
+        "rgba(99,102,241,0.04)", "rgba(99,102,241,0.12)",
+        language
+    )
+
+
+def generate_impact_html(content: str, language: str = "en") -> str:
+    return _render_markdown_section(
+        content, "impact",
+        "Impact Assessment", "Konsekvensvurdering",
+        "impact", "#f59e0b",
+        "rgba(245,158,11,0.04)", "rgba(245,158,11,0.12)",
+        language
+    )
+
+
 def generate_summary_html(summary_content: str, language: str = "en") -> str:
     if not summary_content or not summary_content.strip():
         return ""
@@ -593,7 +754,10 @@ def format_response_as_html(markdown: str, language: str = "en") -> str:
 def _format_response_internal(markdown: str, language: str) -> str:
     parsed = parse_structured_response(markdown)
 
+    executive_html = generate_executive_html(parsed["executive_section"], language)
     table_html = generate_table_html(parsed["tables_section"], language)
+    root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
+    impact_html = generate_impact_html(parsed["impact_section"], language)
     summary_html = generate_summary_html(parsed["summary_section"], language)
     health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language)
 
@@ -609,7 +773,10 @@ def _format_response_internal(markdown: str, language: str) -> str:
     return f'''
 {styles}
 <div class="agent-response" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  {executive_html}
   {table_html}
+  {root_cause_html}
+  {impact_html}
   {summary_html}
   {health_html}
 </div>'''
