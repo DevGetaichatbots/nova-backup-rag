@@ -8,6 +8,7 @@ Converts OCR table output to compact CSV format (identical to CSV upload path).
 import csv
 import io
 import logging
+import re
 from src.azure_ocr import AzureDocumentIntelligence
 
 logger = logging.getLogger(__name__)
@@ -69,11 +70,41 @@ KNOWN_HEADERS = {
     "opg.navn", "opgavenavn/aktivitet"
 }
 
+SCHEDULE_DATA_HEADERS = {
+    "id", "opg", "opgavenavn", "varighed", "startdato", "slutdato",
+    "% arbejde færdigt", "% færdigt", "foregående opgaver",
+    "efterfølgende opgaver", "opgavetilstand", "entydigt id",
+    "etage", "omr.", "ansvarlig", "bemærkn.", "bemærkn",
+    "task name", "duration", "start", "finish", "start date",
+    "end date", "% complete", "predecessors", "successors",
+    "responsible", "area"
+}
+
+GANTT_HEADER_RE = re.compile(
+    r'^(kvt\d|kvt \d|\d{4}\s*kvt|uge\s*\d|jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|'
+    r'\d{4}\s+(jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec|q[1-4]|kvt)|'
+    r'col\d+|\d{4}\s+\d{4})',
+    re.IGNORECASE
+)
+
 MS_PROJECT_HEADERS = {
     9: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver"],
     10: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10"],
     11: ["Id", "Opgavetilstand", "Opgavenavn", "Varighed", "Startdato", "Slutdato", "% arbejde færdigt", "Foregående opgaver", "Efterfølgende opgaver", "Col10", "Col11"],
 }
+
+
+def _is_schedule_column(header: str) -> bool:
+    h = header.strip().lower()
+    if not h:
+        return False
+    if h in SCHEDULE_DATA_HEADERS:
+        return True
+    if GANTT_HEADER_RE.match(h):
+        return False
+    if h.startswith("col") and h[3:].isdigit():
+        return False
+    return True
 
 
 def _serialize_compact_row(vals: list[str], sep: str = CSV_SEPARATOR) -> str:
@@ -170,8 +201,21 @@ def rows_to_compact_csv_chunks(headers: list[str], data_rows: list[list[str]], s
     return chunks
 
 
+def _filter_schedule_columns(headers: list[str], rows: list[list[str]]) -> tuple[list[str], list[list[str]]]:
+    sched_indices = [i for i, h in enumerate(headers) if _is_schedule_column(h)]
+    if not sched_indices:
+        sched_indices = list(range(len(headers)))
+
+    filtered_h = [headers[i] for i in sched_indices]
+    filtered_rows = []
+    for row in rows:
+        vals = [row[i] if i < len(row) else "" for i in sched_indices]
+        filtered_rows.append(vals)
+    return filtered_h, filtered_rows
+
+
 def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list[dict]:
-    all_headers = []
+    canonical_headers = []
     all_data_rows = []
 
     for table in tables:
@@ -183,54 +227,129 @@ def _ocr_tables_to_compact_csv_chunks(tables: list[dict], filename: str) -> list
             continue
 
         header_row, data_rows = _detect_header_row(rows, col_count)
-
         header_clean = [str(h).strip() for h in header_row]
-        logger.info(f"[{filename}] Table {table_id}: {len(data_rows)} data rows, headers (score={_header_score(header_row)}): {header_clean}")
 
-        if data_rows:
-            sample = data_rows[0]
+        sched_headers, sched_data = _filter_schedule_columns(header_clean, data_rows)
+
+        logger.info(f"[{filename}] Table {table_id}: {len(sched_data)} data rows, "
+                     f"schedule cols={len(sched_headers)}/{len(header_clean)} "
+                     f"(score={_header_score(header_row)}): {sched_headers}")
+
+        if sched_data:
+            sample = sched_data[0]
             sample_mapped = " | ".join(
-                f"{header_clean[i] if i < len(header_clean) else f'Col{i}'}: {str(sample[i]).strip()[:30]}"
-                for i in range(min(len(sample), len(header_clean)))
+                f"{sched_headers[i] if i < len(sched_headers) else f'Col{i}'}: {str(sample[i]).strip()[:30]}"
+                for i in range(min(len(sample), len(sched_headers)))
             )
             logger.info(f"[{filename}] Table {table_id} first data row: {sample_mapped}")
 
-        if not all_headers:
-            all_headers = header_clean
+        if not canonical_headers:
+            canonical_headers = sched_headers
         else:
-            if header_clean != all_headers:
+            canon_low = [h.lower().strip() for h in canonical_headers]
+            table_low = [h.lower().strip() for h in sched_headers]
+
+            if table_low == canon_low:
+                pass
+            else:
                 col_map = {}
-                for ci, ch in enumerate(all_headers):
-                    ch_low = ch.lower().strip()
-                    for fi, fh in enumerate(header_clean):
-                        if fh.lower().strip() == ch_low:
+                for ci, ch in enumerate(canon_low):
+                    for fi, fh in enumerate(table_low):
+                        if fh == ch:
                             col_map[ci] = fi
                             break
-                if len(col_map) < len(all_headers) - 1:
-                    logger.info(f"[{filename}] Table {table_id}: headers don't match canonical, skipping")
+                min_required = max(1, int(0.6 * len(canonical_headers)))
+                if len(col_map) < min_required:
+                    logger.info(f"[{filename}] Table {table_id}: schedule headers don't match canonical "
+                                f"(matched {len(col_map)}/{len(canonical_headers)}, need {min_required}), skipping")
                     continue
-                remapped_rows = []
-                for row in data_rows:
-                    new_row = []
-                    for ci in range(len(all_headers)):
-                        src_idx = col_map.get(ci, -1)
-                        new_row.append(row[src_idx] if 0 <= src_idx < len(row) else "")
-                    remapped_rows.append(new_row)
-                data_rows = remapped_rows
-                logger.info(f"[{filename}] Table {table_id}: remapped {len(col_map)}/{len(all_headers)} columns")
+                remapped = []
+                for row in sched_data:
+                    new_row = [row[col_map[ci]] if ci in col_map and col_map[ci] < len(row) else "" for ci in range(len(canonical_headers))]
+                    remapped.append(new_row)
+                sched_data = remapped
+                logger.info(f"[{filename}] Table {table_id}: remapped {len(col_map)}/{len(canonical_headers)} columns")
 
-        for row in data_rows:
+        for row in sched_data:
             cleaned = [str(v).strip() if v else "" for v in row]
             if any(v for v in cleaned):
-                while len(cleaned) < len(all_headers):
+                while len(cleaned) < len(canonical_headers):
                     cleaned.append("")
-                all_data_rows.append(cleaned[:len(all_headers)])
+                all_data_rows.append(cleaned[:len(canonical_headers)])
 
-    if not all_headers or not all_data_rows:
+    if not canonical_headers or not all_data_rows:
         logger.warning(f"[{filename}] No structured table data found in OCR output")
         return []
 
-    return rows_to_compact_csv_chunks(all_headers, all_data_rows, filename)
+    logger.info(f"[{filename}] OCR total: {len(all_data_rows)} schedule rows from {len(tables)} tables")
+    return rows_to_compact_csv_chunks(canonical_headers, all_data_rows, filename)
+
+
+def _parse_raw_markdown_tables(raw_markdown: str, filename: str) -> tuple[list[str], list[list[str]]]:
+    tables_html = re.findall(r'<table>.*?</table>', raw_markdown, re.DOTALL)
+    if not tables_html:
+        return [], []
+
+    logger.info(f"[{filename}] Raw markdown: found {len(tables_html)} HTML tables")
+
+    canonical_headers = []
+    all_data_rows = []
+
+    for ti, table_html in enumerate(tables_html):
+        header_matches = list(re.finditer(r'<tr>\s*((?:<th[^>]*>.*?</th>\s*)+)</tr>', table_html, re.DOTALL))
+        if not header_matches:
+            continue
+
+        header_tr = header_matches[0].group(1)
+        raw_headers = [re.sub(r'<[^>]+>', '', c).strip() for c in re.findall(r'<th[^>]*>(.*?)</th>', header_tr, re.DOTALL)]
+
+        sched_indices = [i for i, h in enumerate(raw_headers) if _is_schedule_column(h)]
+        if not sched_indices:
+            sched_indices = list(range(len(raw_headers)))
+
+        filtered_h = [raw_headers[i] for i in sched_indices]
+
+        if _header_score(filtered_h) < 2:
+            continue
+
+        if not canonical_headers:
+            canonical_headers = filtered_h
+            col_indices_map = list(range(len(sched_indices)))
+            logger.info(f"[{filename}] Raw MD table {ti}: canonical headers ({len(canonical_headers)}): {canonical_headers}")
+        else:
+            canon_low = [h.lower().strip() for h in canonical_headers]
+            table_low = [h.lower().strip() for h in filtered_h]
+            col_indices_map = []
+            matched = 0
+            for ci, ch in enumerate(canon_low):
+                found = -1
+                for fi, fh in enumerate(table_low):
+                    if fh == ch:
+                        found = fi
+                        matched += 1
+                        break
+                col_indices_map.append(found)
+            min_required = max(1, int(0.6 * len(canonical_headers)))
+            if matched < min_required:
+                continue
+
+        for row_match in re.finditer(r'<tr>\s*((?:<td[^>]*>.*?</td>\s*)+)</tr>', table_html, re.DOTALL):
+            raw_cells = re.findall(r'<td[^>]*>(.*?)</td>', row_match.group(1), re.DOTALL)
+            cells = [re.sub(r'<[^>]+>', '', c).strip() for c in raw_cells]
+
+            row_vals = []
+            for mi, ci in enumerate(col_indices_map):
+                if ci < 0 or ci >= len(sched_indices):
+                    row_vals.append("")
+                else:
+                    src_idx = sched_indices[ci]
+                    row_vals.append(cells[src_idx] if 0 <= src_idx < len(cells) else "")
+
+            if any(v.strip() for v in row_vals):
+                all_data_rows.append(row_vals)
+
+    logger.info(f"[{filename}] Raw markdown parsed: {len(canonical_headers)} columns, {len(all_data_rows)} rows")
+    return canonical_headers, all_data_rows
 
 
 def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list[dict]:
@@ -239,6 +358,8 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list
 
     OCR extracts tables, then converts to semicolon-separated CSV chunks
     with 250 rows each, type="table", ready for zero-vector storage.
+    Uses structured tables first; falls back to raw_markdown HTML parsing
+    if structured tables yield no data.
 
     Args:
         pdf_bytes: Raw PDF file bytes
@@ -261,7 +382,15 @@ def process_pdf_binary(pdf_bytes: bytes, filename: str = "document.pdf") -> list
     chunks = _ocr_tables_to_compact_csv_chunks(tables, filename)
 
     if not chunks:
-        logger.warning(f"[{filename}] No structured tables found in OCR output — no data to store")
+        raw_markdown = extraction.get("raw_markdown", "")
+        if raw_markdown:
+            logger.info(f"[{filename}] Structured tables failed — trying raw markdown HTML parsing")
+            headers, data_rows = _parse_raw_markdown_tables(raw_markdown, filename)
+            if headers and data_rows:
+                chunks = rows_to_compact_csv_chunks(headers, data_rows, filename)
+
+    if not chunks:
+        logger.warning(f"[{filename}] No schedule data could be extracted from OCR output")
 
     logger.info(f"[{filename}] Final: {len(chunks)} compact CSV chunks")
     return chunks
