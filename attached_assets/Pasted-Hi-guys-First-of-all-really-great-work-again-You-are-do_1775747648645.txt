@@ -1,0 +1,115 @@
+Hi guys,
+
+First of all — really great work again. You are doing an excellent job, and it’s clear that we are now very close to the finish line (around 90%).
+
+Now we are entering the most important phase, where small changes will define whether this becomes:
+
+👉 a “nice analysis tool”
+or
+👉 a must-have product that customers rely on weekly
+
+🚨 IMPORTANT CLARIFICATION (PLEASE READ CAREFULLY)
+
+We need to refine the Executive Actions section.
+
+Right now, it is good — but there is a critical balance we must get right:
+
+❌ We must NOT make it:
+Too aggressive (commands like “Do this now”)
+Too weak (vague suggestions like “Consider reviewing…”)
+✅ The correct direction:
+
+We are building:
+
+👉 “Recommended Actions” (Guided Actions)
+🧠 What this means in practice
+
+Each action must feel like:
+
+“This is what you should probably do next — based on the analysis”
+
+NOT:
+
+“The system is telling you what to do”
+
+🎯 EXACT REQUIREMENTS (VERY IMPORTANT)
+
+Each action MUST include:
+
+1.⁠ ⁠Clear and concrete wording
+
+❌ Avoid:
+“Verify scope”
+
+✅ Use:
+“Review all newly added tasks with the project manager before the next coordination meeting”
+
+👉 Actions must be specific and practical
+
+2.⁠ ⁠Add a WHY (mandatory)
+
+Every action must explain WHY it matters.
+
+Example:
+
+Action: Review newly added tasks with the project manager
+Why: New tasks may introduce hidden dependencies and coordination risks
+
+👉 This builds trust and understanding
+
+3.⁠ ⁠Add PRIORITY
+
+Each action must include:
+
+🔴 Critical
+🟠 Important
+🟢 Low
+4.⁠ ⁠Add ESTIMATED EFFORT
+
+Each action should include effort level:
+
+10–15 minutes
+1 hour
+Half day
+5.⁠ ⁠Add RESPONSIBLE ROLE
+
+Each action should indicate who should handle it:
+
+Project Manager
+Planner
+Site Manager
+Discipline Lead
+6.⁠ ⁠Tone (VERY IMPORTANT)
+
+All actions must be framed as:
+
+👉 Recommendations — NOT commands
+
+Use language like:
+
+“Recommended Action:”
+“We recommend reviewing…”
+“Based on the analysis…”
+🔥 KEY PRODUCT SHIFT
+
+We are moving from:
+
+👉 “AI Analysis”
+
+To:
+
+👉 “Decision Support / What to do next”
+
+💣 WHY THIS IS CRITICAL
+
+If we make actions too strong:
+👉 Users lose trust if it’s wrong
+
+If we make them too weak:
+👉 Users don’t see value
+
+🎯 SUCCESS CRITERIA
+
+When a user sees this section, they must feel:
+
+“I know exactly what I should do next — and why”
