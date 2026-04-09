@@ -477,31 +477,85 @@ def generate_executive_html(content: str, language: str = "en") -> str:
     if not content or not content.strip():
         return ""
 
-    title = "Handlingsplan" if language == "da" else "Executive Actions"
+    title = "Anbefalede Handlinger" if language == "da" else "Recommended Actions"
     icon = SVG_ICONS.get("executive", SVG_ICONS["default"])
     color = "#0d9488"
+
+    subtitle = "Baseret på analysen — de vigtigste næste skridt" if language == "da" else "Based on the analysis — your most important next steps"
 
     lines = content.split("\n")
     action_cards = []
     current_card = None
 
+    def _priority_label(dot_color):
+        if dot_color == "#ef4444":
+            return ("Critical", "Kritisk") if language != "da" else ("Kritisk", "Kritisk")
+        elif dot_color == "#f59e0b":
+            return ("Important", "Vigtig") if language != "da" else ("Vigtig", "Vigtig")
+        else:
+            return ("Low", "Lav") if language != "da" else ("Lav", "Lav")
+
     def flush_card():
         nonlocal current_card
         if current_card:
-            meta_html = ""
-            if current_card["meta"]:
-                meta_html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">' + "".join(current_card["meta"]) + '</div>'
             dot_color = current_card["color"]
             num = current_card["num"]
+            priority_text = _priority_label(dot_color)[0]
+
+            why_html = ""
+            if current_card.get("why"):
+                why_label = "Hvorfor" if language == "da" else "Why"
+                why_html = f'''<div style="margin:10px 0 0 0;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-radius:10px;border:1px solid #e2e8f0;">
+                  <div style="display:flex;align-items:flex-start;gap:8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10" stroke="#0d9488" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    <div><span style="font-size:10px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.5px;">{why_label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{current_card["why"]}</div></div>
+                  </div>
+                </div>'''
+
+            pills = []
+            pills.append(f'<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:{dot_color}10;border:1px solid {dot_color}25;border-radius:6px;font-size:11px;font-weight:700;color:{dot_color};text-transform:uppercase;letter-spacing:0.3px;"><span style="width:6px;height:6px;border-radius:50%;background:{dot_color};"></span>{priority_text}</span>')
+
+            if current_card.get("role"):
+                role_label = current_card["role"]
+                pills.append(f'''<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#6366f108;border:1px solid #6366f120;border-radius:6px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#6366f1" stroke-width="2.5"/><circle cx="12" cy="7" r="4" stroke="#6366f1" stroke-width="2.5"/></svg>
+                  <span style="font-size:11px;font-weight:600;color:#4f46e5;">{role_label}</span>
+                </span>''')
+
+            if current_card.get("effort"):
+                effort_label = current_card["effort"]
+                pills.append(f'''<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f59e0b08;border:1px solid #f59e0b20;border-radius:6px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#d97706" stroke-width="2"/><path d="M12 6v6l4 2" stroke="#d97706" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span style="font-size:11px;font-weight:600;color:#b45309;">{effort_label}</span>
+                </span>''')
+
+            pills_html = f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">{"".join(pills)}</div>'
+
+            related_html = ""
+            if current_card.get("related"):
+                ids_data = current_card["related"]
+                related_html = f'''<div style="display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:6px 10px;background:#8b5cf606;border-radius:6px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:3px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  <span style="font-size:11px;font-weight:500;color:#64748b;line-height:1.4;overflow-wrap:break-word;">{ids_data}</span>
+                </div>'''
+
+            body_html = "".join(current_card["body"]) if current_card["body"] else ""
+
             action_cards.append(f'''
-    <div style="margin:0 0 16px 0;padding:20px 24px;background:white;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04);position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:{dot_color};border-radius:4px 0 0 4px;"></div>
-      <div style="display:flex;align-items:flex-start;gap:14px;">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,{dot_color},{dot_color}cc);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;box-shadow:0 2px 8px {dot_color}40;">{num}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:15px;font-weight:700;color:#0f172a;line-height:1.5;margin-bottom:4px;">{current_card["title"]}</div>
-          {"".join(current_card["body"])}
-          {meta_html}
+    <div style="margin:0 0 14px 0;background:white;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04);overflow:hidden;">
+      <div style="display:flex;align-items:stretch;">
+        <div style="width:4px;background:{dot_color};flex-shrink:0;"></div>
+        <div style="flex:1;padding:18px 22px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,{dot_color},{dot_color}cc);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;box-shadow:0 2px 6px {dot_color}35;">{num}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;color:#0f172a;line-height:1.55;">{current_card["title"]}</div>
+              {body_html}
+              {why_html}
+              {pills_html}
+              {related_html}
+            </div>
+          </div>
         </div>
       </div>
     </div>''')
@@ -528,42 +582,46 @@ def generate_executive_html(content: str, language: str = "en") -> str:
             elif "🟢" in line:
                 dot = "🟢"
             dot_color = {"🔴": "#ef4444", "🟠": "#f59e0b", "🟢": "#10b981"}.get(dot, color)
-            current_card = {"num": num, "title": text, "color": dot_color, "body": [], "meta": []}
+            current_card = {"num": num, "title": text, "color": dot_color, "body": [], "why": "", "role": "", "effort": "", "related": ""}
             continue
 
         if current_card:
+            why_match = re.match(r'^(?:\*\*)?WHY(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if why_match:
+                current_card["why"] = escape_html(why_match.group(1).strip())
+                continue
+
+            role_match = re.match(r'^(?:\*\*)?ROLE(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if role_match:
+                current_card["role"] = escape_html(role_match.group(1).strip())
+                continue
+
+            effort_match = re.match(r'^(?:\*\*)?EFFORT(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if effort_match:
+                current_card["effort"] = escape_html(effort_match.group(1).strip())
+                continue
+
             who_match = re.match(r'^(?:\*\*)?WHO(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
             if who_match:
-                value = escape_html(who_match.group(1).strip())
-                current_card["meta"].append(f'''<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#6366f108,#6366f104);border:1px solid #6366f120;border-radius:8px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#6366f1" stroke-width="2.5"/><circle cx="12" cy="7" r="4" stroke="#6366f1" stroke-width="2.5"/></svg>
-                  <span style="font-size:12px;font-weight:600;color:#6366f1;">{value}</span>
-                </div>''')
+                current_card["role"] = escape_html(who_match.group(1).strip())
                 continue
 
             related_match = re.match(r'^(?:\*\*)?RELATED(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
             if related_match:
                 raw_ids = related_match.group(1).strip()
                 id_list = [x.strip() for x in re.split(r'[,;]\s*', raw_ids) if x.strip()]
-                if len(id_list) > 8:
-                    visible = escape_html(", ".join(id_list[:8]))
-                    rest_count = len(id_list) - 8
-                    ids_display = f'{visible} <span style="color:#8b5cf6;font-weight:600;">+{rest_count} more</span>'
+                if len(id_list) > 10:
+                    visible = escape_html(", ".join(id_list[:10]))
+                    rest_count = len(id_list) - 10
+                    current_card["related"] = f'{visible} <span style="color:#8b5cf6;font-weight:600;">+{rest_count} more</span>'
                 else:
-                    ids_display = escape_html(", ".join(id_list))
-                current_card["meta"].append(f'''<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#8b5cf608,#8b5cf604);border:1px solid #8b5cf620;border-radius:8px;max-width:100%;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/></svg>
-                  <span style="font-size:11px;font-weight:500;color:#64748b;line-height:1.4;overflow-wrap:break-word;word-break:break-all;">{ids_display}</span>
-                </div>''')
+                    current_card["related"] = escape_html(", ".join(id_list))
                 continue
 
             impact_match = re.match(r'^(?:↳\s*)?(?:\*\*)?IMPACT(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
             if impact_match:
-                value = escape_html(impact_match.group(1).strip())
-                current_card["meta"].append(f'''<div style="display:flex;align-items:flex-start;gap:6px;padding:5px 12px;background:linear-gradient(135deg,#ef444408,#ef444404);border:1px solid #ef444420;border-radius:8px;width:100%;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:2px;"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <span style="font-size:12px;font-weight:500;color:#64748b;line-height:1.5;">{value}</span>
-                </div>''')
+                if not current_card["why"]:
+                    current_card["why"] = escape_html(impact_match.group(1).strip())
                 continue
 
             text = _inline_markdown(line)
@@ -578,6 +636,9 @@ def generate_executive_html(content: str, language: str = "en") -> str:
     return f'''
 <div class="executive-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#f0fdfa,#f8fffe,#ffffff);border-radius:16px;border:1px solid rgba(13,148,136,0.15);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
   {_render_section_header(title, icon, color)}
+  <div style="margin:-8px 0 18px 0;padding:8px 14px;background:#f0fdfa;border-radius:8px;border:1px solid #ccfbf1;">
+    <span style="font-size:13px;color:#0f766e;font-style:italic;">{subtitle}</span>
+  </div>
   {"".join(action_cards)}
 </div>'''
 

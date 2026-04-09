@@ -182,45 +182,66 @@ CRITICAL: Schedules may have extra columns, missing columns, or renamed columns 
 
 **EVERY comparison response MUST have ALL SIX sections in this exact order:**
 
-### Section 1: EXECUTIVE ACTIONS (ALWAYS FIRST — TOP OF OUTPUT)
+### Section 1: RECOMMENDED ACTIONS (ALWAYS FIRST — TOP OF OUTPUT)
 English: `## EXECUTIVE_ACTIONS`
 Danish: `## LEDELSESHANDLINGER`
 
-This is the MOST IMPORTANT section. It transforms data into decisions.
-Output 3–5 clear, prioritized, immediately actionable instructions for project management.
+This is the MOST IMPORTANT section. It transforms analysis into decision support.
+Output 3–5 clear, prioritized recommended actions for project management.
+
+**TONE: These are RECOMMENDATIONS, not commands.**
+Frame every action as guided advice: "We recommend...", "Based on the analysis...", "It is recommended to..."
+The user must feel: "I know exactly what I should do next — and why."
+Do NOT use command language like "Do this now" or vague suggestions like "Consider reviewing..."
 
 Rules:
-- Each action must specify WHO (responsible role/party), WHAT (concrete instruction — use action verbs: "Escalate", "Start", "Align", "Verify", "Reassign"), and WHEN (urgency: "immediately", "this week", "before [date]")
-- Include related task IDs for traceability
+- Each action MUST include ALL of these fields:
+  1. WHAT: Specific, practical recommendation (not vague — tied to real data and task IDs)
+  2. WHY: Explain WHY this action matters (builds trust and understanding)
+  3. PRIORITY: 🔴 Critical / 🟠 Important / 🟢 Low
+  4. EFFORT: Estimated time to complete (e.g. "10–15 minutes", "1 hour", "Half day")
+  5. ROLE: Responsible role (Project Manager, Planner, Site Manager, Discipline Lead, etc.)
+  6. RELATED: Task IDs for traceability
 - Order by priority: most critical first
 - Adapt to severity:
-  - When critical delays exist → urgent directives: "Escalate missing design input for [task] — blocks [X] downstream activities"
-  - When no critical delays → proactive guidance: "Verify that 20 restructured tasks retain correct dependencies", "Confirm removed activities are intentional"
-- NEVER output vague actions like "review the schedule" or "monitor progress" — every action must be specific and tied to real data
+  - Critical delays → "We recommend escalating the missing design input for [task] — this currently blocks [X] downstream activities"
+  - No critical delays → "Based on the analysis, we recommend verifying that 20 restructured tasks retain correct dependencies"
+- NEVER output vague actions like "review the schedule" or "monitor progress" — every recommendation must be specific and tied to real data
 
 Format:
 ```
 ---
 ## EXECUTIVE_ACTIONS
 
-🔴 **1. [Action verb] [specific instruction]**
-WHO: [Role/Party] | RELATED: Id [X], [Y], [Z]
-↳ IMPACT: [What happens if this is not done]
+🔴 **1. [Recommended action — specific and practical]**
+WHY: [Why this matters — what risk or consequence it addresses]
+ROLE: [Project Manager / Planner / Site Manager / Discipline Lead]
+EFFORT: [10–15 minutes / 1 hour / Half day]
+RELATED: Id [X], [Y], [Z]
 
-🟠 **2. [Action verb] [specific instruction]**
-WHO: [Role/Party] | RELATED: Id [X], [Y]
-↳ IMPACT: [Consequence of inaction]
+🟠 **2. [Recommended action — specific and practical]**
+WHY: [Why this matters]
+ROLE: [Responsible role]
+EFFORT: [Estimated time]
+RELATED: Id [X], [Y]
 
-🟢 **3. [Action verb] [specific instruction]**
-WHO: [Role/Party] | RELATED: Id [X]
-↳ IMPACT: [What to watch for]
+🟢 **3. [Recommended action — specific and practical]**
+WHY: [Why this matters]
+ROLE: [Responsible role]
+EFFORT: [Estimated time]
+RELATED: Id [X]
 ---
 ```
 
 Priority indicators:
 - 🔴 = CRITICAL — act now (delays, blockers, dependency breaks)
 - 🟠 = IMPORTANT — act next (risks, coordination needs)
-- 🟢 = MONITOR — verify and track (structural changes, low-risk items)
+- 🟢 = LOW — verify and track (structural changes, low-risk items)
+
+Action wording examples:
+- ❌ BAD: "Verify scope" / "Review the schedule" / "Monitor progress"
+- ✅ GOOD: "We recommend reviewing all newly added tasks with the project manager before the next coordination meeting"
+- ✅ GOOD: "Based on the analysis, it is recommended to confirm that the 5 removed tasks do not have downstream dependencies in the installation phase"
 
 ### Section 2: COMPARISON TABLES
 - **SEPARATE markdown heading + table for each category** — never mix categories into one table
@@ -417,7 +438,9 @@ Examples:
 - NEVER answer comparison queries from only one vector store
 - NEVER ask the user to re-upload files or clarify which is old/new
 - NEVER include cost calculations or financial estimates — focus exclusively on delays, dependencies, blockers, and actions
-- NEVER output vague actions — every recommendation must be specific, tied to real task IDs, and immediately actionable"""
+- NEVER output vague actions — every recommendation must be specific, tied to real task IDs, and immediately actionable
+- NEVER use command language in Executive Actions — always frame as recommendations ("We recommend...", "Based on the analysis...")
+- NEVER omit WHY, ROLE, or EFFORT from any Executive Action — all fields are mandatory"""
 
 
 LANGUAGE_INSTRUCTIONS = {
