@@ -1,0 +1,20 @@
+Let me check the latest message to see if the mismatch (25 in table vs 50 in stat cards) comes from the Azure response itself or from our frontend.
+
+Show less
+
+Ran cd
+$ cd Nova-Insights-Backend && python3 -c " import psycopg2, os conn = psycopg2.connect(os.environ['DATABASE_URL']) cur = conn.cursor() cur.execute('SELECT id, session_id, content_type, is_html, length(content), sender_type, created_at FROM chat_messages ORDER BY id DESC LIMIT 5') for r in cur.fetchall(): print(f'Msg {r[0]}: session={r[1]} type={r[2]} is_html={r[3]} len={r[4]} sender={r[5]} at={r[6]}') conn.close() " 2>&1
+
+
+Ran cd
+$ cd Nova-Insights-Backend && python3 -c " import psycopg2, os from bs4 import BeautifulSoup import re conn = psycopg2.connect(os.environ['DATABASE_URL']) cur = conn.cursor() cur.execute('SELECT content FROM chat_messages WHERE id = 458') content = cur.fetchone()[0] conn.close() soup = BeautifulSoup(content, 'html.parser') # 1. Check comparison-results tables comp_div = soup.find('div', class_='comparison-results') if comp_div: cats = comp_div.find_all('div', class_='category-section') print(f'=== COMPARISON RESULTS ===') print(f'Category sections: {len(cats)}') total_rows = 0 for i, cat in enumerate(cats): heading_div = cat.find('div', style=re.compile(r'display:\s*flex.*align-items:\s*center')) heading = heading_div.get_text(strip=True) if heading_div else 'NONE' table = cat.find('table') if table: ths = table.find_all('th') headers = [th.get_text(strip=True) for th in ths] tbody = table.find('tbody') or table rows = tbody.find_all('tr') placeholder_count = 0 for tr in rows: tds = tr.find_all('td') cells = [td.get_text(strip=True) for td in tds] if all(c in ('...', '…', '') for c in cells): placeholder_count += 1 real_rows = len(rows) - placeholder_count total_rows += real_rows print(f' Cat {i}: {heading[:60]} -> {len(headers)} headers, {len(rows)} rows ({placeholder_count} placeholder), {real_rows} real') else: print(f' Cat {i}: {heading[:60]} -> NO TABLE') print(f' TOTAL real rows in tables: {total_rows}') # 2. Check stat cards in health section print() health = soup.find('div', class_='health-section') if health: stat_divs = health.find_all('div', style=lambda x: x and 'text-align' in str(x) and 'center' in str(x)) print(f'=== HEALTH STAT CARDS ===') for s in stat_divs: print(f' {s.get_text(strip=True)}') # 3. Check the comparison header print() if comp_div: p_tag = comp_div.find('p') if p_tag: print(f'=== COMPARISON HEADER P ===') print(f' {p_tag.get_text(strip=True)}') # 4. Check summary section for counts print() summary = soup.find('div', class_='summary-section') if summary: print(f'=== SUMMARY SECTION (first 500 chars) ===') print(summary.get_text(separator='\\n', strip=True)[:500]) " 2>&1
+
+The mismatch is from the Azure agent's response itself, not our frontend. Here's what the Azure response contains:
+
+Table data: Only 25 rows in the actual HTML table (Added Tasks)
+Stat card: Says 50 Added
+Summary text: Says "50+ new activities added"
+Comparison header: Says "25 tasks analyzed"
+So the Azure agent found ~50 added tasks in the documents but could only fit 25 in the actual table due to its output token limit. The stat cards and summary reflect the full analysis (50), while the table only contains 25 rows of detailed data.
+
+This is entirely from the Azure agent side — our frontend is displaying exactly what it sends. The table correctly shows the 25 rows it received, and the summary/stat cards faithfully show the "50" value the agent reported.
