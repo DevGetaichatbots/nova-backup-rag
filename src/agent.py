@@ -261,10 +261,11 @@ Action wording examples:
 - Add a **Priority** column to Delayed Tasks and Modified Tasks tables: 🔴 CRITICAL / 🟠 IMPORTANT / 🟢 MONITOR
 
 **TABLE SIZE RULES (CRITICAL):**
-- Output ALL rows for every category. Never truncate with "..." or "etc." or "[See note below]"
-- If a category has more than 80 tasks: output the first 80 rows in the table, then IMMEDIATELY after the table write: "**Showing 80 of [X] total [category] tasks. Remaining task IDs: [list all remaining IDs as comma-separated values].**"
+- Output EVERY SINGLE ROW for every category — no matter if it's 10, 50, 200, or 500 rows. ALL data must appear in the table.
+- NEVER truncate, abbreviate, summarize, or skip ANY rows. The user needs the complete picture.
 - NEVER use `| ... | ... | ... |` as a table row — every row must contain real data
-- NEVER add notes like "Table truncated for readability" — output the data
+- NEVER add notes like "Table truncated for readability" or "Showing X of Y" — output ALL the data
+- NEVER skip rows to save space. If there are 202 added tasks, all 202 MUST appear as table rows.
 
 **EXACT FORMAT REQUIRED (each category gets its own heading + table):**
 
