@@ -867,9 +867,33 @@ def generate_impact_html(content: str, language: str = "en") -> str:
 </div>'''
 
 
-def generate_summary_html(summary_content: str, language: str = "en") -> str:
+def _fix_summary_counts(text: str, actual_counts: Dict[str, int]) -> str:
+    count_map = {
+        "added": ["added", "new activities added", "new activities", "tilføjede", "nye aktiviteter"],
+        "removed": ["removed", "activities removed", "activities dropped", "fjernede", "aktiviteter fjernet"],
+        "delayed": ["delayed", "activities delayed", "forsinkede"],
+        "accelerated": ["accelerated", "activities accelerated", "fremskyndede"],
+        "moved": ["modified", "activities modified", "ændrede"],
+    }
+    for cat_key, keywords in count_map.items():
+        if cat_key not in actual_counts:
+            continue
+        real_count = actual_counts[cat_key]
+        for kw in keywords:
+            text = re.sub(
+                rf'(\d+\+?\s*(?:activities?\s+)?{re.escape(kw)})',
+                lambda m, rc=real_count, k=kw: re.sub(r'\d+\+?', str(rc), m.group(0), count=1),
+                text, flags=re.IGNORECASE
+            )
+    return text
+
+
+def generate_summary_html(summary_content: str, language: str = "en", actual_counts: Dict[str, int] = None) -> str:
     if not summary_content or not summary_content.strip():
         return ""
+
+    if actual_counts:
+        summary_content = _fix_summary_counts(summary_content, actual_counts)
 
     title = "Opsummering af Ændringer" if language == "da" else "Summary of Changes"
     icon = SVG_ICONS["summary"]
@@ -948,9 +972,12 @@ def generate_summary_html(summary_content: str, language: str = "en") -> str:
 </div>'''
 
 
-def generate_health_html(health_content: str, health_data: Optional[Dict], language: str = "en") -> str:
+def generate_health_html(health_content: str, health_data: Optional[Dict], language: str = "en", actual_counts: Dict[str, int] = None) -> str:
     if not health_content or not health_content.strip():
         return ""
+
+    if actual_counts:
+        health_content = _fix_summary_counts(health_content, actual_counts)
 
     status = "stable"
     if health_data and health_data.get("status"):
@@ -1088,6 +1115,14 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
 </div>'''
 
 
+def _count_actual_table_rows(tables_section: str) -> Dict[str, int]:
+    sections = parse_tables_by_section(tables_section)
+    counts = {}
+    for cat, data in sections.items():
+        counts[cat] = len(data.get("rows", []))
+    return counts
+
+
 def format_response_as_html(markdown: str, language: str = "en") -> str:
     try:
         return _format_response_internal(markdown, language)
@@ -1101,12 +1136,24 @@ def format_response_as_html(markdown: str, language: str = "en") -> str:
 def _format_response_internal(markdown: str, language: str) -> str:
     parsed = parse_structured_response(markdown)
 
+    actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
+
     executive_html = generate_executive_html(parsed["executive_section"], language)
     table_html = generate_table_html(parsed["tables_section"], language)
     root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
     impact_html = generate_impact_html(parsed["impact_section"], language)
-    summary_html = generate_summary_html(parsed["summary_section"], language)
-    health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language)
+    summary_html = generate_summary_html(parsed["summary_section"], language, actual_counts)
+
+    if parsed["health_data"]:
+        health_data = dict(parsed["health_data"])
+        for hd_key, cat_key in [("added_count", "added"), ("removed_count", "removed"),
+                                 ("delayed_count", "delayed"), ("accelerated_count", "accelerated"),
+                                 ("modified_count", "moved")]:
+            if cat_key in actual_counts:
+                health_data[hd_key] = actual_counts[cat_key]
+        parsed["health_data"] = health_data
+
+    health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language, actual_counts)
 
     styles = '''
 <style>
