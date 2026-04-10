@@ -133,7 +133,7 @@ from src.vector_store import vector_store_manager
 from src.agent import rag_agent
 from src.predictive_agent import predictive_agent
 from src.database import init_pgvector_extension, create_chat_memory_table, save_session_metadata, get_session_metadata
-from src.html_formatter import format_response_as_html, format_conversational_html
+from src.html_formatter import format_response_as_html
 from src.predictive_html_formatter import format_predictive_as_html
 from src.pdf_processor import process_pdf_binary, rows_to_compact_csv_chunks
 
@@ -375,8 +375,8 @@ async def query_agent(
             logger.info(f"Converting to HTML format...")
             response_text = format_response_as_html(response_text, language)
         elif format == "html" and not is_comparison:
-            logger.info(f"Conversational response - formatting as HTML...")
-            response_text = format_conversational_html(response_text, language)
+            logger.info(f"Conversational response - wrapping in simple HTML...")
+            response_text = f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px; color: #0f172a; line-height: 1.6; font-size: 15px;">{response_text}</div>'
         
         logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")
