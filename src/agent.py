@@ -779,7 +779,7 @@ Keep your response concise and helpful."""
                 temperature=0,
                 top_p=0.1,
                 seed=42,
-                max_tokens=65536
+                max_tokens=32768
             )
         except Exception as e:
             error_str = str(e)
@@ -824,7 +824,7 @@ Keep your response concise and helpful."""
                     temperature=0,
                     top_p=0.1,
                     seed=42,
-                    max_tokens=65536
+                    max_tokens=32768
                 )
             else:
                 raise
