@@ -1021,7 +1021,13 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         for key, m_color, m_label in metric_items:
             val = health_data.get(key)
             if val is not None:
-                metrics.append(f'<div style="text-align:center;padding:14px 10px;background:white;border-radius:10px;border:1px solid {m_color}20;"><div style="font-size:24px;font-weight:800;color:{m_color};">{val}</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px;font-weight:600;">{m_label}</div></div>')
+                if isinstance(val, int):
+                    display_val = str(val)
+                elif isinstance(val, str) and val.isdigit():
+                    display_val = val
+                else:
+                    continue
+                metrics.append(f'<div style="text-align:center;padding:14px 10px;background:white;border-radius:10px;border:1px solid {m_color}20;"><div style="font-size:24px;font-weight:800;color:{m_color};">{display_val}</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px;font-weight:600;">{m_label}</div></div>')
 
         if metrics:
             metrics_html = f'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid {color}15;">{"".join(metrics)}</div>'

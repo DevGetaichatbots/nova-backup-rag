@@ -415,6 +415,8 @@ Status thresholds:
 [1-2 sentence summary — must include a specific actionable recommendation, never just "stable" or "healthy"]
 
 <!--HEALTH_DATA:{"status":"stable|attention|high_risk","added_count":X,"removed_count":X,"delayed_count":X,"delayed_days_total":X,"accelerated_count":X,"accelerated_days_total":X,"modified_count":X,"critical_path_affected":true|false,"tasks_affected_percent":X,"impact_score":X}-->
+
+CRITICAL: ALL count values (added_count, removed_count, delayed_count, etc.) MUST be integers. Count the actual rows. NEVER use words like "many", "several", or "unknown". If you cannot determine the exact count, estimate by counting the rows in the data. Same applies to [X] placeholders in the text — always replace with actual numbers.
 ---
 ```
 
@@ -440,7 +442,9 @@ Examples:
 - NEVER include cost calculations or financial estimates — focus exclusively on delays, dependencies, blockers, and actions
 - NEVER output vague actions — every recommendation must be specific, tied to real task IDs, and immediately actionable
 - NEVER use command language in Executive Actions — always frame as recommendations ("We recommend...", "Based on the analysis...")
-- NEVER omit WHY, ROLE, or EFFORT from any Executive Action — all fields are mandatory"""
+- NEVER omit WHY, ROLE, or EFFORT from any Executive Action — all fields are mandatory
+- NEVER use words like "many", "several", "[Many]", or "unknown" for counts — ALWAYS use actual integers by counting the data rows
+- NEVER truncate tables with "..." or "[See note below]" — output ALL rows or state the exact count"""
 
 
 LANGUAGE_INSTRUCTIONS = {
