@@ -45,7 +45,7 @@ CATEGORY_ORDER = ["removed", "added", "delayed", "accelerated", "moved", "critic
 
 
 SECTION_PATTERNS = {
-    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*Executive\s+Actions", r"^##\s*HANDLINGSPLAN", r"^##\s*Handlingsplan"],
+    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*Executive\s+Actions", r"^##\s*HANDLINGSPLAN", r"^##\s*Handlingsplan", r"^##\s*LEDELSESHANDLINGER", r"^##\s*Ledelseshandlinger"],
     "root_cause": [r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*Root\s+Cause\s+Analysis", r"^##\s*ÅRSAGSANALYSE", r"^##\s*Årsagsanalyse"],
     "impact": [r"^##\s*IMPACT_ASSESSMENT", r"^##\s*Impact\s+Assessment", r"^##\s*KONSEKVENSVURDERING", r"^##\s*Konsekvensvurdering"],
     "summary": [r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*Summary\s+of\s+Changes", r"^##\s*OPSUMMERING_AF_ÆNDRINGER", r"^##\s*Opsummering\s+af\s+Ændringer"],
@@ -98,7 +98,7 @@ def parse_structured_response(markdown: str) -> Dict:
         exec_section = sections["executive"]
 
         table_start_in_exec = -1
-        for table_pattern in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Forsink|Fremskynd|Tilføj|Fjern|Ændr)",
+        for table_pattern in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Critical|Risks|Forsink|Fremskynd|Tilføj|Fjern|Ændr|Kritisk|Risici)",
                               r"^\|.*\|.*\|"]:
             tm = re.search(table_pattern, exec_section, re.MULTILINE | re.IGNORECASE)
             if tm:
@@ -115,15 +115,26 @@ def parse_structured_response(markdown: str) -> Dict:
 
     if "root_cause" in sections and not tables_part:
         rc_start = found.get("root_cause", len(markdown))
-        tables_between = markdown[first_section_start:rc_start].strip() if first_section_start < rc_start else ""
+        tables_between = ""
         if "executive" in sections:
             exec_end_pos = found["executive"]
+            next_section_pos = None
             for key, pos in boundaries:
                 if key != "executive" and pos > exec_end_pos:
-                    tables_between = markdown[exec_end_pos:pos].strip()
-                    exec_section_text = sections["executive"]
-                    tables_between = tables_between[len(exec_section_text):].strip() if tables_between.startswith(exec_section_text[:20]) else tables_between
+                    next_section_pos = pos
                     break
+            if next_section_pos and next_section_pos > exec_end_pos:
+                exec_section_text = sections["executive"]
+                full_exec_block = markdown[exec_end_pos:next_section_pos]
+                header_end = full_exec_block.find("\n")
+                if header_end > 0:
+                    after_header = full_exec_block[header_end:].strip()
+                    if len(after_header) > len(exec_section_text):
+                        tables_between = after_header[len(exec_section_text):].strip()
+        elif first_section_start < rc_start:
+            tables_between = markdown[first_section_start:rc_start].strip()
+        if tables_between:
+            tables_part = tables_between
 
     result = {
         "executive_section": sections.get("executive", ""),
@@ -206,6 +217,17 @@ def parse_tables_by_section(markdown: str) -> Dict[str, Dict]:
             current_headers = []
             continue
 
+        showing_match = re.match(r"^[\*]*Showing\s+\d+\s+of\s+(\d+)", stripped, re.IGNORECASE)
+        if showing_match and current_category and current_category in sections:
+            sections[current_category]["overflow_note"] = stripped.strip("*").strip()
+            continue
+
+        remaining_match = re.match(r"^[\*]*Remaining\s+task\s+IDs?:", stripped, re.IGNORECASE)
+        if remaining_match and current_category and current_category in sections:
+            existing = sections[current_category].get("overflow_note", "")
+            sections[current_category]["overflow_note"] = (existing + " " + stripped.strip("*").strip()).strip()
+            continue
+
         bold_heading = re.match(r"^\*\*([^*]+)\*\*\s*$", stripped)
         if bold_heading and "|" not in stripped:
             heading_text = bold_heading.group(1).strip().rstrip(":")
@@ -217,12 +239,17 @@ def parse_tables_by_section(markdown: str) -> Dict[str, Dict]:
             continue
 
         if not stripped.startswith("|") or not stripped.endswith("|"):
+            if re.match(r"^\*?Note:", stripped, re.IGNORECASE) or "truncated" in stripped.lower():
+                continue
             continue
 
         if re.match(r"^\|[\s\-:|]+\|$", stripped):
             continue
 
         cells = [c.strip() for c in stripped.strip("|").split("|")]
+
+        if all(c in ("...", "…", "") for c in cells):
+            continue
 
         if current_category is None:
             cat = detect_category(" ".join(cells))
@@ -294,7 +321,7 @@ def _render_cell(cell: str, header_name: str, is_first: bool, accent_color: str)
     return f'<span style="color:#475569;font-size:14px;line-height:1.5;">{escape_html(cell or "—")}</span>'
 
 
-def _build_section_card(category: str, headers: List[str], rows: List[List[str]], language: str, table_id_suffix: str) -> str:
+def _build_section_card(category: str, headers: List[str], rows: List[List[str]], language: str, table_id_suffix: str, overflow_note: str = None) -> str:
     if not rows:
         return ""
 
@@ -348,7 +375,15 @@ def _build_section_card(category: str, headers: List[str], rows: List[List[str]]
     parts.append('''
       </tbody>
     </table>
-  </div>
+  </div>''')
+
+    if overflow_note:
+        parts.append(f'''
+  <div style="padding:12px 20px;background:#f0fdfa;border-top:1px solid #ccfbf1;font-size:13px;color:#0d9488;font-weight:500;">
+    {escape_html(overflow_note)}
+  </div>''')
+
+    parts.append('''
 </div>''')
 
     return "".join(parts)
@@ -435,7 +470,7 @@ def generate_table_html(tables_section: str, language: str = "en") -> str:
             continue
         sec = sections[cat]
         if sec["rows"]:
-            parts.append(_build_section_card(cat, sec["headers"], sec["rows"], language, table_id))
+            parts.append(_build_section_card(cat, sec["headers"], sec["rows"], language, table_id, overflow_note=sec.get("overflow_note")))
         else:
             parts.append(_build_empty_category_note(cat, language))
 

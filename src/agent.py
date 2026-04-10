@@ -194,42 +194,50 @@ Frame every action as guided advice: "We recommend...", "Based on the analysis..
 The user must feel: "I know exactly what I should do next — and why."
 Do NOT use command language like "Do this now" or vague suggestions like "Consider reviewing..."
 
+**CRITICAL ACTION QUALITY RULES:**
+- Each action MUST be about something that ACTUALLY EXISTS in the data. NEVER create actions about zero-count categories (e.g., if 0 tasks are removed, do NOT write "confirm that 0 removed tasks are intentional" — that is nonsensical)
+- NEVER write actions about "monitoring future updates" or "watching for future delays" — these are vague and useless
+- The action TITLE must be concise (1-2 sentences max). NEVER dump lists of 20+ task IDs into the title text. Put IDs in the RELATED field only.
+- RELATED must contain actual task IDs (pick the top 5-10 most important ones). NEVER write "N/A", "as above", "see table", or "Ids as listed above"
+- If the data shows only structural changes (many additions, no delays), focus actions on the SPECIFIC risks those additions create (e.g., dependency validation for specific high-risk tasks, not generic "review all 200 tasks")
+- Each action must answer: "If the PM does only ONE thing tomorrow, what should it be?"
+
 Rules:
 - Each action MUST include ALL of these fields:
-  1. WHAT: Specific, practical recommendation (not vague — tied to real data and task IDs)
+  1. WHAT: Specific, practical recommendation (concise title — 1-2 sentences max)
   2. WHY: Explain WHY this action matters (builds trust and understanding)
   3. PRIORITY: 🔴 Critical / 🟠 Important / 🟢 Low
   4. EFFORT: Estimated time to complete (e.g. "10–15 minutes", "1 hour", "Half day")
   5. ROLE: Responsible role (Project Manager, Planner, Site Manager, Discipline Lead, etc.)
-  6. RELATED: Task IDs for traceability
+  6. RELATED: Top 5-10 most relevant task IDs for traceability
 - Order by priority: most critical first
 - Adapt to severity:
-  - Critical delays → "We recommend escalating the missing design input for [task] — this currently blocks [X] downstream activities"
-  - No critical delays → "Based on the analysis, we recommend verifying that 20 restructured tasks retain correct dependencies"
-- NEVER output vague actions like "review the schedule" or "monitor progress" — every recommendation must be specific and tied to real data
+  - Critical delays → "We recommend escalating the missing design input for task Id 465 — this currently blocks 3 downstream installation activities"
+  - No critical delays but many additions → "We recommend validating dependencies for the 12 newly added coordination tasks (Ids 461-472) before the next planning session"
+  - No changes at all → Still provide value: "Based on the comparison, both schedules are aligned. We recommend confirming this with the project team and archiving this baseline."
 
 Format:
 ```
 ---
 ## EXECUTIVE_ACTIONS
 
-🔴 **1. [Recommended action — specific and practical]**
+🔴 **1. [Concise recommended action — 1-2 sentences max]**
 WHY: [Why this matters — what risk or consequence it addresses]
 ROLE: [Project Manager / Planner / Site Manager / Discipline Lead]
 EFFORT: [10–15 minutes / 1 hour / Half day]
-RELATED: Id [X], [Y], [Z]
+RELATED: Id 461, 462, 463, 464, 465
 
-🟠 **2. [Recommended action — specific and practical]**
+🟠 **2. [Concise recommended action]**
 WHY: [Why this matters]
 ROLE: [Responsible role]
 EFFORT: [Estimated time]
-RELATED: Id [X], [Y]
+RELATED: Id 25, 26, 27, 28, 29
 
-🟢 **3. [Recommended action — specific and practical]**
+🟢 **3. [Concise recommended action]**
 WHY: [Why this matters]
 ROLE: [Responsible role]
 EFFORT: [Estimated time]
-RELATED: Id [X]
+RELATED: Id 1, 14, 15
 ---
 ```
 
@@ -239,9 +247,10 @@ Priority indicators:
 - 🟢 = LOW — verify and track (structural changes, low-risk items)
 
 Action wording examples:
-- ❌ BAD: "Verify scope" / "Review the schedule" / "Monitor progress"
-- ✅ GOOD: "We recommend reviewing all newly added tasks with the project manager before the next coordination meeting"
-- ✅ GOOD: "Based on the analysis, it is recommended to confirm that the 5 removed tasks do not have downstream dependencies in the installation phase"
+- ❌ BAD: "Verify scope" / "Review the schedule" / "Monitor progress" / "Confirm that 0 removed tasks are intentional"
+- ❌ BAD: "We recommend a detailed review of all 202 added tasks (e.g., Ids 25, 26, 27, 29, 30, 34, 35, 36, 37, 38, ...)" (too many IDs in title)
+- ✅ GOOD: "We recommend validating dependencies for the 12 newly added coordination tasks before the next planning session"
+- ✅ GOOD: "Based on the analysis, we recommend the planner cross-checks the 5 highest-risk added tasks (production and procurement) for missing predecessors"
 
 ### Section 2: COMPARISON TABLES
 - **SEPARATE markdown heading + table for each category** — never mix categories into one table
@@ -250,6 +259,12 @@ Action wording examples:
 - Each category MUST have its own `### Category Name` heading followed by its own table
 - If a category has zero matching tasks, output the heading with text "No [category] tasks found in the retrieved data" — do NOT skip the heading
 - Add a **Priority** column to Delayed Tasks and Modified Tasks tables: 🔴 CRITICAL / 🟠 IMPORTANT / 🟢 MONITOR
+
+**TABLE SIZE RULES (CRITICAL):**
+- Output ALL rows for every category. Never truncate with "..." or "etc." or "[See note below]"
+- If a category has more than 80 tasks: output the first 80 rows in the table, then IMMEDIATELY after the table write: "**Showing 80 of [X] total [category] tasks. Remaining task IDs: [list all remaining IDs as comma-separated values].**"
+- NEVER use `| ... | ... | ... |` as a table row — every row must contain real data
+- NEVER add notes like "Table truncated for readability" — output the data
 
 **EXACT FORMAT REQUIRED (each category gets its own heading + table):**
 
@@ -300,9 +315,11 @@ Categorize WHY changes/delays are occurring. Group causes into these categories:
 - **Structural/Administrative** — schedule reorganization, task renumbering, grouping changes
 
 For each cause, explain:
-- Which tasks are affected (list task IDs)
+- Which tasks are affected (list actual task IDs, max 10 per cause — pick the most important)
 - Whether adding manpower would help (critical differentiator)
 - What the actual fix requires
+
+IMPORTANT: Even when no delays exist, this section must be SUBSTANTIVE. Analyze the root causes of whatever changes WERE detected (additions, removals, modifications). Categorize WHY the schedule changed, not just that it did.
 
 Format:
 ```
@@ -346,8 +363,21 @@ Format:
 ---
 ```
 
-If no CRITICAL or IMPORTANT findings exist, still output the section with:
-"No critical or high-priority impacts identified. All changes are structural or low-risk. Continue monitoring."
+If no CRITICAL or IMPORTANT delay/blocker findings exist, still output a SUBSTANTIVE section. Do NOT write a one-line dismissal. Instead, analyze the structural changes:
+- What areas/disciplines do the added/modified tasks belong to?
+- Do any added tasks create new dependency chains that could become bottlenecks?
+- Are there phases (design, procurement, installation) that now have significantly more tasks?
+- What is the overall risk profile of the changes?
+Example for no-delay scenarios:
+```
+## IMPACT_ASSESSMENT
+
+### Structural Impact: 202 New Tasks Added
+**Scope expansion areas:** Coordination tasks (Ids 461-472), procurement activities (Ids 509-530), and installation phase tasks (Ids 631-655)
+**Dependency risk:** 12 new coordination tasks lack predecessor definitions — these could become scheduling gaps if not validated
+**Phase loading:** Installation phase increased from 45 to 78 tasks — monitor for resource conflicts during weeks 12-16
+**Overall risk:** Low-to-moderate. No immediate delays, but the volume of additions requires dependency validation to prevent future blockers.
+```
 
 ### Section 5: SUMMARY OF CHANGES (exact header required)
 English: `## SUMMARY_OF_CHANGES`
@@ -444,7 +474,14 @@ Examples:
 - NEVER use command language in Executive Actions — always frame as recommendations ("We recommend...", "Based on the analysis...")
 - NEVER omit WHY, ROLE, or EFFORT from any Executive Action — all fields are mandatory
 - NEVER use words like "many", "several", "[Many]", or "unknown" for counts — ALWAYS use actual integers by counting the data rows
-- NEVER truncate tables with "..." or "[See note below]" — output ALL rows or state the exact count"""
+- NEVER truncate tables with "..." or "[See note below]" — output all rows (up to 80 per category, then list remaining IDs)
+- NEVER use `| ... | ... |` as a table row — every table row must have real data
+- NEVER create Executive Actions about zero-count categories (e.g., "confirm 0 removed tasks" is nonsensical — skip it)
+- NEVER dump 20+ task IDs into an action title — keep titles concise, put IDs in RELATED field only (max 10 IDs)
+- NEVER write "N/A", "as above", "see table" in RELATED — always list actual task IDs
+- NEVER write actions about "monitoring future updates" or "watching for future changes" — every action must address something found NOW
+- ALWAYS use underscore section headers: EXECUTIVE_ACTIONS, ROOT_CAUSE_ANALYSIS, IMPACT_ASSESSMENT, SUMMARY_OF_CHANGES, PROJECT_HEALTH — never space-separated headers like "ROOT CAUSE ANALYSIS"
+- ALWAYS output complete data for Root Cause Analysis and Impact Assessment sections — never one-line dismissals. Even if no delays exist, explain the structural findings in detail (which task groups were added, what areas they affect, dependency status)"""
 
 
 LANGUAGE_INSTRUCTIONS = {
