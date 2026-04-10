@@ -475,7 +475,7 @@ Examples:
 - NEVER use command language in Executive Actions — always frame as recommendations ("We recommend...", "Based on the analysis...")
 - NEVER omit WHY, ROLE, or EFFORT from any Executive Action — all fields are mandatory
 - NEVER use words like "many", "several", "[Many]", or "unknown" for counts — ALWAYS use actual integers by counting the data rows
-- NEVER truncate tables with "..." or "[See note below]" — output all rows (up to 80 per category, then list remaining IDs)
+- NEVER truncate tables with "...", "[See note below]", "Showing X of Y", or "Table truncated" — output ALL rows completely
 - NEVER use `| ... | ... |` as a table row — every table row must have real data
 - NEVER create Executive Actions about zero-count categories (e.g., "confirm 0 removed tasks" is nonsensical — skip it)
 - NEVER dump 20+ task IDs into an action title — keep titles concise, put IDs in RELATED field only (max 10 IDs)
@@ -779,7 +779,7 @@ Keep your response concise and helpful."""
                 temperature=0,
                 top_p=0.1,
                 seed=42,
-                max_tokens=32768
+                max_tokens=65536
             )
         except Exception as e:
             error_str = str(e)
@@ -824,7 +824,7 @@ Keep your response concise and helpful."""
                     temperature=0,
                     top_p=0.1,
                     seed=42,
-                    max_tokens=32768
+                    max_tokens=65536
                 )
             else:
                 raise
