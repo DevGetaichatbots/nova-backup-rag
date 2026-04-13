@@ -1007,7 +1007,7 @@ def generate_impact_html(content: str, language: str = "en") -> str:
 </div>'''
 
 
-def _fix_summary_counts(text: str, actual_counts: Dict[str, int]) -> str:
+def _fix_summary_counts(text: str, actual_counts: Dict[str, int], total_data_rows: int = 0) -> str:
     count_map = {
         "added": ["added", "new activities added", "new activities", "tilføjede", "nye aktiviteter"],
         "removed": ["removed", "activities removed", "activities dropped", "fjernede", "aktiviteter fjernet"],
@@ -1025,15 +1025,21 @@ def _fix_summary_counts(text: str, actual_counts: Dict[str, int]) -> str:
                 lambda m, rc=real_count, k=kw: re.sub(r'\d+\+?', str(rc), m.group(0), count=1),
                 text, flags=re.IGNORECASE
             )
+    if total_data_rows > 0:
+        text = re.sub(
+            r'[\d,.]+\+?\s*(?:tasks?|activities?|opgaver?)\s+(?:analyzed|analyseret|across)',
+            lambda m: re.sub(r'[\d,.]+\+?', f"{total_data_rows:,}", m.group(0), count=1),
+            text, flags=re.IGNORECASE
+        )
     return text
 
 
-def generate_summary_html(summary_content: str, language: str = "en", actual_counts: Dict[str, int] = None) -> str:
+def generate_summary_html(summary_content: str, language: str = "en", actual_counts: Dict[str, int] = None, total_data_rows: int = 0) -> str:
     if not summary_content or not summary_content.strip():
         return ""
 
     if actual_counts:
-        summary_content = _fix_summary_counts(summary_content, actual_counts)
+        summary_content = _fix_summary_counts(summary_content, actual_counts, total_data_rows)
 
     title = "Opsummering af Ændringer" if language == "da" else "Summary of Changes"
     icon = SVG_ICONS["summary"]
@@ -1112,12 +1118,12 @@ def generate_summary_html(summary_content: str, language: str = "en", actual_cou
 </div>'''
 
 
-def generate_health_html(health_content: str, health_data: Optional[Dict], language: str = "en", actual_counts: Dict[str, int] = None) -> str:
+def generate_health_html(health_content: str, health_data: Optional[Dict], language: str = "en", actual_counts: Dict[str, int] = None, total_data_rows: int = 0) -> str:
     if not health_content or not health_content.strip():
         return ""
 
     if actual_counts:
-        health_content = _fix_summary_counts(health_content, actual_counts)
+        health_content = _fix_summary_counts(health_content, actual_counts, total_data_rows)
 
     status = "stable"
     if health_data and health_data.get("status"):
@@ -1283,9 +1289,9 @@ def _count_actual_table_rows(tables_section: str) -> Dict[str, int]:
     return counts
 
 
-def format_response_as_html(markdown: str, language: str = "en") -> str:
+def format_response_as_html(markdown: str, language: str = "en", total_data_rows: int = 0) -> str:
     try:
-        return _format_response_internal(markdown, language)
+        return _format_response_internal(markdown, language, total_data_rows)
     except Exception as e:
         import logging
         logging.getLogger(__name__).error(f"HTML formatter error: {e}")
@@ -1293,7 +1299,7 @@ def format_response_as_html(markdown: str, language: str = "en") -> str:
         return f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;padding:24px;"><div style="white-space:pre-wrap;color:#334155;line-height:1.7;font-size:14px;">{safe_text}</div></div>'
 
 
-def _format_response_internal(markdown: str, language: str) -> str:
+def _format_response_internal(markdown: str, language: str, total_data_rows: int = 0) -> str:
     parsed = parse_structured_response(markdown)
 
     actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
@@ -1302,7 +1308,7 @@ def _format_response_internal(markdown: str, language: str) -> str:
     table_html = generate_table_html(parsed["tables_section"], language)
     root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
     impact_html = generate_impact_html(parsed["impact_section"], language)
-    summary_html = generate_summary_html(parsed["summary_section"], language, actual_counts)
+    summary_html = generate_summary_html(parsed["summary_section"], language, actual_counts, total_data_rows)
 
     if parsed["health_data"]:
         health_data = dict(parsed["health_data"])
@@ -1313,7 +1319,7 @@ def _format_response_internal(markdown: str, language: str) -> str:
                 health_data[hd_key] = actual_counts[cat_key]
         parsed["health_data"] = health_data
 
-    health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language, actual_counts)
+    health_html = generate_health_html(parsed["health_section"], parsed["health_data"], language, actual_counts, total_data_rows)
 
     styles = '''
 <style>

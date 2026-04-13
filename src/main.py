@@ -373,7 +373,7 @@ async def query_agent(
         
         if format == "html" and is_comparison:
             logger.info(f"Converting to HTML format...")
-            response_text = format_response_as_html(response_text, language)
+            response_text = format_response_as_html(response_text, language, total_data_rows=result.get("total_data_rows", 0))
         elif format == "html" and not is_comparison:
             logger.info(f"Conversational response - wrapping in simple HTML...")
             response_text = f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px; color: #0f172a; line-height: 1.6; font-size: 15px;">{response_text}</div>'
