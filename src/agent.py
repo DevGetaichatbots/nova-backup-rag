@@ -526,17 +526,38 @@ Detect what the user is focusing on:
 - "what blocks X" / "dependencies for" / "what does task 465 affect" → FOCUS = Dependency chain
 - No specific focus detected → treat as full comparison (show everything equally)
 
-### FOCUSED QUERY ROW RULES (CRITICAL)
+### MINIMUM ROW COUNTS (CRITICAL — READ CAREFULLY)
 
-For the FOCUSED category, you MUST show ALL matching rows — not just 6 or 10.
-The user expects to see the complete picture for whatever they asked about.
+When the user asks about a category WITHOUT specifying an exact number (e.g., "show me delayed tasks", NOT "show me top 5 delayed tasks"), you MUST show a GENEROUS number of rows — never just 5 or 10.
 
-Row display rules for the FOCUSED category:
-- **Under 50 rows:** Show ALL rows in the table — no exceptions
-- **50-100 rows:** Show ALL rows — this is still manageable for the user
-- **Over 100 rows:** Show ALL rows — never truncate. The user asked specifically for this data.
+**THE SWEET SPOT RULE:**
+The user does NOT need to say "show me all" or "show me 50". When they ask about a category, they expect a substantial view of that data. Use this minimum:
 
-For NON-FOCUSED categories (the other five categories the user did NOT ask about):
+- **If the category has 1-30 matching tasks:** Show ALL of them
+- **If the category has 30-100 matching tasks:** Show ALL of them — the user wants the full picture
+- **If the category has 100+ matching tasks:** Show ALL of them — never truncate
+
+**NEVER show fewer than what actually exists.** If there are 40 delayed tasks in the data, show all 40. If there are 200 added tasks, show all 200. The user expects completeness.
+
+**CRITICAL INTERPRETATION RULE:**
+When the user says "critical condition" or "critical tasks", this does NOT mean "only show tasks with 🔴 CRITICAL priority tag". It means "show me the important/concerning tasks". You MUST show:
+- ALL tasks with 🔴 CRITICAL priority
+- ALL tasks with 🟠 IMPORTANT priority
+- ALL tasks with 🟢 MONITOR priority
+- In other words: show the COMPLETE category, ordered by priority (most critical first)
+
+Similarly:
+- "show me delayed tasks" = show ALL delayed tasks, not just the top 5
+- "what was added" = show ALL added tasks
+- "modified tasks" = show ALL modified tasks
+- "critical delayed and added" = show ALL delayed tasks + ALL added tasks
+
+**ONLY limit rows when the user EXPLICITLY gives a number:**
+- "show me top 10 delayed tasks" → Show exactly 10
+- "what are the 5 most critical tasks" → Show exactly 5
+- "list 20 added tasks" → Show exactly 20
+
+For NON-FOCUSED categories (categories the user did NOT specifically ask about):
 - Still include their tables with ALL rows as usual
 - The six-section structure remains mandatory and complete
 
