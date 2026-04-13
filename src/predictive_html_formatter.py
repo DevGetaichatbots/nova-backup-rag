@@ -56,6 +56,10 @@ def _svg(name: str, size: int = 16, color: str = "currentColor") -> str:
         "megaphone": f'<svg {base}><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
         "truck": f'<svg {base}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>',
         "circle-check": f'<svg {base}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+        "chevron-right": f'<svg {base}><path d="m9 18 6-6-6-6"/></svg>',
+        "shield-check": f'<svg {base}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+        "shield-alert": f'<svg {base}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>',
+        "octagon-alert": f'<svg {base}><path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2H8.688a2 2 0 0 0-1.414.586l-4.688 4.688A2 2 0 0 0 2 8.688v6.624a2 2 0 0 0 .586 1.414l4.688 4.688A2 2 0 0 0 8.688 22h6.624a2 2 0 0 0 1.414-.586l4.688-4.688A2 2 0 0 0 22 15.312V8.688a2 2 0 0 0-.586-1.414l-4.688-4.688A2 2 0 0 0 15.312 2z"/></svg>',
         "layers": f'<svg {base}><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',
         "split": f'<svg {base}><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>',
     }
@@ -147,14 +151,14 @@ def _render_project_status_card(data: Dict, lang: str) -> str:
         return ""
 
     status_config = {
-        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "icon": "🟢", "label_en": "STABLE", "label_da": "STABIL"},
-        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "icon": "⚠️", "label_en": "AT RISK", "label_da": "I RISIKO"},
-        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "icon": "🔴", "label_en": "CRITICAL", "label_da": "KRITISK"},
+        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "svg": "shield-check", "label_en": "STABLE", "label_da": "STABIL"},
+        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "svg": "alert-triangle", "label_en": "AT RISK", "label_da": "I RISIKO"},
+        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "svg": "octagon-alert", "label_en": "CRITICAL", "label_da": "KRITISK"},
     }
     risk_config = {
-        "LOW": {"color": "#10b981", "label_en": "Low", "label_da": "Lav"},
-        "MEDIUM": {"color": "#d97706", "label_en": "Medium", "label_da": "Moderat"},
-        "HIGH": {"color": "#dc2626", "label_en": "High", "label_da": "Høj"},
+        "LOW": {"color": "#10b981", "svg": "shield-check", "label_en": "Low", "label_da": "Lav"},
+        "MEDIUM": {"color": "#d97706", "svg": "alert-circle", "label_en": "Medium", "label_da": "Moderat"},
+        "HIGH": {"color": "#dc2626", "svg": "alert-triangle", "label_en": "High", "label_da": "Høj"},
     }
 
     sc = status_config.get(status, status_config["AT_RISK"])
@@ -169,13 +173,13 @@ def _render_project_status_card(data: Dict, lang: str) -> str:
 
     findings_html = ""
     for f in findings[:3]:
-        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="color:{sc["color"]};font-size:7px;margin-top:7px;flex-shrink:0;">●</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{_e(f)}</span></div>'
+        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_svg("chevron-right", 12, sc["color"])}</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{_e(f)}</span></div>'
 
     cons_html = ""
     if consequences:
         cons_items = ""
         for c in consequences[:3]:
-            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="font-size:13px;color:#dc2626;font-weight:600;">→</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{_e(c)}</span></div>'
+            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="display:inline-flex;margin-top:2px;flex-shrink:0;">{_svg("arrow-right", 13, "#dc2626")}</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{_e(c)}</span></div>'
         cons_html = f'''
     <div style="margin-top:14px;padding:12px 16px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;">
       <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{cons_title}</div>
@@ -186,11 +190,12 @@ def _render_project_status_card(data: Dict, lang: str) -> str:
 <div style="margin:0 0 18px;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:20px;">{sc["icon"]}</span>
+      <span style="display:inline-flex;">{_svg(sc["svg"], 22, sc["color"])}</span>
       <span style="font-size:11px;font-weight:800;color:{sc["color"]};text-transform:uppercase;letter-spacing:1.2px;">{proj_title}</span>
       <span style="padding:4px 14px;border-radius:20px;font-size:13px;font-weight:800;color:{sc["color"]};background:white;border:2px solid {sc["color"]};">{status_label}</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:white;border:1px solid {rc["color"]}30;">
+      <span style="display:inline-flex;">{_svg(rc["svg"], 14, rc["color"])}</span>
       <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{risk_title}:</span>
       <span style="font-size:12px;font-weight:800;color:{rc["color"]};">{risk_label}</span>
     </div>
