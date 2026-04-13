@@ -265,7 +265,11 @@ NOVA_INSIGHT_SCHEMA = {
                     "schedule_name",
                     "primary_risk",
                     "forceable_count",
-                    "not_forceable_count"
+                    "not_forceable_count",
+                    "project_status",
+                    "risk_level",
+                    "critical_findings",
+                    "consequences_if_no_action"
                 ],
                 "additionalProperties": False,
                 "properties": {
@@ -282,7 +286,27 @@ NOVA_INSIGHT_SCHEMA = {
                     "schedule_name": {"type": "string"},
                     "primary_risk": {"type": "string", "description": "Short description of the primary risk driver"},
                     "forceable_count": {"type": "integer", "description": "Count of delayed activities where is_forceable = 'possible' or 'limited'"},
-                    "not_forceable_count": {"type": "integer", "description": "Count of delayed activities where is_forceable = 'not_recommended'"}
+                    "not_forceable_count": {"type": "integer", "description": "Count of delayed activities where is_forceable = 'not_recommended'"},
+                    "project_status": {
+                        "type": "string",
+                        "enum": ["STABLE", "AT_RISK", "CRITICAL"],
+                        "description": "Overall project status. STABLE: no delays or only minor isolated delays (<5 tasks, <15 days each). AT_RISK: 5-15 delayed tasks or any delay >30 days or structural/coordination delays. CRITICAL: >15 delayed tasks or any delay >60 days on critical path or cascading cross-discipline delays."
+                    },
+                    "risk_level": {
+                        "type": "string",
+                        "enum": ["LOW", "MEDIUM", "HIGH"],
+                        "description": "Risk classification. LOW: few minor delays, isolated. MEDIUM: multiple delays or moderate overdue. HIGH: many delays, critical path affected, cascading impact."
+                    },
+                    "critical_findings": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Exactly 3 short bullet points — the 3 most important things the PM needs to know. Written in plain business language. Each must be specific (reference real task counts, delay magnitudes, or affected areas)."
+                    },
+                    "consequences_if_no_action": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Exactly 3 short bullet points — what happens to the project if the PM does nothing. Real-world business consequences: delayed handover, increased costs, resource conflicts. NEVER vague."
+                    }
                 }
             }
         }
