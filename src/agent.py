@@ -507,6 +507,69 @@ CRITICAL: ALL count values (added_count, removed_count, delayed_count, etc.) MUS
 
 ---
 
+## FOCUSED QUERIES (CATEGORY-SPECIFIC QUESTIONS)
+
+When the user asks about a SPECIFIC category or subset of tasks, you MUST still produce all six mandatory sections.
+However, the FOCUSED CATEGORY gets expanded treatment — show as many rows as possible for that category.
+
+### FOCUSED QUERY DETECTION
+
+Detect what the user is focusing on:
+- "show me delayed tasks" / "vis forsinkede" / "what is delayed" / "which tasks are delayed" → FOCUS = Delayed
+- "show me added tasks" / "what was added" / "new tasks" / "nye opgaver" → FOCUS = Added
+- "removed tasks" / "what was removed" / "fjernede opgaver" → FOCUS = Removed
+- "accelerated tasks" / "what got faster" / "fremskyndede" → FOCUS = Accelerated
+- "modified tasks" / "what changed" / "ændrede opgaver" → FOCUS = Modified
+- "critical tasks" / "critical issues" / "what is critical" → FOCUS = Critical priority
+- "show me tasks in area X" / "omr. 3" / "etage E2" → FOCUS = Area/floor filter
+- "show me VVS tasks" / "EL tasks" / "ventilation" → FOCUS = Trade/discipline filter
+- "what blocks X" / "dependencies for" / "what does task 465 affect" → FOCUS = Dependency chain
+- No specific focus detected → treat as full comparison (show everything equally)
+
+### FOCUSED QUERY ROW RULES (CRITICAL)
+
+For the FOCUSED category, you MUST show ALL matching rows — not just 6 or 10.
+The user expects to see the complete picture for whatever they asked about.
+
+Row display rules for the FOCUSED category:
+- **Under 50 rows:** Show ALL rows in the table — no exceptions
+- **50-100 rows:** Show ALL rows — this is still manageable for the user
+- **Over 100 rows:** Show ALL rows — never truncate. The user asked specifically for this data.
+
+For NON-FOCUSED categories (the other five categories the user did NOT ask about):
+- Still include their tables with ALL rows as usual
+- The six-section structure remains mandatory and complete
+
+### FOCUSED QUERY RESPONSE QUALITY
+
+When the user asks a focused question:
+1. The EXECUTIVE_ACTIONS should prioritize findings related to the focused category
+2. The ROOT_CAUSE_ANALYSIS should lead with causes related to the focused category
+3. The IMPACT_ASSESSMENT should emphasize the downstream effects of the focused category
+4. ALL tables still appear with ALL rows — but the focused category table comes with extra analysis context
+
+### FOLLOW-UP QUERY HANDLING
+
+Users often ask follow-up questions in the same session. Handle these correctly:
+
+- "tell me more about the delayed tasks" → Same as focused query on Delayed — re-analyze with full detail
+- "what about task 465?" / "Id 465" → Find this specific task across both stores, show its full history (OLD vs NEW values), what it blocks, and what blocks it
+- "why is task X delayed?" → Find the task, show its predecessor chain, identify the blocking cause
+- "show me more" / "vis mere" / "more details" → Repeat the full analysis with ALL rows in ALL categories
+- "what about area 3?" / "omr. 2" → Filter-focused query — show all tasks in that area across all categories
+- "which tasks are critical?" → Show all tasks with 🔴 CRITICAL priority across Delayed, Removed, and Modified categories
+- "how many tasks changed?" → Full comparison with emphasis on the Summary section counts
+
+### SINGLE TASK LOOKUP
+
+When the user asks about a SPECIFIC task by Id or name:
+- Find the task in BOTH stores (OLD and NEW)
+- Show: OLD values → NEW values → what changed → delay magnitude → what it blocks → what blocks it
+- If the task has predecessors/successors, trace the dependency chain (up to 5 levels)
+- Still produce all six sections, but the Executive Actions should focus on this task's impact
+
+---
+
 ## NON-COMPARISON QUERIES
 
 For greetings, thanks, or general questions — respond conversationally. Do NOT output tables or the six-section format. Keep it warm and helpful.
@@ -580,12 +643,22 @@ class RAGAgent:
             if query_lower == pattern + ".":
                 return False
         
+        comparison_keywords = [
+            "compare", "sammenlign", "difference", "forskel", "change", "ændring",
+            "delay", "forsink", "schedule", "tidsplan", "task", "opgave",
+            "what", "hvad", "show", "vis", "list", "find",
+            "added", "removed", "tilføj", "fjern", "accelerat", "fremskynd",
+            "modified", "ændret", "critical", "kritisk", "blocked", "blokeret",
+            "area", "omr", "etage", "floor", "vvs", "el ", "ventilation",
+            "more", "mere", "detail", "detalje", "id ", "priority", "priorit",
+            "risk", "risiko", "status", "health", "sundhed", "impact", "konsekvens",
+            "root cause", "årsag", "why", "hvorfor", "blocks", "blokerer",
+            "depends", "afhæng", "predecessor", "foregående", "successor", "efterfølgende",
+            "overview", "overblik", "summary", "opsummering", "analyze", "analys",
+        ]
+        
         if len(query_lower.split()) <= 2 and not any(
-            kw in query_lower for kw in [
-                "compare", "sammenlign", "difference", "forskel", "change", "ændring",
-                "delay", "forsink", "schedule", "tidsplan", "task", "opgave",
-                "what", "hvad", "show", "vis", "list", "find"
-            ]
+            kw in query_lower for kw in comparison_keywords
         ):
             return False
         
