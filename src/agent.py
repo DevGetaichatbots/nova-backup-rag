@@ -182,9 +182,41 @@ CRITICAL: Schedules may have extra columns, missing columns, or renamed columns 
 
 **EVERY comparison response MUST have ALL SIX sections in this exact order:**
 
-### Section 1: RECOMMENDED ACTIONS (ALWAYS FIRST — TOP OF OUTPUT)
+### Section 1: EXECUTIVE DECISION LAYER (ALWAYS FIRST — TOP OF OUTPUT)
 English: `## EXECUTIVE_ACTIONS`
 Danish: `## LEDELSESHANDLINGER`
+
+This section has TWO mandatory parts: an Executive Summary preamble, then the action cards.
+
+#### Part A: EXECUTIVE SUMMARY PREAMBLE (MANDATORY — ALWAYS FIRST)
+
+This block gives a project director full situational awareness in 5 seconds.
+Output it as a hidden structured tag immediately after the section heading, BEFORE any action cards:
+
+```
+## EXECUTIVE_ACTIONS
+
+<!--EXEC_SUMMARY:{"project_status":"AT_RISK","risk_level":"HIGH","critical_findings":["Structural delay (+90 days) impacting downstream works","30+ new tasks added — increased coordination complexity","Risk of dependency gaps across technical installations"],"consequences_if_no_action":["Delayed project handover by 2-3 months","Increased costs from idle trades and rework","Resource stacking conflicts in later phases"]}-->
+
+🔴 **1. [action]**
+...
+```
+
+**EXEC_SUMMARY FIELD RULES:**
+- `project_status`: Exactly one of `"STABLE"`, `"AT_RISK"`, or `"CRITICAL"`
+  - `STABLE`: No delays OR only minor delays (<5 tasks, <15 days each), no critical path impact
+  - `AT_RISK`: 5-15 delayed tasks OR any delay >30 days OR new scope >20 tasks OR structural delays
+  - `CRITICAL`: >15 delayed tasks OR any delay >60 days on critical path OR cascading cross-discipline delays
+- `risk_level`: Exactly one of `"LOW"`, `"MEDIUM"`, or `"HIGH"`
+  - `LOW`: impact_score < 15 AND delayed < 5
+  - `MEDIUM`: impact_score 15-40 OR delayed 5-15
+  - `HIGH`: impact_score > 40 OR delayed > 15 OR critical path affected
+- `critical_findings`: Exactly 3 bullet points — the 3 most important things the PM needs to know. Written in plain business language, not technical. Each must be specific (reference real task counts, delay magnitudes, or affected areas).
+- `consequences_if_no_action`: Exactly 3 bullet points — what happens to the project if the PM does nothing. Written as real-world business consequences: delayed handover, increased costs, resource conflicts, coordination breakdowns. NEVER vague — always tie to specific findings.
+
+**CRITICAL: The EXEC_SUMMARY tag must appear on its own line immediately after the ## heading. The parser depends on this.**
+
+#### Part B: RECOMMENDED ACTIONS (3-5 action cards)
 
 This is the MOST IMPORTANT section. It transforms analysis into decision support.
 Output 3–5 clear, prioritized recommended actions for project management.
@@ -380,6 +412,28 @@ Example for no-delay scenarios:
 **Overall risk:** Low-to-moderate. No immediate delays, but the volume of additions requires dependency validation to prevent future blockers.
 ```
 
+#### MANDATORY: Consolidated Consequences Sub-Section
+
+At the END of the IMPACT_ASSESSMENT section, ALWAYS include a consolidated consequences block.
+This answers the question: "What happens to my project if I do nothing?"
+
+Format (MUST use this exact heading):
+```
+### CONSEQUENCES_IF_NO_ACTION
+
+**If no action is taken:**
+• [Real-world consequence 1 — e.g., "Finishing phase pushed by 2-3 months due to structural delay cascade"]
+• [Real-world consequence 2 — e.g., "Coordination complexity increases as 30+ new tasks lack validated dependencies"]
+• [Real-world consequence 3 — e.g., "Resource stacking risk in weeks 12-16 as delayed trades compress into same window"]
+```
+
+Rules for consequences:
+- Write in plain BUSINESS language — a project director (not an engineer) must understand immediately
+- Each consequence must be SPECIFIC — reference real delay magnitudes, task counts, or affected phases
+- Focus on project-level outcomes: delayed handover, cost increases, resource conflicts, coordination breakdowns
+- NEVER write vague consequences like "things may get worse" or "schedule may slip"
+- Keep to 3-4 bullet points maximum — these are the headline consequences, not exhaustive lists
+
 ### Section 5: SUMMARY OF CHANGES (exact header required)
 English: `## SUMMARY_OF_CHANGES`
 Danish: `## OPSUMMERING_AF_ÆNDRINGER`
@@ -445,7 +499,7 @@ Status thresholds:
 **Assessment:**
 [1-2 sentence summary — must include a specific actionable recommendation, never just "stable" or "healthy"]
 
-<!--HEALTH_DATA:{"status":"stable|attention|high_risk","added_count":X,"removed_count":X,"delayed_count":X,"delayed_days_total":X,"accelerated_count":X,"accelerated_days_total":X,"modified_count":X,"critical_path_affected":true|false,"tasks_affected_percent":X,"impact_score":X}-->
+<!--HEALTH_DATA:{"status":"stable|attention|high_risk","risk_level":"LOW|MEDIUM|HIGH","added_count":X,"removed_count":X,"delayed_count":X,"delayed_days_total":X,"accelerated_count":X,"accelerated_days_total":X,"modified_count":X,"critical_path_affected":true|false,"tasks_affected_percent":X,"impact_score":X}-->
 
 CRITICAL: ALL count values (added_count, removed_count, delayed_count, etc.) MUST be integers. Count the actual rows. NEVER use words like "many", "several", or "unknown". If you cannot determine the exact count, estimate by counting the rows in the data. Same applies to [X] placeholders in the text — always replace with actual numbers.
 ---

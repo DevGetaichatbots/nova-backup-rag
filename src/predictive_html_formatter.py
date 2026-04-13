@@ -136,6 +136,73 @@ def _severity_color(days: int) -> dict:
     return {"color": "#0891b2", "bg": "#ecfeff", "border": "#a5f3fc"}
 
 
+def _render_project_status_card(data: Dict, lang: str) -> str:
+    ins = data.get("insight_data", {})
+    status = ins.get("project_status", "")
+    risk = ins.get("risk_level", "")
+    findings = ins.get("critical_findings", [])
+    consequences = ins.get("consequences_if_no_action", [])
+
+    if not status and not findings:
+        return ""
+
+    status_config = {
+        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "icon": "🟢", "label_en": "STABLE", "label_da": "STABIL"},
+        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "icon": "⚠️", "label_en": "AT RISK", "label_da": "I RISIKO"},
+        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "icon": "🔴", "label_en": "CRITICAL", "label_da": "KRITISK"},
+    }
+    risk_config = {
+        "LOW": {"color": "#10b981", "label_en": "Low", "label_da": "Lav"},
+        "MEDIUM": {"color": "#d97706", "label_en": "Medium", "label_da": "Moderat"},
+        "HIGH": {"color": "#dc2626", "label_en": "High", "label_da": "Høj"},
+    }
+
+    sc = status_config.get(status, status_config["AT_RISK"])
+    rc = risk_config.get(risk, risk_config["MEDIUM"])
+
+    status_label = sc["label_da"] if lang == "da" else sc["label_en"]
+    risk_label = rc["label_da"] if lang == "da" else rc["label_en"]
+    proj_title = "PROJEKTSTATUS" if lang == "da" else "PROJECT STATUS"
+    risk_title = "Risikoniveau" if lang == "da" else "Risk Level"
+    findings_title = "Kritiske Fund" if lang == "da" else "Critical Findings"
+    cons_title = "Hvis ingen handling tages" if lang == "da" else "If No Action Is Taken"
+
+    findings_html = ""
+    for f in findings[:3]:
+        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="color:{sc["color"]};font-size:7px;margin-top:7px;flex-shrink:0;">●</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{_e(f)}</span></div>'
+
+    cons_html = ""
+    if consequences:
+        cons_items = ""
+        for c in consequences[:3]:
+            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="font-size:13px;color:#dc2626;font-weight:600;">→</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{_e(c)}</span></div>'
+        cons_html = f'''
+    <div style="margin-top:14px;padding:12px 16px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;">
+      <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{cons_title}</div>
+      {cons_items}
+    </div>'''
+
+    return f'''
+<div style="margin:0 0 18px;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">{sc["icon"]}</span>
+      <span style="font-size:11px;font-weight:800;color:{sc["color"]};text-transform:uppercase;letter-spacing:1.2px;">{proj_title}</span>
+      <span style="padding:4px 14px;border-radius:20px;font-size:13px;font-weight:800;color:{sc["color"]};background:white;border:2px solid {sc["color"]};">{status_label}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:white;border:1px solid {rc["color"]}30;">
+      <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{risk_title}:</span>
+      <span style="font-size:12px;font-weight:800;color:{rc["color"]};">{risk_label}</span>
+    </div>
+  </div>
+  <div style="margin-bottom:4px;">
+    <div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{findings_title}</div>
+    {findings_html}
+  </div>
+  {cons_html}
+</div>'''
+
+
 def _render_hero(data: Dict, lang: str) -> str:
     ins = data.get("insight_data", {})
     total = _safe_int(ins.get("total_activities", 0))
@@ -173,7 +240,10 @@ def _render_hero(data: Dict, lang: str) -> str:
         rl = "Primær risiko" if lang == "da" else "Primary Risk"
         risk_html = f'<div style="margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">{_svg("alert-triangle", 12, "#991b1b")}<span style="font-size:10px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;">{rl}</span></div><div style="font-size:13px;color:#991b1b;font-weight:600;line-height:1.5;">{primary_risk}</div></div>'
 
+    project_status_card = _render_project_status_card(data, lang)
+
     return f'''
+{project_status_card}
 <div style="margin:0 0 22px;background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
   <div style="background:linear-gradient(135deg,#f0fdfa,#ecfeff);padding:28px 28px 22px;border-bottom:1px solid #e2e8f0;">
     <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">

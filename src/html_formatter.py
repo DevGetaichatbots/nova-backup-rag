@@ -508,9 +508,87 @@ def _render_section_header(title: str, icon: str, color: str) -> str:
     </div>'''
 
 
+def _parse_exec_summary(content: str) -> Optional[Dict]:
+    m = re.search(r"<!--EXEC_SUMMARY:(.*?)-->", content, re.DOTALL)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(1))
+    except:
+        return None
+
+
+def _render_exec_summary_card(summary_data: Dict, language: str) -> str:
+    status = summary_data.get("project_status", "AT_RISK")
+    risk = summary_data.get("risk_level", "MEDIUM")
+    findings = summary_data.get("critical_findings", [])
+    consequences = summary_data.get("consequences_if_no_action", [])
+
+    status_config = {
+        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "icon": "🟢", "label_en": "STABLE", "label_da": "STABIL"},
+        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "icon": "⚠️", "label_en": "AT RISK", "label_da": "I RISIKO"},
+        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "icon": "🔴", "label_en": "CRITICAL", "label_da": "KRITISK"},
+    }
+    risk_config = {
+        "LOW": {"color": "#10b981", "label_en": "Low", "label_da": "Lav"},
+        "MEDIUM": {"color": "#d97706", "label_en": "Medium", "label_da": "Moderat"},
+        "HIGH": {"color": "#dc2626", "label_en": "High", "label_da": "Høj"},
+    }
+
+    sc = status_config.get(status, status_config["AT_RISK"])
+    rc = risk_config.get(risk, risk_config["MEDIUM"])
+
+    status_label = sc["label_da"] if language == "da" else sc["label_en"]
+    risk_label = rc["label_da"] if language == "da" else rc["label_en"]
+    proj_status_title = "PROJEKTSTATUS" if language == "da" else "PROJECT STATUS"
+    risk_title = "Risikoniveau" if language == "da" else "Risk Level"
+    findings_title = "Kritiske Fund" if language == "da" else "Critical Findings"
+    consequences_title = "Hvis ingen handling tages" if language == "da" else "If No Action Is Taken"
+
+    findings_html = ""
+    for f in findings[:3]:
+        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="color:{sc["color"]};font-size:7px;margin-top:7px;flex-shrink:0;">●</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{escape_html(f)}</span></div>'
+
+    consequences_html = ""
+    if consequences:
+        cons_items = ""
+        for c in consequences[:3]:
+            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="font-size:13px;color:#dc2626;font-weight:600;">→</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{escape_html(c)}</span></div>'
+        consequences_html = f'''
+    <div style="margin-top:14px;padding:12px 16px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;">
+      <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{consequences_title}</div>
+      {cons_items}
+    </div>'''
+
+    return f'''
+<div style="margin:0 0 18px 0;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">{sc["icon"]}</span>
+      <span style="font-size:11px;font-weight:800;color:{sc["color"]};text-transform:uppercase;letter-spacing:1.2px;">{proj_status_title}</span>
+      <span style="padding:4px 14px;border-radius:20px;font-size:13px;font-weight:800;color:{sc["color"]};background:white;border:2px solid {sc["color"]};">{status_label}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:white;border:1px solid {rc["color"]}30;">
+      <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{risk_title}:</span>
+      <span style="font-size:12px;font-weight:800;color:{rc["color"]};">{risk_label}</span>
+    </div>
+  </div>
+  <div style="margin-bottom:4px;">
+    <div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{findings_title}</div>
+    {findings_html}
+  </div>
+  {consequences_html}
+</div>'''
+
+
 def generate_executive_html(content: str, language: str = "en") -> str:
     if not content or not content.strip():
         return ""
+
+    exec_summary_data = _parse_exec_summary(content)
+    exec_summary_html = _render_exec_summary_card(exec_summary_data, language) if exec_summary_data else ""
+
+    content = re.sub(r"<!--EXEC_SUMMARY:.*?-->", "", content, flags=re.DOTALL).strip()
 
     title = "Anbefalede Handlinger" if language == "da" else "Recommended Actions"
     icon = SVG_ICONS.get("executive", SVG_ICONS["default"])
@@ -669,6 +747,7 @@ def generate_executive_html(content: str, language: str = "en") -> str:
     flush_card()
 
     return f'''
+{exec_summary_html}
 <div class="executive-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#f0fdfa,#f8fffe,#ffffff);border-radius:16px;border:1px solid rgba(13,148,136,0.15);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
   {_render_section_header(title, icon, color)}
   <div style="margin:-8px 0 18px 0;padding:8px 14px;background:#f0fdfa;border-radius:8px;border:1px solid #ccfbf1;">
@@ -797,6 +876,8 @@ def generate_impact_html(content: str, language: str = "en") -> str:
     lines = content.split("\n")
     processed = []
     list_items = []
+    in_consequences_block = False
+    consequences_items = []
 
     def flush_list():
         nonlocal list_items
@@ -807,14 +888,50 @@ def generate_impact_html(content: str, language: str = "en") -> str:
             processed.append('</div>')
             list_items = []
 
+    def flush_consequences():
+        nonlocal consequences_items, in_consequences_block
+        if consequences_items:
+            cons_title = "Hvis ingen handling tages" if language == "da" else "If No Action Is Taken"
+            cons_html = ""
+            for c in consequences_items:
+                cons_html += f'<div style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;"><span style="font-size:14px;color:#dc2626;font-weight:700;flex-shrink:0;">→</span><span style="font-size:13px;color:#991b1b;line-height:1.6;font-weight:500;">{c}</span></div>'
+            processed.append(f'''
+    <div style="margin:20px 0 8px 0;padding:18px 22px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-radius:12px;border:1px solid #fecaca;border-left:4px solid #dc2626;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" stroke="#dc2626" stroke-width="2"/><path d="M12 9v4M12 17h.01" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span style="font-size:12px;font-weight:800;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;">{cons_title}</span>
+      </div>
+      {cons_html}
+    </div>''')
+            consequences_items = []
+        in_consequences_block = False
+
     for line in lines:
         line = line.strip()
         if not line or line in ["---", "***"]:
-            flush_list()
+            if not in_consequences_block:
+                flush_list()
             continue
 
         if re.match(r"^##\s", line):
             continue
+
+        consequences_header = re.match(r'^###\s*CONSEQUENCES_IF_NO_ACTION', line, re.IGNORECASE)
+        if consequences_header:
+            flush_list()
+            in_consequences_block = True
+            continue
+
+        if in_consequences_block:
+            if re.match(r'^###\s', line):
+                flush_consequences()
+            elif line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
+                consequences_items.append(_inline_markdown(line[2:]))
+                continue
+            elif re.match(r'^\*\*[^*]+\*\*', line):
+                continue
+            else:
+                continue
 
         sub_header = re.match(r'^###\s*(.+)$', line)
         if sub_header:
@@ -859,6 +976,7 @@ def generate_impact_html(content: str, language: str = "en") -> str:
         processed.append(f'<p style="margin:8px 0;color:#475569;font-size:14px;line-height:1.7;">{text}</p>')
 
     flush_list()
+    flush_consequences()
 
     return f'''
 <div class="impact-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#fffbeb,#fefce8,#ffffff);border-radius:16px;border:1px solid rgba(217,119,6,0.12);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
@@ -1099,6 +1217,21 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         <span style="font-size:13px;font-weight:700;color:{color};">{status_label}</span>
       </div>'''
 
+    risk_badge_html = ""
+    if health_data and health_data.get("risk_level"):
+        rl = health_data["risk_level"]
+        rl_config = {
+            "LOW": {"color": "#10b981", "label_en": "Low Risk", "label_da": "Lav Risiko"},
+            "MEDIUM": {"color": "#d97706", "label_en": "Medium Risk", "label_da": "Moderat Risiko"},
+            "HIGH": {"color": "#dc2626", "label_en": "High Risk", "label_da": "Høj Risiko"},
+        }
+        rl_c = rl_config.get(rl, rl_config["MEDIUM"])
+        rl_label = rl_c["label_da"] if language == "da" else rl_c["label_en"]
+        risk_badge_html = f'''<div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;background:white;border:1px solid {rl_c["color"]}25;">
+          <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{"Risiko" if language == "da" else "Risk"}:</span>
+          <span style="font-size:12px;font-weight:800;color:{rl_c["color"]};">{rl_label}</span>
+        </div>'''
+
     return f'''
 <div class="health-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,{grad_from},{grad_mid},#ffffff);border-radius:16px;border:1px solid {color}18;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid {color}18;flex-wrap:wrap;">
@@ -1108,7 +1241,10 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
       </div>
       <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;letter-spacing:-0.3px;">{header_text}</h2>
     </div>
-    {status_badge}
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      {status_badge}
+      {risk_badge_html}
+    </div>
   </div>
   {"".join(processed)}
   {metrics_html}
