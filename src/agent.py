@@ -610,6 +610,7 @@ class RAGAgent:
         context_parts = []
         total_chunks = 0
         total_skipped = 0
+        total_data_rows = 0
 
         for table_name in table_names:
             doc_label = self._get_doc_label(table_name, old_filename, new_filename)
@@ -638,6 +639,10 @@ class RAGAgent:
                 store_parts.append(chunk_text)
                 store_bytes += chunk_bytes
                 included += 1
+                content = result.get('content', '')
+                lines = [l for l in content.split('\n') if l.strip() and ';' in l]
+                if lines:
+                    total_data_rows += max(0, len(lines) - 1)
 
             total_chunks += included
             total_skipped += skipped
@@ -651,6 +656,9 @@ class RAGAgent:
             logger.warning(f"  Context truncated: {total_chunks} chunks sent, {total_skipped} omitted (API limit: {self.MAX_CONTEXT_BYTES:,} bytes)")
         else:
             logger.info(f"  Chunks sent to LLM: {total_chunks}")
+
+        self._last_total_data_rows = total_data_rows
+        logger.info(f"  Total data rows across all stores: {total_data_rows}")
         return "\n".join(context_parts)
     
     def query(
@@ -894,7 +902,8 @@ Keep your response concise and helpful."""
             "response": assistant_response,
             "sources": list(table_names),
             "context_chunks": len(context.split("Chunk")),
-            "is_comparison": is_comparison
+            "is_comparison": is_comparison,
+            "total_data_rows": getattr(self, '_last_total_data_rows', 0)
         }
 
 
