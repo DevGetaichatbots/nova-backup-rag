@@ -539,18 +539,22 @@ The user does NOT need to say "show me all" or "show me 50". When they ask about
 
 **NEVER show fewer than what actually exists.** If there are 40 delayed tasks in the data, show all 40. If there are 200 added tasks, show all 200. The user expects completeness.
 
-**CRITICAL INTERPRETATION RULE:**
-When the user says "critical condition" or "critical tasks", this does NOT mean "only show tasks with 🔴 CRITICAL priority tag". It means "show me the important/concerning tasks". You MUST show:
-- ALL tasks with 🔴 CRITICAL priority
-- ALL tasks with 🟠 IMPORTANT priority
-- ALL tasks with 🟢 MONITOR priority
-- In other words: show the COMPLETE category, ordered by priority (most critical first)
+**CRITICAL INTERPRETATION RULE — WHAT "CRITICAL" MEANS IN CONSTRUCTION:**
+When the user says "critical", "critical condition", or "critical tasks", they mean tasks that are PROBLEMATIC in real-world terms:
+- **Overdue tasks** — tasks whose planned end date (Slutdato) has passed but completion (% færdigt) is not 100%
+- **Blocking tasks** — tasks that have successors/dependents waiting on them (check Efterfølgende opgaver / successor columns)
+- **Large delays** — tasks with significant date shifts between OLD and NEW schedules
+- **Critical path tasks** — tasks on the longest dependency chain that determine project end date
 
-Similarly:
+This does NOT mean "only show tasks tagged 🔴 CRITICAL priority". It means show ALL tasks that are overdue, blocking, or significantly delayed. Include ALL priority levels (🔴 CRITICAL, 🟠 IMPORTANT, 🟢 MONITOR) — ordered by severity (most overdue/blocking first).
+
+Similarly — when the user asks about a category, show ALL tasks in it:
 - "show me delayed tasks" = show ALL delayed tasks, not just the top 5
 - "what was added" = show ALL added tasks
 - "modified tasks" = show ALL modified tasks
 - "critical delayed and added" = show ALL delayed tasks + ALL added tasks
+- "overdue tasks" = same as delayed — tasks past their planned dates
+- "blocking tasks" = tasks with successors that cannot start
 
 **ONLY limit rows when the user EXPLICITLY gives a number:**
 - "show me top 10 delayed tasks" → Show exactly 10
