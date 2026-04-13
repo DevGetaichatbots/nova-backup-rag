@@ -1,0 +1,265 @@
+🚀 NOVA INSIGHT – TRANSFORMATION TO A DECISION ENGINE
+Internal Development Directive – MUST READ
+
+Prepared by: Product Strategy
+Objective: Transform Nova Insight from a “smart analysis tool” into a mission-critical decision-making platform for project directors
+
+⚠️ CORE MESSAGE (READ THIS FIRST)
+
+We are no longer building a reporting tool.
+
+We are building a Decision Engine for Construction Projects.
+
+Every output in Nova must answer instantly:
+
+1.⁠ ⁠What is wrong?
+2.⁠ ⁠Why does it matter?
+3.⁠ ⁠What should I focus on?
+
+If the system does NOT clearly answer these 3 questions within 10 seconds, it is NOT good enough.
+
+🎯 END GOAL
+
+When a Project Director (e.g., Wicotech, NCC, Rambøll) receives a Nova report, their reaction should be:
+
+"This saves me hours every week.
+We need this on all our projects."
+🧠 CURRENT STATE (IMPORTANT)
+
+Nova already does:
+
+Detects changes (added, removed, delayed tasks)
+Provides analysis
+Generates summaries
+
+👉 This is GOOD.
+
+BUT:
+
+👉 It is still analysis-focused, not decision-focused
+
+🔥 NEW LAYER TO BUILD
+👉 EXECUTIVE DECISION LAYER
+
+This layer sits ON TOP of the existing analysis.
+
+We DO NOT replace current logic.
+We UPGRADE how results are interpreted and presented.
+
+🧱 STRUCTURE OF NEW OUTPUT
+
+Every report (PDF + UI) must follow this EXACT order:
+
+1.⁠ ⁠🚨 EXECUTIVE SUMMARY (TOP PRIORITY)
+Purpose
+
+Give full project understanding in 5–10 seconds
+
+Required Output Format
+PROJECT STATUS: ⚠️ AT RISK
+
+Critical Findings:
+•⁠  ⁠Structural delay (+90 days) impacting downstream works
+•⁠  ⁠30+ new tasks added (increased complexity)
+•⁠  ⁠Risk of coordination issues across trades
+
+Risk Level: MEDIUM → HIGH
+
+Immediate Focus:
+1.⁠ ⁠Resolve structural delay immediately
+2.⁠ ⁠Validate integration of new scope
+3.⁠ ⁠Review dependencies for technical tasks
+Development Instruction
+
+Create function:
+
+generate_executive_summary(analysis_data)
+Logic Rules
+Delay > 30 days → HIGH impact
+Many added tasks (>20) → complexity risk
+Structural delays → CRITICAL
+
+Output must be:
+
+short
+direct
+business-focused (NOT technical)
+2.⁠ ⁠🔥 PRIORITY ENGINE (MOST IMPORTANT FEATURE)
+Purpose
+
+Reduce ALL data to:
+
+👉 “These are the 3–5 things you must care about”
+
+Required Output
+TOP 3 CRITICAL ISSUES
+
+1.⁠ ⁠Structural Task: Dæk over
+→ Delay: +90 days
+→ Impact: Blocks downstream MEP & finishing
+→ Risk: Delayed project completion
+
+2.⁠ ⁠New Technical Installations
+→ Type: Added scope
+→ Risk: Missing dependencies & coordination gaps
+
+3.⁠ ⁠Steel Structure Expansion
+→ Risk: Resource conflicts & sequencing issues
+Development Instruction
+
+Create:
+
+prioritize_issues(tasks)
+Scoring Model (MANDATORY)
+score = 0
+
+if delay_days > 30:
+    score += 5
+
+if task_type == "structural":
+    score += 5
+
+if blocks_other_tasks:
+    score += 4
+
+if is_new_scope:
+    score += 3
+
+if missing_dependencies:
+    score += 4
+
+👉 Return TOP 3–5 highest scored issues
+
+3.⁠ ⁠💣 “SO WHAT” ENGINE (CRITICAL DIFFERENTIATOR)
+Purpose
+
+Translate analysis → real-world consequences
+
+Required Output
+WHAT THIS MEANS FOR YOUR PROJECT
+
+•⁠  ⁠Structural delay may push finishing phase by 2–3 months
+•⁠  ⁠New scope increases coordination complexity across trades
+•⁠  ⁠Risk of resource stacking in later phases
+
+If no action is taken:
+→ Delayed handover
+→ Increased costs
+→ Reduced efficiency
+Development Instruction
+
+Create:
+
+generate_consequences(prioritized_issues)
+Mapping Logic
+Issue Type	Consequence
+Structural delay	Delays downstream works
+MEP delay	Blocks commissioning
+New tasks	Increases coordination complexity
+Missing links	Risk of scheduling errors
+4.⁠ ⁠🎯 ACTION ENGINE (IMPORTANT: NOT COMMANDS)
+Purpose
+
+Guide focus WITHOUT giving strict instructions
+
+Required Output
+RECOMMENDED FOCUS AREAS
+
+•⁠  ⁠Validate integration of new tasks into the schedule
+•⁠  ⁠Review sequencing of structural activities
+•⁠  ⁠Ensure all new tasks are properly linked with dependencies
+Development Instruction
+
+Create:
+
+generate_recommendations(issue_types)
+Mapping
+Issue	Recommendation
+Delay	Review sequencing
+New scope	Validate integration
+Missing dependencies	Check task links
+5.⁠ ⁠📊 PROJECT HEALTH SCORECARD
+Purpose
+
+Give quick visual overview of project condition
+
+Required Output
+PROJECT HEALTH DASHBOARD
+
+Delays: ⚠️ 10 tasks (+90 days total)
+Added Scope: ⚠️ 30+ tasks
+Critical Path: ✅ Not impacted
+Overall Risk: ⚠️ Medium
+Development Instruction
+
+Create:
+
+generate_scorecard(data)
+6.⁠ ⁠📎 EXISTING ANALYSIS (KEEP THIS)
+
+Your current output (tables, details, etc.) is GOOD.
+
+👉 BUT:
+
+It must be placed AFTER the executive layer
+As supporting documentation (appendix style)
+
+🧠 FINAL SYSTEM ARCHITECTURE
+def generate_nova_report(data):
+
+    analysis = run_existing_analysis(data)
+
+    executive_summary = generate_executive_summary(analysis)
+    priorities = prioritize_issues(analysis.tasks)
+    consequences = generate_consequences(priorities)
+    recommendations = generate_recommendations(priorities)
+    scorecard = generate_scorecard(analysis)
+
+    return assemble_output(
+        executive_summary,
+        scorecard,
+        priorities,
+        consequences,
+        recommendations,
+        analysis
+    )
+⚡ PERFORMANCE REQUIREMENT
+
+The system must:
+
+Deliver insights instantly
+Be readable in under 30 seconds
+Remove need for manual interpretation
+💎 WHY THIS IS EXTREMELY VALUABLE
+
+If implemented correctly:
+
+Nova will:
+
+Save planners 5–10 hours per schedule update
+Allow project directors to:
+make decisions faster
+identify risks earlier
+run better meetings
+🔥 FINAL EXPECTATION
+
+When a user opens Nova, they should NOT feel:
+
+"This is interesting data"
+
+They MUST feel:
+
+"This is exactly what I needed to know"
+🚀 FINAL INSTRUCTION TO TEAM
+We are not building a reporting tool.
+
+We are building the most powerful decision support system
+for construction schedules in the world.
+
+Every output must be:
+•⁠  ⁠Clear
+•⁠  ⁠Actionable
+•⁠  ⁠Business-focused
+
+If a project director cannot understand the situation in 10 seconds,
+we have failed.
