@@ -30,6 +30,27 @@ SVG_ICONS = {
     "default": '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#06b6d4" opacity="0.15"/><path d="M9 9h6M9 12h6M9 15h4" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"/></svg>'
 }
 
+
+def _mini_svg(name: str, size: int = 14, color: str = "currentColor") -> str:
+    sw = "2"
+    b = f'width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round"'
+    icons = {
+        "dot": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="{color}" stroke="none"><circle cx="12" cy="12" r="5"/></svg>',
+        "chevron-right": f'<svg {b}><path d="m9 18 6-6-6-6"/></svg>',
+        "arrow-right": f'<svg {b}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+        "check": f'<svg {b}><path d="M20 6 9 17l-5-5"/></svg>',
+        "x": f'<svg {b}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+        "circle-check": f'<svg {b}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+        "circle-x": f'<svg {b}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+        "info": f'<svg {b}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+        "alert-circle": f'<svg {b}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+        "alert-triangle": f'<svg {b}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+        "shield-check": f'<svg {b}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+        "shield-alert": f'<svg {b}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>',
+        "octagon-alert": f'<svg {b}><path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2H8.688a2 2 0 0 0-1.414.586l-4.688 4.688A2 2 0 0 0 2 8.688v6.624a2 2 0 0 0 .586 1.414l4.688 4.688A2 2 0 0 0 8.688 22h6.624a2 2 0 0 0 1.414-.586l4.688-4.688A2 2 0 0 0 22 15.312V8.688a2 2 0 0 0-.586-1.414l-4.688-4.688A2 2 0 0 0 15.312 2z"/></svg>',
+    }
+    return icons.get(name, icons["dot"])
+
 CATEGORY_CONFIG = {
     "removed": {"label": "Removed Tasks", "label_da": "Fjernede Opgaver", "color": "#ef4444", "bg": "rgba(239, 68, 68, 0.04)", "border": "rgba(239, 68, 68, 0.12)"},
     "added": {"label": "Added Tasks", "label_da": "Tilføjede Opgaver", "color": "#10b981", "bg": "rgba(16, 185, 129, 0.04)", "border": "rgba(16, 185, 129, 0.12)"},
@@ -493,9 +514,9 @@ def _inline_markdown(text: str) -> str:
         else:
             result.append(escape_html(part))
     text = "".join(result)
-    text = text.replace('🔴', '<span style="color:#ef4444;font-size:10px;">●</span>')
-    text = text.replace('🟠', '<span style="color:#f59e0b;font-size:10px;">●</span>')
-    text = text.replace('🟢', '<span style="color:#10b981;font-size:10px;">●</span>')
+    text = text.replace('🔴', f'<span style="display:inline-flex;vertical-align:middle;margin:0 1px;">{_mini_svg("dot", 10, "#ef4444")}</span>')
+    text = text.replace('🟠', f'<span style="display:inline-flex;vertical-align:middle;margin:0 1px;">{_mini_svg("dot", 10, "#f59e0b")}</span>')
+    text = text.replace('🟢', f'<span style="display:inline-flex;vertical-align:middle;margin:0 1px;">{_mini_svg("dot", 10, "#10b981")}</span>')
     return text
 
 
@@ -525,14 +546,14 @@ def _render_exec_summary_card(summary_data: Dict, language: str) -> str:
     consequences = summary_data.get("consequences_if_no_action", [])
 
     status_config = {
-        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "icon": "🟢", "label_en": "STABLE", "label_da": "STABIL"},
-        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "icon": "⚠️", "label_en": "AT RISK", "label_da": "I RISIKO"},
-        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "icon": "🔴", "label_en": "CRITICAL", "label_da": "KRITISK"},
+        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "svg": "shield-check", "label_en": "STABLE", "label_da": "STABIL"},
+        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "svg": "alert-triangle", "label_en": "AT RISK", "label_da": "I RISIKO"},
+        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "svg": "octagon-alert", "label_en": "CRITICAL", "label_da": "KRITISK"},
     }
     risk_config = {
-        "LOW": {"color": "#10b981", "label_en": "Low", "label_da": "Lav"},
-        "MEDIUM": {"color": "#d97706", "label_en": "Medium", "label_da": "Moderat"},
-        "HIGH": {"color": "#dc2626", "label_en": "High", "label_da": "Høj"},
+        "LOW": {"color": "#10b981", "svg": "shield-check", "label_en": "Low", "label_da": "Lav"},
+        "MEDIUM": {"color": "#d97706", "svg": "alert-circle", "label_en": "Medium", "label_da": "Moderat"},
+        "HIGH": {"color": "#dc2626", "svg": "alert-triangle", "label_en": "High", "label_da": "Høj"},
     }
 
     sc = status_config.get(status, status_config["AT_RISK"])
@@ -547,13 +568,13 @@ def _render_exec_summary_card(summary_data: Dict, language: str) -> str:
 
     findings_html = ""
     for f in findings[:3]:
-        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="color:{sc["color"]};font-size:7px;margin-top:7px;flex-shrink:0;">●</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{escape_html(f)}</span></div>'
+        findings_html += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;"><span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, sc["color"])}</span><span style="font-size:13px;color:#334155;line-height:1.55;font-weight:500;">{escape_html(f)}</span></div>'
 
     consequences_html = ""
     if consequences:
         cons_items = ""
         for c in consequences[:3]:
-            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="font-size:13px;color:#dc2626;font-weight:600;">→</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{escape_html(c)}</span></div>'
+            cons_items += f'<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;"><span style="display:inline-flex;margin-top:2px;flex-shrink:0;">{_mini_svg("arrow-right", 13, "#dc2626")}</span><span style="font-size:12px;color:#991b1b;line-height:1.5;">{escape_html(c)}</span></div>'
         consequences_html = f'''
     <div style="margin-top:14px;padding:12px 16px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;">
       <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">{consequences_title}</div>
@@ -564,11 +585,12 @@ def _render_exec_summary_card(summary_data: Dict, language: str) -> str:
 <div style="margin:0 0 18px 0;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:20px;">{sc["icon"]}</span>
+      <span style="display:inline-flex;">{_mini_svg(sc["svg"], 22, sc["color"])}</span>
       <span style="font-size:11px;font-weight:800;color:{sc["color"]};text-transform:uppercase;letter-spacing:1.2px;">{proj_status_title}</span>
       <span style="padding:4px 14px;border-radius:20px;font-size:13px;font-weight:800;color:{sc["color"]};background:white;border:2px solid {sc["color"]};">{status_label}</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:white;border:1px solid {rc["color"]}30;">
+      <span style="display:inline-flex;">{_mini_svg(rc["svg"], 14, rc["color"])}</span>
       <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{risk_title}:</span>
       <span style="font-size:12px;font-weight:800;color:{rc["color"]};">{risk_label}</span>
     </div>
@@ -689,12 +711,12 @@ def generate_executive_html(content: str, language: str = "en") -> str:
             text = escape_html(priority_match.group(2))
             dot = ""
             if "🔴" in line:
-                dot = "🔴"
+                dot = "critical"
             elif "🟠" in line:
-                dot = "🟠"
+                dot = "important"
             elif "🟢" in line:
-                dot = "🟢"
-            dot_color = {"🔴": "#ef4444", "🟠": "#f59e0b", "🟢": "#10b981"}.get(dot, color)
+                dot = "low"
+            dot_color = {"critical": "#ef4444", "important": "#f59e0b", "low": "#10b981"}.get(dot, color)
             current_card = {"num": num, "title": text, "color": dot_color, "body": [], "why": "", "role": "", "effort": "", "related": ""}
             continue
 
@@ -807,10 +829,10 @@ def generate_root_cause_html(content: str, language: str = "en") -> str:
             if any(k in label_lower for k in ["manpower", "mandskab", "adding"]):
                 will_help = any(k in value.lower() for k in ["will not", "useless", "hjælper ikke", "no ", "ikke"])
                 badge_color = "#ef4444" if will_help else "#10b981"
-                badge_icon = "✕" if will_help else "✓"
+                badge_svg = _mini_svg("circle-x", 14, badge_color) if will_help else _mini_svg("circle-check", 14, badge_color)
                 current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
                   <div style="width:24px;height:24px;border-radius:6px;background:{badge_color}12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                    <span style="color:{badge_color};font-size:12px;font-weight:800;">{badge_icon}</span>
+                    {badge_svg}
                   </div>
                   <div><span style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
                 </div>''')
@@ -831,7 +853,7 @@ def generate_root_cause_html(content: str, language: str = "en") -> str:
             else:
                 current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;border-radius:10px;border:1px solid #e2e8f0;">
                   <div style="width:24px;height:24px;border-radius:6px;background:#64748b12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                    <span style="color:#64748b;font-size:11px;font-weight:800;">i</span>
+                    {_mini_svg("info", 14, "#64748b")}
                   </div>
                   <div><span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
                 </div>''')
@@ -847,7 +869,7 @@ def generate_root_cause_html(content: str, language: str = "en") -> str:
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
             item_text = _inline_markdown(line[2:])
             current_cause_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
-              <span style="color:#6366f1;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, "#6366f1")}</span>
               <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
             </div>''')
             continue
@@ -894,7 +916,7 @@ def generate_impact_html(content: str, language: str = "en") -> str:
             cons_title = "Hvis ingen handling tages" if language == "da" else "If No Action Is Taken"
             cons_html = ""
             for c in consequences_items:
-                cons_html += f'<div style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;"><span style="font-size:14px;color:#dc2626;font-weight:700;flex-shrink:0;">→</span><span style="font-size:13px;color:#991b1b;line-height:1.6;font-weight:500;">{c}</span></div>'
+                cons_html += f'<div style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;"><span style="display:inline-flex;margin-top:2px;flex-shrink:0;">{_mini_svg("arrow-right", 14, "#dc2626")}</span><span style="font-size:13px;color:#991b1b;line-height:1.6;font-weight:500;">{c}</span></div>'
             processed.append(f'''
     <div style="margin:20px 0 8px 0;padding:18px 22px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-radius:12px;border:1px solid #fecaca;border-left:4px solid #dc2626;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
@@ -950,7 +972,7 @@ def generate_impact_html(content: str, language: str = "en") -> str:
             value = _inline_markdown(label_value.group(2).strip())
             processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
               <div style="width:24px;height:24px;border-radius:6px;background:#d9770612;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                <span style="color:#d97706;font-size:11px;font-weight:800;">!</span>
+                {_mini_svg("alert-circle", 14, "#d97706")}
               </div>
               <div><span style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
             </div>''')
@@ -966,7 +988,7 @@ def generate_impact_html(content: str, language: str = "en") -> str:
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
             item_text = _inline_markdown(line[2:])
             list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
-              <span style="color:#d97706;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, "#d97706")}</span>
               <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
             </div>''')
             continue
@@ -1063,7 +1085,7 @@ def generate_summary_html(summary_content: str, language: str = "en", actual_cou
             value = _inline_markdown(label_value.group(2).strip())
             processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
               <div style="width:24px;height:24px;border-radius:6px;background:#8b5cf612;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                <span style="color:#8b5cf6;font-size:11px;font-weight:800;">i</span>
+                {_mini_svg("info", 14, "#8b5cf6")}
               </div>
               <div><span style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
             </div>''')
@@ -1072,7 +1094,7 @@ def generate_summary_html(summary_content: str, language: str = "en", actual_cou
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
             item_text = _inline_markdown(line[2:])
             list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
-              <span style="color:#8b5cf6;font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, "#8b5cf6")}</span>
               <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
             </div>''')
             continue
@@ -1162,7 +1184,7 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
             value = _inline_markdown(label_value.group(2).strip())
             processed.append(f'''<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin:6px 0;background:white;border-radius:10px;border:1px solid #e2e8f0;">
               <div style="width:24px;height:24px;border-radius:6px;background:{color}12;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                <span style="color:{color};font-size:11px;font-weight:800;">i</span>
+                {_mini_svg("info", 14, color)}
               </div>
               <div><span style="font-size:11px;font-weight:700;color:{color};text-transform:uppercase;letter-spacing:0.5px;">{label}</span><div style="font-size:13px;color:#475569;line-height:1.5;margin-top:2px;">{value}</div></div>
             </div>''')
@@ -1178,7 +1200,7 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
             item_text = _inline_markdown(line[2:])
             list_items.append(f'''<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 14px;">
-              <span style="color:{color};font-size:6px;margin-top:7px;flex-shrink:0;">●</span>
+              <span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, color)}</span>
               <span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span>
             </div>''')
             continue
@@ -1227,7 +1249,9 @@ def generate_health_html(health_content: str, health_data: Optional[Dict], langu
         }
         rl_c = rl_config.get(rl, rl_config["MEDIUM"])
         rl_label = rl_c["label_da"] if language == "da" else rl_c["label_en"]
+        rl_svg_name = {"LOW": "shield-check", "MEDIUM": "alert-circle", "HIGH": "alert-triangle"}.get(rl, "alert-circle")
         risk_badge_html = f'''<div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;background:white;border:1px solid {rl_c["color"]}25;">
+          <span style="display:inline-flex;">{_mini_svg(rl_svg_name, 14, rl_c["color"])}</span>
           <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">{"Risiko" if language == "da" else "Risk"}:</span>
           <span style="font-size:12px;font-weight:800;color:{rl_c["color"]};">{rl_label}</span>
         </div>'''
