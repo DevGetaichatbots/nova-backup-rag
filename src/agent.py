@@ -918,18 +918,22 @@ class RAGAgent:
         else:
             logger.info(f"  Chunks sent to LLM: {total_chunks}")
 
-        if len(table_names) == 2 and len(per_store_chunks) == 2:
+        if len(table_names) == 2:
             old_table = [t for t in table_names if 'old' in t.lower()]
-            new_table = [t for t in table_names if 'new' in t.lower() or t not in old_table]
+            new_table = [t for t in table_names if 'new' in t.lower()]
+            if not new_table:
+                new_table = [t for t in table_names if t not in old_table]
             if old_table and new_table:
+                old_all = list(all_table_results.get(old_table[0], []) if not isinstance(all_table_results.get(old_table[0], {}), dict) else [])
+                new_all = list(all_table_results.get(new_table[0], []) if not isinstance(all_table_results.get(new_table[0], {}), dict) else [])
                 try:
-                    diff_text = self._compute_schedule_diff(
-                        per_store_chunks.get(old_table[0], []),
-                        per_store_chunks.get(new_table[0], [])
-                    )
+                    diff_text = self._compute_schedule_diff(old_all, new_all)
                     if diff_text:
+                        is_partial = total_skipped > 0
+                        if is_partial:
+                            diff_text = diff_text.replace("PRE-COMPUTED SCHEDULE DIFF", "PRE-COMPUTED SCHEDULE DIFF (PARTIAL — some chunks omitted from context)")
                         context_parts.append(f"\n\n{diff_text}")
-                        logger.info(f"  Pre-computed diff appended to context ({len(diff_text)} chars)")
+                        logger.info(f"  Pre-computed diff appended to context ({len(diff_text)} chars, partial={is_partial})")
                 except Exception as e:
                     logger.warning(f"  Pre-diff computation failed: {e}")
 
@@ -1139,29 +1143,16 @@ Keep your response concise and helpful."""
             error_str = str(e)
             if "context_length_exceeded" in error_str:
                 logger.warning(f"  Token limit exceeded, retrying with reduced context...")
-                reduced_context = self._retrieve_context(
-                    user_query, table_names, top_k,
-                    old_filename=old_filename, new_filename=new_filename
-                )
-                reduced_bytes = int(len(reduced_context.encode("utf-8")) * 0.85)
-                per_store = reduced_bytes // max(len(table_names), 1)
-
-                trimmed_parts = []
-                for table_name in table_names:
-                    results = vector_store_manager.fetch_all_from_stores([table_name], chunk_type="table").get(table_name, [])
-                    if isinstance(results, dict):
-                        continue
-                    store_bytes = 0
-                    for i, result in enumerate(results, 1):
-                        chunk_text = f"--- Table {i} ---\n{result['content']}\n"
-                        cb = len(chunk_text.encode("utf-8"))
-                        if store_bytes + cb > per_store:
-                            break
-                        trimmed_parts.append(chunk_text)
-                        store_bytes += cb
-
-                reduced_ctx = "\n".join(trimmed_parts)
-                logger.info(f"  Reduced context to {len(reduced_ctx):,} bytes (was {len(reduced_context):,})")
+                original_budget = self.MAX_CONTEXT_BYTES
+                self.MAX_CONTEXT_BYTES = int(original_budget * 0.85)
+                try:
+                    reduced_ctx = self._retrieve_context(
+                        user_query, table_names, top_k,
+                        old_filename=old_filename, new_filename=new_filename
+                    )
+                finally:
+                    self.MAX_CONTEXT_BYTES = original_budget
+                logger.info(f"  Reduced context to {len(reduced_ctx):,} bytes")
 
                 if is_comparison:
                     user_message = user_message.replace(context, reduced_ctx)
