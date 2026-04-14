@@ -1,0 +1,318 @@
+Hi Guys,
+
+First of all – excellent progress. The platform is already strong and clearly moving in the right direction.
+
+However, we are currently missing the MOST IMPORTANT layer.
+
+Right now, the system is an *analysis tool*.
+
+We must transform it into an *INDISPENSABLE DECISION TOOL* used by project directors in real meetings.
+
+This requires a very specific upgrade in how we present information.
+
+Below is the FINAL instruction guide.
+Everything here must be implemented exactly as described.
+
+---
+
+# 🔴 CORE PRINCIPLE (READ THIS FIRST)
+
+We are NOT building software that explains problems.
+
+We are building software that answers:
+
+→ What is the ONE biggest problem?
+→ How serious is it?
+→ What does it impact (time, cost, delivery)?
+→ What should I focus on right now?
+
+If the user needs to THINK → we have failed.
+If the user instantly understands and acts → we have succeeded.
+
+---
+
+# 1. 🔥 EXECUTIVE TOP SECTION (MOST IMPORTANT FEATURE)
+
+## WHAT TO BUILD
+
+At the VERY TOP of the output (above everything else), create an ultra-simple executive summary.
+
+It MUST be readable in 5 seconds.
+
+## EXACT FORMAT (MANDATORY)
+
+🔴 PROJECT STATUS: AT RISK
+
+🔥 BIGGEST ISSUE
+Structural delay blocking handover
+
+⏱ IMPACT
++60–90 days delay
+High cost risk
+Affects handover & commissioning
+
+⚠️ WHY
+Critical path delay + missing dependencies
+
+🎯 FOCUS
+Fix sequence + validate dependencies before adding resources
+
+---
+
+## RULES
+
+•⁠  ⁠MAX 5 lines total
+•⁠  ⁠NO technical noise
+•⁠  ⁠NO long explanations
+•⁠  ⁠NO multiple issues
+•⁠  ⁠ONLY ONE issue allowed
+
+---
+
+## WHY THIS IS CRITICAL
+
+Executives do NOT read reports.
+
+They scan.
+
+If they cannot understand the situation in 5 seconds:
+→ The product fails
+
+This section alone determines whether this becomes a MUST-HAVE tool.
+
+---
+
+# 2. 👉 “BIGGEST RISK RIGHT NOW” (THE ONE THING)
+
+## WHAT TO BUILD
+
+Immediately after the top section, create a dedicated block:
+
+BIGGEST RISK RIGHT NOW
+
+→ [Short, specific issue]
+→ [What it is blocking]
+→ [Estimated delay impact]
+
+## EXAMPLE
+
+BIGGEST RISK RIGHT NOW
+
+→ Structural delay on "2. Gennemgang"
+→ Blocking project handover
+→ Estimated impact: +2–3 months delay
+
+---
+
+## LOGIC (VERY IMPORTANT)
+
+The system MUST internally analyze many issues, BUT:
+
+→ Only show ONE
+
+Selection criteria:
+
+•⁠  ⁠On critical path
+•⁠  ⁠Highest delay impact
+•⁠  ⁠Blocks downstream phases (handover, commissioning)
+
+---
+
+## WHY THIS IS CRITICAL
+
+Project directors do NOT want 5 problems.
+
+They want:
+→ THE problem
+
+Too many priorities = no priorities.
+
+This is where we FORCE clarity.
+
+---
+
+# 3. 💰 TIME / COST / BUSINESS IMPACT (CRITICAL LAYER)
+
+## WHAT TO BUILD
+
+Every major issue MUST include business impact.
+
+## FORMAT
+
+Estimated Impact:
+
+•⁠  ⁠Delay: +60–90 days
+•⁠  ⁠Cost risk: HIGH (due to prolonged site & coordination)
+•⁠  ⁠Affected phases: Handover, commissioning, finishing
+
+---
+
+## WHY THIS IS CRITICAL
+
+Directors think in:
+
+→ Time
+→ Money
+→ Risk
+
+NOT technical details.
+
+If we don’t translate analysis into business impact:
+→ The tool will NOT be used in leadership decisions.
+
+This is what makes it valuable in real meetings.
+
+---
+
+# 4. 🧠 CONFIDENCE LEVEL (TRUST LAYER)
+
+## WHAT TO BUILD
+
+Every major conclusion must include a confidence level.
+
+## FORMAT
+
+Confidence Level: HIGH
+(Based on critical path analysis & dependency structure)
+
+---
+
+## WHY THIS IS CRITICAL
+
+Every director will think:
+
+“Can I trust this?”
+
+If we don’t answer that:
+→ They will hesitate
+→ They will not act
+
+Confidence = Trust = Adoption
+
+---
+
+# 5. ❌ SIMPLIFICATION RULE (REMOVE NOISE)
+
+## WHAT TO BUILD
+
+The system must REDUCE visible complexity.
+
+## RULES
+
+•⁠  ⁠Do NOT show everything at once
+•⁠  ⁠Do NOT overload the top
+•⁠  ⁠Do NOT present multiple equal-priority insights
+
+Structure must be:
+
+→ Simple first
+→ Detailed later
+
+---
+
+## WHY THIS IS CRITICAL
+
+Right now, the system still feels like:
+
+“Here is everything we found”
+
+We need:
+
+“Here is what matters”
+
+---
+
+# 6. 🧱 FINAL OUTPUT STRUCTURE (MANDATORY)
+
+The output MUST follow this EXACT hierarchy:
+
+1.⁠ ⁠EXECUTIVE TOP SECTION (5-second overview)
+2.⁠ ⁠BIGGEST RISK RIGHT NOW
+3.⁠ ⁠ESTIMATED IMPACT (time / cost / phases)
+4.⁠ ⁠CONFIDENCE LEVEL
+5.⁠ ⁠ROOT CAUSE ANALYSIS
+6.⁠ ⁠RECOMMENDED ACTIONS
+7.⁠ ⁠DETAILED TABLES (deep dive)
+
+---
+
+## WHY THIS STRUCTURE
+
+We guide the user through:
+
+→ Understanding
+→ Trust
+→ Decision
+→ Detail
+
+---
+
+# 7. 🚨 CRITICAL UX RULE
+
+Everything above “Root Cause Analysis” must be:
+
+→ Fast
+→ Clear
+→ Action-oriented
+
+Everything below can be:
+
+→ Detailed
+→ Analytical
+
+---
+
+# 8. 🎯 FINAL GOAL
+
+We are NOT building:
+
+❌ A reporting tool
+❌ A technical analysis system
+
+We ARE building:
+
+✅ A decision engine for project directors
+
+The user must feel:
+
+“I know exactly what the problem is and what it means for my project”
+
+---
+
+# 🔥 SUCCESS CRITERIA
+
+If a project director opens the report:
+
+→ Within 5 seconds:
+Understands the problem
+
+→ Within 10 seconds:
+Understands the impact
+
+→ Within 20 seconds:
+Knows what to focus on
+
+If this happens:
+→ This becomes a MUST-HAVE product
+
+If not:
+→ It remains “interesting software”
+
+---
+
+# ⚠️ FINAL NOTE
+
+This layer is NOT optional.
+
+This is the difference between:
+
+A good product
+and
+A product that gets used in every executive meeting
+
+---
+
+Let’s execute this with precision.
+
+This is the final step that unlocks massive value.
+
