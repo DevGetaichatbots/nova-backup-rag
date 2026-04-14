@@ -361,7 +361,26 @@ These tables are the deep-dive data supporting the executive conclusions above.
 - NEVER truncate, abbreviate, summarize, or skip ANY rows.
 - NEVER use `| ... | ... | ... |` as a table row — every row must contain real data
 
-**For MS Project format:**
+**For Tactplan export format (match by TBS):**
+
+### Delayed Tasks
+| Priority | TBS | Navn | Lokation | Startdato (A) | Slutdato (A) | Slutdato (B) | Difference | Varighed (A) → (B) |
+|---|---|---|---|---|---|---|---|---|
+| 🔴 CRITICAL | 1.1.1 | Dæk over | L1/Stueplan | 16/03/2021 | 09/03/2022 | 14/06/2021 | -269d | 257→64 |
+
+### Accelerated Tasks
+| TBS | Navn | Lokation | Slutdato (A) | Slutdato (B) | Difference | Notes |
+
+### Added Tasks (TBS only in NEW)
+| TBS | Navn | Aktivitetstype | Lokation | Startdato | Slutdato | Varighed |
+
+### Removed Tasks (TBS only in OLD)
+| Priority | TBS | Navn | Aktivitetstype | Lokation | Slutdato (A) | Varighed (A) | Risk If Intentional |
+
+### Modified Tasks (same TBS, field changes)
+| Priority | TBS | Navn | Change Type | Old Value | New Value | Notes |
+
+**For MS Project format (match by Id):**
 
 ### Delayed Tasks
 | Priority | Id | Opgavenavn | Area (Omr.) | Slutdato (A) | Slutdato (B) | Difference | What It Blocks |
@@ -643,6 +662,197 @@ class RAGAgent:
     TOKENS_PER_BYTE = 0.50
     RESERVED_TOKENS = 50_000
 
+    def _parse_csv_rows(self, chunks: list) -> tuple:
+        import csv
+        import io
+        headers = None
+        rows = []
+        for chunk in chunks:
+            content = chunk.get('content', '') if isinstance(chunk, dict) else str(chunk)
+            reader = csv.reader(io.StringIO(content), delimiter=';', quotechar='"')
+            for parts in reader:
+                line_text = ';'.join(parts)
+                if line_text.startswith('FORMAT:') or not line_text.strip():
+                    continue
+                if len(parts) < 5:
+                    continue
+                stripped = [p.strip() for p in parts]
+                if headers is None:
+                    headers = stripped
+                    continue
+                if stripped == headers:
+                    continue
+                if len(parts) >= len(headers) * 0.7:
+                    row = {}
+                    for i, h in enumerate(headers):
+                        row[h] = stripped[i] if i < len(stripped) else ''
+                    rows.append(row)
+        return headers, rows
+
+    def _detect_match_key(self, headers: list) -> str:
+        if not headers:
+            return 'name'
+        h_lower = [h.lower() for h in headers]
+        if 'tbs' in h_lower and '#' in headers:
+            return 'tbs'
+        if any('foregående opgaver' in h for h in h_lower):
+            return 'id'
+        if any('entydigt id' in h for h in h_lower):
+            return 'entydigt_id'
+        if any('tbs' in h for h in h_lower):
+            return 'tbs'
+        return 'name'
+
+    def _get_row_key(self, row: dict, match_key: str) -> str:
+        if match_key == 'tbs':
+            return row.get('TBS', row.get('tbs', '')).strip()
+        elif match_key == 'id':
+            return row.get('Id', row.get('id', row.get('#', ''))).strip()
+        elif match_key == 'entydigt_id':
+            return row.get('Entydigt id', row.get('entydigt id', '')).strip()
+        else:
+            return row.get('Navn', row.get('Opgavenavn', row.get('navn', ''))).strip()
+
+    def _compute_schedule_diff(self, old_chunks: list, new_chunks: list) -> str:
+        old_headers, old_rows = self._parse_csv_rows(old_chunks)
+        new_headers, new_rows = self._parse_csv_rows(new_chunks)
+
+        if not old_rows or not new_rows:
+            return ""
+
+        match_key = self._detect_match_key(old_headers)
+        key_label = {'tbs': 'TBS', 'id': 'Id', 'entydigt_id': 'Entydigt id', 'name': 'Navn'}.get(match_key, match_key)
+        logger.info(f"  Pre-diff: match_key={match_key} ({key_label}), old={len(old_rows)} rows, new={len(new_rows)} rows")
+
+        old_map = {}
+        for r in old_rows:
+            k = self._get_row_key(r, match_key)
+            if k:
+                old_map[k] = r
+
+        new_map = {}
+        for r in new_rows:
+            k = self._get_row_key(r, match_key)
+            if k:
+                new_map[k] = r
+
+        old_keys = set(old_map.keys())
+        new_keys = set(new_map.keys())
+        removed_keys = old_keys - new_keys
+        added_keys = new_keys - old_keys
+        common_keys = old_keys & new_keys
+
+        compare_fields = ['Startdato', 'Slutdato', 'Varighed', 'Lokation', 'Fremdrift', 'Navn',
+                         'startdato', 'slutdato', 'varighed', 'lokation', 'fremdrift', 'navn',
+                         'Aktivitetstype', 'aktivitetstype']
+
+        def _parse_date(d):
+            from datetime import datetime
+            if not d:
+                return None
+            for fmt in ['%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%d.%m.%Y']:
+                try:
+                    return datetime.strptime(d.strip(), fmt)
+                except ValueError:
+                    continue
+            return None
+
+        delayed = []
+        accelerated = []
+        modified = []
+
+        for k in sorted(common_keys):
+            old_r = old_map[k]
+            new_r = new_map[k]
+            changes = []
+            date_shift = None
+
+            for field in compare_fields:
+                if field in old_r or field in new_r:
+                    old_val = old_r.get(field, '').strip()
+                    new_val = new_r.get(field, '').strip()
+                    if old_val != new_val and (old_val or new_val):
+                        changes.append(f"{field}: '{old_val}' → '{new_val}'")
+                        if field.lower() == 'slutdato' and old_val and new_val:
+                            old_date = _parse_date(old_val)
+                            new_date = _parse_date(new_val)
+                            if old_date and new_date:
+                                diff_days = (new_date - old_date).days
+                                date_shift = diff_days
+
+            if changes:
+                entry = f"{key_label}={k} | {old_r.get('Navn', old_r.get('Opgavenavn', old_r.get('navn', '')))} | " + ' | '.join(changes)
+                if date_shift is not None and date_shift > 0:
+                    delayed.append(entry)
+                elif date_shift is not None and date_shift < 0:
+                    accelerated.append(entry)
+                else:
+                    modified.append(entry)
+
+        diff_parts = []
+        diff_parts.append(f"═══ PRE-COMPUTED SCHEDULE DIFF ({key_label}-based matching) ═══")
+        diff_parts.append(f"Format detected: {'Tactplan export' if match_key == 'tbs' else match_key.upper()}")
+        diff_parts.append(f"OLD rows: {len(old_rows)} | NEW rows: {len(new_rows)}")
+        diff_parts.append(f"Matched {key_label}s: {len(common_keys)} | Only in OLD (REMOVED): {len(removed_keys)} | Only in NEW (ADDED): {len(added_keys)}")
+        diff_parts.append(f"Changed (date/field differences): {len(delayed) + len(accelerated) + len(modified)} ({len(delayed)} with Slutdato changes, {len(modified)} other modifications)")
+        diff_parts.append("")
+
+        max_rows_per_category = 100
+
+        if delayed:
+            diff_parts.append(f"── TASKS WITH SLUTDATO CHANGES ({len(delayed)} tasks) ──")
+            for row in delayed[:max_rows_per_category]:
+                diff_parts.append(f"  {row}")
+            if len(delayed) > max_rows_per_category:
+                diff_parts.append(f"  ... and {len(delayed) - max_rows_per_category} more")
+            diff_parts.append("")
+
+        if accelerated:
+            diff_parts.append(f"── ACCELERATED TASKS ({len(accelerated)} tasks) ──")
+            for row in accelerated[:max_rows_per_category]:
+                diff_parts.append(f"  {row}")
+            diff_parts.append("")
+
+        if modified:
+            diff_parts.append(f"── MODIFIED TASKS (non-date changes) ({len(modified)} tasks) ──")
+            for row in modified[:max_rows_per_category]:
+                diff_parts.append(f"  {row}")
+            if len(modified) > max_rows_per_category:
+                diff_parts.append(f"  ... and {len(modified) - max_rows_per_category} more")
+            diff_parts.append("")
+
+        if removed_keys:
+            diff_parts.append(f"── REMOVED TASKS ({len(removed_keys)} tasks — {key_label} only in OLD) ──")
+            for k in sorted(removed_keys)[:max_rows_per_category]:
+                r = old_map[k]
+                name = r.get('Navn', r.get('Opgavenavn', r.get('navn', '')))
+                slut = r.get('Slutdato', r.get('slutdato', ''))
+                diff_parts.append(f"  {key_label}={k} | {name} | Slutdato={slut}")
+            if len(removed_keys) > max_rows_per_category:
+                diff_parts.append(f"  ... and {len(removed_keys) - max_rows_per_category} more")
+            diff_parts.append("")
+
+        if added_keys:
+            diff_parts.append(f"── ADDED TASKS ({len(added_keys)} tasks — {key_label} only in NEW) ──")
+            for k in sorted(added_keys)[:max_rows_per_category]:
+                r = new_map[k]
+                name = r.get('Navn', r.get('Opgavenavn', r.get('navn', '')))
+                slut = r.get('Slutdato', r.get('slutdato', ''))
+                diff_parts.append(f"  {key_label}={k} | {name} | Slutdato={slut}")
+            if len(added_keys) > max_rows_per_category:
+                diff_parts.append(f"  ... and {len(added_keys) - max_rows_per_category} more")
+            diff_parts.append("")
+
+        if not delayed and not accelerated and not modified and not removed_keys and not added_keys:
+            diff_parts.append("⚠️ NO DIFFERENCES FOUND — schedules appear truly identical.")
+        else:
+            total_diffs = len(delayed) + len(accelerated) + len(modified) + len(removed_keys) + len(added_keys)
+            diff_parts.append(f"═══ TOTAL: {total_diffs} differences found across all categories ═══")
+
+        diff_text = '\n'.join(diff_parts)
+        logger.info(f"  Pre-diff computed: {len(delayed)} date changes, {len(modified)} modifications, {len(removed_keys)} removed, {len(added_keys)} added")
+        return diff_text
+
     def _get_doc_label(self, table_name: str, old_filename: str = None, new_filename: str = None) -> str:
         if "old" in table_name.lower():
             return f"OLD Schedule ({old_filename})" if old_filename else "OLD Schedule"
@@ -658,6 +868,7 @@ class RAGAgent:
         total_chunks = 0
         total_skipped = 0
         total_data_rows = 0
+        per_store_chunks = {}
 
         for table_name in table_names:
             doc_label = self._get_doc_label(table_name, old_filename, new_filename)
@@ -677,6 +888,7 @@ class RAGAgent:
             store_bytes = 0
             included = 0
             skipped = 0
+            included_results = []
             for i, result in enumerate(results, 1):
                 chunk_text = f"--- Data {i} ---\n{result['content']}\n"
                 chunk_bytes = len(chunk_text.encode("utf-8"))
@@ -686,11 +898,13 @@ class RAGAgent:
                 store_parts.append(chunk_text)
                 store_bytes += chunk_bytes
                 included += 1
+                included_results.append(result)
                 content = result.get('content', '')
                 lines = [l for l in content.split('\n') if l.strip() and ';' in l]
                 if lines:
                     total_data_rows += max(0, len(lines) - 1)
 
+            per_store_chunks[table_name] = included_results
             total_chunks += included
             total_skipped += skipped
             label = f"\n[{doc_label}: {table_name}] — {included} chunks (table)"
@@ -703,6 +917,21 @@ class RAGAgent:
             logger.warning(f"  Context truncated: {total_chunks} chunks sent, {total_skipped} omitted (API limit: {self.MAX_CONTEXT_BYTES:,} bytes)")
         else:
             logger.info(f"  Chunks sent to LLM: {total_chunks}")
+
+        if len(table_names) == 2 and len(per_store_chunks) == 2:
+            old_table = [t for t in table_names if 'old' in t.lower()]
+            new_table = [t for t in table_names if 'new' in t.lower() or t not in old_table]
+            if old_table and new_table:
+                try:
+                    diff_text = self._compute_schedule_diff(
+                        per_store_chunks.get(old_table[0], []),
+                        per_store_chunks.get(new_table[0], [])
+                    )
+                    if diff_text:
+                        context_parts.append(f"\n\n{diff_text}")
+                        logger.info(f"  Pre-computed diff appended to context ({len(diff_text)} chars)")
+                except Exception as e:
+                    logger.warning(f"  Pre-diff computation failed: {e}")
 
         self._last_total_data_rows = total_data_rows
         logger.info(f"  Total data rows across all stores: {total_data_rows}")
@@ -780,7 +1009,9 @@ class RAGAgent:
         new_label = new_filename if new_filename else "Version B"
         
         if is_comparison:
-            user_message = f"""You have been given retrieved chunks from two construction schedule files. Perform a precise comparison.
+            user_message = f"""You have been given retrieved chunks from two construction schedule files. Perform a precise, row-by-row comparison.
+
+⚠️ CRITICAL: A pre-computed diff analysis is included at the end of the retrieved context (marked "PRE-COMPUTED SCHEDULE DIFF"). This diff was computed by comparing every row between the two schedules using the appropriate matching key (TBS, Id, etc.). You MUST use these pre-computed differences as the factual basis for your response. Report the actual differences found — do NOT override the diff results with your own analysis. If the diff shows hundreds of differences, your response must reflect that reality.
 
 IMPORTANT: Throughout your response, refer to the old schedule as "{old_label}" and the new schedule as "{new_label}". Use these exact names in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
 
@@ -798,35 +1029,44 @@ STEP-BY-STEP MATCHING INSTRUCTIONS (MANDATORY):
 
 STEP 0 — DETECT DOCUMENT FORMAT
 Check the column headers in the retrieved data:
-  - If you see "Foregående opgaver" / "Efterfølgende opgaver" → MS Project format → match by Id
+  - If you see columns "#" + "TBS" + "Aktivitetstype" + "Foregående" / "Efterfølgende" → Tactplan export format → match by TBS code
+  - If you see "Foregående opgaver" / "Efterfølgende opgaver" (with "opgaver") AND an "Id" column → MS Project format → match by Id
   - If you see "Entydigt id" / "bemærkn." → Detailtidsplan format → match by Entydigt id
   - If you see "Uge:" week headers → Unstructured format → match by week + work type + responsible
   - If OLD and NEW use different formats → Mixed → flag it in your response, match by task name + dates as best-effort
+CRITICAL: The "#" column in Tactplan exports is an UNSTABLE internal export ID — it changes between exports of the same project. NEVER use "#" as a matching key. Use TBS instead.
 
 STEP 1 — BUILD TASK LISTS
 From every OLD Schedule chunk, extract all task rows and record their fields.
 From every NEW Schedule chunk, do the same.
+For Tactplan: use TBS (e.g. "1.1.1", "2.3.4") as the stable unique identifier. The "#" column is NOT stable — ignore it for matching. Record: TBS, Navn, Aktivitetstype, Lokation, Startdato, Slutdato, Varighed, Fremdrift.
 For MS Project: skip summary/parent rows (Slutdato = "-") for comparison but note them for context.
 For Unstructured: group entries by Uge (week) and work description.
 
 STEP 2 — MATCH TASKS (format-dependent)
-A. MS Project format: match by Id
+A. Tactplan export format: match by TBS code
+   - TBS in OLD only → REMOVED
+   - TBS in NEW only → ADDED
+   - TBS in BOTH → compare Startdato/Slutdato for DELAYED/ACCELERATED, Varighed/Lokation/Fremdrift/Navn for MODIFIED
+   IMPORTANT: Even if task names look similar, tasks with different TBS codes are DIFFERENT tasks. Two schedules from the same project will share many task names but may have very different TBS structures, dates, and durations. You MUST compare field-by-field for every matched TBS.
+
+B. MS Project format: match by Id
    - Id in OLD only → REMOVED
    - Id in NEW only → ADDED
    - Id in BOTH → compare Slutdato for DELAYED/ACCELERATED, other fields for MODIFIED
 
-B. Detailtidsplan format: match by Entydigt id
+C. Detailtidsplan format: match by Entydigt id
    - Entydigt id in OLD only → REMOVED
    - Entydigt id in NEW only → ADDED (often marked NY in bemærkn.)
    - Entydigt id in BOTH → compare Slutdato for DELAYED/ACCELERATED, other fields for MODIFIED
 
-C. Unstructured format: match by week + work type + responsible
+D. Unstructured format: match by week + work type + responsible
    - Week + work type in NEW only → ADDED
    - Week + work type in OLD only → REMOVED
    - Same work type, different week → MOVED (DELAYED/ACCELERATED)
    - Same week + work type, different days or person → MODIFIED
 
-D. Mixed format: match by Opgavenavn + date overlap as best-effort, flag uncertainty
+E. Mixed format: match by Opgavenavn + date overlap as best-effort, flag uncertainty
 
 STEP 3 — BUILD SEPARATE TABLES (ONE PER CATEGORY)
 For each category, output a ### heading then its own markdown table IN THIS ORDER:
