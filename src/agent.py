@@ -713,12 +713,12 @@ class RAGAgent:
         else:
             return row.get('Navn', row.get('Opgavenavn', row.get('navn', ''))).strip()
 
-    def _compute_schedule_diff(self, old_chunks: list, new_chunks: list) -> str:
+    def _compute_schedule_diff(self, old_chunks: list, new_chunks: list) -> tuple:
         old_headers, old_rows = self._parse_csv_rows(old_chunks)
         new_headers, new_rows = self._parse_csv_rows(new_chunks)
 
         if not old_rows or not new_rows:
-            return ""
+            return "", None
 
         match_key = self._detect_match_key(old_headers)
         key_label = {'tbs': 'TBS', 'id': 'Id', 'entydigt_id': 'Entydigt id', 'name': 'Navn'}.get(match_key, match_key)
@@ -757,9 +757,12 @@ class RAGAgent:
                     continue
             return None
 
-        delayed = []
-        accelerated = []
-        modified = []
+        def _get_name(r):
+            return r.get('Navn', r.get('Opgavenavn', r.get('navn', '')))
+
+        delayed_rows = []
+        accelerated_rows = []
+        modified_rows = []
 
         for k in sorted(common_keys):
             old_r = old_map[k]
@@ -772,86 +775,105 @@ class RAGAgent:
                     old_val = old_r.get(field, '').strip()
                     new_val = new_r.get(field, '').strip()
                     if old_val != new_val and (old_val or new_val):
-                        changes.append(f"{field}: '{old_val}' → '{new_val}'")
+                        changes.append({"field": field, "old": old_val, "new": new_val})
                         if field.lower() == 'slutdato' and old_val and new_val:
                             old_date = _parse_date(old_val)
                             new_date = _parse_date(new_val)
                             if old_date and new_date:
-                                diff_days = (new_date - old_date).days
-                                date_shift = diff_days
+                                date_shift = (new_date - old_date).days
 
             if changes:
-                entry = f"{key_label}={k} | {old_r.get('Navn', old_r.get('Opgavenavn', old_r.get('navn', '')))} | " + ' | '.join(changes)
+                row_data = {
+                    "key": k,
+                    "old_name": _get_name(old_r),
+                    "new_name": _get_name(new_r),
+                    "lokation": old_r.get('Lokation', old_r.get('lokation', '')),
+                    "old_slutdato": old_r.get('Slutdato', old_r.get('slutdato', '')),
+                    "new_slutdato": new_r.get('Slutdato', new_r.get('slutdato', '')),
+                    "old_varighed": old_r.get('Varighed', old_r.get('varighed', '')),
+                    "new_varighed": new_r.get('Varighed', new_r.get('varighed', '')),
+                    "date_shift": date_shift,
+                    "changes": changes,
+                }
                 if date_shift is not None and date_shift > 0:
-                    delayed.append(entry)
+                    delayed_rows.append(row_data)
                 elif date_shift is not None and date_shift < 0:
-                    accelerated.append(entry)
+                    accelerated_rows.append(row_data)
                 else:
-                    modified.append(entry)
+                    modified_rows.append(row_data)
 
+        removed_rows = []
+        for k in sorted(removed_keys):
+            r = old_map[k]
+            removed_rows.append({
+                "key": k, "name": _get_name(r),
+                "aktivitetstype": r.get('Aktivitetstype', r.get('aktivitetstype', '')),
+                "lokation": r.get('Lokation', r.get('lokation', '')),
+                "slutdato": r.get('Slutdato', r.get('slutdato', '')),
+                "varighed": r.get('Varighed', r.get('varighed', '')),
+            })
+
+        added_rows = []
+        for k in sorted(added_keys):
+            r = new_map[k]
+            added_rows.append({
+                "key": k, "name": _get_name(r),
+                "aktivitetstype": r.get('Aktivitetstype', r.get('aktivitetstype', '')),
+                "lokation": r.get('Lokation', r.get('lokation', '')),
+                "startdato": r.get('Startdato', r.get('startdato', '')),
+                "slutdato": r.get('Slutdato', r.get('slutdato', '')),
+                "varighed": r.get('Varighed', r.get('varighed', '')),
+            })
+
+        diff_data = {
+            "key_label": key_label,
+            "match_key": match_key,
+            "old_count": len(old_rows),
+            "new_count": len(new_rows),
+            "delayed": delayed_rows,
+            "accelerated": accelerated_rows,
+            "modified": modified_rows,
+            "removed": removed_rows,
+            "added": added_rows,
+        }
+
+        max_summary_rows = 30
         diff_parts = []
         diff_parts.append(f"═══ PRE-COMPUTED SCHEDULE DIFF ({key_label}-based matching) ═══")
         diff_parts.append(f"Format detected: {'Tactplan export' if match_key == 'tbs' else match_key.upper()}")
         diff_parts.append(f"OLD rows: {len(old_rows)} | NEW rows: {len(new_rows)}")
         diff_parts.append(f"Matched {key_label}s: {len(common_keys)} | Only in OLD (REMOVED): {len(removed_keys)} | Only in NEW (ADDED): {len(added_keys)}")
-        diff_parts.append(f"Changed (date/field differences): {len(delayed) + len(accelerated) + len(modified)} ({len(delayed)} with Slutdato changes, {len(modified)} other modifications)")
+        diff_parts.append(f"Delayed (Slutdato later): {len(delayed_rows)} | Accelerated (Slutdato earlier): {len(accelerated_rows)} | Modified (other changes): {len(modified_rows)}")
+        diff_parts.append("")
+        diff_parts.append("NOTE: Complete tables with ALL rows will be auto-generated from the diff data. In your response, focus on ANALYSIS and INSIGHTS — show only the most critical examples in your tables (top 10-15 per category). The full tables are injected automatically.")
         diff_parts.append("")
 
-        max_rows_per_category = 100
-
-        if delayed:
-            diff_parts.append(f"── TASKS WITH SLUTDATO CHANGES ({len(delayed)} tasks) ──")
-            for row in delayed[:max_rows_per_category]:
-                diff_parts.append(f"  {row}")
-            if len(delayed) > max_rows_per_category:
-                diff_parts.append(f"  ... and {len(delayed) - max_rows_per_category} more")
+        if delayed_rows:
+            diff_parts.append(f"── TOP DELAYED TASKS (showing {min(max_summary_rows, len(delayed_rows))} of {len(delayed_rows)}) ──")
+            for row in delayed_rows[:max_summary_rows]:
+                diff_parts.append(f"  {key_label}={row['key']} | {row['old_name']} | Slutdato: {row['old_slutdato']} → {row['new_slutdato']} ({'+' if row['date_shift'] > 0 else ''}{row['date_shift']}d)")
             diff_parts.append("")
 
-        if accelerated:
-            diff_parts.append(f"── ACCELERATED TASKS ({len(accelerated)} tasks) ──")
-            for row in accelerated[:max_rows_per_category]:
-                diff_parts.append(f"  {row}")
+        if accelerated_rows:
+            diff_parts.append(f"── TOP ACCELERATED TASKS (showing {min(max_summary_rows, len(accelerated_rows))} of {len(accelerated_rows)}) ──")
+            for row in accelerated_rows[:max_summary_rows]:
+                diff_parts.append(f"  {key_label}={row['key']} | {row['old_name']} | Slutdato: {row['old_slutdato']} → {row['new_slutdato']} ({row['date_shift']}d)")
             diff_parts.append("")
 
-        if modified:
-            diff_parts.append(f"── MODIFIED TASKS (non-date changes) ({len(modified)} tasks) ──")
-            for row in modified[:max_rows_per_category]:
-                diff_parts.append(f"  {row}")
-            if len(modified) > max_rows_per_category:
-                diff_parts.append(f"  ... and {len(modified) - max_rows_per_category} more")
+        if modified_rows:
+            diff_parts.append(f"── TOP MODIFIED TASKS (showing {min(max_summary_rows, len(modified_rows))} of {len(modified_rows)}) ──")
+            for row in modified_rows[:max_summary_rows]:
+                chg_summary = '; '.join(f"{c['field']}: {c['old']}→{c['new']}" for c in row['changes'][:3])
+                diff_parts.append(f"  {key_label}={row['key']} | {row['old_name']} | {chg_summary}")
             diff_parts.append("")
 
-        if removed_keys:
-            diff_parts.append(f"── REMOVED TASKS ({len(removed_keys)} tasks — {key_label} only in OLD) ──")
-            for k in sorted(removed_keys)[:max_rows_per_category]:
-                r = old_map[k]
-                name = r.get('Navn', r.get('Opgavenavn', r.get('navn', '')))
-                slut = r.get('Slutdato', r.get('slutdato', ''))
-                diff_parts.append(f"  {key_label}={k} | {name} | Slutdato={slut}")
-            if len(removed_keys) > max_rows_per_category:
-                diff_parts.append(f"  ... and {len(removed_keys) - max_rows_per_category} more")
-            diff_parts.append("")
-
-        if added_keys:
-            diff_parts.append(f"── ADDED TASKS ({len(added_keys)} tasks — {key_label} only in NEW) ──")
-            for k in sorted(added_keys)[:max_rows_per_category]:
-                r = new_map[k]
-                name = r.get('Navn', r.get('Opgavenavn', r.get('navn', '')))
-                slut = r.get('Slutdato', r.get('slutdato', ''))
-                diff_parts.append(f"  {key_label}={k} | {name} | Slutdato={slut}")
-            if len(added_keys) > max_rows_per_category:
-                diff_parts.append(f"  ... and {len(added_keys) - max_rows_per_category} more")
-            diff_parts.append("")
-
-        if not delayed and not accelerated and not modified and not removed_keys and not added_keys:
-            diff_parts.append("⚠️ NO DIFFERENCES FOUND — schedules appear truly identical.")
-        else:
-            total_diffs = len(delayed) + len(accelerated) + len(modified) + len(removed_keys) + len(added_keys)
-            diff_parts.append(f"═══ TOTAL: {total_diffs} differences found across all categories ═══")
+        total_diffs = len(delayed_rows) + len(accelerated_rows) + len(modified_rows) + len(removed_keys) + len(added_keys)
+        diff_parts.append(f"Removed: {len(removed_keys)} | Added: {len(added_keys)}")
+        diff_parts.append(f"═══ TOTAL: {total_diffs} differences found across all categories ═══")
 
         diff_text = '\n'.join(diff_parts)
-        logger.info(f"  Pre-diff computed: {len(delayed)} date changes, {len(modified)} modifications, {len(removed_keys)} removed, {len(added_keys)} added")
-        return diff_text
+        logger.info(f"  Pre-diff computed: {len(delayed_rows)} delayed, {len(accelerated_rows)} accelerated, {len(modified_rows)} modified, {len(removed_keys)} removed, {len(added_keys)} added")
+        return diff_text, diff_data
 
     def _get_doc_label(self, table_name: str, old_filename: str = None, new_filename: str = None) -> str:
         if "old" in table_name.lower():
@@ -918,6 +940,7 @@ class RAGAgent:
         else:
             logger.info(f"  Chunks sent to LLM: {total_chunks}")
 
+        self._last_diff_data = None
         if len(table_names) == 2:
             old_table = [t for t in table_names if 'old' in t.lower()]
             new_table = [t for t in table_names if 'new' in t.lower()]
@@ -927,13 +950,12 @@ class RAGAgent:
                 old_all = list(all_table_results.get(old_table[0], []) if not isinstance(all_table_results.get(old_table[0], {}), dict) else [])
                 new_all = list(all_table_results.get(new_table[0], []) if not isinstance(all_table_results.get(new_table[0], {}), dict) else [])
                 try:
-                    diff_text = self._compute_schedule_diff(old_all, new_all)
+                    diff_text, diff_data = self._compute_schedule_diff(old_all, new_all)
                     if diff_text:
-                        is_partial = total_skipped > 0
-                        if is_partial:
-                            diff_text = diff_text.replace("PRE-COMPUTED SCHEDULE DIFF", "PRE-COMPUTED SCHEDULE DIFF (PARTIAL — some chunks omitted from context)")
                         context_parts.append(f"\n\n{diff_text}")
-                        logger.info(f"  Pre-computed diff appended to context ({len(diff_text)} chars, partial={is_partial})")
+                        logger.info(f"  Pre-computed diff appended to context ({len(diff_text)} chars)")
+                    if diff_data:
+                        self._last_diff_data = diff_data
                 except Exception as e:
                     logger.warning(f"  Pre-diff computation failed: {e}")
 
@@ -952,6 +974,8 @@ class RAGAgent:
         old_filename: str = None,
         new_filename: str = None
     ) -> dict:
+        self._last_diff_data = None
+        self._last_total_data_rows = 0
         is_comparison = self._is_comparison_query(user_query)
         logger.info(f"  Query type: {'comparison' if is_comparison else 'conversational'}")
         
@@ -1186,7 +1210,8 @@ Keep your response concise and helpful."""
             "sources": list(table_names),
             "context_chunks": len(context.split("Chunk")),
             "is_comparison": is_comparison,
-            "total_data_rows": getattr(self, '_last_total_data_rows', 0)
+            "total_data_rows": getattr(self, '_last_total_data_rows', 0),
+            "diff_data": getattr(self, '_last_diff_data', None)
         }
 
 

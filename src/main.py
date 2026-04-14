@@ -390,7 +390,7 @@ async def query_agent(
         
         if format == "html" and has_sections:
             logger.info(f"Structured response detected — applying full HTML formatter...")
-            response_text = format_response_as_html(response_text, language, total_data_rows=result.get("total_data_rows", 0))
+            response_text = format_response_as_html(response_text, language, total_data_rows=result.get("total_data_rows", 0), diff_data=result.get("diff_data"))
         elif format == "html":
             logger.info(f"Conversational response - converting markdown to HTML...")
             from html import escape as _html_escape
