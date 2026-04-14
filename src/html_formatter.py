@@ -49,6 +49,11 @@ def _mini_svg(name: str, size: int = 14, color: str = "currentColor") -> str:
         "shield-check": f'<svg {b}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
         "shield-alert": f'<svg {b}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>',
         "octagon-alert": f'<svg {b}><path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2H8.688a2 2 0 0 0-1.414.586l-4.688 4.688A2 2 0 0 0 2 8.688v6.624a2 2 0 0 0 .586 1.414l4.688 4.688A2 2 0 0 0 8.688 22h6.624a2 2 0 0 0 1.414-.586l4.688-4.688A2 2 0 0 0 22 15.312V8.688a2 2 0 0 0-.586-1.414l-4.688-4.688A2 2 0 0 0 15.312 2z"/></svg>',
+        "clock": f'<svg {b}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        "zap": f'<svg {b}><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>',
+        "plus": f'<svg {b}><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+        "minus": f'<svg {b}><path d="M5 12h14"/></svg>',
+        "edit": f'<svg {b}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
     }
     return icons.get(name, icons["dot"])
 
@@ -79,6 +84,57 @@ SECTION_PATTERNS = {
 }
 
 SECTION_ORDER = ["executive_top", "biggest_risk", "estimated_impact", "confidence", "root_cause", "executive", "impact", "summary", "health"]
+
+
+def _safe_eval_arithmetic(expr: str) -> int:
+    expr = expr.strip()
+    if not re.match(r'^[\d\s\(\)\+\-\*\/\.]+$', expr):
+        return 0
+    tokens = re.findall(r'[\d\.]+|[\+\-\*\/\(\)]', expr)
+    if not tokens:
+        return 0
+    result = 0.0
+    current = 0.0
+    op = '+'
+    i = 0
+    depth = 0
+    for t in tokens:
+        if t == '(':
+            depth += 1
+        elif t == ')':
+            depth -= 1
+        elif t in ('+', '-', '*', '/'):
+            op = t
+        else:
+            try:
+                val = float(t)
+            except ValueError:
+                return 0
+            if op == '+':
+                result += current
+                current = val
+            elif op == '-':
+                result += current
+                current = -val
+            elif op == '*':
+                current *= val
+            elif op == '/':
+                current = current / val if val != 0 else 0
+            op = '+'
+    result += current
+    return int(result) if result == int(result) else 0
+
+
+def _sanitize_health_data_json(raw_json: str) -> str:
+    def _replace_math(m):
+        val = _safe_eval_arithmetic(m.group(1))
+        return f": {val}"
+    raw_json = re.sub(r':\s*([\d\s\(\)\+\-\*\/\.]+(?:[\+\-\*\/][\d\s\(\)\.]+)+)', _replace_math, raw_json)
+    raw_json = re.sub(r':\s*">[^"]*"', ': 0', raw_json)
+    raw_json = re.sub(r':\s*>(\d+)', r': \1', raw_json)
+    raw_json = re.sub(r':\s*null\b', ': 0', raw_json)
+    raw_json = re.sub(r':\s*"-"', ': "0"', raw_json)
+    return raw_json
 
 
 def parse_structured_response(markdown: str) -> Dict:
@@ -237,10 +293,11 @@ def parse_structured_response(markdown: str) -> Dict:
     health_match = re.search(r"<!--HEALTH_DATA:(.*?)-->", result["health_section"], re.DOTALL)
     if health_match:
         try:
-            result["health_data"] = json.loads(health_match.group(1))
-            result["health_section"] = re.sub(r"<!--HEALTH_DATA:.*?-->", "", result["health_section"], flags=re.DOTALL).strip()
+            sanitized = _sanitize_health_data_json(health_match.group(1))
+            result["health_data"] = json.loads(sanitized)
         except:
             pass
+        result["health_section"] = re.sub(r"<!--HEALTH_DATA:.*?-->", "", result["health_section"], flags=re.DOTALL).strip()
 
     return result
 
@@ -1526,9 +1583,9 @@ def _count_actual_table_rows(tables_section: str) -> Dict[str, int]:
     return counts
 
 
-def format_response_as_html(markdown: str, language: str = "en", total_data_rows: int = 0) -> str:
+def format_response_as_html(markdown: str, language: str = "en", total_data_rows: int = 0, diff_data: dict = None) -> str:
     try:
-        return _format_response_internal(markdown, language, total_data_rows)
+        return _format_response_internal(markdown, language, total_data_rows, diff_data=diff_data)
     except Exception as e:
         import logging
         logging.getLogger(__name__).error(f"HTML formatter error: {e}")
@@ -1556,19 +1613,146 @@ def _render_extra_content(content: str) -> str:
     return f'<div style="margin:0 0 16px 0;padding:16px 20px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">{"".join(parts)}</div>'
 
 
-def _format_response_internal(markdown: str, language: str, total_data_rows: int = 0) -> str:
+def _generate_diff_tables_html(diff_data: dict, language: str = "en") -> str:
+    if not diff_data:
+        return ""
+
+    key_label = diff_data.get("key_label", "TBS")
+    parts = []
+
+    def _esc(v):
+        return escape_html(str(v)) if v else "—"
+
+    def _priority_badge(shift):
+        if shift is None:
+            return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626;">🔴 CRITICAL</span>'
+        if abs(shift) > 30:
+            return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626;">🔴 CRITICAL</span>'
+        if abs(shift) > 7:
+            return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#fef3c7;color:#d97706;">🟠 IMPORTANT</span>'
+        return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#ecfdf5;color:#059669;">🟢 LOW</span>'
+
+    def _diff_badge(shift):
+        if shift is None:
+            return "—"
+        color = "#dc2626" if shift > 0 else "#059669"
+        sign = "+" if shift > 0 else ""
+        return f'<span style="font-weight:700;color:{color};">{sign}{shift}d</span>'
+
+    th_style = 'style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;background:#f0fdfa;"'
+    td_style = 'style="padding:10px 14px;font-size:13px;color:#334155;border-bottom:1px solid #f1f5f9;"'
+    table_wrap = 'style="width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;"'
+
+    delayed = diff_data.get("delayed", [])
+    if delayed:
+        delayed_sorted = sorted(delayed, key=lambda r: -(r.get("date_shift") or 0))
+        rows_html = ""
+        for r in delayed_sorted:
+            rows_html += f'<tr><td {td_style}>{_priority_badge(r.get("date_shift"))}</td><td {td_style}><strong>{_esc(r["key"])}</strong></td><td {td_style}>{_esc(r["old_name"])}</td><td {td_style}>{_esc(r.get("lokation",""))}</td><td {td_style}>{_esc(r.get("old_slutdato",""))}</td><td {td_style}>{_esc(r.get("new_slutdato",""))}</td><td {td_style}>{_diff_badge(r.get("date_shift"))}</td><td {td_style}>{_esc(r.get("old_varighed",""))} → {_esc(r.get("new_varighed",""))}</td></tr>'
+        parts.append(f'''<div class="category-section" style="margin:0 0 24px 0;padding:20px;background:#fff;border-radius:16px;border:1px solid #fee2e2;border-left:5px solid #ef4444;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="color:#ef4444;">{_mini_svg("clock", 22, "#ef4444")}</span><span style="font-size:18px;font-weight:800;color:#1e293b;">Delayed Tasks</span><span style="background:#ef4444;color:white;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;">{len(delayed)}</span></div>
+  <div style="overflow-x:auto;"><table {table_wrap}><thead><tr><th {th_style}>Priority</th><th {th_style}>{key_label}</th><th {th_style}>Navn</th><th {th_style}>Lokation</th><th {th_style}>Slutdato (A)</th><th {th_style}>Slutdato (B)</th><th {th_style}>Difference</th><th {th_style}>Varighed (A) → (B)</th></tr></thead><tbody>{rows_html}</tbody></table></div>
+  <div style="margin-top:8px;font-size:12px;color:#94a3b8;">📊 Total: {len(delayed)} entries</div>
+</div>''')
+
+    accelerated = diff_data.get("accelerated", [])
+    if accelerated:
+        accel_sorted = sorted(accelerated, key=lambda r: r.get("date_shift") or 0)
+        rows_html = ""
+        for r in accel_sorted:
+            rows_html += f'<tr><td {td_style}><strong>{_esc(r["key"])}</strong></td><td {td_style}>{_esc(r["old_name"])}</td><td {td_style}>{_esc(r.get("lokation",""))}</td><td {td_style}>{_esc(r.get("old_slutdato",""))}</td><td {td_style}>{_esc(r.get("new_slutdato",""))}</td><td {td_style}>{_diff_badge(r.get("date_shift"))}</td><td {td_style}>{_esc(r.get("old_varighed",""))} → {_esc(r.get("new_varighed",""))}</td></tr>'
+        parts.append(f'''<div class="category-section" style="margin:0 0 24px 0;padding:20px;background:#fff;border-radius:16px;border:1px solid #d1fae5;border-left:5px solid #10b981;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="color:#10b981;">{_mini_svg("zap", 22, "#10b981")}</span><span style="font-size:18px;font-weight:800;color:#1e293b;">Accelerated Tasks</span><span style="background:#10b981;color:white;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;">{len(accelerated)}</span></div>
+  <div style="overflow-x:auto;"><table {table_wrap}><thead><tr><th {th_style}>{key_label}</th><th {th_style}>Navn</th><th {th_style}>Lokation</th><th {th_style}>Slutdato (A)</th><th {th_style}>Slutdato (B)</th><th {th_style}>Difference</th><th {th_style}>Varighed (A) → (B)</th></tr></thead><tbody>{rows_html}</tbody></table></div>
+  <div style="margin-top:8px;font-size:12px;color:#94a3b8;">📊 Total: {len(accelerated)} entries</div>
+</div>''')
+
+    added = diff_data.get("added", [])
+    if added:
+        rows_html = ""
+        for r in added:
+            rows_html += f'<tr><td {td_style}><strong>{_esc(r["key"])}</strong></td><td {td_style}>{_esc(r.get("name",""))}</td><td {td_style}>{_esc(r.get("aktivitetstype",""))}</td><td {td_style}>{_esc(r.get("lokation",""))}</td><td {td_style}>{_esc(r.get("startdato",""))}</td><td {td_style}>{_esc(r.get("slutdato",""))}</td><td {td_style}>{_esc(r.get("varighed",""))}</td></tr>'
+        parts.append(f'''<div class="category-section" style="margin:0 0 24px 0;padding:20px;background:#fff;border-radius:16px;border:1px solid #dbeafe;border-left:5px solid #3b82f6;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="color:#3b82f6;">{_mini_svg("plus", 22, "#3b82f6")}</span><span style="font-size:18px;font-weight:800;color:#1e293b;">Added Tasks</span><span style="background:#3b82f6;color:white;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;">{len(added)}</span></div>
+  <div style="overflow-x:auto;"><table {table_wrap}><thead><tr><th {th_style}>{key_label}</th><th {th_style}>Navn</th><th {th_style}>Type</th><th {th_style}>Lokation</th><th {th_style}>Startdato</th><th {th_style}>Slutdato</th><th {th_style}>Varighed</th></tr></thead><tbody>{rows_html}</tbody></table></div>
+  <div style="margin-top:8px;font-size:12px;color:#94a3b8;">📊 Total: {len(added)} entries</div>
+</div>''')
+
+    removed = diff_data.get("removed", [])
+    if removed:
+        rows_html = ""
+        for r in removed:
+            rows_html += f'<tr><td {td_style}><strong>{_esc(r["key"])}</strong></td><td {td_style}>{_esc(r.get("name",""))}</td><td {td_style}>{_esc(r.get("aktivitetstype",""))}</td><td {td_style}>{_esc(r.get("lokation",""))}</td><td {td_style}>{_esc(r.get("slutdato",""))}</td><td {td_style}>{_esc(r.get("varighed",""))}</td></tr>'
+        parts.append(f'''<div class="category-section" style="margin:0 0 24px 0;padding:20px;background:#fff;border-radius:16px;border:1px solid #fecaca;border-left:5px solid #dc2626;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="color:#dc2626;">{_mini_svg("minus", 22, "#dc2626")}</span><span style="font-size:18px;font-weight:800;color:#1e293b;">Removed Tasks</span><span style="background:#dc2626;color:white;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;">{len(removed)}</span></div>
+  <div style="overflow-x:auto;"><table {table_wrap}><thead><tr><th {th_style}>{key_label}</th><th {th_style}>Navn</th><th {th_style}>Type</th><th {th_style}>Lokation</th><th {th_style}>Slutdato</th><th {th_style}>Varighed</th></tr></thead><tbody>{rows_html}</tbody></table></div>
+  <div style="margin-top:8px;font-size:12px;color:#94a3b8;">📊 Total: {len(removed)} entries</div>
+</div>''')
+
+    modified = diff_data.get("modified", [])
+    if modified:
+        rows_html = ""
+        for r in modified:
+            change_text = "; ".join(f"{c['field']}: {_esc(c['old'])} → {_esc(c['new'])}" for c in r.get("changes", [])[:3])
+            rows_html += f'<tr><td {td_style}><strong>{_esc(r["key"])}</strong></td><td {td_style}>{_esc(r["old_name"])}</td><td {td_style}>{change_text}</td></tr>'
+        parts.append(f'''<div class="category-section" style="margin:0 0 24px 0;padding:20px;background:#fff;border-radius:16px;border:1px solid #e9d5ff;border-left:5px solid #8b5cf6;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="color:#8b5cf6;">{_mini_svg("edit", 22, "#8b5cf6")}</span><span style="font-size:18px;font-weight:800;color:#1e293b;">Modified Tasks</span><span style="background:#8b5cf6;color:white;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;">{len(modified)}</span></div>
+  <div style="overflow-x:auto;"><table {table_wrap}><thead><tr><th {th_style}>{key_label}</th><th {th_style}>Navn</th><th {th_style}>Changes</th></tr></thead><tbody>{rows_html}</tbody></table></div>
+  <div style="margin-top:8px;font-size:12px;color:#94a3b8;">📊 Total: {len(modified)} entries</div>
+</div>''')
+
+    return "\n".join(parts)
+
+
+def _format_response_internal(markdown: str, language: str, total_data_rows: int = 0, diff_data: dict = None) -> str:
     parsed = parse_structured_response(markdown)
 
-    actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
+    if diff_data:
+        actual_counts = {
+            "delayed": len(diff_data.get("delayed", [])),
+            "accelerated": len(diff_data.get("accelerated", [])),
+            "added": len(diff_data.get("added", [])),
+            "removed": len(diff_data.get("removed", [])),
+            "moved": len(diff_data.get("modified", [])),
+        }
+    else:
+        actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
 
     decision_engine_html = _render_decision_engine_cards(parsed.get("decision_engine_data"), language)
     extra_decision_html = _render_extra_content(parsed.get("extra_decision_content", ""))
     executive_html = generate_executive_html(parsed["executive_section"], language)
-    table_html = generate_table_html(parsed["tables_section"], language)
+
+    if diff_data:
+        table_html = _generate_diff_tables_html(diff_data, language)
+    else:
+        table_html = generate_table_html(parsed["tables_section"], language)
+
     root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
     impact_html = generate_impact_html(parsed["impact_section"], language)
     summary_html = generate_summary_html(parsed["summary_section"], language, actual_counts, total_data_rows)
     orphan_html = _render_extra_content(parsed.get("orphan_content", ""))
+
+    if not parsed["health_data"]:
+        health_match = re.search(r"<!--HEALTH_DATA:(.*?)-->", markdown, re.DOTALL)
+        if health_match:
+            try:
+                sanitized = _sanitize_health_data_json(health_match.group(1))
+                parsed["health_data"] = json.loads(sanitized)
+                parsed["health_section"] = re.sub(r"<!--HEALTH_DATA:.*?-->", "", parsed["health_section"], flags=re.DOTALL).strip()
+            except:
+                parsed["health_section"] = re.sub(r"<!--HEALTH_DATA:.*?-->", "", parsed["health_section"], flags=re.DOTALL).strip()
+
+    if diff_data and not parsed["health_data"]:
+        parsed["health_data"] = {
+            "status": "high_risk" if len(diff_data.get("delayed", [])) > 10 else "attention",
+            "risk_level": "HIGH" if len(diff_data.get("delayed", [])) > 10 else "MEDIUM",
+            "added_count": len(diff_data.get("added", [])),
+            "removed_count": len(diff_data.get("removed", [])),
+            "delayed_count": len(diff_data.get("delayed", [])),
+            "accelerated_count": len(diff_data.get("accelerated", [])),
+            "modified_count": len(diff_data.get("modified", [])),
+            "critical_path_affected": len(diff_data.get("delayed", [])) > 0,
+        }
 
     if parsed["health_data"]:
         health_data = dict(parsed["health_data"])
