@@ -174,7 +174,10 @@ def parse_structured_response(markdown: str) -> Dict:
             tables_part = exec_section[table_start_in_exec:].strip()
 
     if not tables_part:
+        collected_tables = []
         for section_key in list(sections.keys()):
+            if section_key in ["health", "summary"]:
+                continue
             section_text = sections.get(section_key, "")
             table_start = -1
             for tp in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Critical|Risks|Forsink|Fremskynd|Tilføj|Fjern|Ændr|Kritisk|Risici)",
@@ -183,10 +186,11 @@ def parse_structured_response(markdown: str) -> Dict:
                 if tm:
                     if table_start == -1 or tm.start() < table_start:
                         table_start = tm.start()
-            if table_start > 0 and section_key not in ["health", "summary"]:
-                tables_part = section_text[table_start:].strip()
+            if table_start > 0:
+                collected_tables.append(section_text[table_start:].strip())
                 sections[section_key] = section_text[:table_start].strip()
-                break
+        if collected_tables:
+            tables_part = "\n\n".join(collected_tables)
 
     if not tables_part:
         tables_part = pre_content
@@ -195,16 +199,39 @@ def parse_structured_response(markdown: str) -> Dict:
     exec_section_clean = re.sub(r"<!--EXEC_SUMMARY:.*?-->", "", exec_section_clean, flags=re.DOTALL).strip()
     exec_section_clean = re.sub(r"<!--DECISION_ENGINE:.*?-->", "", exec_section_clean, flags=re.DOTALL).strip()
 
+    extra_decision_content = []
+    for dk in ["executive_top", "biggest_risk", "estimated_impact", "confidence"]:
+        raw = sections.get(dk, "")
+        cleaned = re.sub(r"<!--DECISION_ENGINE:.*?-->", "", raw, flags=re.DOTALL)
+        cleaned = re.sub(r"<!--EXEC_SUMMARY:.*?-->", "", cleaned, flags=re.DOTALL)
+        cleaned = re.sub(r"^##\s+\S+.*$", "", cleaned, flags=re.MULTILINE).strip()
+        if cleaned:
+            extra_decision_content.append(cleaned)
+    extra_decision_text = "\n\n".join(extra_decision_content).strip()
+
+    if not tables_part and pre_content:
+        has_table = bool(re.search(r"^\|.*\|.*\|", pre_content, re.MULTILINE))
+        has_heading = bool(re.search(r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified)", pre_content, re.MULTILINE | re.IGNORECASE))
+        if has_table or has_heading:
+            tables_part = pre_content
+            pre_content = ""
+
+    orphan_content = ""
+    if pre_content and not tables_part:
+        orphan_content = pre_content
+
     result = {
         "executive_top_section": sections.get("executive_top", ""),
         "decision_engine_data": decision_engine_data,
+        "extra_decision_content": extra_decision_text,
         "executive_section": exec_section_clean,
         "tables_section": tables_part,
         "root_cause_section": sections.get("root_cause", ""),
         "impact_section": sections.get("impact", ""),
         "summary_section": sections.get("summary", ""),
         "health_section": sections.get("health", ""),
-        "health_data": None
+        "health_data": None,
+        "orphan_content": orphan_content,
     }
 
     health_match = re.search(r"<!--HEALTH_DATA:(.*?)-->", result["health_section"], re.DOTALL)
@@ -879,7 +906,11 @@ def generate_executive_html(content: str, language: str = "en") -> str:
         if re.match(r"^##\s", line):
             continue
 
-        priority_match = re.match(r'^(?:🔴|🟠|🟢)?\s*\*\*(\d+)\.\s*(.+?)\*\*\s*$', line)
+        priority_match = re.match(r'^(?:🔴|🟠|🟢)?\s*\*\*(\d+)[\.\)]\s*(.+?)\*\*\s*$', line)
+        if not priority_match:
+            priority_match = re.match(r'^(?:🔴|🟠|🟢)?\s*(\d+)[\.\)]\s*\*\*(.+?)\*\*\s*$', line)
+        if not priority_match:
+            priority_match = re.match(r'^(?:🔴|🟠|🟢)?\s*\*\*(?:Action|Handling|Anbefaling)\s*(\d+)[:\.\)]\s*(.+?)\*\*\s*$', line, re.IGNORECASE)
         if priority_match:
             flush_card()
             num = priority_match.group(1)
@@ -901,6 +932,26 @@ def generate_executive_html(content: str, language: str = "en") -> str:
                 current_card["why"] = escape_html(why_match.group(1).strip())
                 continue
 
+            what_match = re.match(r'^(?:\*\*)?WHAT(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if what_match:
+                what_text = escape_html(what_match.group(1).strip())
+                if not current_card["title"]:
+                    current_card["title"] = what_text
+                else:
+                    current_card["body"].append(f'<p style="margin:4px 0;color:#475569;font-size:13px;line-height:1.6;">{what_text}</p>')
+                continue
+
+            priority_field = re.match(r'^(?:\*\*)?PRIORITY(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if priority_field:
+                pval = priority_field.group(1).strip().lower()
+                if "critical" in pval or "🔴" in pval or "kritisk" in pval:
+                    current_card["color"] = "#ef4444"
+                elif "important" in pval or "🟠" in pval or "vigtig" in pval:
+                    current_card["color"] = "#f59e0b"
+                elif "low" in pval or "🟢" in pval or "lav" in pval:
+                    current_card["color"] = "#10b981"
+                continue
+
             role_match = re.match(r'^(?:\*\*)?ROLE(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
             if role_match:
                 current_card["role"] = escape_html(role_match.group(1).strip())
@@ -914,6 +965,12 @@ def generate_executive_html(content: str, language: str = "en") -> str:
             who_match = re.match(r'^(?:\*\*)?WHO(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
             if who_match:
                 current_card["role"] = escape_html(who_match.group(1).strip())
+                continue
+
+            when_match = re.match(r'^(?:\*\*)?WHEN(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if when_match:
+                when_text = escape_html(when_match.group(1).strip())
+                current_card["body"].append(f'<p style="margin:4px 0;color:#475569;font-size:13px;line-height:1.6;"><strong style="color:#1e293b;font-weight:700;">When:</strong> {when_text}</p>')
                 continue
 
             related_match = re.match(r'^(?:\*\*)?RELATED(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
@@ -932,6 +989,12 @@ def generate_executive_html(content: str, language: str = "en") -> str:
             if impact_match:
                 if not current_card["why"]:
                     current_card["why"] = escape_html(impact_match.group(1).strip())
+                continue
+
+            deadline_match = re.match(r'^(?:\*\*)?DEADLINE(?:\*\*)?:\s*(.+)$', line, re.IGNORECASE)
+            if deadline_match:
+                dl_text = escape_html(deadline_match.group(1).strip())
+                current_card["body"].append(f'<p style="margin:4px 0;color:#475569;font-size:13px;line-height:1.6;"><strong style="color:#1e293b;font-weight:700;">Deadline:</strong> {dl_text}</p>')
                 continue
 
             text = _inline_markdown(line)
@@ -1473,17 +1536,39 @@ def format_response_as_html(markdown: str, language: str = "en", total_data_rows
         return f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;padding:24px;"><div style="white-space:pre-wrap;color:#334155;line-height:1.7;font-size:14px;">{safe_text}</div></div>'
 
 
+def _render_extra_content(content: str) -> str:
+    if not content or not content.strip():
+        return ""
+    lines = content.strip().split("\n")
+    parts = []
+    for line in lines:
+        line = line.strip()
+        if not line or line in ["---", "***"]:
+            continue
+        if line.startswith("• ") or line.startswith("* ") or line.startswith("- "):
+            item_text = _inline_markdown(line[2:])
+            parts.append(f'<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 14px;"><span style="display:inline-flex;margin-top:4px;flex-shrink:0;">{_mini_svg("chevron-right", 12, "#64748b")}</span><span style="font-size:13px;color:#475569;line-height:1.6;">{item_text}</span></div>')
+        else:
+            text = _inline_markdown(line)
+            parts.append(f'<p style="margin:6px 0;color:#475569;font-size:13px;line-height:1.6;">{text}</p>')
+    if not parts:
+        return ""
+    return f'<div style="margin:0 0 16px 0;padding:16px 20px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">{"".join(parts)}</div>'
+
+
 def _format_response_internal(markdown: str, language: str, total_data_rows: int = 0) -> str:
     parsed = parse_structured_response(markdown)
 
     actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
 
     decision_engine_html = _render_decision_engine_cards(parsed.get("decision_engine_data"), language)
+    extra_decision_html = _render_extra_content(parsed.get("extra_decision_content", ""))
     executive_html = generate_executive_html(parsed["executive_section"], language)
     table_html = generate_table_html(parsed["tables_section"], language)
     root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
     impact_html = generate_impact_html(parsed["impact_section"], language)
     summary_html = generate_summary_html(parsed["summary_section"], language, actual_counts, total_data_rows)
+    orphan_html = _render_extra_content(parsed.get("orphan_content", ""))
 
     if parsed["health_data"]:
         health_data = dict(parsed["health_data"])
@@ -1508,7 +1593,9 @@ def _format_response_internal(markdown: str, language: str, total_data_rows: int
     return f'''
 {styles}
 <div class="agent-response" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  {orphan_html}
   {decision_engine_html}
+  {extra_decision_html}
   {root_cause_html}
   {executive_html}
   {table_html}
