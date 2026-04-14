@@ -25,19 +25,28 @@ The system features two independent agents: a Comparison Agent and a Predictive 
 - Task type badges are color-coded (e.g., purple for "Coordination," blue for "Design").
 - Severity-colored overdue indicators are used within tables.
 
-**Decision Engine Layer (Both Agents):**
-- Both agents include a mandatory Executive Decision Layer that sits ON TOP of all analysis. This layer provides instant project situational awareness:
-  - **Project Status Classification:** `STABLE` / `AT_RISK` / `CRITICAL` — determined by delay count, severity, and critical path impact.
-  - **Risk Level:** `LOW` / `MEDIUM` / `HIGH` — based on impact_score thresholds and delay severity.
-  - **Critical Findings:** Exactly 3 bullet points summarizing what the PM needs to know — written in plain business language, not technical.
-  - **Consequences If No Action:** Exactly 3 bullet points answering "what happens if I do nothing" — delayed handover, cost increases, resource conflicts.
-- For the Comparison Agent, this data is embedded as a `<!--EXEC_SUMMARY:{...}-->` JSON tag in the EXECUTIVE_ACTIONS section and parsed by `html_formatter.py` into a prominent status card rendered above the action items.
+**Decision Engine Layer (Comparison Agent — 9-Section Format):**
+- The Comparison Agent uses a 9-section output format structured as two layers:
+  - **Decision Layer (Sections 1-4):** Fast, clear, action-oriented — rendered from a single `<!--DECISION_ENGINE:{...}-->` JSON tag embedded in the EXECUTIVE_TOP section.
+    - **Section 1: EXECUTIVE_TOP** — 5-second overview card with project status (`STABLE`/`AT_RISK`/`CRITICAL`), biggest issue, why it matters, and focus area.
+    - **Section 2: BIGGEST_RISK** — Single risk block showing what's blocked and potential delay.
+    - **Section 3: ESTIMATED_IMPACT** — Time/cost/phases impact card in 3-column grid.
+    - **Section 4: CONFIDENCE_LEVEL** — Trust badge (`HIGH`/`MEDIUM`/`LOW`) with basis explanation.
+  - **Analysis Layer (Sections 5-9):** Detailed supporting evidence.
+    - **Section 5: ROOT_CAUSE_ANALYSIS** — Categorized causes with manpower assessment.
+    - **Section 6: RECOMMENDED_ACTIONS** — 3-5 prioritized action cards with WHY/ROLE/EFFORT/RELATED fields.
+    - **Section 7: COMPARISON TABLES** — Full data tables (Delayed/Accelerated/Added/Removed/Modified).
+    - **Section 8: SUMMARY_OF_CHANGES** — Statistics and top impacts.
+    - **Section 9: PROJECT_HEALTH** — Health score with `<!--HEALTH_DATA:{...}-->` tag.
+- The `DECISION_ENGINE` tag contains: `project_status`, `biggest_issue`, `impact_time`, `impact_cost`, `impact_phases`, `why`, `focus`, `biggest_risk`, `risk_blocking`, `risk_delay`, `confidence`, `confidence_basis`.
+- Backward compatible: parser also handles legacy `<!--EXEC_SUMMARY:{...}-->` tags by converting them to decision engine format.
+
+**Decision Engine Layer (Predictive Agent):**
 - For the Predictive Agent, the fields are part of `insight_data` in the JSON schema: `project_status`, `risk_level`, `critical_findings`, `consequences_if_no_action`.
-- The Impact Assessment section (comparison agent) includes a mandatory `### CONSEQUENCES_IF_NO_ACTION` sub-section rendered as a distinctive red warning card.
 - The Health section displays a risk level badge alongside the existing status badge.
 
 **Technical Implementations & Feature Specifications:**
-- **Comparison Agent:** Processes two PDF or CSV schedules, creates separate vector store tables for each, and uses dual vector store querying to provide comparison analysis. Output includes a mandatory six-section format: EXECUTIVE_ACTIONS (with Executive Summary preamble + 3-5 recommended actions as decision support), COMPARISON TABLES (with priority tags on delayed/removed tasks), ROOT_CAUSE_ANALYSIS (categorizes why delays exist, manpower assessment), IMPACT_ASSESSMENT (downstream consequences per critical finding + consolidated consequences block), SUMMARY_OF_CHANGES, and PROJECT_HEALTH (with risk_level badge). The Executive Actions section frames output as "Recommended Actions" (not commands), each with mandatory WHY explanation, PRIORITY (🔴Critical/🟠Important/🟢Low), EFFORT estimate (e.g. "1 hour", "Half day"), ROLE (Project Manager/Planner/Site Manager/Discipline Lead), and RELATED task IDs. This transforms raw data into a decision support engine — the PM knows exactly what to do next and why.
+- **Comparison Agent:** Processes two PDF or CSV schedules, creates separate vector store tables for each, and uses dual vector store querying to provide comparison analysis. Output uses a mandatory 9-section format with a Decision Layer (EXECUTIVE_TOP with DECISION_ENGINE tag, BIGGEST_RISK, ESTIMATED_IMPACT, CONFIDENCE_LEVEL) followed by an Analysis Layer (ROOT_CAUSE_ANALYSIS, RECOMMENDED_ACTIONS with 3-5 prioritized action cards, COMPARISON TABLES with priority tags, SUMMARY_OF_CHANGES, PROJECT_HEALTH with risk_level badge). Each action card includes WHY, PRIORITY (🔴Critical/🟠Important/🟢Low), EFFORT estimate, ROLE, and RELATED task IDs.
 - **Predictive Agent (Nova Insight):** Analyzes a single PDF or CSV schedule to identify delayed activities, perform root cause analysis, prioritize actions, assess resources, and evaluate forcing options.
 - **File Processing (Unified Format):** Supports both PDF and CSV inputs. Both are converted to the same compact CSV format at upload time — semicolon-separated values, header row per chunk, 250 rows per chunk, stored as `type="table"` with zero-vector placeholders (fetch-all retrieval, not similarity search). PDFs are processed via Azure Document Intelligence OCR which extracts structured tables, then `_ocr_tables_to_compact_csv_chunks()` in `pdf_processor.py` converts OCR table rows to compact CSV (same format as CSV upload). CSVs are parsed directly (no OCR needed). No embedding API calls for either format. Context sent to LLM is capped at 1.9MB (MAX_CONTEXT_BYTES=1,900,000) to stay safely within the 1,047,576 token model limit after accounting for system prompt and output tokens. Both agents (comparison and predictive) send ALL data to the LLM. Auto-retry on context_length_exceeded reduces context to 85% and strips chat history. The comparison agent's `_retrieve_context` always fetches `type="table"` chunks only — no fallback logic.
 - **Reference Date Extraction:** Automatically extracts reference dates from PDF filenames using various formats.

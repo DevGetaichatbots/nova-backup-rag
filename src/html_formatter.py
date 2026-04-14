@@ -1,8 +1,9 @@
 """
 Premium Structured HTML Converter — SaaS Section-Grouped Layout
 Each task category gets its own card with header + table.
-Parses all 6 sections: EXECUTIVE_ACTIONS → COMPARISON TABLES →
-ROOT_CAUSE_ANALYSIS → IMPACT_ASSESSMENT → SUMMARY_OF_CHANGES → PROJECT_HEALTH
+Parses 9 sections: EXECUTIVE_TOP → BIGGEST_RISK → ESTIMATED_IMPACT →
+CONFIDENCE_LEVEL → ROOT_CAUSE_ANALYSIS → RECOMMENDED_ACTIONS →
+COMPARISON TABLES → SUMMARY_OF_CHANGES → PROJECT_HEALTH
 """
 import re
 import json
@@ -66,18 +67,24 @@ CATEGORY_ORDER = ["removed", "added", "delayed", "accelerated", "moved", "critic
 
 
 SECTION_PATTERNS = {
-    "executive": [r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*Executive\s+Actions", r"^##\s*HANDLINGSPLAN", r"^##\s*Handlingsplan", r"^##\s*LEDELSESHANDLINGER", r"^##\s*Ledelseshandlinger"],
+    "executive_top": [r"^##\s*EXECUTIVE_TOP", r"^##\s*LEDELSESOVERBLIK"],
+    "biggest_risk": [r"^##\s*BIGGEST_RISK", r"^##\s*STØRSTE_RISIKO"],
+    "estimated_impact": [r"^##\s*ESTIMATED_IMPACT", r"^##\s*ESTIMERET_KONSEKVENS"],
+    "confidence": [r"^##\s*CONFIDENCE_LEVEL", r"^##\s*TILLIDSNIVEAU"],
     "root_cause": [r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*Root\s+Cause\s+Analysis", r"^##\s*ÅRSAGSANALYSE", r"^##\s*Årsagsanalyse"],
+    "executive": [r"^##\s*RECOMMENDED_ACTIONS", r"^##\s*ANBEFALEDE_HANDLINGER", r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*Executive\s+Actions", r"^##\s*HANDLINGSPLAN", r"^##\s*Handlingsplan", r"^##\s*LEDELSESHANDLINGER", r"^##\s*Ledelseshandlinger"],
     "impact": [r"^##\s*IMPACT_ASSESSMENT", r"^##\s*Impact\s+Assessment", r"^##\s*KONSEKVENSVURDERING", r"^##\s*Konsekvensvurdering"],
     "summary": [r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*Summary\s+of\s+Changes", r"^##\s*OPSUMMERING_AF_ÆNDRINGER", r"^##\s*Opsummering\s+af\s+Ændringer"],
     "health": [r"^##\s*PROJECT_HEALTH", r"^##\s*Project\s+Health", r"^##\s*PROJEKTSUNDHED", r"^##\s*Projektsundhed"],
 }
 
-SECTION_ORDER = ["executive", "root_cause", "impact", "summary", "health"]
+SECTION_ORDER = ["executive_top", "biggest_risk", "estimated_impact", "confidence", "root_cause", "executive", "impact", "summary", "health"]
 
 
 def parse_structured_response(markdown: str) -> Dict:
     empty = {
+        "executive_top_section": "",
+        "decision_engine_data": None,
         "executive_section": "",
         "tables_section": "",
         "root_cause_section": "",
@@ -107,17 +114,53 @@ def parse_structured_response(markdown: str) -> Dict:
     first_section_start = boundaries[0][1] if boundaries else len(markdown)
     pre_content = markdown[:first_section_start].strip()
 
-    if "executive" in sections:
-        exec_end = found["executive"]
-        next_after_exec = None
-        for key, pos in boundaries:
-            if key != "executive" and pos > exec_end:
-                next_after_exec = pos
-                break
-        if next_after_exec is None:
-            next_after_exec = len(markdown)
-        exec_section = sections["executive"]
+    decision_engine_data = None
+    for section_key in ["executive_top", "biggest_risk", "estimated_impact", "confidence"]:
+        section_text = sections.get(section_key, "")
+        de_match = re.search(r"<!--DECISION_ENGINE:(.*?)-->", section_text, re.DOTALL)
+        if de_match:
+            try:
+                decision_engine_data = json.loads(de_match.group(1))
+            except:
+                pass
+            break
+    if not decision_engine_data:
+        de_match = re.search(r"<!--DECISION_ENGINE:(.*?)-->", markdown, re.DOTALL)
+        if de_match:
+            try:
+                decision_engine_data = json.loads(de_match.group(1))
+            except:
+                pass
 
+    if not decision_engine_data:
+        for search_text in [sections.get("executive_top", ""), sections.get("executive", ""), markdown]:
+            if not search_text:
+                continue
+            es_match = re.search(r"<!--EXEC_SUMMARY:(.*?)-->", search_text, re.DOTALL)
+            if es_match:
+                try:
+                    exec_summary_data = json.loads(es_match.group(1))
+                    decision_engine_data = {
+                        "project_status": exec_summary_data.get("project_status", "AT_RISK"),
+                        "biggest_issue": (exec_summary_data.get("critical_findings", [""])[0] if exec_summary_data.get("critical_findings") else ""),
+                        "impact_time": "See analysis below",
+                        "impact_cost": exec_summary_data.get("risk_level", "MEDIUM"),
+                        "impact_phases": "See analysis below",
+                        "why": "See root cause analysis",
+                        "focus": "See recommended actions",
+                        "biggest_risk": (exec_summary_data.get("critical_findings", [""])[0] if exec_summary_data.get("critical_findings") else ""),
+                        "risk_blocking": "See impact assessment",
+                        "risk_delay": "See analysis below",
+                        "confidence": "MEDIUM",
+                        "confidence_basis": "Based on available schedule data analysis",
+                    }
+                    break
+                except:
+                    pass
+
+    tables_part = ""
+    if "executive" in sections:
+        exec_section = sections["executive"]
         table_start_in_exec = -1
         for table_pattern in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Critical|Risks|Forsink|Fremskynd|Tilføj|Fjern|Ændr|Kritisk|Risici)",
                               r"^\|.*\|.*\|"]:
@@ -129,37 +172,34 @@ def parse_structured_response(markdown: str) -> Dict:
         if table_start_in_exec > 0:
             sections["executive"] = exec_section[:table_start_in_exec].strip()
             tables_part = exec_section[table_start_in_exec:].strip()
-        else:
-            tables_part = ""
-    else:
+
+    if not tables_part:
+        for section_key in list(sections.keys()):
+            section_text = sections.get(section_key, "")
+            table_start = -1
+            for tp in [r"^###\s+(?:Delayed|Accelerated|Added|Removed|Modified|Critical|Risks|Forsink|Fremskynd|Tilføj|Fjern|Ændr|Kritisk|Risici)",
+                       r"^\|.*\|.*\|"]:
+                tm = re.search(tp, section_text, re.MULTILINE | re.IGNORECASE)
+                if tm:
+                    if table_start == -1 or tm.start() < table_start:
+                        table_start = tm.start()
+            if table_start > 0 and section_key not in ["health", "summary"]:
+                tables_part = section_text[table_start:].strip()
+                sections[section_key] = section_text[:table_start].strip()
+                break
+
+    if not tables_part:
         tables_part = pre_content
 
-    if "root_cause" in sections and not tables_part:
-        rc_start = found.get("root_cause", len(markdown))
-        tables_between = ""
-        if "executive" in sections:
-            exec_end_pos = found["executive"]
-            next_section_pos = None
-            for key, pos in boundaries:
-                if key != "executive" and pos > exec_end_pos:
-                    next_section_pos = pos
-                    break
-            if next_section_pos and next_section_pos > exec_end_pos:
-                exec_section_text = sections["executive"]
-                full_exec_block = markdown[exec_end_pos:next_section_pos]
-                header_end = full_exec_block.find("\n")
-                if header_end > 0:
-                    after_header = full_exec_block[header_end:].strip()
-                    if len(after_header) > len(exec_section_text):
-                        tables_between = after_header[len(exec_section_text):].strip()
-        elif first_section_start < rc_start:
-            tables_between = markdown[first_section_start:rc_start].strip()
-        if tables_between:
-            tables_part = tables_between
+    exec_section_clean = sections.get("executive", "")
+    exec_section_clean = re.sub(r"<!--EXEC_SUMMARY:.*?-->", "", exec_section_clean, flags=re.DOTALL).strip()
+    exec_section_clean = re.sub(r"<!--DECISION_ENGINE:.*?-->", "", exec_section_clean, flags=re.DOTALL).strip()
 
     result = {
-        "executive_section": sections.get("executive", ""),
-        "tables_section": tables_part if tables_part else pre_content,
+        "executive_top_section": sections.get("executive_top", ""),
+        "decision_engine_data": decision_engine_data,
+        "executive_section": exec_section_clean,
+        "tables_section": tables_part,
         "root_cause_section": sections.get("root_cause", ""),
         "impact_section": sections.get("impact", ""),
         "summary_section": sections.get("summary", ""),
@@ -603,14 +643,149 @@ def _render_exec_summary_card(summary_data: Dict, language: str) -> str:
 </div>'''
 
 
+def _render_decision_engine_cards(de_data: Optional[Dict], language: str = "en") -> str:
+    if not de_data:
+        return ""
+
+    status = de_data.get("project_status", "AT_RISK")
+    status_config = {
+        "STABLE": {"color": "#10b981", "bg": "#ecfdf5", "border": "#a7f3d0", "svg": "shield-check", "label_en": "STABLE", "label_da": "STABIL"},
+        "AT_RISK": {"color": "#d97706", "bg": "#fffbeb", "border": "#fde68a", "svg": "alert-triangle", "label_en": "AT RISK", "label_da": "I RISIKO"},
+        "CRITICAL": {"color": "#dc2626", "bg": "#fef2f2", "border": "#fecaca", "svg": "octagon-alert", "label_en": "CRITICAL", "label_da": "KRITISK"},
+    }
+    sc = status_config.get(status, status_config["AT_RISK"])
+    status_label = sc["label_da"] if language == "da" else sc["label_en"]
+
+    biggest_issue = escape_html(str(de_data.get("biggest_issue", "")))
+    why = escape_html(str(de_data.get("why", "")))
+    focus = escape_html(str(de_data.get("focus", "")))
+    biggest_risk = escape_html(str(de_data.get("biggest_risk", "")))
+    risk_blocking = escape_html(str(de_data.get("risk_blocking", "")))
+    risk_delay = escape_html(str(de_data.get("risk_delay", "")))
+    impact_time = escape_html(str(de_data.get("impact_time", "")))
+    impact_cost = escape_html(str(de_data.get("impact_cost", "")))
+    impact_phases = escape_html(str(de_data.get("impact_phases", "")))
+    confidence = de_data.get("confidence", "MEDIUM")
+    confidence_basis = escape_html(str(de_data.get("confidence_basis", "")))
+
+    conf_config = {
+        "HIGH": {"color": "#10b981", "label_en": "HIGH", "label_da": "HØJ"},
+        "MEDIUM": {"color": "#d97706", "label_en": "MEDIUM", "label_da": "MODERAT"},
+        "LOW": {"color": "#dc2626", "label_en": "LOW", "label_da": "LAV"},
+    }
+    cc = conf_config.get(confidence, conf_config["MEDIUM"])
+
+    top_title = "Ledelsesoverblik" if language == "da" else "Executive Overview"
+    top_subtitle = "5-sekunders overblik" if language == "da" else "5-second overview"
+    issue_label = "Største problem" if language == "da" else "Biggest Issue"
+    why_label = "Hvorfor" if language == "da" else "Why"
+    focus_label = "Fokus" if language == "da" else "Focus"
+    risk_title = "Største Risiko" if language == "da" else "Biggest Risk"
+    blocking_label = "Blokerer" if language == "da" else "What It Blocks"
+    delay_label = "Potentiel forsinkelse" if language == "da" else "Potential Delay"
+    impact_title = "Estimeret Konsekvens" if language == "da" else "Estimated Impact"
+    time_label = "Tid" if language == "da" else "Time"
+    cost_label = "Omkostning" if language == "da" else "Cost"
+    phases_label = "Faser" if language == "da" else "Phases"
+    conf_title = "Tillidsniveau" if language == "da" else "Confidence Level"
+    basis_label = "Grundlag" if language == "da" else "Basis"
+
+    executive_top_html = f'''
+<div style="margin:0 0 16px 0;padding:24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:16px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+    <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,{sc["color"]},{sc["color"]}dd);box-shadow:0 4px 14px {sc["color"]}30;">
+      <span style="color:white;">{_mini_svg(sc["svg"], 22, "white")}</span>
+    </div>
+    <div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;">{top_title}</h2>
+      <div style="font-size:12px;color:#64748b;margin-top:2px;">{top_subtitle}</div>
+    </div>
+    <span style="margin-left:auto;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:{sc["color"]};background:white;border:2px solid {sc["color"]};">{status_label}</span>
+  </div>
+  <div style="display:grid;gap:12px;">
+    <div style="padding:14px 18px;background:white;border-radius:12px;border:1px solid #e2e8f0;">
+      <div style="font-size:10px;font-weight:700;color:{sc["color"]};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">{issue_label}</div>
+      <div style="font-size:14px;font-weight:600;color:#0f172a;line-height:1.5;">{biggest_issue}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="padding:12px 16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">{why_label}</div>
+        <div style="font-size:13px;color:#334155;line-height:1.5;">{why}</div>
+      </div>
+      <div style="padding:12px 16px;background:#f0fdfa;border-radius:10px;border:1px solid #ccfbf1;">
+        <div style="font-size:10px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">{focus_label}</div>
+        <div style="font-size:13px;color:#0f766e;line-height:1.5;">{focus}</div>
+      </div>
+    </div>
+  </div>
+</div>'''
+
+    biggest_risk_html = f'''
+<div style="margin:0 0 16px 0;padding:20px 24px;background:linear-gradient(135deg,#fef2f2,#ffffff);border-radius:14px;border:1px solid #fecaca;border-left:4px solid #ef4444;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="display:inline-flex;">{_mini_svg("alert-triangle", 20, "#ef4444")}</span>
+    <span style="font-size:14px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;">{risk_title}</span>
+  </div>
+  <div style="font-size:14px;font-weight:600;color:#0f172a;line-height:1.55;margin-bottom:12px;">{biggest_risk}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="padding:10px 14px;background:white;border-radius:8px;border:1px solid #fecaca;">
+      <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">{blocking_label}</div>
+      <div style="font-size:12px;color:#7f1d1d;line-height:1.5;">{risk_blocking}</div>
+    </div>
+    <div style="padding:10px 14px;background:white;border-radius:8px;border:1px solid #fecaca;">
+      <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">{delay_label}</div>
+      <div style="font-size:12px;color:#7f1d1d;line-height:1.5;">{risk_delay}</div>
+    </div>
+  </div>
+</div>'''
+
+    estimated_impact_html = f'''
+<div style="margin:0 0 16px 0;padding:20px 24px;background:linear-gradient(135deg,#fffbeb,#ffffff);border-radius:14px;border:1px solid #fde68a;border-left:4px solid #d97706;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="display:inline-flex;">{_mini_svg("alert-circle", 20, "#d97706")}</span>
+    <span style="font-size:14px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;">{impact_title}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+    <div style="padding:14px;background:white;border-radius:10px;border:1px solid #fde68a;text-align:center;">
+      <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">{time_label}</div>
+      <div style="font-size:13px;font-weight:700;color:#78350f;line-height:1.4;">{impact_time}</div>
+    </div>
+    <div style="padding:14px;background:white;border-radius:10px;border:1px solid #fde68a;text-align:center;">
+      <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">{cost_label}</div>
+      <div style="font-size:13px;font-weight:700;color:#78350f;line-height:1.4;">{impact_cost}</div>
+    </div>
+    <div style="padding:14px;background:white;border-radius:10px;border:1px solid #fde68a;text-align:center;">
+      <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">{phases_label}</div>
+      <div style="font-size:13px;font-weight:700;color:#78350f;line-height:1.4;">{impact_phases}</div>
+    </div>
+  </div>
+</div>'''
+
+    conf_label = cc["label_da"] if language == "da" else cc["label_en"]
+    confidence_html = f'''
+<div style="margin:0 0 20px 0;padding:16px 24px;background:linear-gradient(135deg,#f8fafc,#ffffff);border-radius:14px;border:1px solid #e2e8f0;border-left:4px solid {cc["color"]};box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-flex;">{_mini_svg("shield-check", 18, cc["color"])}</span>
+      <span style="font-size:13px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">{conf_title}</span>
+    </div>
+    <span style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;color:{cc["color"]};background:white;border:2px solid {cc["color"]};">{conf_label}</span>
+    <span style="font-size:12px;color:#64748b;font-style:italic;flex:1;min-width:200px;">{basis_label}: {confidence_basis}</span>
+  </div>
+</div>'''
+
+    return executive_top_html + biggest_risk_html + estimated_impact_html + confidence_html
+
+
 def generate_executive_html(content: str, language: str = "en") -> str:
     if not content or not content.strip():
         return ""
 
-    exec_summary_data = _parse_exec_summary(content)
-    exec_summary_html = _render_exec_summary_card(exec_summary_data, language) if exec_summary_data else ""
-
     content = re.sub(r"<!--EXEC_SUMMARY:.*?-->", "", content, flags=re.DOTALL).strip()
+    content = re.sub(r"<!--DECISION_ENGINE:.*?-->", "", content, flags=re.DOTALL).strip()
+
+    if not content.strip():
+        return ""
 
     title = "Anbefalede Handlinger" if language == "da" else "Recommended Actions"
     icon = SVG_ICONS.get("executive", SVG_ICONS["default"])
@@ -769,7 +944,6 @@ def generate_executive_html(content: str, language: str = "en") -> str:
     flush_card()
 
     return f'''
-{exec_summary_html}
 <div class="executive-section" style="margin:0 0 24px 0;padding:28px;background:linear-gradient(145deg,#f0fdfa,#f8fffe,#ffffff);border-radius:16px;border:1px solid rgba(13,148,136,0.15);box-shadow:0 1px 3px rgba(0,0,0,0.03);">
   {_render_section_header(title, icon, color)}
   <div style="margin:-8px 0 18px 0;padding:8px 14px;background:#f0fdfa;border-radius:8px;border:1px solid #ccfbf1;">
@@ -1304,6 +1478,7 @@ def _format_response_internal(markdown: str, language: str, total_data_rows: int
 
     actual_counts = _count_actual_table_rows(parsed["tables_section"]) if parsed["tables_section"] else {}
 
+    decision_engine_html = _render_decision_engine_cards(parsed.get("decision_engine_data"), language)
     executive_html = generate_executive_html(parsed["executive_section"], language)
     table_html = generate_table_html(parsed["tables_section"], language)
     root_cause_html = generate_root_cause_html(parsed["root_cause_section"], language)
@@ -1333,9 +1508,10 @@ def _format_response_internal(markdown: str, language: str, total_data_rows: int
     return f'''
 {styles}
 <div class="agent-response" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  {decision_engine_html}
+  {root_cause_html}
   {executive_html}
   {table_html}
-  {root_cause_html}
   {impact_html}
   {summary_html}
   {health_html}
