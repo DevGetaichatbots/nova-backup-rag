@@ -372,39 +372,51 @@ async def query_agent(
         response_text = result["response"]
         actual_is_comparison = result.get("is_comparison", is_comparison)
         
-        if format == "html" and actual_is_comparison:
-            logger.info(f"Converting to HTML format...")
+        import re as _re
+        _STRUCTURED_MARKERS = [
+            r"^##\s*EXECUTIVE_TOP", r"^##\s*LEDELSESOVERBLIK",
+            r"^##\s*BIGGEST_RISK", r"^##\s*STØRSTE_RISIKO",
+            r"^##\s*ESTIMATED_IMPACT", r"^##\s*ESTIMERET_KONSEKVENS",
+            r"^##\s*CONFIDENCE_LEVEL", r"^##\s*TILLIDSNIVEAU",
+            r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*ÅRSAGSANALYSE",
+            r"^##\s*RECOMMENDED_ACTIONS", r"^##\s*ANBEFALEDE_HANDLINGER",
+            r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*HANDLINGSPLAN",
+            r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*OPSUMMERING_AF_ÆNDRINGER",
+            r"^##\s*PROJECT_HEALTH", r"^##\s*PROJEKTSUNDHED",
+            r"^##\s*COMPARISON", r"^##\s*IMPACT_ASSESSMENT",
+            r"<!--DECISION_ENGINE:", r"<!--HEALTH_DATA:",
+        ]
+        has_sections = any(_re.search(p, response_text, _re.MULTILINE | _re.IGNORECASE) for p in _STRUCTURED_MARKERS)
+        
+        if format == "html" and has_sections:
+            logger.info(f"Structured response detected — applying full HTML formatter...")
             response_text = format_response_as_html(response_text, language, total_data_rows=result.get("total_data_rows", 0))
-        elif format == "html" and not actual_is_comparison:
-            has_sections = any(marker in response_text for marker in ["## EXECUTIVE_TOP", "## RECOMMENDED_ACTIONS", "## ROOT_CAUSE_ANALYSIS", "## SUMMARY_OF_CHANGES", "## PROJECT_HEALTH", "## EXECUTIVE_ACTIONS", "## LEDELSESOVERBLIK", "## ÅRSAGSANALYSE"])
-            if has_sections:
-                logger.info(f"Non-comparison query but structured sections detected — applying full HTML formatter...")
-                response_text = format_response_as_html(response_text, language, total_data_rows=result.get("total_data_rows", 0))
-            else:
-                logger.info(f"Conversational response - converting markdown to HTML...")
-                import re as _re
-                conv = response_text
-                conv = _re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', conv)
-                conv = _re.sub(r'\*([^*]+)\*', r'<em>\1</em>', conv)
-                lines = conv.split('\n')
-                html_lines = []
-                in_list = False
-                for ln in lines:
-                    stripped = ln.strip()
-                    if stripped.startswith('- ') or stripped.startswith('• ') or stripped.startswith('* '):
-                        if not in_list:
-                            html_lines.append('<ul style="margin:8px 0;padding-left:20px;">')
-                            in_list = True
-                        html_lines.append(f'<li style="margin:4px 0;line-height:1.6;">{stripped[2:]}</li>')
-                    else:
-                        if in_list:
-                            html_lines.append('</ul>')
-                            in_list = False
-                        if stripped:
-                            html_lines.append(f'<p style="margin:8px 0;line-height:1.6;">{stripped}</p>')
-                if in_list:
-                    html_lines.append('</ul>')
-                response_text = f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px; color: #0f172a; line-height: 1.6; font-size: 15px;">{"".join(html_lines)}</div>'
+        elif format == "html":
+            logger.info(f"Conversational response - converting markdown to HTML...")
+            from html import escape as _html_escape
+            conv = _html_escape(response_text)
+            conv = _re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', conv)
+            conv = _re.sub(r'\*([^*]+)\*', r'<em>\1</em>', conv)
+            lines = conv.split('\n')
+            html_lines = []
+            in_list = False
+            for ln in lines:
+                stripped = ln.strip()
+                if stripped.startswith('- ') or stripped.startswith('&bull; ') or stripped.startswith('• ') or stripped.startswith('* '):
+                    if not in_list:
+                        html_lines.append('<ul style="margin:8px 0;padding-left:20px;">')
+                        in_list = True
+                    item_text = _re.sub(r'^[-•*]\s*|^&bull;\s*', '', stripped)
+                    html_lines.append(f'<li style="margin:4px 0;line-height:1.6;">{item_text}</li>')
+                else:
+                    if in_list:
+                        html_lines.append('</ul>')
+                        in_list = False
+                    if stripped:
+                        html_lines.append(f'<p style="margin:8px 0;line-height:1.6;">{stripped}</p>')
+            if in_list:
+                html_lines.append('</ul>')
+            response_text = f'<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px; color: #0f172a; line-height: 1.6; font-size: 15px;">{"".join(html_lines)}</div>'
         
         logger.info(f"Response generated: {len(response_text)} chars, {result['context_chunks']} chunks used")
         logger.info(f"=== QUERY COMPLETE ===")
