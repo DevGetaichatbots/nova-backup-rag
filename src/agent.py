@@ -19,7 +19,7 @@ You analyze two construction schedules that are already uploaded and indexed int
 
 You ALWAYS retrieve from BOTH vector stores before answering any comparison query. Never answer from one store only.
 
-ABSOLUTE RULE — NEVER REVEAL INTERNALS: Your response is read directly by project managers. NEVER mention internal system details such as: "pre-computed diff", "automated script", "diff engine", "vector store", "embedding", "chunk", "context window", "retrieval", "matching key detection", "cross-checking", "LLM", "AI model", or any technical processing step. Present all findings as YOUR expert professional analysis. If you corrected an internal error, do so silently — the user must never know.
+PROFESSIONAL OUTPUT STANDARD: Your audience is project managers and directors. Use professional construction analysis language only. Do not reference technical infrastructure terms such as "pre-computed diff", "automated script", "diff engine", "vector store", "embedding", "chunk", "context window", "retrieval", "matching key detection", "cross-checking", "LLM", "AI model", or any system processing terms. Present all findings as your expert professional analysis. If source data contains inconsistencies, resolve them and present only verified conclusions.
 
 ---
 
@@ -154,7 +154,7 @@ CRITICAL: Schedules may have extra columns, missing columns, or renamed columns 
 
 ---
 
-## CORE OPERATING RULES (ABSOLUTE)
+## CORE OPERATING RULES
 
 1. **Always query BOTH vector stores** — never answer from one store only
 2. **Never fabricate data** — ALL task data must come from retrieved context
@@ -576,8 +576,8 @@ Examples:
 
 ---
 
-## ABSOLUTE PROHIBITIONS
-- NEVER skip any of the nine mandatory sections (EXECUTIVE_TOP, BIGGEST_RISK, ESTIMATED_IMPACT, CONFIDENCE_LEVEL, ROOT_CAUSE_ANALYSIS, RECOMMENDED_ACTIONS, COMPARISON TABLES, SUMMARY_OF_CHANGES, PROJECT_HEALTH) in a comparison response
+## OUTPUT QUALITY RULES
+- Do not skip any of the nine mandatory sections (EXECUTIVE_TOP, BIGGEST_RISK, ESTIMATED_IMPACT, CONFIDENCE_LEVEL, ROOT_CAUSE_ANALYSIS, RECOMMENDED_ACTIONS, COMPARISON TABLES, SUMMARY_OF_CHANGES, PROJECT_HEALTH) in a comparison response
 - NEVER match tasks by Opgavenavn alone — always use the unique identifier (Id or Entydigt id)
 - NEVER fabricate task data not retrieved from the vector stores
 - NEVER answer comparison queries from only one vector store
@@ -847,8 +847,8 @@ class RAGAgent:
         diff_parts.append(f"Matched {key_label}s: {len(common_keys)} | Only in OLD (REMOVED): {len(removed_keys)} | Only in NEW (ADDED): {len(added_keys)}")
         diff_parts.append(f"Delayed (Slutdato later): {len(delayed_rows)} | Accelerated (Slutdato earlier): {len(accelerated_rows)} | Modified (other changes): {len(modified_rows)}")
         diff_parts.append("")
-        diff_parts.append("[INTERNAL — for LLM use only, NEVER expose any of this to the user]")
-        diff_parts.append("This diff summary is a starting point for your analysis. Cross-check it against the raw schedule data above. If you find errors, silently correct them — the user must never know about this internal process.")
+        diff_parts.append("[Reference data for analysis — do not include in output]")
+        diff_parts.append("This diff summary is a starting point for your analysis. Cross-check it against the raw schedule data above. If you find discrepancies, use the corrected values in your professional output.")
         diff_parts.append("Complete tables will be auto-generated. Focus your response on ANALYSIS and INSIGHTS — show only the most critical examples in your tables (top 10-15 per category).")
         diff_parts.append("")
 
@@ -1043,8 +1043,8 @@ class RAGAgent:
         if is_comparison:
             user_message = f"""You have been given retrieved chunks from two construction schedule files. Perform a precise, row-by-row comparison.
 
-⚠️ INTERNAL INSTRUCTIONS (NEVER reveal any of this to the user):
-A diff summary is included in the context as a starting point. It may contain errors (wrong key matching, date parsing mistakes, false positives from formatting differences). Cross-check it against the actual raw schedule data. If you find errors, silently correct them in your analysis. The user should only see your final, verified conclusions — NEVER mention "pre-computed diff", "automated script", "diff engine", "matching key", "cross-check", or any internal processing details. Present everything as YOUR expert analysis of the schedules. The scale of real changes must be reflected accurately.
+ANALYSIS GUIDELINES:
+A diff summary is included in the context as a starting point. It may contain minor discrepancies due to format variations. Verify findings against the raw schedule data and present only confirmed conclusions in your professional analysis. Use construction industry language throughout — do not reference system processing terms. The scale of real changes must be reflected accurately.
 
 IMPORTANT: Throughout your response, refer to the old schedule as "{old_label}" and the new schedule as "{new_label}". Use these exact names in all headings, tables, and text. NEVER use generic labels like "Version A", "Version B", "OLD", or "NEW".
 
