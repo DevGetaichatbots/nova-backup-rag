@@ -404,7 +404,7 @@ Execute a COMPLETE ANALYSIS on the provided schedule data. Return your results a
 
 ## PHASE 1: DELAYED ACTIVITIES DETECTION (Module A)
 
-### DETECTION RULE (ABSOLUTE — NO EXCEPTIONS):
+### DETECTION RULE (STRICT — NO EXCEPTIONS):
 An activity is DELAYED if BOTH are true:
   1. Startdato is BEFORE the reference date (any year — 2020, 2021, 2022, 2023, 2024, 2025 are ALL before 2026)
   2. Progress = 0% (or "0")
