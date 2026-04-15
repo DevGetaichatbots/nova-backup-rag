@@ -500,6 +500,7 @@ For each critical issue: manpower problem, coordination bottleneck, design depen
 - executive_actions must be concrete instructions, NOT summaries of the analysis
 - executive_actions.manpower_helps must be false for any action addressing coordination, design, bygherre, or procurement bottlenecks
 - executive_actions.manpower_note must be blunt and clear when manpower is useless — state it explicitly so the PM does not waste resources
+- NUMBER CONSISTENCY IS MANDATORY: The numbers in insight_data (delayed_count, critical_count, root_cause_count) MUST exactly match the actual arrays. delayed_count = len(delayed_activities). critical_count = count of delayed_activities where priority = "CRITICAL_NOW". root_cause_count = count of delayed_activities where is_root_cause = true. The critical_findings text MUST reference these exact same numbers. NEVER write "38 delayed" in critical_findings if delayed_activities contains 28 entries. Count your arrays and use those exact counts everywhere.
 </constraints>
 
 ## DETECTION MODULE A: Delayed Activities
@@ -888,14 +889,72 @@ Return complete JSON matching the strict schema."""
             fa_final = parsed_json.get("forcing_assessment", [])
             forceable = sum(1 for f in fa_final if f.get("is_forceable") in ["possible", "limited"])
             not_forceable = sum(1 for f in fa_final if f.get("is_forceable") == "not_recommended")
-            if "insight_data" in parsed_json:
-                parsed_json["insight_data"]["forceable_count"] = forceable
-                parsed_json["insight_data"]["not_forceable_count"] = not_forceable
 
-            delayed_count = len(parsed_json.get("delayed_activities", []))
-            root_causes = sum(1 for a in parsed_json.get("delayed_activities", []) if a.get("is_root_cause"))
+            delayed_list = parsed_json.get("delayed_activities", [])
+            true_delayed = len(delayed_list)
+            true_critical = sum(1 for a in delayed_list if a.get("priority") == "CRITICAL_NOW")
+            true_important = sum(1 for a in delayed_list if a.get("priority") == "IMPORTANT_NEXT")
+            true_monitor = sum(1 for a in delayed_list if a.get("priority") == "MONITOR")
+            true_root_causes = sum(1 for a in delayed_list if a.get("is_root_cause"))
+            true_root_cause_count = true_root_causes
+            unique_areas = set()
+            for a in delayed_list:
+                loc = a.get("lokation", a.get("area", ""))
+                if loc and str(loc).strip():
+                    unique_areas.add(str(loc).strip())
+            true_areas = len(unique_areas)
+            most_overdue = max((a.get("days_overdue", 0) for a in delayed_list), default=0)
+
+            if "insight_data" in parsed_json:
+                ins = parsed_json["insight_data"]
+                ins["delayed_count"] = true_delayed
+                ins["critical_count"] = true_critical
+                ins["important_count"] = true_important
+                ins["monitor_count"] = true_monitor
+                ins["root_cause_count"] = true_root_cause_count
+                ins["forceable_count"] = forceable
+                ins["not_forceable_count"] = not_forceable
+                ins["areas_affected"] = true_areas if true_areas > 0 else ins.get("areas_affected", 0)
+                ins["most_overdue_days"] = most_overdue
+
+                if true_delayed > 15 or most_overdue > 60:
+                    ins["project_status"] = "CRITICAL"
+                    ins["risk_level"] = "HIGH"
+                elif true_delayed >= 5 or most_overdue > 30:
+                    ins["project_status"] = "AT_RISK"
+                    ins["risk_level"] = "MEDIUM"
+                else:
+                    ins["project_status"] = "STABLE"
+                    ins["risk_level"] = "LOW"
+
+                import re as _re
+                findings = ins.get("critical_findings", [])
+                if findings:
+                    corrected = []
+                    for f in findings:
+                        f = _re.sub(r'\b\d+\s+delayed\s+activit', f'{true_delayed} delayed activit', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\b\d+\s+forsinkede\s+aktivit', f'{true_delayed} forsinkede aktivit', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\b\d+\s+delayed,', f'{true_delayed} delayed,', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\b\d+\s+critical\s+root\s+cause', f'{true_root_cause_count} critical root cause', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\b\d+\s+root\s+cause', f'{true_root_cause_count} root cause', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\b\d+\s+grundårsag', f'{true_root_cause_count} grundårsag', f, flags=_re.IGNORECASE)
+                        f = _re.sub(r'\bonly\s+\d+\s+production', f'only {sum(1 for a in delayed_list if a.get("task_type") == "Production")} production', f, flags=_re.IGNORECASE)
+                        corrected.append(f)
+                    ins["critical_findings"] = corrected
+                    logger.info(f"  [PredictiveAgent] Post-validation: corrected critical_findings numbers")
+
+                mc = parsed_json.get("management_conclusion", "")
+                if mc:
+                    mc = _re.sub(r'\b\d+\s+delayed\s+activit', f'{true_delayed} delayed activit', mc, flags=_re.IGNORECASE)
+                    mc = _re.sub(r'\b\d+\s+forsinkede\s+aktivit', f'{true_delayed} forsinkede aktivit', mc, flags=_re.IGNORECASE)
+                    mc = _re.sub(r'\b\d+\s+root\s+cause', f'{true_root_cause_count} root cause', mc, flags=_re.IGNORECASE)
+                    parsed_json["management_conclusion"] = mc
+
+            if "schedule_overview" in parsed_json:
+                parsed_json["schedule_overview"]["delayed_count"] = true_delayed
+
             forcing_count = len(fa_final)
-            logger.info(f"  [PredictiveAgent] JSON response: {delayed_count} delayed activities, {root_causes} root causes, model: {model_used}{usage_info}")
+            logger.info(f"  [PredictiveAgent] JSON response: {true_delayed} delayed activities, {true_root_cause_count} root causes, model: {model_used}{usage_info}")
             logger.info(f"  [PredictiveAgent] Forcing assessment: {forcing_count} evaluated — {forceable} forceable, {not_forceable} not recommended")
 
             delayed_ids = [a.get("id", "?") for a in parsed_json.get("delayed_activities", [])]
