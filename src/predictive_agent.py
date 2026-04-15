@@ -80,7 +80,7 @@ NOVA_INSIGHT_SCHEMA = {
                         "days_overdue": {"type": "integer", "description": "Calendar days between start_date and reference_date"},
                         "task_type": {"type": "string", "enum": ["Coordination", "Design", "Bygherre", "Production", "Procurement", "Milestone"]},
                         "priority": {"type": "string", "enum": ["CRITICAL_NOW", "IMPORTANT_NEXT", "MONITOR"]},
-                        "is_root_cause": {"type": "boolean", "description": "true if this is a root cause, false if downstream consequence"},
+                        "is_root_cause": {"type": "boolean", "description": "true ONLY if this delay is NOT caused by another delayed task. Most delays are downstream consequences (false). Expect <40% true in a typical schedule."},
                         "blocked_by_id": {"type": ["string", "null"], "description": "If downstream consequence, the ID of the root cause task. null if root cause."},
                         "area": {"type": "string", "description": "Area or discipline this task belongs to"}
                     }
@@ -278,7 +278,7 @@ NOVA_INSIGHT_SCHEMA = {
                     "critical_count": {"type": "integer"},
                     "important_count": {"type": "integer"},
                     "monitor_count": {"type": "integer"},
-                    "root_cause_count": {"type": "integer"},
+                    "root_cause_count": {"type": "integer", "description": "Count of delayed_activities where is_root_cause=true. Must equal len(root_cause_analysis). Always LESS than delayed_count — typically 3-10 root causes for 20-40 delays."},
                     "reference_date": {"type": "string"},
                     "most_overdue_days": {"type": "integer"},
                     "areas_affected": {"type": "integer"},
@@ -453,10 +453,17 @@ After collecting all delayed activities, verify:
 - Procurement: ordering, delivering, confirming materials
 - Milestone: zero-duration markers, decision gates
 
-### STEP 2: Root cause vs consequence
-- Root cause: delay NOT caused by another delayed task
-- Downstream consequence: delayed because depends on another delayed task
-Use predecessors/successors if available. Otherwise infer from naming, sequencing, area grouping.
+### STEP 2: Root cause vs consequence (CRITICAL DISTINCTION)
+A ROOT CAUSE is a delay whose origin is NOT another delayed task in this list. It is the SOURCE of a delay chain.
+A DOWNSTREAM CONSEQUENCE is a task delayed BECAUSE it depends on (or is blocked by) another delayed task.
+
+RULE: Most delayed tasks are DOWNSTREAM CONSEQUENCES, not root causes. In a typical schedule with 20-40 delays, expect only 3-10 root causes. If you find yourself marking >50% of tasks as root causes, you are doing it wrong — re-examine the dependency chains.
+
+How to identify:
+- If task B depends on task A, and both are delayed → A is the root cause, B is the downstream consequence (is_root_cause=false, blocked_by_id=A's id)
+- If a group of tasks all wait for the same decision/input → that decision task is ONE root cause, the rest are consequences
+- If tasks share the same area + same problem type + similar start dates → likely one root cause drives several consequences
+- Use predecessors/successors if available. Otherwise infer from naming, sequencing, area grouping, and task type.
 
 ### STEP 3: Downstream impact per root cause
 - Which tasks/disciplines affected
@@ -896,7 +903,22 @@ Return complete JSON matching the strict schema."""
             true_important = sum(1 for a in delayed_list if a.get("priority") == "IMPORTANT_NEXT")
             true_monitor = sum(1 for a in delayed_list if a.get("priority") == "MONITOR")
             true_root_causes = sum(1 for a in delayed_list if a.get("is_root_cause"))
-            true_root_cause_count = true_root_causes
+            rca_list = parsed_json.get("root_cause_analysis", [])
+            dc_list_check = parsed_json.get("downstream_consequences", [])
+            if true_root_causes >= true_delayed and true_delayed > 5:
+                if len(rca_list) < true_delayed:
+                    true_root_cause_count = len(rca_list)
+                    logger.warning(f"  [PredictiveAgent] Root cause sanity fix: LLM marked {true_root_causes}/{true_delayed} as root causes (all). Using root_cause_analysis array length: {true_root_cause_count}")
+                elif len(dc_list_check) > 0:
+                    true_root_cause_count = true_delayed - len(dc_list_check)
+                    logger.warning(f"  [PredictiveAgent] Root cause sanity fix: Using delayed-downstream: {true_delayed}-{len(dc_list_check)}={true_root_cause_count}")
+                else:
+                    true_root_cause_count = true_root_causes
+            elif true_root_causes > true_delayed * 0.7 and true_delayed > 10 and len(rca_list) < true_root_causes:
+                true_root_cause_count = len(rca_list)
+                logger.warning(f"  [PredictiveAgent] Root cause sanity fix: {true_root_causes}/{true_delayed} (>70%) marked as root. Using root_cause_analysis array: {true_root_cause_count}")
+            else:
+                true_root_cause_count = true_root_causes
             unique_areas = set()
             for a in delayed_list:
                 loc = a.get("lokation", a.get("area", ""))
