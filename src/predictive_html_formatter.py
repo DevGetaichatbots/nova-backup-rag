@@ -187,7 +187,7 @@ def _render_project_status_card(data: Dict, lang: str) -> str:
     </div>'''
 
     return f'''
-<div style="margin:0 0 18px;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div id="predictive-project-status" style="margin:0 0 18px;padding:22px 24px;background:linear-gradient(135deg,{sc["bg"]},#ffffff);border-radius:14px;border:1px solid {sc["border"]};border-left:5px solid {sc["color"]};box-shadow:0 2px 8px rgba(0,0,0,0.04);">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="display:inline-flex;">{_svg(sc["svg"], 22, sc["color"])}</span>
@@ -245,11 +245,8 @@ def _render_hero(data: Dict, lang: str) -> str:
         rl = "Primær risiko" if lang == "da" else "Primary Risk"
         risk_html = f'<div style="margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">{_svg("alert-triangle", 12, "#991b1b")}<span style="font-size:10px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.8px;">{rl}</span></div><div style="font-size:13px;color:#991b1b;font-weight:600;line-height:1.5;">{primary_risk}</div></div>'
 
-    project_status_card = _render_project_status_card(data, lang)
-
     return f'''
-{project_status_card}
-<div style="margin:0 0 22px;background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+<div id="predictive-overview" style="margin:0 0 22px;background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
   <div style="background:linear-gradient(135deg,#f0fdfa,#ecfeff);padding:28px 28px 22px;border-bottom:1px solid #e2e8f0;">
     <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
       <div style="text-align:center;flex-shrink:0;min-width:110px;">
@@ -293,7 +290,7 @@ def _render_management_conclusion(data: Dict, lang: str) -> str:
     label = "Ledelseskonklusion" if lang == "da" else "Management Conclusion"
     sub = "Overordnet vurdering og anbefaling" if lang == "da" else "Executive assessment and recommendation"
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-radius:14px;border:1px solid #99f6e4;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-management-conclusion" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-radius:14px;border:1px solid #99f6e4;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #99f6e4;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("activity", 18, "#0d9488")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
@@ -321,7 +318,7 @@ def _render_schedule_overview(data: Dict, lang: str) -> str:
         fields_html += f'<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;">{_icon_box(icon_name, "#64748b", 14)}<span style="font-size:12px;color:#64748b;font-weight:600;min-width:120px;">{name}</span><span style="font-size:13px;color:#1a202c;font-weight:600;">{val}</span></div>'
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-schedule-overview" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#0d948812;border:1px solid #0d948822;">{_svg("clock", 18, "#0d9488")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
@@ -362,9 +359,14 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
 
         days_label = f"{days} {'dage' if lang == 'da' else 'days'}"
 
+        human_label = _e(act.get("human_label", ""))
+        task_name_cell = f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("task_name",""))}</span>'
+        if human_label:
+            task_name_cell = f'<div><span style="color:#4a5568;font-size:13px;">{_e(act.get("task_name",""))}</span><br><span style="color:#7c3aed;font-size:11px;font-weight:600;font-style:italic;">{human_label}</span></div>'
+
         cells = [
             f'<span style="font-weight:700;color:#1a202c;font-size:13px;font-family:\'SF Mono\',\'Cascadia Code\',monospace;">{_e(act.get("id",""))}</span>',
-            f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("task_name",""))}</span>',
+            task_name_cell,
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("start_date",""))}</span>',
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("end_date",""))}</span>',
             f'<span style="color:#4a5568;font-size:13px;">{_e(act.get("duration",""))}</span>',
@@ -382,7 +384,7 @@ def _render_delayed_table(data: Dict, lang: str) -> str:
         rows_html += f'<tr style="background:{bg};transition:background .15s;" onmouseover="this.style.background=\'#edf2f7\'" onmouseout="this.style.background=\'{bg}\'">{tds}</tr>'
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-delayed-activities" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#dc262612;border:1px solid #dc262622;">{_svg("alert-circle", 18, "#dc2626")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
@@ -425,12 +427,15 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
   <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:{f_color};text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">{f_name}</div><div style="font-size:13px;color:#374151;line-height:1.6;">{f_val}</div></div>
 </div>'''
 
+        rc_human = _e(rc.get("human_label", ""))
+        rc_label_tag = f'<span style="padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;font-style:italic;">{rc_human}</span>' if rc_human else ""
         cards_html += f'''<div style="margin:14px 0;background:#fff;border-radius:12px;border:1px solid #99f6e4;border-left:4px solid #0d9488;overflow:hidden;box-shadow:0 1px 3px rgba(13,148,136,.08);">
   <div style="padding:14px 18px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-bottom:1px solid #99f6e4;">
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       {_svg(icon_name, 14, "#0d9488")}
       <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#134e4a;background:#f0fdfa;border:1px solid #99f6e4;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(rc.get("id",""))}</span>
-      <span style="font-size:13px;font-weight:700;color:#134e4a;">{_e(rc.get("task_name",""))}</span>
+      {rc_label_tag}
+      <span style="font-size:13px;font-weight:600;color:#475569;">{_e(rc.get("task_name",""))}</span>
     </div>
   </div>
   <div style="padding:6px 18px 14px;">{fields_html}</div>
@@ -442,14 +447,16 @@ def _render_root_cause_analysis(data: Dict, lang: str) -> str:
         dc_sub = "Løses når grundårsagen er adresseret" if lang == "da" else "Will likely resolve when root cause is addressed"
         items = ""
         for dc in dcs:
-            items += f'<div style="padding:8px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;line-height:1.6;display:flex;align-items:flex-start;gap:8px;">{_svg("arrow-right", 14, "#94a3b8")}<span>ID <strong style="font-family:\'SF Mono\',\'Cascadia Code\',monospace;color:#475569;">{_e(dc.get("id",""))}</strong> ({_e(dc.get("task_name",""))}) — {"blokeret af" if lang == "da" else "blocked by"} ID {_e(dc.get("blocked_by_id",""))}</span></div>'
+            dc_hl = _e(dc.get("human_label", ""))
+            dc_hl_part = f' <em style="color:#7c3aed;font-size:11px;">· {dc_hl}</em>' if dc_hl else ""
+            items += f'<div style="padding:8px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;line-height:1.6;display:flex;align-items:flex-start;gap:8px;">{_svg("arrow-right", 14, "#94a3b8")}<span>ID <strong style="font-family:\'SF Mono\',\'Cascadia Code\',monospace;color:#475569;">{_e(dc.get("id",""))}</strong>{dc_hl_part} ({_e(dc.get("task_name",""))}) — {"blokeret af" if lang == "da" else "blocked by"} ID {_e(dc.get("blocked_by_id",""))}</span></div>'
         dc_html = f'''<div style="margin:20px 0 8px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;">
   <div style="padding:12px 16px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;"><h4 style="margin:0;color:#475569;font-size:13px;font-weight:700;">{dc_label}</h4><p style="margin:3px 0 0;color:#94a3b8;font-size:11px;">{dc_sub}</p></div>
   {items}
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-root-cause" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#7c3aed12;border:1px solid #7c3aed22;">{_svg("scan-search", 18, "#7c3aed")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
@@ -483,7 +490,7 @@ def _render_priority_actions(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #059669;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-priority-actions" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #059669;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#05966912;border:1px solid #05966922;">{_svg("list-checks", 18, "#059669")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
@@ -505,12 +512,15 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
         r_type = item.get("resource_type", "management_attention")
         r_config = RESOURCE_TYPE_CONFIG.get(r_type, RESOURCE_TYPE_CONFIG["management_attention"])
         r_label = r_config[f"label_{lang}"] if f"label_{lang}" in r_config else r_config.get("label_en", r_type)
+        ra_human = _e(item.get("human_label", ""))
+        ra_human_tag = f'<span style="padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;font-style:italic;">{ra_human}</span>' if ra_human else ""
 
         cards_html += f'''<div style="display:flex;gap:12px;padding:14px 16px;margin:8px 0;background:#fff;border-radius:10px;border:1px solid #e2e8f0;align-items:flex-start;transition:all .15s;" onmouseover="this.style.borderColor='#cbd5e1';this.style.boxShadow='0 2px 6px rgba(0,0,0,.04)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
   <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{r_config["bg"]};border:1px solid {r_config["color"]}22;flex-shrink:0;">{_svg(r_config["icon"], 16, r_config["color"])}</div>
   <div style="flex:1;min-width:0;">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
       <span style="font-weight:700;color:#1a202c;font-size:13px;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(item.get("id",""))}</span>
+      {ra_human_tag}
       <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;color:{r_config["color"]};background:{r_config["bg"]};">{r_label}</span>
     </div>
     <p style="margin:0 0 4px;color:#475569;font-size:12px;font-weight:600;">{_e(item.get("task_name",""))}</p>
@@ -519,7 +529,7 @@ def _render_resource_assessment(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-resource-assessment" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#d9770612;border:1px solid #d9770622;">{_svg("users", 18, "#d97706")}</div>
     <div><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p></div>
@@ -578,12 +588,15 @@ def _render_forcing_assessment(data: Dict, lang: str) -> str:
         speedup_title = "Maks. speedup" if lang == "da" else "Max Speedup"
         team_title = "Optimal holdstørrelse" if lang == "da" else "Optimal Team Size"
 
+        fa_human = _e(item.get("human_label", ""))
+        fa_human_tag = f'<span style="padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;font-style:italic;white-space:nowrap;">{fa_human}</span>' if fa_human else ""
         cards_html += f'''<div style="margin:12px 0;background:#fff;border-radius:12px;border:1px solid {f_style["border"]};border-left:4px solid {f_style["color"]};overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="padding:14px 18px;background:{f_style["bg"]};border-bottom:1px solid {f_style["border"]};">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       {_svg(f_style["icon"], 14, f_style["color"])}
       <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#134e4a;background:#f0fdfa;border:1px solid #99f6e4;font-family:'SF Mono','Cascadia Code',monospace;">ID {_e(item.get("id",""))}</span>
-      <span style="font-size:13px;font-weight:700;color:#1a202c;flex:1;min-width:0;">{_e(item.get("task_name",""))}</span>
+      {fa_human_tag}
+      <span style="font-size:13px;font-weight:600;color:#475569;flex:1;min-width:0;">{_e(item.get("task_name",""))}</span>
       <span style="display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700;color:{f_style["color"]};background:#fff;border:1px solid {f_style["border"]};white-space:nowrap;">{f_label}</span>
       <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;color:{c_config["color"]};background:#f8fafc;border:1px solid #e2e8f0;white-space:nowrap;">{_svg(c_config["icon"], 10, c_config["color"])} {c_label}</span>
     </div>
@@ -628,7 +641,7 @@ def _render_forcing_assessment(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-forcing-assessment" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#ea580c12;border:1px solid #ea580c22;">{_svg("zap", 18, "#ea580c")}</div>
     <div style="flex:1;"><h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3><p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub_text}</p></div>
@@ -672,7 +685,7 @@ def _render_summary_by_area(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+<div id="predictive-summary-by-area" class="module-card" style="margin:0 0 16px;padding:22px 24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;border-left:5px solid #0d9488;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;">
     <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#2563eb12;border:1px solid #2563eb22;">{_svg("layers", 18, "#2563eb")}</div>
     <h3 style="font-size:16px;font-weight:700;color:#1a202c;margin:0;">{label}</h3>
@@ -681,13 +694,136 @@ def _render_summary_by_area(data: Dict, lang: str) -> str:
 </div>'''
 
 
+def _render_predictive_executive_snapshot(data: Dict, lang: str) -> str:
+    snapshot = data.get("predictive_snapshot")
+    if not snapshot or not isinstance(snapshot, dict):
+        return ""
+    what = snapshot.get("what_will_happen", "")
+    if not what:
+        return ""
+
+    title = "TIDSPLAN PROGNOSE" if lang == "da" else "SCHEDULE OUTLOOK"
+    sub = "Hvad sker der, hvis der ikke handles?" if lang == "da" else "What happens if no action is taken?"
+
+    delay_impact = _e(snapshot.get("estimated_delay_impact", ""))
+    drivers = snapshot.get("main_delay_drivers", [])
+
+    delay_badge = ""
+    if delay_impact:
+        delay_badge = f'<div style="display:inline-flex;align-items:center;gap:6px;margin:12px 0 16px;padding:8px 16px;border-radius:10px;background:#fffbeb;border:1.5px solid #fde68a;">{_svg("trending-up", 16, "#d97706")}<span style="font-size:16px;font-weight:900;color:#92400e;letter-spacing:-.3px;">{delay_impact}</span><span style="font-size:11px;color:#b45309;font-weight:600;">{"Estimeret forsinkelse" if lang == "da" else "Estimated delay"}</span></div>'
+
+    drivers_label = "Primære forsinkelsesdrivere" if lang == "da" else "Main delay drivers"
+    drivers_html = ""
+    if drivers:
+        items = "".join(
+            f'<div style="padding:10px 14px;background:white;border-radius:8px;border:1px solid #fed7aa;margin-top:8px;display:flex;align-items:flex-start;gap:8px;"><span style="flex-shrink:0;margin-top:2px;">{_svg("chevron-right", 13, "#d97706")}</span><span style="font-size:13px;color:#374151;line-height:1.5;font-weight:500;">{_e(d)}</span></div>'
+            for d in drivers[:3]
+        )
+        drivers_html = f'''<div style="margin-top:4px;">
+  <div style="font-size:10px;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;">{_e(drivers_label)}</div>
+  {items}
+</div>'''
+
+    return f'''
+<div id="predictive-schedule-outlook" class="module-card" style="margin:0 0 20px;padding:22px 24px;background:linear-gradient(135deg,#fffbeb 0%,#fff7ed 100%);border-radius:14px;border:1px solid #fed7aa;border-left:5px solid #d97706;transition:all .2s;box-shadow:0 2px 10px rgba(217,119,6,.1);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #fde68a;">
+    <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#d97706,#ea580c);box-shadow:0 3px 10px rgba(217,119,6,.3);">{_svg("trending-up", 20, "#fff")}</div>
+    <div>
+      <h3 style="font-size:17px;font-weight:800;color:#92400e;margin:0;letter-spacing:-.3px;">{title}</h3>
+      <p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p>
+    </div>
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#0f172a;line-height:1.7;padding:14px 18px;background:white;border-radius:10px;border:1px solid #e2e8f0;">{_e(what)}</div>
+  {delay_badge}
+  {drivers_html}
+</div>'''
+
+
+def _render_predictive_biggest_risk_card(data: Dict, lang: str) -> str:
+    risk = data.get("predictive_biggest_risk")
+    if not risk or not isinstance(risk, dict):
+        return ""
+    risk_title = risk.get("risk_title", "")
+    if not risk_title:
+        return ""
+
+    will_block = _e(risk.get("will_block", ""))
+    prevent = _e(risk.get("prevent_action_now", ""))
+
+    card_title = "STØRSTE PRÆDIKTIVE RISIKO" if lang == "da" else "PREDICTIVE BIGGEST RISK"
+    card_sub = "Den enkelt højest-prioriterede risiko der kræver øjeblikkelig handling" if lang == "da" else "The single highest-priority risk requiring immediate action"
+
+    issue_label = "Problemet" if lang == "da" else "The Issue"
+    block_label = "Blokerer" if lang == "da" else "What It Will Block"
+    prevent_label = "Din næste handling" if lang == "da" else "Your Next Action"
+
+    def _risk_part(emoji, label, text, bg, border, label_color, text_color):
+        if not text:
+            return ""
+        return (
+            f'<div style="padding:12px 16px;background:{bg};border-radius:10px;border:1px solid {border};margin-top:10px;">'
+            f'<div style="font-size:11px;font-weight:700;color:{label_color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">{emoji} {_e(label)}</div>'
+            f'<div style="font-size:13px;color:{text_color};line-height:1.6;">{text}</div>'
+            f'</div>'
+        )
+
+    rows = (
+        _risk_part("⚠️", issue_label, _e(risk_title), "#fef2f2", "#fecaca", "#dc2626", "#7f1d1d") +
+        _risk_part("🔗", block_label, will_block, "#fff7ed", "#fed7aa", "#c2410c", "#7c2d12") +
+        _risk_part("➡️", prevent_label, prevent, "#f0fdf4", "#bbf7d0", "#15803d", "#14532d")
+    )
+
+    return f'''
+<div id="predictive-biggest-risk" class="module-card" style="margin:0 0 20px;padding:20px 24px;background:linear-gradient(135deg,#fef2f2,#ffffff);border-radius:14px;border:1px solid #fecaca;border-left:4px solid #ef4444;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.03);">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+    <span style="display:inline-flex;">{_svg("alert-triangle", 20, "#ef4444")}</span>
+    <span style="font-size:14px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.5px;">{card_title}</span>
+  </div>
+  <div style="font-size:11px;color:#94a3b8;margin-bottom:2px;">{card_sub}</div>
+  {rows}
+</div>'''
+
+
+def _render_predictive_confidence(data: Dict, lang: str) -> str:
+    snapshot = data.get("predictive_snapshot")
+    if not snapshot or not isinstance(snapshot, dict):
+        return ""
+    confidence = snapshot.get("confidence_level", "")
+    basis = _e(snapshot.get("confidence_basis", ""))
+    if not confidence:
+        return ""
+
+    card_title = "TILLIDSNIVEAU" if lang == "da" else "PREDICTIVE CONFIDENCE"
+    basis_label = "Grundlag" if lang == "da" else "Basis"
+
+    conf_config = {
+        "HIGH": {"color": "#10b981", "label_en": "HIGH", "label_da": "HØJ"},
+        "MEDIUM": {"color": "#d97706", "label_en": "MEDIUM", "label_da": "MODERAT"},
+        "LOW": {"color": "#dc2626", "label_en": "LOW", "label_da": "LAV"},
+    }
+    cc = conf_config.get(confidence, conf_config["MEDIUM"])
+    conf_label = cc["label_da"] if lang == "da" else cc["label_en"]
+
+    return f'''
+<div id="predictive-confidence" class="module-card" style="margin:0 0 20px 0;padding:16px 24px;background:linear-gradient(135deg,#f8fafc,#ffffff);border-radius:14px;border:1px solid #e2e8f0;border-left:4px solid {cc["color"]};box-shadow:0 1px 4px rgba(0,0,0,.03);">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      {_svg("shield-check", 18, cc["color"])}
+      <span style="font-size:13px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;">{card_title}</span>
+    </div>
+    <span style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;color:{cc["color"]};background:white;border:2px solid {cc["color"]};">{conf_label}</span>
+    <span style="font-size:12px;color:#64748b;font-style:italic;flex:1;min-width:200px;">{basis_label}: {basis}</span>
+  </div>
+</div>'''
+
+
 def _render_executive_actions(data: Dict, lang: str) -> str:
     actions = data.get("executive_actions", [])
     if not actions:
         return ""
 
-    title = "Ledelsens Handlingsplan" if lang == "da" else "Executive Actions"
-    sub = "De vigtigste handlinger baseret på analysen" if lang == "da" else "The most critical actions based on the analysis"
+    title = "PRÆDIKTIVE HANDLINGER" if lang == "da" else "PREDICTIVE ACTIONS"
+    sub = "Hvad skal gøres nu for at undgå fremtidige forsinkelser" if lang == "da" else "What must be done now to avoid future delays"
     who_label = "Ansvarlig" if lang == "da" else "Responsible"
     when_label = "Deadline" if lang == "da" else "Deadline"
     tasks_label = "Relaterede opgaver" if lang == "da" else "Related tasks"
@@ -761,11 +897,11 @@ def _render_executive_actions(data: Dict, lang: str) -> str:
 </div>'''
 
     return f'''
-<div class="module-card" style="margin:0 0 20px;padding:22px 24px;background:linear-gradient(135deg,#fff 0%,#f0fdfa 100%);border-radius:14px;border:2px solid #0d9488;transition:all .2s;box-shadow:0 4px 16px rgba(13,148,136,.1);">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #99f6e4;">
-    <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#0891b2);box-shadow:0 3px 10px rgba(13,148,136,.3);">{_svg("target", 20, "#fff")}</div>
+<div id="predictive-actions" class="module-card" style="margin:0 0 20px;padding:22px 24px;background:linear-gradient(135deg,#fff 0%,#f5f3ff 100%);border-radius:14px;border:1px solid #ddd6fe;border-left:5px solid #7c3aed;transition:all .2s;box-shadow:0 2px 10px rgba(124,58,237,.08);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd6fe;">
+    <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7c3aed,#6d28d9);box-shadow:0 3px 10px rgba(124,58,237,.3);">{_svg("zap", 20, "#fff")}</div>
     <div>
-      <h3 style="font-size:17px;font-weight:800;color:#0d9488;margin:0;letter-spacing:-.3px;">{title}</h3>
+      <h3 style="font-size:17px;font-weight:800;color:#5b21b6;margin:0;letter-spacing:-.3px;">{title}</h3>
       <p style="margin:0;font-size:11px;color:#94a3b8;font-weight:500;">{sub}</p>
     </div>
   </div>
@@ -832,16 +968,20 @@ def _build_html(data: Dict, lang: str) -> str:
     </div>
   </div>''']
 
+    parts.append(_render_predictive_executive_snapshot(data, lang))
+    parts.append(_render_predictive_biggest_risk_card(data, lang))
+    parts.append(_render_executive_actions(data, lang))
+    parts.append(_render_predictive_confidence(data, lang))
     parts.append(_render_hero(data, lang))
-    parts.append(_render_management_conclusion(data, lang))
+    parts.append(_render_project_status_card(data, lang))
     parts.append(_render_schedule_overview(data, lang))
+    parts.append(_render_management_conclusion(data, lang))
     parts.append(_render_delayed_table(data, lang))
     parts.append(_render_root_cause_analysis(data, lang))
+    parts.append(_render_summary_by_area(data, lang))
     parts.append(_render_priority_actions(data, lang))
     parts.append(_render_resource_assessment(data, lang))
     parts.append(_render_forcing_assessment(data, lang))
-    parts.append(_render_executive_actions(data, lang))
-    parts.append(_render_summary_by_area(data, lang))
 
     parts.append(f'''
   <div style="margin-top:12px;padding-top:16px;border-top:2px solid #edf2f7;display:flex;align-items:center;justify-content:center;gap:10px;">

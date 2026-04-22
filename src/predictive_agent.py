@@ -14,6 +14,8 @@ NOVA_INSIGHT_SCHEMA = {
     "schema": {
         "type": "object",
         "required": [
+            "predictive_snapshot",
+            "predictive_biggest_risk",
             "executive_actions",
             "management_conclusion",
             "schedule_overview",
@@ -28,6 +30,58 @@ NOVA_INSIGHT_SCHEMA = {
         ],
         "additionalProperties": False,
         "properties": {
+            "predictive_snapshot": {
+                "type": "object",
+                "description": "A plain-language predictive summary synthesised from the full analysis. Answers the 5 key executive questions in under 10 seconds of reading.",
+                "required": ["what_will_happen", "estimated_delay_impact", "confidence_level", "confidence_basis", "main_delay_drivers"],
+                "additionalProperties": False,
+                "properties": {
+                    "what_will_happen": {
+                        "type": "string",
+                        "description": "One concrete sentence starting with 'If no action is taken, ...' — state the expected total delay window and the primary cause. Example: 'If no action is taken, your project is expected to be delayed by 4–8 months due to unresolved coordination and design dependencies.'"
+                    },
+                    "estimated_delay_impact": {
+                        "type": "string",
+                        "description": "Concise delay estimate derived from most_overdue_days and cascade risk. Format: '+N weeks' or '+N–M months'. Examples: '+6 weeks', '+3–5 months', '+8–12 weeks'. NEVER vague — always give a number range."
+                    },
+                    "confidence_level": {
+                        "type": "string",
+                        "enum": ["HIGH", "MEDIUM", "LOW"],
+                        "description": "HIGH = clear root causes with concrete days, full schedule data available. MEDIUM = some ambiguity in root cause chain or partial data. LOW = sparse data, unstructured format, or fewer than 5 delayed activities."
+                    },
+                    "confidence_basis": {
+                        "type": "string",
+                        "description": "One sentence explaining why the confidence level was assigned. Example: 'Based on 28 delayed activities with clear root cause chains across 3 disciplines.' or 'Based on partial data — schedule has no predecessor columns, dependency chains inferred.'",
+                    },
+                    "main_delay_drivers": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "description": "Exactly 3 short bullet strings summarising the top delay categories. Each ≤15 words. Reference real task types and counts. Example: ['12 coordination bottlenecks blocking cross-discipline handoffs', '6 unresolved bygherre decisions stalling design input', '8 production tasks overdue in Omr. 2 and Omr. 3']"
+                    }
+                }
+            },
+            "predictive_biggest_risk": {
+                "type": "object",
+                "description": "The single highest-impact root cause — rendered as a 3-part risk card at the top of the report.",
+                "required": ["risk_title", "will_block", "prevent_action_now"],
+                "additionalProperties": False,
+                "properties": {
+                    "risk_title": {
+                        "type": "string",
+                        "description": "≤15 words naming the specific task or issue. Must include task ID and concrete overdue figure. Example: 'Task ID 41 — coordination milestone 47 days overdue, blocking all EL and VVS trades.' NEVER vague ('multiple delays exist'). NEVER omit the ID."
+                    },
+                    "will_block": {
+                        "type": "string",
+                        "description": "One sentence identifying the downstream consequence if this risk is not resolved. Example: 'Unresolved, this will delay electrical and HVAC installation across Omr. 2 and Omr. 3 by at least 6–8 weeks.' Reference real disciplines/areas."
+                    },
+                    "prevent_action_now": {
+                        "type": "string",
+                        "description": "≤10-word imperative verb phrase — the single action that prevents this risk. Match the WHAT style rule: start with a verb, name the responsible party or task. Example: 'Escalate ID 41 coordination meeting to project director today.' FORBIDDEN: 'monitor', 'consider', 'review', 'look into'."
+                    }
+                }
+            },
             "executive_actions": {
                 "type": "array",
                 "description": "TOP 3 most critical actions the project manager must take IMMEDIATELY. Not analysis — direct, concrete instructions. Each action answers: WHAT to do, WHO does it, WHEN it must happen. Sorted by urgency (most urgent first). These come from synthesizing delayed_activities, root_cause_analysis, forcing_assessment, and priority_actions into the 3 most impactful moves.",
@@ -58,9 +112,9 @@ NOVA_INSIGHT_SCHEMA = {
                     "schedule_name": {"type": "string"},
                     "reference_date": {"type": "string", "description": "dd-mm-yyyy format"},
                     "total_activities": {"type": "integer", "description": "Count of ALL work rows excluding summary/grouping headers"},
-                    "delayed_count": {"type": "integer", "description": "Count of rows matching Startdato < reference_date AND progress = 0"},
+                    "delayed_count": {"type": "integer", "description": "Count of delayed activities. Standard formats: rows matching Startdato < reference_date AND progress = 0. Plandisc format: rows matching Condition A, B, or C from the Plandisc detection rule (includes is_late=true tasks that are in progress but behind)."},
                     "areas_covered": {"type": "array", "items": {"type": "string"}},
-                    "format_detected": {"type": "string", "enum": ["MS Project Export", "Detailtidsplan", "Structured Table", "Unstructured", "Hybrid"]}
+                    "format_detected": {"type": "string", "enum": ["MS Project Export", "Detailtidsplan", "Structured Table", "Unstructured", "Hybrid", "Plandisc Export"]}
                 }
             },
             "delayed_activities": {
@@ -68,11 +122,12 @@ NOVA_INSIGHT_SCHEMA = {
                 "description": "ALL delayed activities sorted by priority (CRITICAL_NOW first) then days_overdue descending",
                 "items": {
                     "type": "object",
-                    "required": ["id", "task_name", "start_date", "end_date", "duration", "progress", "days_overdue", "task_type", "priority", "is_root_cause", "blocked_by_id", "area"],
+                    "required": ["id", "task_name", "human_label", "start_date", "end_date", "duration", "progress", "days_overdue", "task_type", "priority", "is_root_cause", "blocked_by_id", "area"],
                     "additionalProperties": False,
                     "properties": {
                         "id": {"type": "string", "description": "Task ID from the schedule (real ID, never N/A)"},
                         "task_name": {"type": "string", "description": "Full task name from Opgavenavn column"},
+                        "human_label": {"type": "string", "description": "2–4 word plain-language description of what this task actually is. E.g. 'Electrical slab work', 'Client sign-off milestone', 'VVS pipe fitting'. Use context from discipline, area and schedule position. If name is already readable, copy a shortened version."},
                         "start_date": {"type": "string", "description": "dd-mm-yyyy format"},
                         "end_date": {"type": "string", "description": "dd-mm-yyyy or - if not available"},
                         "duration": {"type": "string", "description": "Original duration value e.g. 44d, 0d, 15d"},
@@ -91,11 +146,12 @@ NOVA_INSIGHT_SCHEMA = {
                 "description": "One entry per root cause task (is_root_cause=true)",
                 "items": {
                     "type": "object",
-                    "required": ["id", "task_name", "days_overdue", "problem_type", "why_it_matters", "downstream_impact", "consequence_if_unresolved", "affected_task_ids"],
+                    "required": ["id", "task_name", "human_label", "days_overdue", "problem_type", "why_it_matters", "downstream_impact", "consequence_if_unresolved", "affected_task_ids"],
                     "additionalProperties": False,
                     "properties": {
                         "id": {"type": "string"},
                         "task_name": {"type": "string"},
+                        "human_label": {"type": "string", "description": "2–4 word plain-language description of what this root cause task is. E.g. 'Client decision pending', 'EL coordination milestone', 'Structural slab handover'."},
                         "days_overdue": {"type": "integer"},
                         "problem_type": {"type": "string", "enum": ["Coordination blockage", "Design input missing", "Bygherre decision pending", "Production delay", "Procurement delay"]},
                         "why_it_matters": {"type": "string", "description": "1 sentence: what does this block or prevent"},
@@ -110,11 +166,12 @@ NOVA_INSIGHT_SCHEMA = {
                 "description": "Tasks that are delayed because of a root cause (not root causes themselves)",
                 "items": {
                     "type": "object",
-                    "required": ["id", "task_name", "blocked_by_id"],
+                    "required": ["id", "task_name", "human_label", "blocked_by_id"],
                     "additionalProperties": False,
                     "properties": {
                         "id": {"type": "string"},
                         "task_name": {"type": "string"},
+                        "human_label": {"type": "string", "description": "2–4 word plain-language description of what this downstream task is."},
                         "blocked_by_id": {"type": "string", "description": "ID of the root cause task"}
                     }
                 }
@@ -138,11 +195,12 @@ NOVA_INSIGHT_SCHEMA = {
                 "description": "One entry per CRITICAL_NOW task",
                 "items": {
                     "type": "object",
-                    "required": ["id", "task_name", "resource_type", "assessment"],
+                    "required": ["id", "task_name", "human_label", "resource_type", "assessment"],
                     "additionalProperties": False,
                     "properties": {
                         "id": {"type": "string"},
                         "task_name": {"type": "string"},
+                        "human_label": {"type": "string", "description": "2–4 word plain-language description of what this task is."},
                         "resource_type": {"type": "string", "enum": ["coordination_bottleneck", "design_dependency", "bygherre_escalation", "production_manpower", "management_attention", "procurement_dependency"]},
                         "assessment": {"type": "string", "description": "1-2 sentences: whether adding labour helps, whether management attention is needed, whether prerequisites must be resolved first"}
                     }
@@ -156,6 +214,7 @@ NOVA_INSIGHT_SCHEMA = {
                     "required": [
                         "id",
                         "task_name",
+                        "human_label",
                         "is_forceable",
                         "constraint_type",
                         "reason",
@@ -176,6 +235,10 @@ NOVA_INSIGHT_SCHEMA = {
                         "task_name": {
                             "type": "string",
                             "description": "Full task name matching delayed_activities"
+                        },
+                        "human_label": {
+                            "type": "string",
+                            "description": "2–4 word plain-language description of what this task is. E.g. 'EL slab installation', 'Client approval gate'."
                         },
                         "is_forceable": {
                             "type": "string",
@@ -351,6 +414,22 @@ Activities = each "Day-range: Description @person" line. Duration = day count in
 ### FORMAT 4: HYBRID / CUSTOM
 Any other layout — ADAPT to whatever is present.
 
+### FORMAT 5: PLANDISC EXPORT (semicolon-separated, two progress columns)
+Exact columns: name | location_path | task_group_name | planned_start_date | planned_end_date | planned_shift_duration | planned_completion_pct | actual_start_date | actual_end_date | actual_completion_pct | actual_completion_date | actual_by | is_late | inspectedType | inspected_by | has_constraint | is_flagged
+
+CRITICAL PLANDISC RULES — apply these ONLY when these exact column names are present:
+- TASK NAME = "name" column (not Opgavenavn)
+- TASK ID = use row position or name since there is no numeric Id column — derive a short unique key from name + location_path
+- START DATE = "planned_start_date" column (ISO format YYYY-MM-DD HH:MM:SS — use only the date part)
+- END DATE = "planned_end_date" column (same format)
+- TRUE PROGRESS = "actual_completion_pct" column (0–100 integer; EMPTY or missing = 0% actual done — NOT the same as planned)
+- WARNING: "planned_completion_pct" is the TARGET percentage (always 100 for a normal work task). It is NOT actual progress. NEVER use planned_completion_pct to determine if a task is complete.
+- A task is ONLY complete when actual_completion_pct = 100
+- is_late = "true" means the Plandisc system has flagged this task as running behind its planned progress curve — treat this as a strong delay signal
+- inspectedType = "accepted" means the task was completed and signed off
+- inspectedType = "noProgress" means the task has not started or no progress has been recorded
+- AREA = derived from "location_path" column — parse the slash-separated path hierarchy (e.g., "KatrineTorvet / Råhus / Square / P-kælder -2" → area = "Square / P-kælder -2" or the most specific segment)
+
 ## ADAPTIVE COLUMN MAPPING
 
 CRITICAL ID RULE:
@@ -360,18 +439,20 @@ You MUST extract this number and use it as the "id" field in your JSON output.
 NEVER output empty IDs. NEVER use row numbers, sequence numbers, or task names as IDs.
 If the format uses "Entydigt id" instead of "Id", use that value.
 
-1. Determine format type FIRST (week-based vs table-based)
+1. Determine format type FIRST (week-based vs table-based vs Plandisc)
 2. Map columns to semantic roles:
-   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id". Extract the VALUE after the colon.
-   - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name"
-   - DURATION: "Varighed", "Duration"
-   - START DATE: "Startdato", "Start", "Start Date"
-   - END DATE: "Slutdato", "Slut", "End Date", "Finish"
-   - PROGRESS: "% arbejde færdigt", "% færdigt", "% Complete"
+   - TASK ID: "Id", "Entydigt id", "Task ID" — use "Entydigt id" if present (Detailtidsplan), else "Id". Extract the VALUE after the colon. For Plandisc: no numeric ID column — derive from name + location_path.
+   - TASK NAME: "Opgavenavn", "Aktivitet", "Task Name", "name" (Plandisc)
+   - DURATION: "Varighed", "Duration", "planned_shift_duration" (Plandisc, value in hours)
+   - START DATE: "Startdato", "Start", "Start Date", "planned_start_date" (Plandisc — ISO datetime, use date only)
+   - END DATE: "Slutdato", "Slut", "End Date", "Finish", "planned_end_date" (Plandisc — ISO datetime, use date only)
+   - PROGRESS: "% arbejde færdigt", "% færdigt", "% Complete", "actual_completion_pct" (Plandisc — this is true actual %; EMPTY = 0%; NEVER use "planned_completion_pct" as progress)
+   - LATE FLAG: "is_late" (Plandisc only — "true" = behind schedule, strong delay signal)
+   - COMPLETION STATUS: "inspectedType" (Plandisc only — "accepted" = done, "noProgress" = not started)
    - PREDECESSORS: "Foregående opgaver", "Predecessors"
    - SUCCESSORS: "Efterfølgende opgaver", "Successors"
-   - RESPONSIBLE: "Ansvarlig", "Responsible"
-   - AREA: "omr.", "Område", "Area"
+   - RESPONSIBLE: "Ansvarlig", "Responsible", "actual_by" (Plandisc — person who last updated actual)
+   - AREA: "omr.", "Område", "Area", "location_path" (Plandisc — parse path hierarchy)
 3. Missing columns → degrade gracefully. Extra columns → ignore.
 
 ## FIELD DEFINITIONS
@@ -382,6 +463,11 @@ If the format uses "Entydigt id" instead of "Id", use that value.
 - % arbejde færdigt / % færdigt: 0-100
 - Foregående opgaver: semicolon-separated predecessor IDs, may include "489AS+5d"
 - bemærkn.: R=revised, X=progress updated, NY=new activity
+- planned_shift_duration (Plandisc): duration in hours (e.g., 48 = 48 working hours ≈ 6 working days)
+- planned_completion_pct (Plandisc): TARGET completion % — for normal tasks this is always 100. THIS IS NOT ACTUAL PROGRESS. Ignore this column for delay detection.
+- actual_completion_pct (Plandisc): ACTUAL progress 0–100. Empty cell = 0% done. 100 = fully complete. Use THIS for progress in delay detection.
+- is_late (Plandisc): "true" = Plandisc system flagged this task as behind planned schedule curve. A task may be is_late=true even if its planned_end_date is still in the future — it is running slower than planned.
+- inspectedType (Plandisc): "accepted" = completed and signed off, "noProgress" = not started / no progress logged
 
 ## RESPONSIBLE PARTY IDENTIFICATION
 
@@ -397,6 +483,7 @@ If the format uses "Entydigt id" instead of "Id", use that value.
 3. Sub-tasks inherit parent area
 4. "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL" = discipline-level parents
 5. "Globals" = cross-area/global scope
+6. Plandisc "location_path": slash-separated hierarchy, e.g. "KatrineTorvet / Råhus / Square / P-kælder -2" — use the 3rd and 4th segments as area (e.g. "Square / P-kælder -2"). Group tasks by the 2nd-level segment (e.g. "Råhus", "Aptering Boliger", "Aptering KLD", "Tag", "Trappeopgange", "Terræn") for area-level summaries.
 </context>
 
 <task>
@@ -404,7 +491,7 @@ Execute a COMPLETE ANALYSIS on the provided schedule data. Return your results a
 
 ## PHASE 1: DELAYED ACTIVITIES DETECTION (Module A)
 
-### DETECTION RULE (STRICT — NO EXCEPTIONS):
+### DETECTION RULE — STANDARD FORMATS (MS Project, Detailtidsplan, Hybrid):
 An activity is DELAYED if BOTH are true:
   1. Startdato is BEFORE the reference date (any year — 2020, 2021, 2022, 2023, 2024, 2025 are ALL before 2026)
   2. Progress = 0% (or "0")
@@ -414,7 +501,27 @@ If an activity started in 2020 and still has 0% — it is delayed (2190+ days ov
 If an activity started yesterday with 0% — it is delayed (1 day overdue).
 If 50 activities have the same start date and all have 0% — ALL 50 are delayed.
 
-### WHAT TO EXCLUDE (ONLY these):
+### DETECTION RULE — PLANDISC FORMAT (columns: name, planned_start_date, actual_completion_pct, is_late):
+A Plandisc activity is DELAYED if ANY of these conditions is true:
+
+**Condition A — Not started, past planned end:**
+  planned_end_date < reference_date AND actual_completion_pct is empty or 0 AND inspectedType != "accepted"
+
+**Condition B — In progress but flagged behind schedule:**
+  is_late = "true" AND actual_completion_pct < 100 AND inspectedType != "accepted"
+  (This catches tasks running slower than planned, even if planned_end_date is still in the future.)
+
+**Condition C — Started but stalled:**
+  actual_start_date is filled AND actual_completion_pct is empty or 0 AND planned_end_date < reference_date
+
+EXCLUDE from Plandisc analysis:
+- Any row where actual_completion_pct = 100 (fully complete)
+- Any row where inspectedType = "accepted" (signed off as done)
+- Rows with no planned_start_date (structural/grouping rows)
+
+CRITICAL: For Plandisc, days_overdue should be calculated from planned_end_date (not planned_start_date), since planned_start_date may be far in the past for a multi-month revised schedule. If planned_end_date is in the future and is_late=true, set days_overdue to 0 and note in the assessment that the task is currently running behind its progress curve.
+
+### WHAT TO EXCLUDE (standard formats ONLY):
 - Grouping/summary HEADER rows: "Omr. 1", "Omr. 2", "E100.01 Ventilation", "E100.02 VVS", "E100.03 EL", "Globals", "Afhængigheder", "Færdiggøre projektering"
 - These are section headers with very high durations that group sub-tasks
 - EVERYTHING ELSE with 0% and Startdato < reference_date is a delayed activity
@@ -422,26 +529,27 @@ If 50 activities have the same start date and all have 0% — ALL 50 are delayed
 ### PASS 1: Scan EVERY single row from first to last
 - Read EVERY row. Do NOT stop after finding a few.
 - For each row: check progress column. If 0% → candidate.
-- If progress > 0% → skip.
+- If progress > 0% → skip (UNLESS Plandisc format AND is_late = "true").
 - If grouping header → skip.
 
 ### PASS 2: Filter candidates by date
-- Parse Startdato. If Startdato < reference_date → DELAYED. Include it.
-- If Startdato >= reference_date → not delayed yet. Skip.
-- Calculate days_overdue = reference_date minus Startdato in calendar days.
+- Parse Startdato / planned_start_date. If before reference_date → DELAYED. Include it.
+- Plandisc: also include any row with is_late = "true" regardless of dates.
+- Calculate days_overdue = reference_date minus planned_end_date in calendar days (Plandisc) or reference_date minus Startdato (other formats). Minimum 0.
 - IMPORTANT: A start date in year 2025 IS before a reference date in 2026. Year 2024 IS before 2026. Etc.
 
 ### PASS 3: Extract the real ID
-- For each delayed activity, extract the "Id" column value (the number after "Id:").
-- This is MANDATORY. The "id" field in your output must contain this number, e.g., "41", "520", "33".
+- Standard formats: extract the "Id" column value (the number after "Id:"). This is MANDATORY.
+- Plandisc format: no numeric Id column — construct a short identifier from the task name abbreviation + area segment (e.g., "MU-SKALM-VEJSIDE-5", "EL-FOERING-4").
+- The "id" field in your output must be non-empty and unique per task.
 
 ### PASS 4: Verify completeness
 After collecting all delayed activities, verify:
 1. You processed EVERY row in the data (not just the first page or first area)
-2. Every listed activity truly has Startdato < reference_date AND 0% progress
-3. You included activities from ALL areas/disciplines (Omr. 1, Omr. 2, Omr. 3, etc.)
-4. You did not miss any — go back and scan again if uncertain
-5. Every activity has a real numeric ID from the Id column
+2. Standard formats: every listed activity truly has Startdato < reference_date AND 0% progress
+3. Plandisc format: every listed activity meets Condition A, B, or C above
+4. You included activities from ALL areas/disciplines
+5. You did not miss any — go back and scan again if uncertain
 
 ## PHASE 2: DECISION SUPPORT ANALYSIS
 
@@ -512,8 +620,8 @@ For each critical issue: manpower problem, coordination bottleneck, design depen
 
 ## DETECTION MODULE A: Delayed Activities
 
-Logic: IF Startdato < reference_date AND progress = 0 THEN flag as DELAYED
-Include 0d tasks. Exclude only summary/parent GROUPING rows.
+Standard formats: IF Startdato < reference_date AND progress = 0 THEN flag as DELAYED. Include 0d tasks. Exclude only summary/parent GROUPING rows.
+Plandisc format: flag as DELAYED if is_late = "true" AND actual_completion_pct < 100, OR if planned_end_date < reference_date AND actual_completion_pct != 100. Never flag a row where actual_completion_pct = 100 or inspectedType = "accepted".
 
 ## FORCING MODULE F: Acceleration Viability
 
@@ -627,8 +735,93 @@ Use these as baseline estimates when classifying coordination_cost:
 4. Each recommendation must be actionable — tell the PM what to DO, not just what the situation IS
 5. Always reference the specific constraint preventing or limiting acceleration
 
+## HUMAN-READABLE TASK NAME TRANSLATION (MANDATORY FOR ALL OUTPUT)
+
+Every task in every array (delayed_activities, root_cause_analysis, downstream_consequences, resource_assessment, forcing_assessment) MUST include a `human_label` field alongside the original `task_name`.
+
+### Rules:
+
+**Rule 1 — Detect code-only names:**
+A task name is "code-only" if it consists primarily of abbreviations, alphanumeric codes, or acronyms without a descriptive phrase. Examples:
+- "BH GG" → code-only ✗
+- "E100.03" → code-only ✗
+- "TBS 16 (BH GG)" → code-only ✗
+- "EL installationer, 1. sal" → already readable ✓
+- "Ventilation montage" → already readable ✓
+
+**Rule 2 — Generate human_label using context:**
+For code-only names, generate the best 2–4 word plain-language label using:
+- The discipline section the task belongs to (VVS, EL, BMS, Ventilation, Tømrer, etc.)
+- The area the task belongs to (Omr. 1, Etage 2, etc.)
+- Standard Danish construction terminology
+- The task's position in the sequence (early = groundwork/structure, late = fit-out/finishing)
+
+**Rule 3 — Format of human_label:**
+Always 2–4 words. Must be immediately understandable to a non-technical project manager.
+Examples:
+- "BH GG" → "Structural handover milestone"
+- "E100.03 EL" → "Electrical installation package"
+- "TBS 16 (BH GG)" → "Client sign-off gate"
+- "EL installationer, 1. sal" → "1st floor electrics"
+- "VVS Rørføring Omr. 2" → "VVS pipe fitting"
+- "Trykprøve EL" → "Pressure test EL"
+
+**Rule 4 — Already-readable names:**
+If the task name is already clear, use a shortened plain version as human_label.
+- "Ventilation montage, Omr. 3" → "Ventilation install"
+- "Bygherreafklaringer" → "Client decisions"
+
+**Rule 5 — Danish construction code reference:**
+- BH = Bygherre (Client) or Bygningshåndværker — use area context
+- GG = specific building section identifier
+- VVS = Plumbing & HVAC
+- EL = Electrical
+- BMS = Building Management System
+- ABA = Automatic fire alarm
+- Omr. = Område (area/zone)
+- Etage = Floor/level
+- TØ = Tømrer (carpenter)
+- APT = Aptering (fit-out)
+- Råhus = Structural shell
+- LUK = Closing/sealing works
+- STÅL = Steel works
+
+**Rule 6 — Never leave a task without human_label:**
+Every single task object in every array must have a human_label field. If you genuinely cannot interpret a code, write a short category label like "Unknown task" — never omit the field.
+
+**Rule 7 — Language of human_label:**
+human_label must be written in the RESPONSE LANGUAGE (Danish if language=da, English if language=en).
+
+---
+
 ## LANGUAGE HANDLING
-The management_conclusion, priority_actions, resource_assessment, forcing_assessment descriptive fields, summary_by_area, and all descriptive text fields must be in the requested language. Task names (task_name) stay in their original language from the PDF."""
+The management_conclusion, priority_actions, resource_assessment, forcing_assessment descriptive fields, summary_by_area, and all descriptive text fields must be in the requested language. Task names (task_name) stay in their original language from the PDF.
+
+## PHASE 5: PREDICTIVE SNAPSHOT
+
+After completing all four analysis phases, synthesise the findings into the two new top-of-report fields:
+
+### predictive_snapshot
+Fill this AFTER the rest of the analysis is complete — it is a synthesis, not a speculation.
+
+- **what_will_happen**: Write exactly ONE sentence starting with "If no action is taken, ...". State the expected delay window (in weeks or months) AND the primary cause category. Use the most_overdue_days to derive the window: <30 days → "+2–4 weeks", 30–60 days → "+4–8 weeks", 60–90 days → "+2–3 months", 90–180 days → "+3–6 months", >180 days → "+6–12 months or more". Adjust upward if there are cascading root causes across multiple disciplines. NEVER write "significant delay" or "some delay" — always give a number range.
+
+- **estimated_delay_impact**: Short form of the delay window only. Format "+N weeks" or "+N–M months". Derived from the same logic as what_will_happen.
+
+- **confidence_level**: Assign HIGH if: root_cause_count < delayed_count * 0.5 (good separation), most_overdue_days is concrete, and predecessor data is present. Assign MEDIUM if: root causes are inferred (no predecessor columns), or data quality is mixed. Assign LOW if: fewer than 5 delayed activities, unstructured format (week-based), or most task types could not be classified.
+
+- **confidence_basis**: ONE sentence. State what the confidence is based on. Reference real numbers. Example: "Based on 28 delayed activities with 6 identified root causes and clear predecessor chains across 3 disciplines." Do NOT write vague statements like "based on the schedule data".
+
+- **main_delay_drivers**: Exactly 3 strings. Each is a short bullet (≤15 words) summarising a delay category. Reference real task counts and areas. Derive from the root_cause_analysis and delayed_activities arrays — do NOT invent. Must be in the response language.
+
+### predictive_biggest_risk
+Pick the single root cause task with the highest combination of: days_overdue + number of affected_task_ids.
+
+- **risk_title**: ≤15 words. Must include: task ID, the specific task name or type, and days overdue. Example: "Task ID 41 — coordination milestone 47 days overdue, blocking EL and VVS trades." NEVER use vague language. NEVER omit the ID.
+
+- **will_block**: One sentence describing the downstream consequence if unresolved. Reference specific disciplines or areas. Example: "Unresolved, this will delay electrical and HVAC installation across Omr. 2 and Omr. 3 by at least 6–8 weeks."
+
+- **prevent_action_now**: ≤10-word imperative starting with an action verb. Names who does what. Example: "Escalate ID 41 coordination meeting to project director today." FORBIDDEN words: "monitor", "consider", "review", "look into", "assess", "evaluate". Must be in the response language."""
 
 
 PREDICTIVE_LANGUAGE_INSTRUCTIONS = {
@@ -647,12 +840,20 @@ IMPORTANT: All descriptive text must be in Danish (Dansk):
 - forcing_assessment[].point_of_no_return: written in Danish
 - summary_by_area[].summary: written in Danish
 - root_cause_analysis[].why_it_matters, downstream_impact, consequence_if_unresolved: Danish
+- predictive_snapshot.what_will_happen: written in Danish — start with "Hvis der ikke handles, ..."
+- predictive_snapshot.confidence_basis: written in Danish
+- predictive_snapshot.main_delay_drivers[]: written in Danish — short bullets
+- predictive_biggest_risk.risk_title: written in Danish
+- predictive_biggest_risk.will_block: written in Danish
+- predictive_biggest_risk.prevent_action_now: written in Danish — imperative verb phrase
 - Keep task_name values in their ORIGINAL language from the PDF (do not translate)
-- Enum values (task_type, priority, problem_type, resource_type, action_type, is_forceable, constraint_type, coordination_cost, parallelizability) stay in English — these are machine-readable
+- human_label must be written in DANISH — 2–4 ord på dansk der beskriver opgaven for en ikke-teknisk projektleder
+- Enum values (task_type, priority, problem_type, resource_type, action_type, is_forceable, constraint_type, coordination_cost, parallelizability, confidence_level) stay in English — these are machine-readable
 """,
     "en": """
 Respond with all descriptive text in English.
 Keep task_name values in their original language from the PDF (do not translate).
+human_label must be written in ENGLISH — 2–4 plain English words describing the task for a non-technical project manager.
 Enum values stay as defined in the schema.
 """
 }
