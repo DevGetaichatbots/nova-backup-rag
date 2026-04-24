@@ -3,7 +3,7 @@ modules = ["python-3.11", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["libxcrypt", "postgresql"]
+packages = ["cargo", "libiconv", "libxcrypt", "postgresql", "rustc"]
 
 [unitTest]
 language = "python3"
@@ -17,6 +17,7 @@ deploymentTarget = "autoscale"
 
 [agent]
 expertMode = true
+integrations = ["github:1.0.0"]
 
 [workflows]
 runButton = "Project"

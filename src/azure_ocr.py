@@ -69,28 +69,32 @@ class AzureDocumentIntelligence:
             logger.error(f"[{filename}] Failed to submit PDF: {e}")
             return None
     
-    def _poll_results(self, operation_url: str, filename: str, 
-                      timeout: int = 180, poll_interval: int = 3) -> Optional[Dict]:
+    def _poll_results(self, operation_url: str, filename: str,
+                      timeout: int = 180) -> Optional[Dict]:
         headers = {"Ocp-Apim-Subscription-Key": self.key}
         start_time = time.time()
-        
+
         while True:
             elapsed = time.time() - start_time
-            
+
             if elapsed > timeout:
                 logger.error(f"[{filename}] Polling timeout after {timeout}s")
                 return None
-            
+
+            # Adaptive back-off: 1s for the first 30s, then 2s after that.
+            # Avoids hammering Azure on slow jobs while staying responsive on fast ones.
+            poll_interval = 1 if elapsed < 30 else 2
+
             try:
                 response = requests.get(operation_url, headers=headers, timeout=30)
                 response.raise_for_status()
                 result = response.json()
-                
+
                 status = result.get("status", "unknown")
-                logger.info(f"[{filename}] Status: {status} (elapsed: {elapsed:.1f}s)")
-                
+                logger.info(f"[{filename}] Status: {status} (elapsed: {elapsed:.1f}s, next poll in {poll_interval}s)")
+
                 if status == "succeeded":
-                    logger.info(f"[{filename}] Extraction complete!")
+                    logger.info(f"[{filename}] Extraction complete in {elapsed:.1f}s")
                     return result
                 elif status == "failed":
                     error = result.get("error", {})
@@ -101,7 +105,7 @@ class AzureDocumentIntelligence:
                 else:
                     logger.warning(f"[{filename}] Unknown status: {status}")
                     time.sleep(poll_interval)
-                    
+
             except requests.exceptions.RequestException as e:
                 logger.error(f"[{filename}] Polling error: {e}")
                 time.sleep(poll_interval)
