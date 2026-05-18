@@ -8,8 +8,9 @@ Chains:
   → returns (NormalizedSchedule, compact_csv_chunks)
 
 The compact_csv_chunks list is identical in format to the output of
-src/pdf_processor.process_pdf_binary(), allowing the downstream vector store
-and LLM agents to consume it without modification.
+src/pdf_processor.rows_to_compact_csv_chunks() because the bridge operates
+on the original extracted headers and rows, applying the same filtering logic.
+Downstream vector store and LLM agents are unchanged.
 """
 from __future__ import annotations
 import logging
@@ -22,7 +23,7 @@ from ingestion.extractors.registry import ExtractorRegistry
 from ingestion.models.nusf import NormalizedSchedule
 from ingestion.normalization.engine import NormalizationEngine
 from ingestion.recognition.ai_fallback import AIFallbackRecognizer
-from ingestion.recognition.heuristics import HeuristicRecognizer, CRITICAL_FIELDS
+from ingestion.recognition.heuristics import HeuristicRecognizer, RecognitionResult
 from ingestion.validation.engine import ValidationEngine
 
 import ingestion.extractors.csv as _  # noqa: F401 — triggers self-registration
@@ -88,9 +89,7 @@ class IngestionPipeline:
         extractor = ExtractorRegistry.get(source_system)
 
         try:
-            if source_system == "PDF":
-                extracted = extractor.extract_from_bytes(file_bytes, filename)
-            elif source_system == "CSV":
+            if hasattr(extractor, "extract_from_bytes"):
                 extracted = extractor.extract_from_bytes(file_bytes, filename)
             else:
                 with tempfile.NamedTemporaryFile(
@@ -104,6 +103,8 @@ class IngestionPipeline:
             raise PipelineError(f"Extraction failed for '{filename}': {e}") from e
 
         headers = extracted.get("headers", [])
+        rows = extracted.get("rows", [])
+
         if not headers:
             raise PipelineError(
                 f"No column headers could be extracted from '{filename}'. "
@@ -121,7 +122,6 @@ class IngestionPipeline:
                 for role, col in ai_map.items():
                     if role not in merged_map:
                         merged_map[role] = col
-                from ingestion.recognition.heuristics import RecognitionResult
                 recognition = RecognitionResult(
                     column_map=merged_map,
                     match_key=recognition.match_key,
@@ -157,7 +157,7 @@ class IngestionPipeline:
                 issues=schedule.validation_issues,
             )
 
-        chunks = self._normalizer.to_compact_csv_chunks(schedule)
+        chunks = self._normalizer.to_compact_csv_chunks(headers, rows, filename)
 
         logger.info(
             f"[{filename}] Pipeline complete: "

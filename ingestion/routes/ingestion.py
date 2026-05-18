@@ -1,27 +1,43 @@
 """
 NUSF V2 Ingestion Routes
 =========================
-New FastAPI endpoints under /v2/ prefix.
-These run files through the NUSF pipeline (Detect → Extract → Recognize → Normalize → Validate)
-and hand the resulting compact CSV chunks to the same downstream vector store and LLM agents
-used by the existing v1 routes. The v1 routes are not modified.
+FastAPI router for /v2/ endpoints. ZERO imports from src/.
+
+All downstream dependencies (vector_store_manager, save_session_metadata,
+predictive_agent, format_predictive_as_html) are injected at configuration
+time via configure() before the router is mounted. This keeps ingestion/
+fully self-contained.
+
+Wire-up in src/main.py:
+    from ingestion.routes.ingestion import router as _v2_router, configure as _v2_configure
+    from ingestion.routes.ingestion import RouterDependencies
+    _v2_configure(RouterDependencies(
+        vector_store_manager=...,
+        save_session_metadata=...,
+        predictive_agent=...,
+        format_html=...,
+    ))
+    app.include_router(_v2_router, prefix="/v2")
 
 Endpoints:
-  POST   /v2/upload                          — upload 2 schedules for comparison
-  GET    /v2/upload/progress/{upload_id}     — poll upload progress
-  POST   /v2/predictive                      — upload 1 schedule for Nova Insight analysis
-  GET    /v2/predictive/progress/{analysis_id} — poll predictive progress
   GET    /v2/health                          — pipeline health check
-  POST   /v2/inspect                         — inspect a file through the pipeline (debug)
+  POST   /v2/inspect                         — diagnose a file through the pipeline
+  POST   /v2/upload                          — two-schedule comparison upload
+  GET    /v2/upload/progress/{upload_id}     — poll upload progress
+  POST   /v2/predictive                      — single-schedule Nova Insight analysis
+  GET    /v2/predictive/progress/{analysis_id} — poll predictive progress
 """
 from __future__ import annotations
 import asyncio
 import logging
+import re
 import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Callable, Dict, Optional
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
@@ -41,28 +57,40 @@ _progress_lock = threading.Lock()
 _ALLOWED_EXTENSIONS = {".pdf", ".csv"}
 
 
+@dataclass
+class RouterDependencies:
+    """
+    Downstream dependencies injected from src/ at mount time.
+    Keeps ingestion/ free of src/ imports.
+    """
+    vector_store_manager: Any
+    save_session_metadata: Callable
+    predictive_agent: Any
+    format_html: Callable
+
+
+_deps: Optional[RouterDependencies] = None
+
+
+def configure(deps: RouterDependencies) -> None:
+    """Call this once from src/main.py before including the router."""
+    global _deps
+    _deps = deps
+    logger.info("V2 router dependencies configured")
+
+
+def _require_deps() -> RouterDependencies:
+    if _deps is None:
+        raise RuntimeError(
+            "V2 router dependencies not configured. "
+            "Call ingestion.routes.ingestion.configure(RouterDependencies(...)) "
+            "before mounting the router."
+        )
+    return _deps
+
+
 def _is_allowed(filename: str) -> bool:
     return any(filename.lower().endswith(ext) for ext in _ALLOWED_EXTENSIONS)
-
-
-def _update_upload_progress(upload_id: str, **kwargs):
-    with _progress_lock:
-        if upload_id in _v2_upload_progress:
-            _v2_upload_progress[upload_id].update(kwargs)
-
-
-def _update_predictive_progress(analysis_id: str, stage: str, message: str, step: int,
-                                 total_steps: int = 6, detail: str = None):
-    with _progress_lock:
-        _v2_predictive_progress[analysis_id] = {
-            "analysis_id": analysis_id,
-            "stage": stage,
-            "step": step,
-            "total_steps": total_steps,
-            "message": message,
-            "detail": detail,
-            "timestamp": time.time(),
-        }
 
 
 def _schedule_cleanup(store: Dict, key: str, delay: int = 300):
@@ -72,6 +100,36 @@ def _schedule_cleanup(store: Dict, key: str, delay: int = 300):
     threading.Thread(target=_clean, daemon=True).start()
 
 
+def _extract_ref_date(name: str) -> Optional[str]:
+    patterns = [
+        (r"(\d{4})-(\d{2})-(\d{2})", lambda m: datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
+        (r"(\d{2})-(\d{2})-(\d{4})", lambda m: datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))),
+        (r"(\d{2})\.(\d{2})\.(\d{4})", lambda m: datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))),
+        (r"(\d{4})(\d{2})(\d{2})", lambda m: datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
+    ]
+    for pattern, parser in patterns:
+        m = re.search(pattern, name)
+        if m:
+            try:
+                return parser(m).strftime("%d-%m-%Y")
+            except ValueError:
+                continue
+    return None
+
+
+def _issues_to_list(issues: list) -> list:
+    return [
+        {
+            "level": i.level,
+            "category": i.category,
+            "activity_id": i.activity_id,
+            "message": i.message,
+            "remediation": i.remediation,
+        }
+        for i in issues
+    ]
+
+
 @router.get("/health")
 async def v2_health():
     from ingestion.extractors.registry import ExtractorRegistry
@@ -79,6 +137,65 @@ async def v2_health():
         "status": "healthy",
         "pipeline": "NUSF v1.0",
         "registered_extractors": ExtractorRegistry.available(),
+        "dependencies_configured": _deps is not None,
+    }
+
+
+@router.post("/inspect")
+async def v2_inspect_file(schedule: UploadFile = File(...)):
+    """
+    Debug endpoint: run a file through the NUSF pipeline and return
+    the NormalizedSchedule metadata + validation issues without
+    storing anything in the vector database.
+    """
+    filename = schedule.filename or "schedule.pdf"
+    if not _is_allowed(filename):
+        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+
+    file_bytes = await schedule.read()
+    loop = asyncio.get_event_loop()
+
+    try:
+        schedule_obj, chunks = await loop.run_in_executor(
+            _executor,
+            lambda: _pipeline.run_from_bytes(file_bytes, filename),
+        )
+    except PipelineError as e:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": str(e),
+                "issues": _issues_to_list(e.issues),
+            },
+        )
+
+    meta = schedule_obj.metadata
+    return {
+        "pipeline": "NUSF",
+        "validation_passed": schedule_obj.validation_passed,
+        "filename": meta.source_filename,
+        "source_system": meta.source_system,
+        "total_activities": meta.total_activities,
+        "total_relationships": meta.total_relationships,
+        "parse_quality_score": meta.parse_quality_score,
+        "parse_duration_seconds": meta.parse_duration_seconds,
+        "earliest_date": meta.earliest_date.isoformat(),
+        "latest_date": meta.latest_date.isoformat(),
+        "duration_days": meta.duration_days,
+        "compact_chunks": len(chunks),
+        "validation_issues": _issues_to_list(schedule_obj.validation_issues),
+        "sample_activities": [
+            {
+                "source_id": a.source_id,
+                "name": a.name[:80],
+                "planned_start": a.planned_start.strftime("%d-%m-%Y"),
+                "planned_finish": a.planned_finish.strftime("%d-%m-%Y"),
+                "percent_complete": a.percent_complete,
+                "activity_type": a.activity_type.value,
+                "discipline": a.discipline,
+            }
+            for a in schedule_obj.activities[:10]
+        ],
     }
 
 
@@ -92,7 +209,6 @@ async def v2_upload_schedules(
 ):
     """
     Upload two schedule files through the NUSF pipeline for comparison analysis.
-    Same parameters as POST /upload — supports PDF and CSV.
     Returns upload_id for progress polling.
     """
     old_filename = old_schedule.filename or "old_schedule.pdf"
@@ -122,73 +238,85 @@ async def v2_upload_schedules(
 
     loop = asyncio.get_event_loop()
 
+    def _update_upload(key: str, **kwargs):
+        with _progress_lock:
+            if upload_id in _v2_upload_progress:
+                if key in _v2_upload_progress[upload_id]:
+                    _v2_upload_progress[upload_id][key].update(kwargs)
+                else:
+                    _v2_upload_progress[upload_id].update(kwargs)
+
     async def _background():
         try:
-            from src.vector_store import vector_store_manager
-            from src.database import save_session_metadata
+            deps = _require_deps()
 
-            def _process_one(file_key, filename, file_bytes, table_id):
-                _update_upload_progress(
-                    upload_id,
-                    **{file_key: {"step": "pipeline", "detail": f"Running NUSF pipeline on {filename}...", "progress": 15}},
-                )
-
+            def _process_one(file_key: str, filename: str, file_bytes: bytes, table_id: str):
+                _update_upload(file_key, step="pipeline", detail=f"Running NUSF pipeline on {filename}...", progress=15)
                 try:
-                    schedule, chunks = _pipeline.run_from_bytes(file_bytes, filename)
+                    schedule_obj, chunks = _pipeline.run_from_bytes(file_bytes, filename)
                 except PipelineError as e:
                     logger.error(f"[v2/upload] Pipeline error for {filename}: {e}")
+                    _update_upload(
+                        file_key,
+                        step="error",
+                        detail=str(e),
+                        progress=0,
+                        validation_issues=_issues_to_list(e.issues),
+                    )
+                    _update_upload(
+                        "status", **{}
+                    )
+                    with _progress_lock:
+                        _v2_upload_progress[upload_id]["status"] = "error"
+                        _v2_upload_progress[upload_id]["error"] = str(e)
+                        _v2_upload_progress[upload_id]["validation_issues"] = _issues_to_list(e.issues)
                     raise
 
-                warnings = len([i for i in schedule.validation_issues if i.level != "ERROR"])
-                _update_upload_progress(
-                    upload_id,
-                    **{file_key: {"step": "storing", "detail": f"Storing {len(chunks)} chunks...", "progress": 60}},
+                warnings = [i for i in schedule_obj.validation_issues if i.level != "ERROR"]
+                _update_upload(file_key, step="storing", detail=f"Storing {len(chunks)} chunks...", progress=60)
+
+                result = deps.vector_store_manager.create_store_from_chunks(
+                    session_id, filename, chunks, table_id
                 )
 
-                result = vector_store_manager.create_store_from_chunks(
-                    session_id, filename, chunks, table_id,
-                    progress_callback=lambda step, detail, pct: _update_upload_progress(
-                        upload_id,
-                        **{file_key: {"step": step, "detail": detail, "progress": 60 + pct // 3}},
-                    ),
-                )
-
-                _update_upload_progress(
-                    upload_id,
-                    **{file_key: {
-                        "step": "complete",
-                        "detail": f"{result.get('chunks_processed', 0)} chunks stored, {warnings} warnings",
-                        "progress": 100,
-                        "table_name": result.get("table_name"),
-                        "chunks": result.get("chunks_processed", 0),
-                        "nusf_activities": schedule.metadata.total_activities,
-                        "nusf_quality": schedule.metadata.parse_quality_score,
-                        "nusf_format": schedule.metadata.source_system,
-                        "nusf_warnings": warnings,
-                    }},
-                )
+                _update_upload(file_key, **{
+                    "step": "complete",
+                    "detail": f"{result.get('chunks_processed', 0)} chunks stored, {len(warnings)} warnings",
+                    "progress": 100,
+                    "table_name": result.get("table_name"),
+                    "chunks": result.get("chunks_processed", 0),
+                    "nusf_activities": schedule_obj.metadata.total_activities,
+                    "nusf_quality": schedule_obj.metadata.parse_quality_score,
+                    "nusf_format": schedule_obj.metadata.source_system,
+                    "nusf_warnings": len(warnings),
+                    "validation_issues": _issues_to_list(warnings),
+                })
                 return result
 
             old_f = loop.run_in_executor(_executor, lambda: _process_one("old_schedule", old_filename, old_bytes, old_session_id))
             new_f = loop.run_in_executor(_executor, lambda: _process_one("new_schedule", new_filename, new_bytes, new_session_id))
 
             old_result, new_result = await asyncio.gather(old_f, new_f)
-            save_session_metadata(session_id, old_filename, new_filename, old_session_id, new_session_id)
+            deps.save_session_metadata(session_id, old_filename, new_filename, old_session_id, new_session_id)
 
             elapsed = time.time() - _v2_upload_progress[upload_id]["started_at"]
-            _update_upload_progress(
-                upload_id,
-                status="complete",
-                overall_progress=100,
-                elapsed_seconds=round(elapsed, 1),
-            )
+            with _progress_lock:
+                _v2_upload_progress[upload_id].update(
+                    status="complete",
+                    overall_progress=100,
+                    elapsed_seconds=round(elapsed, 1),
+                )
             logger.info(f"[v2/upload] Complete ({elapsed:.1f}s) upload_id={upload_id}")
 
         except Exception as e:
             logger.error(f"[v2/upload] Failed: {e}")
-            _update_upload_progress(upload_id, status="error", error=str(e))
+            with _progress_lock:
+                _v2_upload_progress.setdefault(upload_id, {}).update(
+                    status="error", error=str(e)
+                )
 
     asyncio.create_task(_background())
+    _schedule_cleanup(_v2_upload_progress, upload_id, 600)
 
     return {
         "status": "processing",
@@ -217,7 +345,7 @@ async def v2_predictive_analysis(
 ):
     """
     Upload a single schedule through the NUSF pipeline for Nova Insight predictive analysis.
-    Same behaviour as POST /predictive — supports PDF and CSV.
+    Supports PDF and CSV. Returns analysis_id for progress polling.
     """
     if not analysis_id:
         analysis_id = str(uuid.uuid4())[:12]
@@ -229,37 +357,33 @@ async def v2_predictive_analysis(
         raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
 
     file_bytes = await schedule.read()
-
-    _update_predictive_progress(analysis_id, "received", "Received — starting NUSF pipeline...", 1)
-
-    import re
-    from datetime import datetime
-
-    def _extract_ref_date(name: str) -> Optional[str]:
-        patterns = [
-            (r"(\d{4})-(\d{2})-(\d{2})", lambda m: datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
-            (r"(\d{2})-(\d{2})-(\d{4})", lambda m: datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))),
-            (r"(\d{2})\.(\d{2})\.(\d{4})", lambda m: datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))),
-            (r"(\d{4})(\d{2})(\d{2})", lambda m: datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
-        ]
-        for pattern, parser in patterns:
-            m = re.search(pattern, name)
-            if m:
-                try:
-                    return parser(m).strftime("%d-%m-%Y")
-                except ValueError:
-                    continue
-        return None
-
     reference_date = _extract_ref_date(filename_clean)
+
+    with _progress_lock:
+        _v2_predictive_progress[analysis_id] = {
+            "analysis_id": analysis_id,
+            "stage": "received",
+            "step": 1,
+            "total_steps": 6,
+            "message": "Received — starting NUSF pipeline...",
+            "timestamp": time.time(),
+        }
 
     loop = asyncio.get_event_loop()
     start_time = time.time()
 
+    def _set_progress(stage: str, message: str, step: int, detail: str = None):
+        with _progress_lock:
+            _v2_predictive_progress[analysis_id].update(
+                stage=stage, message=message, step=step,
+                timestamp=time.time(), detail=detail,
+            )
+
     async def _background():
         try:
-            _update_predictive_progress(analysis_id, "pipeline", "Running NUSF ingestion pipeline...", 2)
+            deps = _require_deps()
 
+            _set_progress("pipeline", "Running NUSF ingestion pipeline...", 2)
             try:
                 schedule_obj, chunks = await loop.run_in_executor(
                     _executor,
@@ -267,31 +391,37 @@ async def v2_predictive_analysis(
                 )
             except PipelineError as e:
                 logger.error(f"[v2/predictive] Pipeline error: {e}")
-                _update_predictive_progress(analysis_id, "error", str(e), -1)
+                with _progress_lock:
+                    _v2_predictive_progress[analysis_id].update(
+                        stage="error",
+                        step=-1,
+                        message=str(e),
+                        error=str(e),
+                        validation_issues=_issues_to_list(e.issues),
+                        timestamp=time.time(),
+                    )
                 _schedule_cleanup(_v2_predictive_progress, analysis_id, 120)
                 return
 
-            warnings = len([i for i in schedule_obj.validation_issues if i.level != "ERROR"])
+            warnings = [i for i in schedule_obj.validation_issues if i.level != "ERROR"]
             row_count = schedule_obj.metadata.total_activities
             logger.info(
                 f"[v2/predictive] Pipeline complete: {row_count} activities, "
-                f"{len(chunks)} chunks, {warnings} warnings"
+                f"{len(chunks)} chunks, {len(warnings)} warnings"
             )
 
-            _update_predictive_progress(
-                analysis_id, "extracting",
+            _set_progress(
+                "extracting",
                 f"Found {row_count} activities via NUSF ({schedule_obj.metadata.source_system})",
-                3, detail=f"{row_count} activities"
+                3,
+                detail=f"{row_count} activities",
             )
-
-            from src.predictive_agent import predictive_agent
-            from src.predictive_html_formatter import format_predictive_as_html
 
             MAX_CONTEXT_BYTES = 1_900_000
             table_chunks = [c for c in chunks if c.get("metadata", {}).get("type") == "table"]
             preamble = f"[{filename_clean}] — COMPLETE SCHEDULE DATA\nScan EVERY row for delayed activities.\n\n"
             budget = MAX_CONTEXT_BYTES - len(preamble.encode("utf-8"))
-            included_parts = []
+            included_parts: list = []
             current_bytes = 0
             for chunk in table_chunks:
                 cb = len(chunk["content"].encode("utf-8")) + 1
@@ -301,11 +431,11 @@ async def v2_predictive_analysis(
                 current_bytes += cb
             context = preamble + "\n".join(included_parts) + "\n"
 
-            _update_predictive_progress(analysis_id, "analyzing", "Nova Insight is analyzing your schedule...", 4)
+            _set_progress("analyzing", "Nova Insight is analyzing your schedule...", 4)
 
             predictive_result = await loop.run_in_executor(
                 _executor,
-                lambda: predictive_agent.analyze(
+                lambda: deps.predictive_agent.analyze(
                     context=context,
                     user_query=(
                         "Execute full two-phase analysis: detect ALL delayed activities "
@@ -322,12 +452,12 @@ async def v2_predictive_analysis(
             predictive_text = predictive_result.get("predictive_insights", "")
             predictive_status = predictive_result.get("status", "error")
 
-            _update_predictive_progress(analysis_id, "formatting", "Building report...", 5)
+            _set_progress("formatting", "Building report...", 5)
 
             if format == "html" and predictive_json:
-                predictive_text = format_predictive_as_html(predictive_json, language)
+                predictive_text = deps.format_html(predictive_json, language)
             elif format == "html" and predictive_text:
-                predictive_text = format_predictive_as_html(predictive_text, language)
+                predictive_text = deps.format_html(predictive_text, language)
 
             elapsed = time.time() - start_time
 
@@ -339,6 +469,7 @@ async def v2_predictive_analysis(
                     "total_steps": 6,
                     "message": "Analysis ready",
                     "timestamp": time.time(),
+                    "validation_issues": _issues_to_list(warnings),
                     "result": {
                         "predictive_insights": predictive_text,
                         "predictive_status": predictive_status,
@@ -350,7 +481,7 @@ async def v2_predictive_analysis(
                         "nusf_activities": row_count,
                         "nusf_quality": schedule_obj.metadata.parse_quality_score,
                         "nusf_format": schedule_obj.metadata.source_system,
-                        "nusf_warnings": warnings,
+                        "nusf_warnings": len(warnings),
                     },
                 }
 
@@ -359,7 +490,11 @@ async def v2_predictive_analysis(
 
         except Exception as e:
             logger.error(f"[v2/predictive] Unexpected error: {e}", exc_info=True)
-            _update_predictive_progress(analysis_id, "error", str(e), -1)
+            with _progress_lock:
+                _v2_predictive_progress[analysis_id].update(
+                    stage="error", step=-1, message=str(e),
+                    error=str(e), timestamp=time.time(),
+                )
             _schedule_cleanup(_v2_predictive_progress, analysis_id, 120)
 
     asyncio.create_task(_background())
@@ -381,75 +516,4 @@ async def v2_get_predictive_progress(analysis_id: str):
             status_code=404,
             detail="No analysis found with this ID. It may have completed or expired.",
         )
-    resp = {k: v for k, v in progress.items()}
-    return resp
-
-
-@router.post("/inspect")
-async def v2_inspect_file(
-    schedule: UploadFile = File(...),
-):
-    """
-    Debug endpoint: run a file through the NUSF pipeline and return
-    the NormalizedSchedule metadata + validation issues without
-    storing anything in the vector database.
-    """
-    filename = schedule.filename or "schedule.pdf"
-    if not _is_allowed(filename):
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
-
-    file_bytes = await schedule.read()
-    loop = asyncio.get_event_loop()
-
-    try:
-        schedule_obj, chunks = await loop.run_in_executor(
-            _executor,
-            lambda: _pipeline.run_from_bytes(file_bytes, filename),
-        )
-    except PipelineError as e:
-        raise HTTPException(
-            status_code=422,
-            detail={
-                "error": str(e),
-                "issues": [i.model_dump() for i in e.issues],
-            },
-        )
-
-    meta = schedule_obj.metadata
-    issues = schedule_obj.validation_issues
-
-    return {
-        "pipeline": "NUSF",
-        "validation_passed": schedule_obj.validation_passed,
-        "filename": meta.source_filename,
-        "source_system": meta.source_system,
-        "total_activities": meta.total_activities,
-        "total_relationships": meta.total_relationships,
-        "parse_quality_score": meta.parse_quality_score,
-        "parse_duration_seconds": meta.parse_duration_seconds,
-        "earliest_date": meta.earliest_date.isoformat(),
-        "latest_date": meta.latest_date.isoformat(),
-        "duration_days": meta.duration_days,
-        "compact_chunks": len(chunks),
-        "validation_issues": [
-            {
-                "level": i.level,
-                "category": i.category,
-                "message": i.message,
-                "remediation": i.remediation,
-            }
-            for i in issues
-        ],
-        "sample_activities": [
-            {
-                "source_id": a.source_id,
-                "name": a.name[:80],
-                "planned_start": a.planned_start.strftime("%d-%m-%Y"),
-                "planned_finish": a.planned_finish.strftime("%d-%m-%Y"),
-                "percent_complete": a.percent_complete,
-                "activity_type": a.activity_type.value,
-                "discipline": a.discipline,
-            }
-            for a in schedule_obj.activities[:10]
-        ],
-    }
+    return progress
