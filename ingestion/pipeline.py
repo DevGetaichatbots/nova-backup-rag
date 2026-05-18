@@ -119,6 +119,11 @@ class IngestionPipeline:
         headers = extracted.get("headers", [])
         rows = extracted.get("rows", [])
 
+        logger.info(
+            f"[{filename}] Extracted {len(rows)} rows, "
+            f"{len(headers)} headers: {headers}"
+        )
+
         if not headers:
             raise PipelineError(
                 f"No column headers could be extracted from '{filename}'. "
@@ -129,8 +134,12 @@ class IngestionPipeline:
         logger.info(f"[{filename}] Heuristic recognition: {recognition}")
 
         if recognition.ai_needed:
-            logger.info(f"[{filename}] Critical fields missing — invoking AI fallback recognizer")
+            logger.info(
+                f"[{filename}] Critical fields missing — invoking AI fallback recognizer. "
+                f"Headers sent: {headers}"
+            )
             ai_map = self._ai_fallback.recognize(headers)
+            logger.info(f"[{filename}] AI fallback returned: {ai_map}")
             if ai_map:
                 merged_map = dict(recognition.column_map)
                 for role, col in ai_map.items():
@@ -144,8 +153,13 @@ class IngestionPipeline:
                     confidence=max(recognition.confidence, 0.5),
                 )
                 logger.info(
-                    f"[{filename}] AI fallback added fields: {list(ai_map.keys())}"
+                    f"[{filename}] After AI fallback — column_map: {recognition.column_map}"
                 )
+
+        # Always produce compact CSV chunks from raw OCR/CSV rows — this mirrors
+        # the existing src/pdf_processor behaviour and keeps LLM agents working
+        # even when structured normalization cannot fully parse the headers.
+        chunks = self._normalizer.to_compact_csv_chunks(headers, rows, filename)
 
         schedule = self._normalizer.normalize(
             extracted=extracted,
@@ -155,10 +169,23 @@ class IngestionPipeline:
         )
 
         if not schedule.activities:
-            raise PipelineError(
-                f"No activities could be normalized from '{filename}'. "
-                f"Columns recognized: {list(recognition.column_map.keys())}"
+            if not chunks:
+                raise PipelineError(
+                    f"No data could be extracted from '{filename}'. "
+                    f"Raw headers from OCR: {headers}. "
+                    f"Data rows extracted: {len(rows)}. "
+                    f"Columns recognized: {list(recognition.column_map.keys())}. "
+                    f"Column map: {recognition.column_map}."
+                )
+            # Chunks exist but structured normalization failed — log and continue.
+            # The LLM agents will still receive the raw table data via chunks.
+            logger.warning(
+                f"[{filename}] Structured normalization produced 0 activities "
+                f"(columns recognized: {list(recognition.column_map.keys())}). "
+                f"Proceeding with {len(chunks)} raw chunk(s) for LLM agents. "
+                f"Raw headers: {headers}"
             )
+            return schedule, chunks
 
         schedule = self._validator.validate(schedule)
 
@@ -170,8 +197,6 @@ class IngestionPipeline:
                 f"First: {error_issues[0].message if error_issues else 'unknown'}",
                 issues=schedule.validation_issues,
             )
-
-        chunks = self._normalizer.to_compact_csv_chunks(headers, rows, filename)
 
         logger.info(
             f"[{filename}] Pipeline complete: "
