@@ -55,6 +55,20 @@ class IngestionPipeline:
         self._normalizer = NormalizationEngine()
         self._validator = ValidationEngine()
 
+    def run(
+        self,
+        file_path: Path,
+        filename: str = None,
+    ) -> Tuple[NormalizedSchedule, List[Dict[str, Any]]]:
+        """
+        Full pipeline run from a file path on disk.
+        filename defaults to file_path.name if not provided.
+        """
+        file_path = Path(file_path)
+        if filename is None:
+            filename = file_path.name
+        return self.run_from_bytes(file_path.read_bytes(), filename)
+
     def run_from_bytes(
         self,
         file_bytes: bytes,

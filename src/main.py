@@ -873,6 +873,11 @@ async def get_predictive_progress(analysis_id: str):
     return resp
 
 
+# ── NUSF v2 Routes ───────────────────────────────────────────────────────────
+# Dependency injection keeps ingestion/ free of src/ imports.
+# All downstream objects (vector_store_manager, predictive_agent, etc.) are
+# wired here in src/main.py and passed into the router at startup.
+# Existing /upload, /query, /predictive routes above are NOT modified.
 from ingestion.routes.ingestion import (
     router as _v2_router,
     configure as _v2_configure,
@@ -889,6 +894,7 @@ _v2_configure(RouterDependencies(
     format_html=_format_html,
 ))
 app.include_router(_v2_router, prefix="/v2")
+# ─────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     import uvicorn
