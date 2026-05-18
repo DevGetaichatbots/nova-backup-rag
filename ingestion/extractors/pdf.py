@@ -176,8 +176,15 @@ def _parse_ocr_tables(result: Dict, filename: str) -> List[Dict]:
 
 
 def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
-    canonical_headers: List[str] = []
-    all_data_rows: List[List[str]] = []
+    # ------------------------------------------------------------------
+    # Phase 1: parse every table independently, score each by how many
+    # recognised schedule columns it contains.  The table with the highest
+    # score becomes the canonical header schema.  Using the FIRST table as
+    # the canonical template fails when the PDF opens with a small summary
+    # or legend table (e.g. 2-col ["Id","Opgavetilstand"]) that then blocks
+    # every subsequent wider table.
+    # ------------------------------------------------------------------
+    parsed: List[dict] = []  # {score, sched_headers, sched_data}
 
     for table in tables:
         col_count = table.get("column_count", 0)
@@ -201,27 +208,63 @@ def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
         if not sched_data:
             continue
 
-        if not canonical_headers:
-            canonical_headers = sched_headers
-        else:
-            canon_low = [h.lower().strip() for h in canonical_headers]
-            table_low = [h.lower().strip() for h in sched_headers]
-            col_map = {}
-            for ci, ch in enumerate(canon_low):
-                for fi, fh in enumerate(table_low):
-                    if fh == ch:
-                        col_map[ci] = fi
-                        break
-            min_req = max(1, int(0.6 * len(canonical_headers)))
-            if len(col_map) < min_req:
-                continue
-            sched_data = [
-                [row[col_map[ci]] if ci in col_map and col_map[ci] < len(row) else ""
-                 for ci in range(len(canonical_headers))]
-                for row in sched_data
-            ]
+        score = _header_score(sched_headers)
+        parsed.append({
+            "score": score,
+            "col_count": len(sched_headers),
+            "sched_headers": sched_headers,
+            "sched_data": sched_data,
+        })
 
-        for row in sched_data:
+    if not parsed:
+        return [], []
+
+    # Pick canonical: highest recognised-header score first,
+    # break ties by column count (wider table wins).
+    parsed.sort(key=lambda t: (t["score"], t["col_count"]), reverse=True)
+    canonical_headers = parsed[0]["sched_headers"]
+
+    logger.debug(
+        f"[{filename}] Canonical table: score={parsed[0]['score']}, "
+        f"cols={parsed[0]['col_count']}, headers={canonical_headers}"
+    )
+
+    # ------------------------------------------------------------------
+    # Phase 2: merge all tables into the canonical schema.
+    # ------------------------------------------------------------------
+    all_data_rows: List[List[str]] = []
+    canon_low = [h.lower().strip() for h in canonical_headers]
+
+    for entry in parsed:
+        sched_headers = entry["sched_headers"]
+        sched_data = entry["sched_data"]
+        table_low = [h.lower().strip() for h in sched_headers]
+
+        col_map: dict = {}
+        for ci, ch in enumerate(canon_low):
+            for fi, fh in enumerate(table_low):
+                if fh == ch:
+                    col_map[ci] = fi
+                    break
+
+        # Require at least 50% column overlap (relaxed from 60% to handle
+        # multi-page tables that may omit repeated header columns).
+        min_req = max(1, int(0.5 * len(canonical_headers)))
+        if len(col_map) < min_req:
+            logger.debug(
+                f"[{filename}] Skipping table with {len(sched_headers)} cols "
+                f"(overlap {len(col_map)}/{len(canonical_headers)} < {min_req}): "
+                f"{sched_headers}"
+            )
+            continue
+
+        mapped_rows = [
+            [row[col_map[ci]] if ci in col_map and col_map[ci] < len(row) else ""
+             for ci in range(len(canonical_headers))]
+            for row in sched_data
+        ]
+
+        for row in mapped_rows:
             cleaned = [str(v).strip() for v in row]
             if any(cleaned):
                 while len(cleaned) < len(canonical_headers):
