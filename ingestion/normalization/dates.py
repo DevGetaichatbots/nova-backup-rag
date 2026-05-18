@@ -114,13 +114,13 @@ def parse_duration_to_hours(value: str) -> int:
     num = float(m.group(1))
     unit = m.group(2).lower()
 
-    if unit in ("d", ""):
+    if unit == "d":
         return round(num * 8)
-    elif unit in ("h",):
+    elif unit == "" or unit == "h":
         return round(num)
     elif unit in ("w", "u"):
         return round(num * 40)
     elif unit == "m":
         return round(num * 160)
 
-    return round(num * 8)
+    return round(num)
