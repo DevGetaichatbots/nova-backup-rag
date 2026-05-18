@@ -873,6 +873,9 @@ async def get_predictive_progress(analysis_id: str):
     return resp
 
 
+from ingestion.routes.ingestion import router as _v2_router
+app.include_router(_v2_router, prefix="/v2")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5000)
