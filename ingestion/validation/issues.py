@@ -16,11 +16,11 @@ CAT_QUALITY = "QUALITY"
 
 def rule_101_date_logic(activity_id: str, start: str, finish: str) -> ValidationIssue:
     return ValidationIssue(
-        level=LEVEL_ERROR,
+        level=LEVEL_WARNING,
         category=CAT_STRUCTURAL,
         activity_id=activity_id,
-        message=f"Rule 101: planned_start ({start}) > planned_finish ({finish}). Date logic violated.",
-        remediation="Swap or correct the start/finish dates for this activity.",
+        message=f"Rule 101: planned_start ({start}) > planned_finish ({finish}). Dates were auto-corrected by swapping.",
+        remediation="Verify start/finish date columns in source file are not transposed.",
     )
 
 

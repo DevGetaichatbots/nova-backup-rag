@@ -58,6 +58,12 @@ class ValidationEngine:
         return schedule
 
     def _rule_101(self, schedule: NormalizedSchedule) -> List[ValidationIssue]:
+        """
+        Rule 101: planned_start <= planned_finish.
+        Normalization auto-swaps inverted dates (marked via has_logic_warning),
+        so this check catches any remaining inversions as WARNINGs rather than
+        hard ERRORs — ensuring files are never blocked by corrected date swaps.
+        """
         issues = []
         for act in schedule.activities:
             if act.planned_start > act.planned_finish:

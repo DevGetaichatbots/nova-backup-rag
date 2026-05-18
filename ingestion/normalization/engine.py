@@ -139,6 +139,11 @@ class NormalizationEngine:
             if not planned_finish:
                 planned_finish = planned_start
 
+            date_swapped = False
+            if planned_start > planned_finish:
+                planned_start, planned_finish = planned_finish, planned_start
+                date_swapped = True
+
             raw_dur = _get_val(row, headers, dur_col)
             duration_hours = parse_duration_to_hours(raw_dur)
             if duration_hours == 0 and planned_start != planned_finish:
@@ -223,6 +228,11 @@ class NormalizationEngine:
                 activity_type=act_type,
                 discipline=discipline,
                 provenance=provenance,
+                has_logic_warning=date_swapped,
+                warning_messages=(
+                    ["Start/finish dates were inverted in source data and have been auto-corrected."]
+                    if date_swapped else []
+                ),
             )
 
             activities.append(activity)
@@ -283,9 +293,11 @@ class NormalizationEngine:
             validation_passed=True,
         )
 
+        swapped = sum(1 for a in activities if a.has_logic_warning)
         logger.info(
             f"[{filename}] Normalized: {len(activities)} activities, "
             f"{len(relationships)} relationships, "
+            f"date_swaps={swapped}, "
             f"quality={quality_score:.2f}, "
             f"elapsed={metadata.parse_duration_seconds}s"
         )
