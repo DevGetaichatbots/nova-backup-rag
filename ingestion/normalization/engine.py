@@ -120,18 +120,27 @@ class NormalizationEngine:
         min_date: Optional[datetime] = None
         max_date: Optional[datetime] = None
 
+        _skip_empty = 0
+        _skip_no_date = 0
+
         for row_idx, row in enumerate(rows):
             raw_name = _get_val(row, headers, name_col)
             raw_start = _get_val(row, headers, start_col)
             raw_finish = _get_val(row, headers, finish_col)
 
             if not raw_name and not raw_start and not raw_finish:
+                _skip_empty += 1
                 continue
 
             planned_start = parse_date(raw_start)
             planned_finish = parse_date(raw_finish)
 
             if not planned_start and not planned_finish:
+                _skip_no_date += 1
+                logger.debug(
+                    f"[{filename}] Row {row_idx} skipped — no parseable dates "
+                    f"(start={raw_start!r}, finish={raw_finish!r}, name={raw_name[:40]!r})"
+                )
                 continue
 
             if not planned_start:
@@ -297,6 +306,7 @@ class NormalizationEngine:
         logger.info(
             f"[{filename}] Normalized: {len(activities)} activities, "
             f"{len(relationships)} relationships, "
+            f"skipped_empty={_skip_empty}, skipped_no_date={_skip_no_date}, "
             f"date_swaps={swapped}, "
             f"quality={quality_score:.2f}, "
             f"elapsed={metadata.parse_duration_seconds}s"

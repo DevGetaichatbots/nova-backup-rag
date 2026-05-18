@@ -251,7 +251,7 @@ def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
         # multi-page tables that may omit repeated header columns).
         min_req = max(1, int(0.5 * len(canonical_headers)))
         if len(col_map) < min_req:
-            logger.debug(
+            logger.info(
                 f"[{filename}] Skipping table with {len(sched_headers)} cols "
                 f"(overlap {len(col_map)}/{len(canonical_headers)} < {min_req}): "
                 f"{sched_headers}"
@@ -264,13 +264,25 @@ def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
             for row in sched_data
         ]
 
+        contributed = 0
         for row in mapped_rows:
             cleaned = [str(v).strip() for v in row]
             if any(cleaned):
                 while len(cleaned) < len(canonical_headers):
                     cleaned.append("")
                 all_data_rows.append(cleaned[:len(canonical_headers)])
+                contributed += 1
 
+        logger.info(
+            f"[{filename}] Merged table: {len(sched_headers)} cols, "
+            f"{len(sched_data)} raw rows → {contributed} kept "
+            f"(overlap {len(col_map)}/{len(canonical_headers)}): {sched_headers}"
+        )
+
+    logger.info(
+        f"[{filename}] Table merge complete: {len(all_data_rows)} total rows "
+        f"from canonical schema {canonical_headers}"
+    )
     return canonical_headers, all_data_rows
 
 
