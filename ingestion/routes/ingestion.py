@@ -240,11 +240,15 @@ async def v2_upload_schedules(
 
     def _update_upload(key: str, **kwargs):
         with _progress_lock:
-            if upload_id in _v2_upload_progress:
-                if key in _v2_upload_progress[upload_id]:
-                    _v2_upload_progress[upload_id][key].update(kwargs)
-                else:
-                    _v2_upload_progress[upload_id].update(kwargs)
+            if upload_id not in _v2_upload_progress:
+                return
+            if key in _v2_upload_progress[upload_id] and isinstance(_v2_upload_progress[upload_id][key], dict):
+                _v2_upload_progress[upload_id][key].update(kwargs)
+            else:
+                _v2_upload_progress[upload_id].update(kwargs)
+            old_pct = _v2_upload_progress[upload_id].get("old_schedule", {}).get("progress", 0)
+            new_pct = _v2_upload_progress[upload_id].get("new_schedule", {}).get("progress", 0)
+            _v2_upload_progress[upload_id]["overall_progress"] = (old_pct + new_pct) // 2
 
     async def _background():
         try:
