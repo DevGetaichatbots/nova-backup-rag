@@ -18,26 +18,33 @@ from ingestion.models.nusf import Relationship, DependencyType
 
 logger = logging.getLogger(__name__)
 
+# Matches a valid schedule ID token: purely numeric ("489") or TBS-style ("1.2.3")
+# followed by an optional dependency type and optional lag.
+# This deliberately rejects name-based Tactplan references like "Dæk over FS 0 d".
 _DEP_RE = re.compile(
-    r"([A-Za-z0-9._\-]+?)"
-    r"(?:(FS|SS|FF|SF))?"
-    r"(?:([+\-]\d+))?"
+    r"^(\d+(?:\.\d+)*)"        # numeric or TBS id  e.g. "489" or "1.2.3"
+    r"(?:(FS|SS|FF|SF))?"      # optional dep type
+    r"(?:([+\-]\d+))?"         # optional lag
     r"$",
     re.IGNORECASE,
 )
+
+# Dependency keywords that appear as bare tokens in some formats — always skip
+_DEP_KEYWORDS = {"fs", "ss", "ff", "sf", "d", "h", "w", "u"}
 
 
 def _parse_single_dep(token: str) -> Tuple[str, DependencyType, int]:
     """
     Returns (predecessor_source_id, dep_type, lag_hours).
+    Returns ("", ...) if the token is not a recognisable ID reference.
     """
     token = token.strip()
-    if not token:
+    if not token or token.lower() in _DEP_KEYWORDS:
         return "", DependencyType.FS, 0
 
     m = _DEP_RE.match(token)
     if not m:
-        return token, DependencyType.FS, 0
+        return "", DependencyType.FS, 0  # reject name-based tokens
 
     pred_id = m.group(1).strip()
     dep_str = (m.group(2) or "FS").upper()
@@ -59,13 +66,22 @@ def _parse_single_dep(token: str) -> Tuple[str, DependencyType, int]:
 def parse_predecessor_string(value: str) -> List[Tuple[str, DependencyType, int]]:
     """
     Parse a predecessor field value into list of (source_id, dep_type, lag_hours).
-    Handles semicolon-separated and comma-separated multi-predecessor strings.
+
+    Handles:
+      - Semicolon-separated numeric IDs:  "489;490;491"
+      - TBS codes:                        "1.2.3FS+8"
+      - Mixed with lag:                   "1024FS+24"
+
+    Rejects name-based Tactplan predecessor fields like "Dæk over FS 0 d".
+    Those are human-readable labels, not stable IDs the pipeline can resolve.
     """
     if not value or not value.strip() or value.strip() in ("-", "—"):
         return []
 
-    separators = r"[;,\s]+"
-    tokens = re.split(separators, value.strip())
+    # Split only on semicolons and commas — NOT on spaces.
+    # Name-based tokens contain spaces; splitting on them fragments task names
+    # into word-tokens that accidentally match row-index source IDs.
+    tokens = re.split(r"[;,]+", value.strip())
     results = []
     for token in tokens:
         token = token.strip()
