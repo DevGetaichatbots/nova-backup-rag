@@ -37,7 +37,8 @@ KNOWN_SCHEDULE_HEADERS = {
 
 GANTT_NOISE_RE = re.compile(
     r"^(kvt\d|kvt \d|\d{4}\s*kvt|uge\s*\d|jan|feb|mar|apr|maj|jun|"
-    r"jul|aug|sep|okt|nov|dec|q[1-4]|col\d+|\d{4}\s+\d{4})",
+    r"jul|aug|sep|okt|nov|dec|q[1-4]|col\d+|\d{4}\s+\d{4}"
+    r"|\d{4}$)",          # bare 4-digit year (e.g. "2026", "2027") is Gantt
     re.IGNORECASE,
 )
 
@@ -209,6 +210,11 @@ def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
             continue
 
         score = _header_score(sched_headers)
+        logger.info(
+            f"[{filename}] Phase1 table: score={score}, "
+            f"cols={len(sched_headers)}, rows={len(sched_data)}, "
+            f"headers={sched_headers}"
+        )
         parsed.append({
             "score": score,
             "col_count": len(sched_headers),
@@ -224,7 +230,7 @@ def _tables_to_headers_and_rows(tables: List[Dict], filename: str):
     parsed.sort(key=lambda t: (t["score"], t["col_count"]), reverse=True)
     canonical_headers = parsed[0]["sched_headers"]
 
-    logger.debug(
+    logger.info(
         f"[{filename}] Canonical table: score={parsed[0]['score']}, "
         f"cols={parsed[0]['col_count']}, headers={canonical_headers}"
     )
