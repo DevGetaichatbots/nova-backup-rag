@@ -2,9 +2,14 @@
 Normalization Engine
 ====================
 Transforms raw extracted {headers, rows} into a fully typed NormalizedSchedule.
-Also provides the bridge function _to_compact_csv_chunks() which converts
-the NormalizedSchedule back to the semicolon-separated compact CSV format
-that the existing LLM agents consume — keeping downstream agents unchanged.
+
+Also provides the bridge function to_compact_csv_chunks() which converts the
+original extracted headers and rows into the same compact semicolon-separated
+CSV chunk format produced by src/pdf_processor.rows_to_compact_csv_chunks(),
+so existing LLM agents consume it unchanged.
+
+Key design decision: the bridge operates on the ORIGINAL extracted headers and
+rows (not the NormalizedSchedule objects), preserving column provenance exactly.
 """
 from __future__ import annotations
 import csv
@@ -13,7 +18,7 @@ import logging
 import time
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 
 from ingestion.models.nusf import (
     Activity, ActivityType, NormalizedSchedule, Provenance,
@@ -29,10 +34,12 @@ logger = logging.getLogger(__name__)
 _CSV_SEP = ";"
 _MAX_CHUNK_ROWS = 250
 
+_SKIP_HEADERS = {"opg", "opgavetilstand"}
 
-def _serialize_row(vals: List[str]) -> str:
+
+def _serialize_row(vals: List[str], sep: str = _CSV_SEP) -> str:
     buf = io.StringIO()
-    writer = csv.writer(buf, delimiter=_CSV_SEP, quoting=csv.QUOTE_MINIMAL, lineterminator="")
+    writer = csv.writer(buf, delimiter=sep, quoting=csv.QUOTE_MINIMAL, lineterminator="")
     writer.writerow(vals)
     return buf.getvalue()
 
@@ -69,8 +76,8 @@ def _detect_activity_type(duration_raw: str, name: str) -> ActivityType:
 
 class NormalizationEngine:
     """
-    Converts raw extracted data into NormalizedSchedule, then bridges back
-    to compact CSV for downstream LLM agents.
+    Converts raw extracted data into NormalizedSchedule (for validation and NUSF model),
+    and bridges the original extracted data to compact CSV for LLM agents.
     """
 
     def normalize(
@@ -110,9 +117,6 @@ class NormalizationEngine:
         raw_predecessors: Dict[str, str] = {}
         raw_successors: Dict[str, str] = {}
 
-        mapped_count = 0
-        total_fields = len([f for f in [name_col, start_col, finish_col] if f])
-
         min_date: Optional[datetime] = None
         max_date: Optional[datetime] = None
 
@@ -133,9 +137,6 @@ class NormalizationEngine:
             if not planned_start:
                 planned_start = planned_finish
             if not planned_finish:
-                planned_finish = planned_start
-
-            if planned_start > planned_finish:
                 planned_finish = planned_start
 
             raw_dur = _get_val(row, headers, dur_col)
@@ -226,7 +227,6 @@ class NormalizationEngine:
 
             activities.append(activity)
             source_id_to_internal[raw_source_id] = internal_id
-            mapped_count += 1
 
             raw_pred = _get_val(row, headers, pred_col) if pred_col else ""
             raw_succ = _get_val(row, headers, succ_col) if succ_col else ""
@@ -259,7 +259,7 @@ class NormalizationEngine:
         max_date = max_date or now
         duration_days = max(0, (max_date - min_date).days)
 
-        quality_score = mapped_count / max(len(rows), 1)
+        quality_score = len(activities) / max(len(rows), 1)
 
         metadata = ScheduleMetadata(
             project_name=filename.rsplit(".", 1)[0],
@@ -293,74 +293,58 @@ class NormalizationEngine:
         return schedule
 
     def to_compact_csv_chunks(
-        self, schedule: NormalizedSchedule
+        self,
+        headers: List[str],
+        data_rows: List[List[str]],
+        source: str,
     ) -> List[Dict[str, Any]]:
         """
-        Bridge: converts NormalizedSchedule → compact semicolon-separated CSV chunks.
-        Output format is identical to src/pdf_processor.py rows_to_compact_csv_chunks()
+        Bridge: converts original extracted headers and rows to compact semicolon-separated
+        CSV chunks. Output format is IDENTICAL to src/pdf_processor.rows_to_compact_csv_chunks()
         so the existing vector store and LLM agents consume it unchanged.
+
+        Filters out skip-only headers (opg, opgavetilstand) as the production function does.
+        Preserves ALL remaining original columns, including schedule-specific ones.
         """
-        headers = [
-            "Id", "Navn", "Startdato", "Slutdato", "Varighed",
-            "% Færdigt", "Fremdrift", "Foregående", "Ansvarlig",
-        ]
-
-        data_rows: List[List[str]] = []
-        for act in schedule.activities:
-            start_str = act.planned_start.strftime("%d-%m-%Y")
-            finish_str = act.planned_finish.strftime("%d-%m-%Y")
-            dur_str = f"{round(act.duration_hours / 8)}d" if act.duration_hours else "0d"
-            pct_str = f"{int(act.percent_complete)}%"
-            pred_str = ";".join(
-                next(
-                    (a.source_id for a in schedule.activities if a.internal_id == pid),
-                    pid
-                )
-                for pid in act.predecessors
-            )
-            discipline = act.discipline or ""
-
-            data_rows.append([
-                act.source_id,
-                act.name,
-                start_str,
-                finish_str,
-                dur_str,
-                pct_str,
-                pct_str,
-                pred_str,
-                discipline,
-            ])
-
-        if not data_rows:
+        if not headers or not data_rows:
             return []
 
-        header_line = _serialize_row(headers)
-        source = schedule.metadata.source_filename
-        chunks = []
+        display_headers = [h for h in headers if h.strip().lower() not in _SKIP_HEADERS]
+        keep_indices = [i for i, h in enumerate(headers) if h.strip().lower() not in _SKIP_HEADERS]
 
+        header_line = _serialize_row(display_headers)
+
+        chunks = []
+        total_stored = 0
         for batch_start in range(0, len(data_rows), _MAX_CHUNK_ROWS):
             batch = data_rows[batch_start: batch_start + _MAX_CHUNK_ROWS]
-            lines = [_serialize_row(r) for r in batch]
-            content = (
-                f"FORMAT: CSV — each row = one activity. "
-                f"Columns separated by semicolon (values with semicolons are quoted).\n"
-                f"{header_line}\n"
-                + "\n".join(lines)
-            )
-            part = batch_start // _MAX_CHUNK_ROWS + 1
-            chunks.append({
-                "content": content,
-                "metadata": {
-                    "type": "table",
-                    "source": source,
-                    "part": part,
-                    "row_count": len(lines),
-                },
-            })
+            compact_lines = []
+            for row in batch:
+                vals = [row[idx].strip() if idx < len(row) else "" for idx in keep_indices]
+                compact_lines.append(_serialize_row(vals))
+
+            if compact_lines:
+                content = (
+                    "FORMAT: CSV — each row = one activity. "
+                    "Columns separated by semicolon (values with semicolons are quoted).\n"
+                    f"{header_line}\n"
+                    + "\n".join(compact_lines)
+                )
+                part_num = batch_start // _MAX_CHUNK_ROWS + 1
+                total_stored += len(compact_lines)
+                chunks.append({
+                    "content": content,
+                    "metadata": {
+                        "type": "table",
+                        "source": source,
+                        "part": part_num,
+                        "row_count": len(compact_lines),
+                    },
+                })
 
         logger.info(
-            f"[{source}] Bridge: {len(schedule.activities)} activities → "
-            f"{len(chunks)} compact CSV chunks"
+            f"[{source}] Bridge: {len(chunks)} chunks, "
+            f"{total_stored}/{len(data_rows)} rows, "
+            f"{len(display_headers)} columns"
         )
         return chunks
