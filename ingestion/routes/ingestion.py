@@ -168,6 +168,12 @@ async def v2_inspect_file(schedule: UploadFile = File(...)):
                 "issues": _issues_to_list(e.issues),
             },
         )
+    except Exception as e:
+        logger.exception(f"[v2/inspect] Unexpected error processing '{filename}': {type(e).__name__}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={"error": f"{type(e).__name__}: {str(e)}"},
+        )
 
     meta = schedule_obj.metadata
     return {
@@ -267,13 +273,22 @@ async def v2_upload_schedules(
                         progress=0,
                         validation_issues=_issues_to_list(e.issues),
                     )
-                    _update_upload(
-                        "status", **{}
-                    )
                     with _progress_lock:
                         _v2_upload_progress[upload_id]["status"] = "error"
                         _v2_upload_progress[upload_id]["error"] = str(e)
                         _v2_upload_progress[upload_id]["validation_issues"] = _issues_to_list(e.issues)
+                    raise
+                except Exception as e:
+                    logger.exception(f"[v2/upload] Unexpected error for {filename}: {type(e).__name__}: {e}")
+                    _update_upload(
+                        file_key,
+                        step="error",
+                        detail=f"{type(e).__name__}: {str(e)}",
+                        progress=0,
+                    )
+                    with _progress_lock:
+                        _v2_upload_progress[upload_id]["status"] = "error"
+                        _v2_upload_progress[upload_id]["error"] = f"{type(e).__name__}: {str(e)}"
                     raise
 
                 warnings = [i for i in schedule_obj.validation_issues if i.level != "ERROR"]
@@ -402,6 +417,18 @@ async def v2_predictive_analysis(
                         message=str(e),
                         error=str(e),
                         validation_issues=_issues_to_list(e.issues),
+                        timestamp=time.time(),
+                    )
+                _schedule_cleanup(_v2_predictive_progress, analysis_id, 120)
+                return
+            except Exception as e:
+                logger.exception(f"[v2/predictive] Unexpected error: {type(e).__name__}: {e}")
+                with _progress_lock:
+                    _v2_predictive_progress[analysis_id].update(
+                        stage="error",
+                        step=-1,
+                        message=f"{type(e).__name__}: {str(e)}",
+                        error=f"{type(e).__name__}: {str(e)}",
                         timestamp=time.time(),
                     )
                 _schedule_cleanup(_v2_predictive_progress, analysis_id, 120)
