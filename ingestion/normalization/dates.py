@@ -107,11 +107,14 @@ def parse_duration_to_hours(value: str) -> int:
 
     v = value.strip().replace(",", ".")
 
-    m = re.match(r"^([\d.]+)\s*([dDhHwWuUmM]?)$", v)
+    m = re.match(r"^(\d+(?:[.,]\d+)?)\s*([dDhHwWuUmM]?)$", v)
     if not m:
         return 0
 
-    num = float(m.group(1))
+    try:
+        num = float(m.group(1).replace(",", "."))
+    except ValueError:
+        return 0
     unit = m.group(2).lower()
 
     if unit == "d":
