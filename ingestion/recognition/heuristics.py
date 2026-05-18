@@ -95,11 +95,13 @@ TOKEN_MAP: Dict[str, List[str]] = {
         "startdato", "start", "start date", "startdate", "planned start",
         "planned_start", "planned_start_date", "planlagt start",
         "baseline start", "early start",
+        "dato fra", "fra dato", "start dato", "fra", "begyndelsesdato",
     ],
     "planned_finish": [
         "slutdato", "finish", "end date", "enddate", "planned finish",
         "planned_finish", "planned_end_date", "planned end", "planlagt slut",
         "baseline finish", "early finish", "slut", "færdigdato",
+        "dato til", "til dato", "slut dato", "til", "afslutningsdato",
     ],
     "duration": [
         "varighed", "duration", "planned_shift_duration", "planned duration",
