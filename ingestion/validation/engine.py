@@ -71,7 +71,7 @@ class ValidationEngine:
         return issues
 
     def _rule_102(self, schedule: NormalizedSchedule) -> List[ValidationIssue]:
-        """Detect circular dependencies using DFS."""
+        """Detect circular dependencies using iterative DFS (no recursion limit risk)."""
         issues = []
         activity_ids: Set[str] = {a.internal_id for a in schedule.activities}
 
@@ -83,30 +83,34 @@ class ValidationEngine:
                 adj[rel.predecessor_id].append(rel.successor_id)
 
         visited: Set[str] = set()
-        rec_stack: Set[str] = set()
         reported_cycles: Set[str] = set()
 
-        def dfs(node: str, path: List[str]) -> bool:
-            visited.add(node)
-            rec_stack.add(node)
-            for neighbour in adj.get(node, []):
-                if neighbour not in activity_ids:
-                    continue
-                if neighbour not in visited:
-                    if dfs(neighbour, path + [neighbour]):
-                        return True
-                elif neighbour in rec_stack:
-                    cycle_key = "→".join(sorted(path + [neighbour]))
-                    if cycle_key not in reported_cycles:
-                        reported_cycles.add(cycle_key)
-                        issues.append(rule_102_circular(path + [neighbour]))
-                    return True
-            rec_stack.discard(node)
-            return False
+        for start in list(adj.keys()):
+            if start in visited:
+                continue
+            # Iterative DFS — each stack frame: (node, iterator-over-neighbours, path-so-far)
+            stack: List[tuple] = [(start, iter(adj.get(start, [])), [start])]
+            on_stack: Set[str] = {start}
+            visited.add(start)
 
-        for act_id in list(adj.keys()):
-            if act_id not in visited:
-                dfs(act_id, [act_id])
+            while stack:
+                node, children, path = stack[-1]
+                try:
+                    neighbour = next(children)
+                    if neighbour not in activity_ids:
+                        continue
+                    if neighbour in on_stack:
+                        cycle_key = "→".join(sorted(path + [neighbour]))
+                        if cycle_key not in reported_cycles:
+                            reported_cycles.add(cycle_key)
+                            issues.append(rule_102_circular(path + [neighbour]))
+                    elif neighbour not in visited:
+                        visited.add(neighbour)
+                        on_stack.add(neighbour)
+                        stack.append((neighbour, iter(adj.get(neighbour, [])), path + [neighbour]))
+                except StopIteration:
+                    stack.pop()
+                    on_stack.discard(node)
 
         return issues
 
