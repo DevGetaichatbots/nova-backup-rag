@@ -1,0 +1,191 @@
+
+
+Overview
+
+Logs
+
+Analytics
+
+Resources
+
+Domains
+
+Manage
+Search
+
+
+Errors only
+
+Date
+Time
+Deployment
+Source
+Log
+2026-05-18 20:59:23.89
+faffc8b0
+User
+[2026-05-18 15:59:23 +0000] [32] [INFO] Waiting for application startup.
+2026-05-18 21:00:58.80
+64c28662
+System
+main done, exiting
+2026-05-18 21:09:33.78
+7060e777
+System
+metasidecar: loaded enterprise status from environment is_enterprise=false
+2026-05-18 21:09:33.78
+7060e777
+System
+starting up user application
+2026-05-18 21:09:33.78
+7060e777
+System
+forwarding local port 5000 to external port 80 (mapped as 1104)
+2026-05-18 21:09:36.17
+7060e777
+User
+[2026-05-18 16:09:36 +0000] [25] [INFO] Starting gunicorn 25.0.1
+2026-05-18 21:09:36.17
+7060e777
+User
+[2026-05-18 16:09:36 +0000] [25] [INFO] Listening at: http://0.0.0.0:5000 (25)
+2026-05-18 21:09:36.17
+7060e777
+User
+[2026-05-18 16:09:36 +0000] [25] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2026-05-18 21:09:36.18
+7060e777
+User
+[2026-05-18 16:09:36 +0000] [33] [INFO] Booting worker with pid: 33
+2026-05-18 21:09:47.31
+7060e777
+User
+16:09:47 | INFO | PredictiveAgent initialized with model: gpt-4.1
+2026-05-18 21:09:48.13
+7060e777
+User
+16:09:48 | INFO | V2 router dependencies configured
+2026-05-18 21:09:48.69
+7060e777
+User
+[2026-05-18 16:09:48 +0000] [33] [INFO] Started server process [33]
+2026-05-18 21:09:48.69
+7060e777
+User
+[2026-05-18 16:09:48 +0000] [33] [INFO] Waiting for application startup.
+2026-05-18 21:09:51.43
+7060e777
+User
+[2026-05-18 16:09:51 +0000] [33] [INFO] Application startup complete.
+2026-05-18 21:11:11.81
+7060e777
+User
+16:11:11 | INFO | [Nova_Insight_Analysis-samlet.pdf] Submitting PDF to Azure OCR (219302 bytes)...
+2026-05-18 21:11:11.81
+7060e777
+User
+16:11:11 | INFO | [Nova_Insight_Analysis-samlet.pdf] Detected: source_system=PDF, mime=application/pdf
+2026-05-18 21:11:11.81
+7060e777
+User
+16:11:11 | INFO | [Nova_Insight_Analysis-samlet.pdf] Pipeline start — 219302 bytes
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=2, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=4, cols=9, rows=1, headers=['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=4, cols=9, rows=4, headers=['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=4, cols=9, rows=23, headers=['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=2, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Phase1 table: score=2, cols=2, rows=1, headers=['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Canonical table: score=4, cols=9, headers=['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Skipping table with 2 cols (overlap 1/9 < 4): ['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 1 raw rows → 1 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 23 raw rows → 23 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 4 raw rows → 4 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 4 raw rows → 4 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 23 raw rows → 23 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Merged table: 9 cols, 1 raw rows → 1 kept (overlap 9/9): ['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Skipping table with 2 cols (overlap 1/9 < 4): ['Id', 'Opgavetilstand']
+2026-05-18 21:11:21.97
+7060e777
+User
+16:11:21 | INFO | [Nova_Insight_Analysis-samlet.pdf] Canonical table: score=4, cols=9, headers=['Id', 'Opgavenavn', 'Startdato', 'Slutdato', 'Varigh ed', '% færd igt', 'Days Ov erdue', 'Task Type', 'Priority']
