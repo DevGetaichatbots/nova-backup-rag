@@ -27,7 +27,7 @@ def rule_101_date_logic(activity_id: str, start: str, finish: str) -> Validation
 def rule_102_circular(activity_ids: list) -> ValidationIssue:
     ids_str = " → ".join(activity_ids)
     return ValidationIssue(
-        level=LEVEL_ERROR,
+        level=LEVEL_WARNING,
         category=CAT_LOGICAL,
         activity_id=activity_ids[0] if activity_ids else None,
         message=f"Rule 102: Circular dependency detected: {ids_str}",

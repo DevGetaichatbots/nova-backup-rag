@@ -32,10 +32,11 @@ _FORMATS = [
     "%Y-%m-%d",
     "%d.%m.%Y",
     "%d.%m.%y",
-    "%m/%d/%Y",
-    "%m/%d/%y",
+    "%d/%m/%Y",   # Danish/European slash format — must precede American
+    "%d/%m/%y",
     "%Y/%m/%d",
-    "%d/%m/%Y",
+    "%m/%d/%Y",   # American slash format — fallback only
+    "%m/%d/%y",
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%M:%S",
     "%Y-%m-%d %H:%M:%S",
