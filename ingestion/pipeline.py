@@ -27,6 +27,7 @@ from ingestion.recognition.heuristics import HeuristicRecognizer, RecognitionRes
 from ingestion.validation.engine import ValidationEngine
 
 import ingestion.extractors.csv as _  # noqa: F401 — triggers self-registration
+import ingestion.extractors.excel as _  # noqa: F401 — triggers self-registration
 import ingestion.extractors.pdf as _  # noqa: F401 — triggers self-registration
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,7 @@ class IngestionPipeline:
         if source_system == "UNKNOWN":
             raise PipelineError(
                 f"Unsupported file format for '{filename}'. "
-                f"Phase 1 supports PDF and CSV only."
+                f"Supported formats: PDF, CSV, XLSX."
             )
 
         if source_system not in ExtractorRegistry.available():

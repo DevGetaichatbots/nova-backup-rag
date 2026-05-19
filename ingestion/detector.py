@@ -4,7 +4,7 @@ Format Detector
 Identifies file type and source system from MIME type (python-magic) and binary header.
 Uses python-magic when libmagic is available; falls back to pure binary header inspection
 when the native library is not installed (e.g. Replit / NixOS without libmagic).
-Phase 1 supports PDF and CSV. Future phases add XER, XML, XLSX, Asta.
+Supports: PDF, CSV, XLSX/XLS (Excel). Future phases add XER, XML, Asta.
 """
 from pathlib import Path
 import logging
