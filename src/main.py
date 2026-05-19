@@ -889,11 +889,16 @@ from src.vector_store import vector_store_manager as _vsm
 from src.database import save_session_metadata as _save_session_metadata
 from src.predictive_html_formatter import format_predictive_as_html as _format_html
 
+from src.database import get_session_metadata as _get_session_metadata
+
 _v2_configure(RouterDependencies(
     vector_store_manager=_vsm,
     save_session_metadata=_save_session_metadata,
     predictive_agent=predictive_agent,
     format_html=_format_html,
+    rag_agent=rag_agent,
+    format_comparison_html=format_response_as_html,
+    get_session_metadata=_get_session_metadata,
 ))
 app.include_router(_v2_router, prefix="/v2")
 # ─────────────────────────────────────────────────────────────────────────────
