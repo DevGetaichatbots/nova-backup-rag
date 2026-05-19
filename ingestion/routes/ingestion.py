@@ -68,6 +68,9 @@ class RouterDependencies:
     save_session_metadata: Callable
     predictive_agent: Any
     format_html: Callable
+    rag_agent: Any = None
+    format_comparison_html: Callable = None
+    get_session_metadata: Callable = None
 
 
 _deps: Optional[RouterDependencies] = None
@@ -552,3 +555,108 @@ async def v2_get_predictive_progress(analysis_id: str):
             detail="No analysis found with this ID. It may have completed or expired.",
         )
     return progress
+
+
+@router.post("/query")
+async def v2_query_agent(
+    query: str = Form(...),
+    vs_table: str = Form(...),
+    old_session_id: str = Form(...),
+    new_session_id: str = Form(...),
+    language: str = Form("en"),
+    format: str = Form("html"),
+):
+    """
+    Comparison query for v2 (NUSF) sessions. Identical params to POST /query
+    but always passes data_format="nusf" to the agent — no auto-detection needed.
+    """
+    deps = _require_deps()
+    if deps.rag_agent is None or deps.get_session_metadata is None:
+        raise HTTPException(status_code=503, detail="v2/query: rag_agent not configured")
+
+    logger.info(f"=== V2 QUERY REQUEST === session={vs_table} lang={language}")
+
+    loop = asyncio.get_event_loop()
+
+    session_meta = deps.get_session_metadata(vs_table)
+    old_filename = session_meta.get("old_filename", "Old Schedule")
+    new_filename = session_meta.get("new_filename", "New Schedule")
+    old_filename_clean = old_filename.replace(".pdf", "").replace(".PDF", "")
+    new_filename_clean = new_filename.replace(".pdf", "").replace(".PDF", "")
+    logger.info(f"  Files: {old_filename} / {new_filename} | data_format=nusf")
+
+    result = await loop.run_in_executor(
+        _executor,
+        lambda: deps.rag_agent.query(
+            user_query=query,
+            table_names=[old_session_id, new_session_id],
+            session_id=vs_table,
+            language=language,
+            top_k=10,
+            old_filename=old_filename_clean,
+            new_filename=new_filename_clean,
+            data_format="nusf",
+        ),
+    )
+
+    response_text = result["response"]
+
+    import re as _re
+    _STRUCTURED_MARKERS = [
+        r"^##\s*EXECUTIVE_TOP", r"^##\s*LEDELSESOVERBLIK",
+        r"^##\s*BIGGEST_RISK", r"^##\s*DATA_TRUST", r"^##\s*DATAGRUNDLAG",
+        r"^##\s*ESTIMATED_IMPACT", r"^##\s*CONFIDENCE_LEVEL",
+        r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*RECOMMENDED_ACTIONS",
+        r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*PROJECT_HEALTH",
+        r"<!--DECISION_ENGINE:", r"<!--HEALTH_DATA:",
+    ]
+    has_sections = any(
+        _re.search(p, response_text, _re.MULTILINE | _re.IGNORECASE)
+        for p in _STRUCTURED_MARKERS
+    )
+
+    if format == "html" and has_sections and deps.format_comparison_html:
+        response_text = deps.format_comparison_html(
+            response_text,
+            language,
+            total_data_rows=result.get("total_data_rows", 0),
+            diff_data=result.get("diff_data"),
+        )
+    elif format == "html":
+        from html import escape as _html_escape
+        conv = _html_escape(response_text)
+        conv = _re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', conv)
+        conv = _re.sub(r'\*([^*]+)\*', r'<em>\1</em>', conv)
+        lines = conv.split('\n')
+        html_lines = []
+        in_list = False
+        for ln in lines:
+            stripped = ln.strip()
+            if stripped.startswith('- ') or stripped.startswith('• ') or stripped.startswith('* '):
+                if not in_list:
+                    html_lines.append('<ul style="margin:8px 0;padding-left:20px;">')
+                    in_list = True
+                item_text = _re.sub(r'^[-•*]\s*', '', stripped)
+                html_lines.append(f'<li style="margin:4px 0;line-height:1.6;">{item_text}</li>')
+            else:
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                if stripped:
+                    html_lines.append(f'<p style="margin:8px 0;line-height:1.6;">{stripped}</p>')
+        if in_list:
+            html_lines.append('</ul>')
+        response_text = (
+            '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;'
+            'padding:20px;color:#0f172a;line-height:1.6;font-size:15px;">'
+            + "".join(html_lines) + "</div>"
+        )
+
+    logger.info(f"=== V2 QUERY COMPLETE === {len(response_text)} chars")
+    return {
+        "response": response_text,
+        "sources": result["sources"],
+        "context_chunks": result["context_chunks"],
+        "format": format,
+        "pipeline": "nusf",
+    }
