@@ -369,7 +369,7 @@ async def v2_predictive_analysis(
 ):
     """
     Upload a single schedule through the NUSF pipeline for Nova Insight predictive analysis.
-    Supports PDF and CSV. Returns analysis_id for progress polling.
+    Supports PDF, CSV, and Excel (.xlsx). Returns analysis_id for progress polling.
     """
     if not analysis_id:
         analysis_id = str(uuid.uuid4())[:12]
