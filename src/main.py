@@ -205,8 +205,8 @@ async def upload_schedules(
     new_filename = new_schedule.filename or "new_schedule.pdf"
     
     if not _is_allowed_file(old_filename) or not _is_allowed_file(new_filename):
-        logger.error("Invalid file type - only PDF and CSV accepted")
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+        logger.error("Invalid file type - only PDF, CSV, and Excel (.xlsx) accepted")
+        raise HTTPException(status_code=400, detail="Only PDF, CSV, and Excel (.xlsx) files are accepted")
     
     try:
         old_pdf_bytes = await old_schedule.read()
@@ -544,7 +544,7 @@ def _clean_gantt_noise(text: str) -> str:
     return "\n".join(clean_lines)
 
 
-ALLOWED_EXTENSIONS = {".pdf", ".csv"}
+ALLOWED_EXTENSIONS = {".pdf", ".csv", ".xlsx"}
 
 def _is_allowed_file(filename: str) -> bool:
     return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
@@ -648,7 +648,7 @@ async def predictive_analysis(
     if not _is_allowed_file(filename):
         _update_progress(analysis_id, "error", language)
         _schedule_progress_cleanup(analysis_id, delay=60)
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+        raise HTTPException(status_code=400, detail="Only PDF, CSV, and Excel (.xlsx) files are accepted")
 
     try:
         file_bytes = await schedule.read()
