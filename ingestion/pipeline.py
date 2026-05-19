@@ -89,10 +89,17 @@ class IngestionPipeline:
         mime_type, source_system = self._detector.detect_from_bytes(file_bytes, filename)
         logger.info(f"[{filename}] Detected: source_system={source_system}, mime={mime_type}")
 
+        if source_system == "XLS_LEGACY":
+            raise PipelineError(
+                f"'{filename}' appears to be a legacy Excel 97-2003 (.xls) file, "
+                f"which is not supported. Please save the file as .xlsx (Excel Workbook) "
+                f"and upload again."
+            )
+
         if source_system == "UNKNOWN":
             raise PipelineError(
                 f"Unsupported file format for '{filename}'. "
-                f"Supported formats: PDF, CSV, XLSX."
+                f"Supported formats: PDF, CSV, XLSX (Excel)."
             )
 
         if source_system not in ExtractorRegistry.available():

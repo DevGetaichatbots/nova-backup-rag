@@ -4,7 +4,9 @@ Format Detector
 Identifies file type and source system from MIME type (python-magic) and binary header.
 Uses python-magic when libmagic is available; falls back to pure binary header inspection
 when the native library is not installed (e.g. Replit / NixOS without libmagic).
-Supports: PDF, CSV, XLSX/XLS (Excel). Future phases add XER, XML, Asta.
+Supports: PDF, CSV, XLSX (Excel Open XML). Future phases add XER, XML, Asta.
+Legacy binary .xls (Excel 97-2003 / OLE2) is detected but routed to XLS_LEGACY
+so the pipeline can surface a clear, actionable error.
 """
 from pathlib import Path
 import logging
@@ -14,7 +16,8 @@ logger = logging.getLogger(__name__)
 _PDF_MAGIC = b"%PDF"
 _XER_MARKERS = (b"ERPROJ", b"SYSASCT")
 _MSP_MARKERS = (b"<Project", b"<?xml")
-_XLSX_MAGIC = b"PK\x03\x04"
+_XLSX_MAGIC = b"PK\x03\x04"          # ZIP/OOXML — .xlsx
+_XLS_MAGIC = b"\xd0\xcf\x11\xe0"     # OLE2 compound document — legacy .xls
 
 try:
     import magic as _magic_lib
@@ -51,7 +54,16 @@ def _source_from_mime(mime: str, ext: str) -> str | None:
         return "PDF"
     if mime in ("text/csv", "text/plain") and ext in (".csv", ".tsv"):
         return "CSV"
-    if "spreadsheet" in mime or "excel" in mime:
+    # xlsx / Office Open XML — openpyxl can handle this
+    if mime == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        return "EXCEL"
+    if mime in ("application/vnd.ms-excel",) or (
+        "excel" in mime and "openxmlformats" not in mime
+    ):
+        # Legacy binary .xls — openpyxl cannot open it
+        return "XLS_LEGACY"
+    if "spreadsheet" in mime:
+        # Generic spreadsheet MIME (e.g. ODS) — try EXCEL and let extractor fail gracefully
         return "EXCEL"
     if mime == "text/xml":
         return "MSP_XML"
@@ -69,6 +81,8 @@ def _detect_by_header(header: bytes, ext: str) -> tuple[str, str]:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "EXCEL",
         )
+    if header[:4] == _XLS_MAGIC or (ext == ".xls" and header[:4] != _XLSX_MAGIC):
+        return ("application/vnd.ms-excel", "XLS_LEGACY")
     if any(m in header for m in _MSP_MARKERS) and b"<Project" in header and ext == ".xml":
         return ("text/xml", "MSP_XML")
     if ext in (".csv", ".tsv"):
@@ -87,7 +101,7 @@ class FormatDetector:
         """
         Returns (MIME_TYPE, SOURCE_SYSTEM_IDENTIFIER).
         Tries python-magic first; falls back to byte-header inspection.
-        SOURCE_SYSTEM values: PDF | CSV | PRIMAVERA_XER | MSP_XML | EXCEL | UNKNOWN
+        SOURCE_SYSTEM values: PDF | CSV | PRIMAVERA_XER | MSP_XML | EXCEL | XLS_LEGACY | UNKNOWN
         """
         ext = file_path.suffix.lower()
         mime = _mime_from_magic(file_path)
