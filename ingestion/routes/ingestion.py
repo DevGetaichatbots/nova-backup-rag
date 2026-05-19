@@ -55,7 +55,7 @@ _v2_upload_progress: Dict[str, Dict[str, Any]] = {}
 _v2_predictive_progress: Dict[str, Dict[str, Any]] = {}
 _progress_lock = threading.Lock()
 
-_ALLOWED_EXTENSIONS = {".pdf", ".csv"}
+_ALLOWED_EXTENSIONS = {".pdf", ".csv", ".xlsx"}
 
 
 @dataclass
@@ -154,7 +154,7 @@ async def v2_inspect_file(schedule: UploadFile = File(...)):
     """
     filename = schedule.filename or "schedule.pdf"
     if not _is_allowed(filename):
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+        raise HTTPException(status_code=400, detail="Only PDF, CSV, and Excel (.xlsx) files are accepted")
 
     file_bytes = await schedule.read()
     loop = asyncio.get_event_loop()
@@ -225,7 +225,7 @@ async def v2_upload_schedules(
     new_filename = new_schedule.filename or "new_schedule.pdf"
 
     if not _is_allowed(old_filename) or not _is_allowed(new_filename):
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+        raise HTTPException(status_code=400, detail="Only PDF, CSV, and Excel (.xlsx) files are accepted")
 
     old_bytes = await old_schedule.read()
     new_bytes = await new_schedule.read()
@@ -378,7 +378,7 @@ async def v2_predictive_analysis(
     filename_clean = filename.rsplit(".", 1)[0]
 
     if not _is_allowed(filename):
-        raise HTTPException(status_code=400, detail="Only PDF and CSV files are accepted")
+        raise HTTPException(status_code=400, detail="Only PDF, CSV, and Excel (.xlsx) files are accepted")
 
     file_bytes = await schedule.read()
     reference_date = _extract_ref_date(filename_clean)
