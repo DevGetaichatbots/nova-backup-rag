@@ -1,10 +1,13 @@
 """
 Excel Extractor
 ===============
-Reads .xlsx (and .xls saved in xlsx format) schedule files using openpyxl.
-Picks the active sheet (or the sheet with the most rows if no active sheet is set).
-Converts all cell values to strings, using the first non-empty row as headers.
-Output dict shape is identical to CSVExtractor so all downstream stages are unchanged.
+Reads .xlsx schedule files using openpyxl (Office Open XML format only).
+Legacy binary .xls files (Excel 97-2003) are not supported; they are rejected
+at the detector stage with a clear error message.
+
+Sheet selection: uses the active/first sheet by default; only falls back to
+the sheet with the most rows when the active sheet is empty.
+Converts all cell values to strings matching the CSVExtractor output shape.
 Self-registers to ExtractorRegistry on import.
 """
 import io
@@ -27,12 +30,23 @@ def _cell_to_str(value: Any) -> str:
 
 
 def _pick_sheet(wb: openpyxl.Workbook):
-    """Return the sheet with the most data rows, preferring the active sheet."""
-    active = wb.active
+    """
+    Return the sheet to extract from.
+    Prefers the active (or first) sheet; falls back to the sheet with the
+    most rows only when the active sheet has no data rows.
+    """
+    active = wb.active or (wb.worksheets[0] if wb.worksheets else None)
+    if active is None:
+        return None
+
+    active_rows = active.max_row or 0
+    if active_rows > 1:
+        return active
+
     best = active
-    best_rows = active.max_row if active else 0
+    best_rows = active_rows
     for sheet in wb.worksheets:
-        if sheet.max_row > best_rows:
+        if sheet.max_row is not None and sheet.max_row > best_rows:
             best = sheet
             best_rows = sheet.max_row
     return best
@@ -44,8 +58,8 @@ def _extract_sheet(ws) -> tuple[List[str], List[List[str]]]:
 
     headers: List[str] = []
     data_rows: List[List[str]] = []
-
     header_idx = None
+
     for i, row in enumerate(all_rows):
         str_row = [_cell_to_str(c) for c in row]
         if any(v for v in str_row):
@@ -79,11 +93,15 @@ class ExcelExtractor(BaseExtractor):
             raise ValueError(f"Cannot open Excel file '{filename}': {e}") from e
 
         ws = _pick_sheet(wb)
+        if ws is None:
+            wb.close()
+            raise ValueError(f"No worksheets found in '{filename}'.")
+
         headers, data_rows = _extract_sheet(ws)
         wb.close()
 
         logger.info(
-            f"[{filename}] Excel extracted: sheet='{ws.title}', "
+            f"[{filename}] Excel (.xlsx) extracted: sheet='{ws.title}', "
             f"{len(headers)} columns, {len(data_rows)} data rows"
         )
 
