@@ -1470,6 +1470,7 @@ class RAGAgent:
             logger.info("  Auto-detected NUSF chunks — switching to NUSF system prompt")
 
         base_prompt = SYSTEM_PROMPT_NUSF if effective_format == "nusf" else SYSTEM_PROMPT_BASE
+        logger.info(f"  [ComparisonAgent] Prompt variant: {'NUSF (pre-normalized)' if effective_format == 'nusf' else 'RAW (original columns)'}")
         system_prompt = f"{base_prompt}\n\n{lang_instruction}"
 
         data_tokens = int(len(context.encode("utf-8")) * self.TOKENS_PER_BYTE)

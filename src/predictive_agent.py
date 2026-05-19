@@ -947,6 +947,7 @@ class PredictiveAgent:
             language, PREDICTIVE_LANGUAGE_INSTRUCTIONS["en"]
         )
         base_prompt = PREDICTIVE_SYSTEM_PROMPT_NUSF if data_format == "nusf" else PREDICTIVE_SYSTEM_PROMPT
+        logger.info(f"  [PredictiveAgent] Prompt variant: {'NUSF (pre-normalized)' if data_format == 'nusf' else 'RAW (original columns)'}")
         system_prompt = f"{base_prompt}\n\n{lang_instruction}"
 
         schedule_label = schedule_filename if schedule_filename else "Schedule"
