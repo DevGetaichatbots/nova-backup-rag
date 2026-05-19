@@ -328,7 +328,8 @@ async def query_agent(
     old_session_id: str = Form(...),
     new_session_id: str = Form(...),
     language: str = Form("en"),
-    format: str = Form(None)
+    format: str = Form(None),
+    data_format: str = Form("raw"),
 ):
     host = request.headers.get("host", "")
     is_dev = any(dev_host in host for dev_host in DEV_HOSTS)
@@ -365,7 +366,8 @@ async def query_agent(
                 language=language,
                 top_k=10,
                 old_filename=old_filename_clean,
-                new_filename=new_filename_clean
+                new_filename=new_filename_clean,
+                data_format=data_format,
             )
         )
         

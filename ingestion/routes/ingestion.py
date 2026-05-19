@@ -479,6 +479,7 @@ async def v2_predictive_analysis(
                     language=language,
                     schedule_filename=filename_clean,
                     reference_date=reference_date,
+                    data_format="nusf",
                 ),
             )
 
