@@ -604,10 +604,16 @@ async def v2_query_agent(
     import re as _re
     _STRUCTURED_MARKERS = [
         r"^##\s*EXECUTIVE_TOP", r"^##\s*LEDELSESOVERBLIK",
-        r"^##\s*BIGGEST_RISK", r"^##\s*DATA_TRUST", r"^##\s*DATAGRUNDLAG",
-        r"^##\s*ESTIMATED_IMPACT", r"^##\s*CONFIDENCE_LEVEL",
-        r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*RECOMMENDED_ACTIONS",
-        r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*PROJECT_HEALTH",
+        r"^##\s*BIGGEST_RISK", r"^##\s*STØRSTE_RISIKO",
+        r"^##\s*ESTIMATED_IMPACT", r"^##\s*ESTIMERET_KONSEKVENS",
+        r"^##\s*CONFIDENCE_LEVEL", r"^##\s*TILLIDSNIVEAU",
+        r"^##\s*ROOT_CAUSE_ANALYSIS", r"^##\s*ÅRSAGSANALYSE",
+        r"^##\s*RECOMMENDED_ACTIONS", r"^##\s*ANBEFALEDE_HANDLINGER",
+        r"^##\s*EXECUTIVE_ACTIONS", r"^##\s*HANDLINGSPLAN",
+        r"^##\s*SUMMARY_OF_CHANGES", r"^##\s*OPSUMMERING_AF_ÆNDRINGER",
+        r"^##\s*PROJECT_HEALTH", r"^##\s*PROJEKTSUNDHED",
+        r"^##\s*COMPARISON", r"^##\s*IMPACT_ASSESSMENT",
+        r"^##\s*DATA_TRUST", r"^##\s*DATAGRUNDLAG",
         r"<!--DECISION_ENGINE:", r"<!--HEALTH_DATA:",
     ]
     has_sections = any(
@@ -632,11 +638,11 @@ async def v2_query_agent(
         in_list = False
         for ln in lines:
             stripped = ln.strip()
-            if stripped.startswith('- ') or stripped.startswith('• ') or stripped.startswith('* '):
+            if stripped.startswith('- ') or stripped.startswith('&bull; ') or stripped.startswith('• ') or stripped.startswith('* '):
                 if not in_list:
                     html_lines.append('<ul style="margin:8px 0;padding-left:20px;">')
                     in_list = True
-                item_text = _re.sub(r'^[-•*]\s*', '', stripped)
+                item_text = _re.sub(r'^[-•*]\s*|^&bull;\s*', '', stripped)
                 html_lines.append(f'<li style="margin:4px 0;line-height:1.6;">{item_text}</li>')
             else:
                 if in_list:
