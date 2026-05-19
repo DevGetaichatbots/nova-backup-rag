@@ -370,3 +370,72 @@ class NormalizationEngine:
             f"{len(display_headers)} columns"
         )
         return chunks
+
+
+def to_nusf_chunks(schedule: NormalizedSchedule) -> List[Dict[str, Any]]:
+    """
+    Serialize a NormalizedSchedule into compact semicolon-separated CSV chunks
+    using fixed NUSF field names. Used exclusively by v2 endpoints so the LLM
+    receives format-agnostic, pre-normalized data regardless of source format.
+
+    Fields emitted (always in this order):
+      source_id, name, planned_start, planned_finish, percent_complete,
+      activity_type, wbs_code, discipline, duration_hours, actual_start, actual_finish
+    """
+    NUSF_HEADERS = [
+        "source_id", "name", "planned_start", "planned_finish",
+        "percent_complete", "activity_type", "wbs_code", "discipline",
+        "duration_hours", "actual_start", "actual_finish",
+    ]
+
+    def _fmt_dt(dt) -> str:
+        return dt.strftime("%d-%m-%Y") if dt else ""
+
+    activities = schedule.activities
+    source = schedule.metadata.source_filename
+    header_line = _serialize_row(NUSF_HEADERS)
+
+    chunks = []
+    total_stored = 0
+    for batch_start in range(0, len(activities), _MAX_CHUNK_ROWS):
+        batch = activities[batch_start: batch_start + _MAX_CHUNK_ROWS]
+        compact_lines = []
+        for act in batch:
+            compact_lines.append(_serialize_row([
+                act.source_id,
+                act.name,
+                _fmt_dt(act.planned_start),
+                _fmt_dt(act.planned_finish),
+                str(act.percent_complete),
+                act.activity_type.value,
+                act.wbs_code or "",
+                act.discipline or "",
+                str(act.duration_hours),
+                _fmt_dt(act.actual_start),
+                _fmt_dt(act.actual_finish),
+            ]))
+
+        if compact_lines:
+            content = (
+                "FORMAT: NUSF CSV — each row = one activity. "
+                "Columns separated by semicolon. Fields are pre-normalized.\n"
+                f"{header_line}\n"
+                + "\n".join(compact_lines)
+            )
+            part_num = batch_start // _MAX_CHUNK_ROWS + 1
+            total_stored += len(compact_lines)
+            chunks.append({
+                "content": content,
+                "metadata": {
+                    "type": "table",
+                    "source": source,
+                    "part": part_num,
+                    "row_count": len(compact_lines),
+                    "format": "nusf",
+                },
+            })
+
+    logger.info(
+        f"[{source}] NUSF chunks: {len(chunks)} chunks, {total_stored} activities"
+    )
+    return chunks
