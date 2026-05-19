@@ -42,6 +42,7 @@ from typing import Any, Callable, Dict, Optional
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from ingestion.pipeline import IngestionPipeline, PipelineError
+from ingestion.normalization.engine import to_nusf_chunks
 
 logger = logging.getLogger(__name__)
 
@@ -263,7 +264,7 @@ async def v2_upload_schedules(
             def _process_one(file_key: str, filename: str, file_bytes: bytes, table_id: str):
                 _update_upload(file_key, step="pipeline", detail=f"Running NUSF pipeline on {filename}...", progress=15)
                 try:
-                    schedule_obj, chunks = _pipeline.run_from_bytes(file_bytes, filename)
+                    schedule_obj, raw_chunks = _pipeline.run_from_bytes(file_bytes, filename)
                 except PipelineError as e:
                     logger.error(f"[v2/upload] Pipeline error for {filename}: {e}")
                     _update_upload(
@@ -291,6 +292,7 @@ async def v2_upload_schedules(
                         _v2_upload_progress[upload_id]["error"] = f"{type(e).__name__}: {str(e)}"
                     raise
 
+                chunks = to_nusf_chunks(schedule_obj) if schedule_obj.activities else raw_chunks
                 warnings = [i for i in schedule_obj.validation_issues if i.level != "ERROR"]
                 _update_upload(file_key, step="storing", detail=f"Storing {len(chunks)} chunks...", progress=60)
 
@@ -404,7 +406,7 @@ async def v2_predictive_analysis(
 
             _set_progress("pipeline", "Running NUSF ingestion pipeline...", 2)
             try:
-                schedule_obj, chunks = await loop.run_in_executor(
+                schedule_obj, raw_chunks = await loop.run_in_executor(
                     _executor,
                     lambda: _pipeline.run_from_bytes(file_bytes, filename),
                 )
@@ -434,6 +436,7 @@ async def v2_predictive_analysis(
                 _schedule_cleanup(_v2_predictive_progress, analysis_id, 120)
                 return
 
+            chunks = to_nusf_chunks(schedule_obj) if schedule_obj.activities else raw_chunks
             warnings = [i for i in schedule_obj.validation_issues if i.level != "ERROR"]
             row_count = schedule_obj.metadata.total_activities
             logger.info(
